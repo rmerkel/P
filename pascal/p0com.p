@@ -181,7 +181,7 @@ procedure block(lev,tx: integer; fsys: symset);
    begin {list code generated for this block}
       for i := cx0 to cx-1 do
          with code[i] do
-            writeln(i:5, mnemonic[f]:5, 1:3, a:5)
+            writeln(i:5, mnemonic[f]:5, l:3, a:5)
    end {listcode};
  
    procedure statement(fsys: symset);

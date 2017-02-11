@@ -1,14 +1,17 @@
-var p, n;
-    procedure factorial;
+var f, n;
+procedure fact;
+    var ans1;
     begin
-        p := 1;
-        while n > 1 do begin
-            p := p * n;
-            n := n - 1;
-        end;
+        ans1 := n;
+        n := n - 1;
+        if n < 0 then f := -1;
+        if n = 0 then f := 1;
+        call fact;
+        f := f * ans1;
     end;
 
 begin
-    n := 10;
-    call factorial;
+    n :=16;
+    call fact;
 end.
+

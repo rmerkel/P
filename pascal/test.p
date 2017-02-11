@@ -1,5 +1,6 @@
-var n, f;
+var x, n, f;
 begin
+   x := 2047;
    n := 0;
    f := 1;
    while n # 16 do
