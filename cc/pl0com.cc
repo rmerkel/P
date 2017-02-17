@@ -9,6 +9,7 @@
 #include <cassert>
 #include <iomanip>
 #include <iostream>
+#include <fstream>
 
 using namespace std;
 using namespace pl0;
@@ -17,7 +18,7 @@ using namespace pl0;
 
 /** Write a error message
  *
- * Write a diagnostic to cerr, incrementing the error count.
+ * Writes a diagnostic to std::cerr, incrementing the error count. 
  *
  * @param s The error message
  */
@@ -28,7 +29,7 @@ void PL0Compilier::error(const string& s) {
 
 /** Write a error message
  *
- * Write a diagnostic, in the form "s 't'", to cerr, incrementing the error count.
+ * Writes a diagnostic, in the form "s 't'", to std::cerr, incrementing the error count. 
  *
  * @param s The error message
  * @param t Parameter to s.
@@ -37,28 +38,22 @@ void PL0Compilier::error(const string& s, const string& t) {
 	error (s + " \'" + t + "\'");
 }
 
-/// Returns a index in code[], one past the last instruction.
-size_t PL0Compilier::cx() {
-	assert(!code.empty());
-	return code.size();
-}
-
-/** Get the next token
- *
- * @return Nnext token from the token stream
- */
+/** Read and return the next token from the token stream
+ *  
+ * @return The next token from the token stream 
+ */ 
 Token PL0Compilier::next() {
 	Token t = ts.get();
 
 	if (verbose)
-		cout << progName << ": getting " << String(t.kind) << ", " << t.string_value << ", " << t.number_value << "\n";
+		cout << progName << ": getting '" << Token::String(t.kind) << "', " << t.string_value << ", " << t.number_value << "\n";
 
 	return t;
 }
 
-/** Emit one pl0 instruction
+/** Emit one PL/0 instruction
  *
- *	Appends Instr(op, level, addr) onto code, and returns it's address.
+ *	Appends (op, level, addr) onto code, and returns it's address.
  *
  *	@param	op		The pl0 instruction operation code
  *	@param	level	The pl0 instruction block level value. Defaults to zero.
@@ -73,20 +68,20 @@ size_t PL0Compilier::emit(const OpCode op, uint8_t level, Word addr) {
 				<< "\n";
 
 	code.push_back({op, level, addr});
-	return cx() - 1;		// so it's the addr of just emitted instruction
+	return code.size() - 1;				// so it's the address of just emitted instruction
 }
 
 /** Accept the next token
  *
- * Returns true and optionally consumes the current token (ts) if it's a k.
+ * Returns true, and optionally consumes the current token, if it's type is euqal to kind.
  *
- * @param	k	The token Kind to accept.
- * @param	get	Consume the token, if true. Defaults true.
+ * @param	kind	The token Kind to accept.
+ * @param	get		Consume the token, if true. Defaults true.
  *
- * @param	true if the current token is a k.
+ * @return	true if the current token is a kind.
  */
-bool PL0Compilier::accept(Kind k, bool get) {
-	if (ts.current().kind == k) {
+bool PL0Compilier::accept(Token::Kind kind, bool get) {
+	if (ts.current().kind == kind) {
 		if (get) next();			// consume the token
 		return true;
 	}
@@ -94,42 +89,45 @@ bool PL0Compilier::accept(Kind k, bool get) {
 	return false;
 }
 
-/** Expect the next token Kind
+/** Expect the next token
  *
- * Evaluate and return accpet(k, get). If accept() returns false, generate an error message.
+ * Evaluate and return accept(kind, get). Generate an error if accept() returns false.
  *
- * @param	k	The token Kind to accept.
- * @param	get	Consume the token, if true. Defaults true.
+ * @param	kind	The token Kind to accept.
+ * @param	get		Consume the token, if true. Defaults true.
  *
- * @param	true if the current token is a k.
+ * @return	true if the current token is a k.
  */
-bool PL0Compilier::expect(Kind k, bool get) {
-	if (accept(k, get)) return true;
+bool PL0Compilier::expect(Token::Kind kind, bool get) {
+	if (accept(kind, get)) return true;
 
-	error("expected", String(k) + "\' got \'" + String(ts.current().kind));
+	error("expected", Token::String(kind) + "\' got \'" + Token::String(ts.current().kind));
 	return false;
 }
 
 /** Factor identifier
  *
- * Push a variable or a constant value. The identifier must not be undefined.
+ * Push a variable or a constant value.
  *
  * @param	level	The current block level
  */
 void PL0Compilier::identifier(unsigned level) {
-	const string& name = ts.current().string_value;
-	const SymValue& v = ts.table[name];
+	const string name = ts.current().string_value;
 
-	if (v.kind == Kind::undefined)
-		error("undefined variable", name);
+	if (expect(Token::identifier)) {
+		auto range = symtbl.equal_range(name);
+		if (range.first == range.second)
+			error("Undefined identifier", name);
 
-	else if (v.kind == Kind::constant)
-		emit(OpCode::pushConst, 0, v.value);
-
-	else									// mutable variable
-		emit(OpCode::pushVar, level - v.level, v.value);
-
-	expect(Kind::ident, true);				// Consume the identifier
+		auto closest = range.first;
+		for (auto it = range.first; it != range.second; ++it)
+			if (it->second.level > closest->second.level)
+				closest = it;
+		if (closest->second.kind == SymValue::constant)
+			emit(OpCode::pushConst, 0, closest->second.value);
+		else									// mutable variable
+			emit(OpCode::pushVar, level - closest->second.level, closest->second.value);
+	}
 }
 
 /** Factor
@@ -139,20 +137,20 @@ void PL0Compilier::identifier(unsigned level) {
  * @param	level	The current block level.
  */
 void PL0Compilier::factor(unsigned level) {
-	if (accept(Kind::ident, false))
+	if (accept(Token::identifier, false))
 		identifier(level);
 
-	else if (accept(Kind::number, false)) {
+	else if (accept(Token::number, false)) {
 		emit(OpCode::pushConst, 0, ts.current().number_value);
-		expect(Kind::number);
+		expect(Token::number);
 
-	} else if (accept(Kind::lp)) {
+	} else if (accept(Token::lparen)) {
 		expression(level);
-		expect(Kind::rp);
+		expect(Token::rparen);
 
 	} else {
 		error("factor: syntax error; expected ident | num | { expr }, but got:",
-			String(ts.current().kind));
+			Token::String(ts.current().kind));
 		next();
 	}
 }
@@ -166,34 +164,34 @@ void PL0Compilier::factor(unsigned level) {
 void PL0Compilier::terminal(unsigned level) {
 	factor(level);
 
-	for (Kind k = ts.current().kind; k == Kind::mul || k == Kind::div; k = ts.current().kind) {
+	for (Token::Kind k = ts.current().kind; k == Token::mul || k == Token::div; k = ts.current().kind) {
 		next();							// consume the token
 
 		factor(level);
-		Kind::mul == k ? emit(OpCode::Mul) : emit(OpCode::Div);
+		Token::mul == k ? emit(OpCode::mul) : emit(OpCode::div);
 	}
 }
 
-/** Expresson
+/** Expression
  *
  * expr = [ +|-] term { (+|-) term } ;
  *
  * @param	level	The current block level.
  */
 void PL0Compilier::expression(unsigned level) {
-	const Kind unary = ts.current().kind;	// unary [ +|-]?
-	if (unary == Kind::plus || unary == Kind::minus)
+	const Token::Kind unary = ts.current().kind;	// unary [ +|-]?
+	if (unary == Token::add || unary == Token::sub)
 		next();
 
 	terminal(level);
-	if (Kind::minus == unary)
-		emit(OpCode::Neg);				// ignore unary +!
+	if (Token::sub == unary)
+		emit(OpCode::neg);				// ignore unary +!
 
-	for (Kind k = ts.current().kind; k == Kind::plus || k == Kind::minus; k = ts.current().kind) {
-		next();						// consume the token
+	for (Token::Kind k = ts.current().kind; k == Token::add || k == Token::sub; k = ts.current().kind) {
+		next();							// consume the token
 
 		terminal(level);
-		Kind::plus == k ? emit(OpCode::Add) : emit(OpCode::Sub);
+		Token::add == k ? emit(OpCode::add) : emit(OpCode::sub);
 	}
 }
 
@@ -204,30 +202,30 @@ void PL0Compilier::expression(unsigned level) {
  * @param	level	The current block level.
  */
 void PL0Compilier::condition(unsigned level) {
-	if (accept(Kind::Odd)) {
+	if (accept(Token::odd)) {
 		expression(level);
-		emit(OpCode::Odd);
+		emit(OpCode::odd);
 
 	} else {
 		expression(level);
-		const Kind op = ts.current().kind;
+		const Token::Kind op = ts.current().kind;
 
-		if (accept(Kind::lte)	||
-			accept(Kind::lthan)	||
-			accept(Kind::equal)	||
-			accept(Kind::gthan)	||
-			accept(Kind::gte)	||
-			accept(Kind::nequal))
+		if (accept(Token::lte)		||
+			accept(Token::lt)		||
+			accept(Token::equ)		||
+			accept(Token::gt)		||
+			accept(Token::gte)		||
+			accept(Token::neq))
 		{
 			expression(level);
 
 			switch(op) {
-			case Kind::lte:		emit (OpCode::LTE);	break;
-			case Kind::lthan:	emit (OpCode::LT);	break;
-			case Kind::equal:	emit (OpCode::Equ);	break;
-			case Kind::gthan:	emit (OpCode::GT);	break;
-			case Kind::gte:		emit (OpCode::GTE);	break;
-			case Kind::nequal:	emit (OpCode::Neq);	break;
+			case Token::lte:		emit(OpCode::lte);	break;
+			case Token::lt:			emit(OpCode::lt);	break;
+			case Token::equ:		emit(OpCode::equ);	break;
+			case Token::gt:			emit(OpCode::gt);	break;
+			case Token::gte:		emit(OpCode::gte);	break;
+			case Token::neq:		emit(OpCode::neq);	break;
 			default:			assert(false);		// can't get here!
 			}
 		}
@@ -243,19 +241,26 @@ void PL0Compilier::condition(unsigned level) {
 void PL0Compilier::assignStmt(unsigned level) {
 	// Save the identifier string and loop it up in the symbol table, before consuming it
 	const string name = ts.current().string_value;
-	SymValue& v = ts.table[name];
-	next();
+	next();												// Consume the identifier
 
-	if (!expect(Kind::assign))
-		error("expected assigment operator '='");
+	auto range = symtbl.equal_range(name);
+	if (range.first == range.second)
+		error("undefined variable", name);
 
-	if (v.kind == Kind::constant)
-		error("attempt to modify constant variable", name);
+	expect(Token::assign);								// Consume "="
+	expression(level);									// Process he expression
 
-	expression(level);
+	if (range.first != range.second) {
+		auto closest = range.first;						// Find the closest identifier
+		for (auto it = range.first; it != range.second; ++it)
+			if (it->second.level > closest->second.level)
+				closest = it;
 
-	emit(OpCode::Pop, level-v.level, v.value);
-	v.kind = Kind::ident;			// no longer undefined!
+		if (SymValue::identifier != closest->second.kind)
+			error("identifier is not mutable", name);
+		else
+			emit(OpCode::pop, level - closest->second.level, closest->second.value);
+	}
 }
 
 /** While statement
@@ -265,18 +270,18 @@ void PL0Compilier::assignStmt(unsigned level) {
  * @param	level	The current block level.
  */
  void PL0Compilier::whileStmt(unsigned level) {
-	const size_t cond_pc = cx();				// Start of while condition
+	const size_t cond_pc = code.size();				// Start of while condition
 	condition(level);
 
-	const size_t jmp_pc = emit(OpCode::Jne, 0, 0);		// jump if condition false
-	expect(Kind::Do);							// consume "do"
+	const size_t jmp_pc = emit(OpCode::jneq, 0, 0);	// jump if condition false
+	expect(Token::Do);								// consume "do"
 	statement(level);
 
-	emit(OpCode::Jump, 0, cond_pc);						// Jump back to conditon test
+	emit(OpCode::jump, 0, cond_pc);					// Jump back to conditon test
 
 	if (verbose)
-		cout << progName << ": patching address at " << jmp_pc << " to " << cx() << "\n";
-	code[jmp_pc].addr = cx();					// Patch jump on condition false instruction
+		cout << progName << ": patching address at " << jmp_pc << " to " << code.size() << "\n";
+	code[jmp_pc].addr = code.size();				// Patch jump on condition false instruction
  }
 
 /**
@@ -284,13 +289,13 @@ void PL0Compilier::assignStmt(unsigned level) {
  void PL0Compilier::ifStmt(unsigned level) {
 	condition(level);
 
-	const size_t jmp_pc = emit(OpCode::Jne, 0, 0);		// jump if condition false
-	expect(Kind::Then);							// Consume "then"
+	const size_t jmp_pc = emit(OpCode::jneq, 0, 0);	// jump if condition false
+	expect(Token::then);							// Consume "then"
 	statement(level);
 
 	if (verbose)
-		cout << progName << ": patching address at " << jmp_pc << " to " << cx() << "\n";
-	code[jmp_pc].addr = cx();					// Patch jump on condition false instruction
+		cout << progName << ": patching address at " << jmp_pc << " to " << code.size() << "\n";
+	code[jmp_pc].addr = code.size();				// Patch jump on condition false instruction
 
 	// TBD: { "else" statement }
  }
@@ -309,25 +314,37 @@ void PL0Compilier::assignStmt(unsigned level) {
  * @param	level	The current block level.
  */
 void PL0Compilier::statement(unsigned level) {
-	if (accept(Kind::ident, false)) 		// assignment
+	if (accept(Token::identifier, false)) 			// assignment
 		assignStmt(level);
 
-	else if (accept(Kind::Call)) {			// procedure call
+	else if (accept(Token::call)) {					// procedure call
 		const string name = ts.current().string_value;
-		SymValue& v = ts.table[name];
-		expect(Kind::ident);
-		emit(OpCode::Call, level-v.level, v.value);
+		expect(Token::identifier);
+		auto range = symtbl.equal_range(name);
+		if (range.first == range.second)
+			error("undefiend identifier", name);
 
-	} else if (accept(Kind::Begin)) {		// begin ... end
+		else {
+			auto closest = range.first;
+			for (auto it = range.first; it != range.second; ++it)
+				if (it->second.level > closest->second.level)
+					closest = it;
+				if (SymValue::proc != closest->second.kind)
+					error("Identifier is not a prodedure", name);
+				else
+					emit(OpCode::call, level - closest->second.level, closest->second.value);
+		}
+
+	} else if (accept(Token::begin)) {				// begin ... end
 		do {
 			statement(level);
-		} while (accept(Kind::scolon));
-		expect(Kind::End);
+		} while (accept(Token::scomma));
+		expect(Token::end);
 
-	} else if (accept(Kind::If)) 			// if condition...
+	} else if (accept(Token::If)) 					// if condition...
 		ifStmt(level);
 
-	else if (accept(Kind::While))			// "while" condition...
+	else if (accept(Token::While))					// "while" condition...
 		whileStmt(level);
 
 	// else: nothing
@@ -345,11 +362,23 @@ void PL0Compilier::constDecl(unsigned level) {
 	// Capture the identifier name before consuming it...
 	const string name = ts.current().string_value;
 
-	expect(Kind::ident);
-	expect(Kind::equal);
-	if (expect(Kind::number, false))
-		ts.table[name] = { Kind::constant, level, ts.current().number_value };
-	next();								// Consume the number
+	expect(Token::identifier);						// Consume the identifier
+	expect(Token::assign);							// Consume the "="
+	if (expect(Token::number, false)) {
+		auto number = ts.current().number_value;
+		next();										// Consume the number
+
+		auto range = symtbl.equal_range(name);
+		for (auto it = range.first; it != range.second; ++it)
+			if (it->second.level == level) {
+				error("identifier has previously been defined", name);
+				return;
+			}
+
+		symtbl.insert({ name, { SymValue::constant, level, number } });
+		if (verbose) 
+			cout << progName << ": constDecl " << name << ": " << level << ", " << number << "\n";
+	}
 }
 
 
@@ -357,18 +386,30 @@ void PL0Compilier::constDecl(unsigned level) {
  *
  * Allocate space on the stack for the variable and install it's offset from the block in the symbol
  * table.
- *
+ *  
+ * @param	offset	Stack offset for the next varaible
  * @param	level	The current block level.
+ * 
+ * @return	Stack offset for the next varaible.
  */
 int PL0Compilier::varDecl(int offset, unsigned level) {
 	const string name = ts.current().string_value;
 
-	if (expect(Kind::ident)) {
-		ts.table[name] = {	Kind::ident, level, offset	};
-		return offset + 1;
+	if (expect(Token::identifier)) {
+		auto range = symtbl.equal_range(name);
+		for (auto it = range.first; it != range.second; ++it)
+			if (it->second.level == level) {
+				error("identifer has previously been defined", name);
+				return offset;
+			}
 
-	} else
-		return offset;
+		symtbl.insert({ name, { SymValue::identifier, level, offset } });
+		if (verbose) 
+			cout << progName << ": varDecl " << name << ": " << level << ", " << offset << "\n";
+		return offset + 1;
+	}
+
+	return offset;
 }
 
 /** Procedure declaration
@@ -380,12 +421,20 @@ int PL0Compilier::varDecl(int offset, unsigned level) {
 void PL0Compilier::procDecl(unsigned level) {
 	const string name = ts.current().string_value;
 
-	if (expect(Kind::ident))
-		ts.table[name] = {	Kind::ident, level, 0	};
+	if (expect(Token::identifier)) {
+		auto range = symtbl.equal_range(name);
+		for (auto it = range.first; it != range.second; ++it)
+			if (it->second.level == level)
+				error("identifier has previously been defined", name);
+		
+		auto it = symtbl.insert({ name, { SymValue::proc, level, 0 } });
+		if (verbose) 
+			cout << progName << ": procDecl " << name << ": " << level << ", 0\n";
 
-	expect(Kind::scolon);	// procedure "ident" ";"
-	block(name, level+1);
-	expect(Kind::scolon);	// prodecure declarations end with ';"
+		expect(Token::scomma);	// procedure name ";"
+		block(it, level+1);
+		expect(Token::scomma);	// procedure declarations end with a ';'!
+	}
 }
 
 /** program block
@@ -394,30 +443,31 @@ void PL0Compilier::procDecl(unsigned level) {
  *         	[ var ident {, ident} ;]
  *         	{ procedure ident ; block ; }
  *          stmt ;
- *
+ *  
+ * @param	it	The blocks (procedures) symbol table entry
  * @param	level	The current block level.
  */
-void PL0Compilier::block(const string&	name, unsigned level) {
-	auto 	jmp_pc	= emit(OpCode::Jump, 0, 0);		// Addr to be patched below..
-	int		dx		= 3;					// Variable offset from block/frame
+void PL0Compilier::block(SymbolTable::iterator it, unsigned level) {
+	auto 	jmp_pc	= emit(OpCode::jump, 0, 0);		// Addr to be patched below..
+	int		dx		= 3;							// Variable offset from block/frame
 
-	if (accept(Kind::ConstDecl)) {			// const ident = number, ...
+	if (accept(Token::constDecl)) {					// const ident = number, ...
 		do {
 			constDecl(level);
 
-		} while (accept(Kind::comma));
-		expect(Kind::scolon);
+		} while (accept(Token::comma));
+		expect(Token::scomma);
 	}
 
-	if (accept(Kind::VarDecl)) {			// var ident, ...
+	if (accept(Token::varDecl)) {					// var ident, ...
 		do {
 			dx = varDecl(dx, level);
 
-		} while (accept(Kind::comma));
-		expect(Kind::scolon);
+		} while (accept(Token::comma));
+		expect(Token::scomma);
 	}
 
-	while (accept(Kind::ProcDecl))			// procedure ident; ...
+	while (accept(Token::procDecl))					// procedure ident; ...
 		procDecl(level);
 
 	/*
@@ -427,17 +477,19 @@ void PL0Compilier::block(const string&	name, unsigned level) {
 	 * patch the jump to it
 	 */
 
-	auto addr = emit(OpCode::Enter, 0, dx);
+	auto addr = emit(OpCode::enter, 0, dx);
 	if (verbose) cout << progName << ": patching address at " << jmp_pc << " to " << addr  << "\n";
-	code[jmp_pc].addr = ts.table[name].value = addr;
-	statement(level);						// block body...
-	emit(OpCode::Return);							// block postfix
+	code[jmp_pc].addr = it->second.value = addr;
+	statement(level);								// block body...
+	emit(OpCode::ret);								// block postfix
 
 	// Finally, remove symbols only visable to this level
-	for (auto i = ts.table.begin(); i != ts.table.end(); )
-		if (level > 0 && i->second.level == level && (Kind::ident == i->second.kind || Kind::constant == i->second.kind))
-			i = ts.table.erase(i);
-		else
+	for (auto i = symtbl.begin(); i != symtbl.end(); )
+		if (i->second.level == level) {
+			if (verbose) cout << ": purging " << i->first << " from the symbol table\n";
+			i = symtbl.erase(i);
+
+		} else
 			++i;
 }
 
@@ -445,61 +497,54 @@ void PL0Compilier::block(const string&	name, unsigned level) {
 
 /// Constructor; construct a compilier; use pName for errors
 PL0Compilier::PL0Compilier(const string& pName) : progName {pName}, nErrors{0}, verbose {false}, ts{cin} {
-	ts.table["begin"].kind		= Kind::Begin;	// Install the keywords into the symbol table
-	ts.table["end"].kind		= Kind::End;
-	ts.table["const"].kind		= Kind::ConstDecl;
-	ts.table["var"].kind		= Kind::VarDecl;
-	ts.table["procedure"].kind	= Kind::ProcDecl;
-	ts.table["call"].kind		= Kind::Call;
-	ts.table["begin"].kind		= Kind::Begin;
-	ts.table["end"].kind		= Kind::End;
-	ts.table["if"].kind			= Kind::If;
-	ts.table["then"].kind		= Kind::Then;
-	ts.table["else"].kind		= Kind::Else;
-	ts.table["while"].kind		= Kind::While;
-	ts.table["do"].kind			= Kind::Do;
-	ts.table["odd"].kind		= Kind::Odd;
+	symtbl.insert({"main", { SymValue::proc, 0, 0 }});	// Install the "main" rountine declaraction
+}
 
-	ts.table["main"].kind		= Kind::ident;		// Install the "main" rountine declaraction
+/// Compile...
+void PL0Compilier::run() {
+	next();
+	auto range = symtbl.equal_range("main");
+	assert(range.first != range.second);
+
+	block(range.first, 0);
+	expect(Token::period);
 }
 
 /** Run the compilier
  *
- * @param	prog	The resultant program is copied here
+ * @param	inFile	The source file name
+ * @param	prog	The generated machine code is appended here
  * @param	v		Output verbose messages if true
  *
  * @return	The number of errors encountered
  */
-unsigned PL0Compilier::operator()(InstrVector& prog, bool v) {
+unsigned PL0Compilier::operator()(const string& inFile, InstrVector& prog, bool v) {
 	verbose = v;
 
-	next();											// Load the token stream...
-	block("main", 0);
-	expect(Kind::period);
+	if ("-" == inFile)  {							// "-" means standard input
+		ts.set_input(cin);
+		run();
 
-	if (verbose) {
-		cout << endl;
+	} else {
+		ifstream ifile(inFile);
+		if (!ifile.is_open())
+			error("error opening soruce file", inFile);
 
+		else {
+			ts.set_input(ifile);
+			run();
+		}
+	}
+
+	if (verbose) {									// disassemble results and dump the symbol table
+		cout << "\n";
 		unsigned loc = 0;
 		for (auto it : code)
-			disasm("", loc++, it);
-		cout << "\n";
-
-		cout << setw(10) << "Name" << setw(10) << "Kind" << setw(6) << "Level" << setw(10) << "Value\n";
-		cout << setw(10) << "----" << setw(10) << "----" << setw(6) << "-----" << setw(10) << "-----\n";
-
-		// TBD: need a operator<< for SymValue!!!
-		for (auto x : ts.table)
-			cout	<< setw(10) << x.first
-					<< setw(10) << String(x.second.kind)
-					<< setw( 6) << x.second.level
-					<< setw(10) << x.second.value
-					<< "\n";
+			disasm(loc++, it);
 		cout << endl;
 	}
 
-	prog = code;
+	prog = code;									// return the results
 		
 	return nErrors;
 }
-

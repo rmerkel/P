@@ -1,4 +1,5 @@
-var p, n;
+	var p, n;
+
     procedure factorial;
     begin
         p = 1;

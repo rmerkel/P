@@ -1,8 +1,8 @@
 /** @file pl0com.h
  *
- * pl/0 compilier...
+ * A PL/0 compiler...
  *
- * Grammer (EBNF)
+ * Grammar (EBNF)
  * --------------
  * prog =	block "." ;
  * 
@@ -40,23 +40,24 @@
 
 #include "pl0.h"
 #include "token.h"
+#include "symbol.h"
 
 /// A PL0 Compiler
 class PL0Compilier {
 	std::string			progName;		///< The owning programs name
 	unsigned			nErrors;		///< # of errors compiling all sources
 	bool				verbose;		///< Dump debugging information if true
-	TokenStream			ts;				///< Input token stream
 	pl0::InstrVector 	code;			///< Emitted code
+	TokenStream			ts;				///< Input token stream
+	SymbolTable			symtbl;			///< The symbol table
 
 protected:
 	void error(const std::string& s);
 	void error(const std::string& s, const std::string& t);
-	size_t cx();
 	Token next();
 	size_t emit(const pl0::OpCode op, uint8_t level = 0, pl0::Word addr = 0);
-	bool accept(Kind k, bool get = true);
-	bool expect(Kind k, bool get = true);
+	bool accept(Token::Kind k, bool get = true);
+	bool expect(Token::Kind k, bool get = true);
 	void identifier(unsigned level);
 	void factor(unsigned level);
 	void terminal(unsigned level);
@@ -69,11 +70,14 @@ protected:
 	void constDecl(unsigned level);
 	int varDecl(int offset, unsigned level);
 	void procDecl(unsigned level);
-	void block(const std::string& name, unsigned level);
+	void block(SymbolTable::iterator it, unsigned level);
+	void run();
 
 public:
 	PL0Compilier(const std::string& pName);
-	unsigned operator()(pl0::InstrVector& code, bool verbose = false);
+	virtual ~PL0Compilier() {}
+
+	unsigned operator()(const std::string& inFile, pl0::InstrVector& code, bool verbose = false);
 };
 
 #endif

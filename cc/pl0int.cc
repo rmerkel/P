@@ -54,7 +54,7 @@ void PL0Interp::dump() {
 		cout <<		"bp: " << setw(5) << bp << ": " << stack[bp] << endl;
 	}
 
-	disasm("pc", pc, code[pc]);
+	disasm(pc, code[pc], "pc");
 
 	cout << endl;
 }
@@ -91,41 +91,51 @@ size_t PL0Interp::run() {
 		++cycles;
 
     	switch(ir.op) {
-        case OpCode::pushConst:	stack[++sp] = ir.addr;							break;
-    	case OpCode::Return: 							// return
-    		sp = bp - 1; pc = stack[sp + 3]; bp = stack[sp + 2];
-    		break;
+ 			// unary operations
 
-		case OpCode::Neg:		stack[sp] = -stack[sp];							break;
-    	case OpCode::Add:		--sp; stack[sp] = stack[sp] + stack[sp+1];		break;
-    	case OpCode::Sub:		--sp; stack[sp] = stack[sp] - stack[sp+1];		break;
-    	case OpCode::Mul:		--sp; stack[sp] = stack[sp] * stack[sp+1];		break;
-    	case OpCode::Div:		--sp; stack[sp] = stack[sp] / stack[sp+1];		break;
-		case OpCode::Odd:		stack[sp] = stack[sp] & 1;						break;
-    	case OpCode::Equ:		--sp; stack[sp] = stack[sp] == stack[sp+1];		break;
-    	case OpCode::Neq:		--sp; stack[sp] = stack[sp] != stack[sp+1];		break;
-    	case OpCode::LT:		--sp; stack[sp] = stack[sp]  < stack[sp+1];		break;
-    	case OpCode::GTE:		--sp; stack[sp] = stack[sp] >= stack[sp+1];		break;
-    	case OpCode::GT:		--sp; stack[sp] = stack[sp]  > stack[sp+1];		break;
-    	case OpCode::LTE:		--sp; stack[sp] = stack[sp] <= stack[sp+1];		break;
+		case OpCode::neg:		stack[sp] = -stack[sp];							break;
+		case OpCode::odd:		stack[sp] = stack[sp] & 1;						break;
+
+			// binrary operations
+
+    	case OpCode::add:		--sp; stack[sp] = stack[sp] + stack[sp+1];		break;
+    	case OpCode::sub:		--sp; stack[sp] = stack[sp] - stack[sp+1];		break;
+    	case OpCode::mul:		--sp; stack[sp] = stack[sp] * stack[sp+1];		break;
+    	case OpCode::div:		--sp; stack[sp] = stack[sp] / stack[sp+1];		break;
+    	case OpCode::equ:		--sp; stack[sp] = stack[sp] == stack[sp+1];		break;
+    	case OpCode::neq:		--sp; stack[sp] = stack[sp] != stack[sp+1];		break;
+    	case OpCode::lt:		--sp; stack[sp] = stack[sp]  < stack[sp+1];		break;
+    	case OpCode::gte:		--sp; stack[sp] = stack[sp] >= stack[sp+1];		break;
+    	case OpCode::gt:		--sp; stack[sp] = stack[sp]  > stack[sp+1];		break;
+		case OpCode::lte:		--sp; stack[sp] = stack[sp] <= stack[sp+1];		break;
+
+			// push/pop
+
+		case OpCode::pushConst:	stack[++sp] = ir.addr;							break;
         case OpCode::pushVar:	stack[++sp] = stack[base(ir.level) + ir.addr];	break;
-        case OpCode::Pop:
+        case OpCode::pop:
 			lastWrite = base(ir.level) + ir.addr;// Save the effective address for dump()
 			stack[lastWrite] = stack[sp--];
 			break;
 
-        case OpCode::Call: 								// Call a procedure
-			// Create a enw frame/mark block that the bp register points to
-        	stack[sp+1] = base(ir.level);
-			stack[sp+2] = bp;
-			stack[sp+3] = pc;
-        	bp = sp + 1;
-			pc = ir.addr;
+        case OpCode::call: 								// Call a procedure
+			// Create a new frame/mark block on the stack, which the bp register points to 
+        	stack[sp+1] = base(ir.level);				// Call the frame base
+			stack[sp+2] = bp;							// Save old bp register
+			stack[sp+3] = pc;							// Save return address
+        	bp = sp + 1;								// points to teh frame base
+			pc = ir.addr;								// Set the procedure address
 			break;
 
-        case OpCode::Enter:		sp += ir.addr;									break;
-        case OpCode::Jump:		pc = ir.addr;									break;
-        case OpCode::Jne:		if (stack[sp--] == 0) pc = ir.addr;				break;
+		case OpCode::ret: 							// Return from a procedure
+			sp = bp - 1; 								// Restore the previous sp
+			pc = stack[sp + 3]; 						// Restore the return address
+			bp = stack[sp + 2];							// Restore the previous bp
+			break;
+
+		case OpCode::enter:		sp += ir.addr;									break;
+        case OpCode::jump:		pc = ir.addr;									break;
+        case OpCode::jneq:		if (stack[sp--] == 0) pc = ir.addr;				break;
 		default:
 			assert(false);
 		};

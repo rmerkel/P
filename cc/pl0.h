@@ -1,8 +1,8 @@
 /** @file pl0.h
  *
- *	PL/0 Machine Description
+ *	PL/0 Machine description and utilities
  *
- *	Ported from p0com.p, from Algorithms + Data Structions = Programes.
+ *	Ported from p0com.p, from Algorithms + Data Structures = Programs.
  */
 
 #ifndef	PL0_H
@@ -12,58 +12,65 @@
 #include <string>
 #include <vector>
 
-/// Describe the PL0 machine
+/// Describes the PL0 machine
 namespace pl0 {
-	/// OpCode - A machine operation code
+	/// Operation codes
 	enum class OpCode : std::uint8_t {
-		pushConst,						///< Push a constant literal on the stack
-		pushVar,						///< Read a variable off of the stack, and push it
-		Pop,							///< Write the value from tos on the stack, and pop
-		Call,							///< Call a procedure, setting up a mark block (frame)
-		Enter,							///< InCremenT? Allocate locals, skip over mark block (frame)
-		Jump,							///< Jump to a location 
-		Jne,							///< Jump if tos == 0, pop
-   		Return,							///< Return (from procedure)
-		Neg,							///< Unary negation 
-   		Add,							///< Binary Addition
-   		Sub,							///< " Subtraction
-   		Mul,							///< " Multiplication
-   		Div,							///< " Divison
-		Odd,							///< Unary "is TOS odd?"
-   		Equ,							///< Is equal?
-   		Neq,							///< Isn't equal?
-   		LT,								///< Less than?
-   		LTE,							///< Less then or equal?
-   		GT,								///< Greater than?
-   		GTE								///< Greater than or equal?
+
+		// Unary operations
+
+		odd,									///< is top-of-stack odd?
+		neg,									///< Negate the top-of-stack
+												 
+		// Binary operations
+
+		add,									///< Addition
+		sub,									///< Subtraction
+		mul,									///< Multiplication
+		div,									///< Division
+		equ,									///< Is equal?
+		neq,									///< Is not equal?
+		lt,										///< Less than?
+		lte,									///< Less then or equal?
+		gt,										///< Greater than?
+		gte,									///< Greater than or equal?
+		
+		// Push/pop
+
+		pushConst,								///< Push a constant literal on the stack
+		pushVar,								///< Read and push a variable on the stack
+		pop,									///< Pop and write a variable off of the stack
+												///
+		call,									///< Call a procedure, setting up a activation block (frame)
+		ret,									///< Return (from procedure)
+		enter,									///< Allocate locals on the stack
+		jump,									///< Jump to a location
+		jneq									///< Jump if top-of-stack == false (0), pop
 	};
 
-	std::string String(OpCode op);
+	std::string String(OpCode op);				///< Return the name of the OpCode as a string
 
-	typedef std::int64_t	Word;		///< A machine data word or address
+	typedef std::int64_t		Word;			///< A data word or address
+	typedef std::vector<Word>	WordVector;		///< A vector of Words
 
-	/// A vector of Words
-	typedef std::vector<Word>	WordVector;
-
-	/// A machine Instruction
+	/// A Instruction
 	struct Instr {
 		struct {
-			Word		addr;			///< Address or data value
-			OpCode		op;				///< Operation code
-			uint8_t		level;			///< level: 0..255, or encouded OpCode
+			Word		addr;					///< Address or data value
+			OpCode		op;						///< Operation code
+			uint8_t		level;					///< level: 0..255
 		};
 
-		/// Default construction; results in pushConst 0 0
+		/// Default constructor; results in pushConst 0, 0
 		Instr() : addr{0}, op{OpCode::pushConst}, level{0}	{}
 
 		/// Construct an instruction from it's components
 		Instr(OpCode o, uint8_t l = 0, Word a = 0) : addr{a}, op{o}, level{l} {}
 	};
 
-	/// A vector of Instrucitons
-	typedef std::vector<Instr>	InstrVector;
+	typedef std::vector<Instr>	InstrVector;	///< A vector of Instr's
 
-	Word disasm(const std::string& label, Word loc, const Instr& instr);
+	Word disasm(Word loc, const Instr& instr, const std::string label = "");
 }
 
 #endif

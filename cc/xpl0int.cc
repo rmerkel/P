@@ -56,8 +56,8 @@ int main(int argc, char** argv) {
 
 	PL0Interp machine;							// Create the machine and load a test program
 	InstrVector fact = {						// Factorial program
-    	{	OpCode::Jump,		0, 19	},		//  0: jump to main
-    	{	OpCode::Jump,		0,  2	},		//  1: jump to factorial
+    	{	OpCode::jump,		0, 19	},		//  0: jump to main
+    	{	OpCode::jump,		0,  2	},		//  1: jump to factorial
 
 		/*
 		 *	var p, n;
@@ -71,23 +71,23 @@ int main(int argc, char** argv) {
 	     *	end;
 		 */
 
-    	{	OpCode::Enter,		0,	 3	},		//  2: factorial
+    	{	OpCode::enter,		0,	 3	},		//  2: factorial
 		{	OpCode::pushConst,	0,	 1	},
-		{	OpCode::Pop,  		1,	 3	},		//  4: p := 1
+		{	OpCode::pop,  		1,	 3	},		//  4: p := 1
 		{	OpCode::pushVar,	1,	 4	},		//  5: while...
 		{	OpCode::pushConst,	0,	 1	},
-		{	OpCode::GT					},		//  7: n > 1
-		{	OpCode::Jne,  		0,	18	},
+		{	OpCode::gt					},		//  7: n > 1
+		{	OpCode::jneq,  		0,	18	},
 		{	OpCode::pushVar,	1,	 3	},
 		{	OpCode::pushVar,	1,	 4	},
-		{	OpCode::Mul					},
-		{	OpCode::Pop, 		1,	 3	},		// 12: p := p * n
+		{	OpCode::mul					},
+		{	OpCode::pop, 		1,	 3	},		// 12: p := p * n
 		{	OpCode::pushVar,	1,	 4	},
 		{	OpCode::pushConst,	0,	 1	},
-		{	OpCode::Sub					},
-		{	OpCode::Pop,  		1,	 4	},		// 16: n := n - 1;
-		{	OpCode::Jump,  		0,	 5	},
-		{	OpCode::Return				},		// 18: ret
+		{	OpCode::sub					},
+		{	OpCode::pop,  		1,	 4	},		// 16: n := n - 1;
+		{	OpCode::jump,  		0,	 5	},
+		{	OpCode::ret					},		// 18: ret
  
 	   /*
 	    *	block 0
@@ -100,11 +100,11 @@ int main(int argc, char** argv) {
 	    *	end.
 		*/
 
-		{	OpCode::Enter,		0,	 5	},		// 19: main
+		{	OpCode::enter,		0,	 5	},		// 19: main
 		{	OpCode::pushConst,	0,	15	},
-		{	OpCode::Pop,  		0,	 4	},		// 22: n := 15;
-		{	OpCode::Call,  		0,	 2	},
-		{	OpCode::Return				}
+		{	OpCode::pop,  		0,	 4	},		// 22: n := 15;
+		{	OpCode::call,  		0,	 2	},
+		{	OpCode::ret				}
 	};
 
 	if (verbose) cout << progName << ": loading Factorial program and starting pl/0...\n";

@@ -2,7 +2,7 @@
  *
  *	PL/0 interpreter in C++
  *
- *	Ported from p0com.p, from Algorithms + Data Structions = Programes. Changes include
+ *	Ported from p0com.p, from Algorithms + Data Structures = Programs. Changes include
  *	- index the stack (stack[0..maxstack-1]); thus the initial values for the t and b registers are
  *    -1 and 0.
  *  - replaced single letter variables, e.g., p is now pc.
@@ -19,7 +19,7 @@
 
 #include "pl0.h"
 
-/// A pl/0 machine...
+/// A PL/0 machine...
 class PL0Interp {
 public:
 	PL0Interp(std::size_t stacksz = 512);

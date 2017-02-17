@@ -9,7 +9,7 @@
 ################################################################################
 
 # Support C++11, enable all, extra warnings, and generate dependency files
-CXXFLAGS	+=-std=c++11 -Wall -Wextra -MMD -MP
+CXXFLAGS +=-std=c++11 -Wall -Wextra -MMD -MP
 
 # Build for debugging by default, or release/optimized
 DEBUG	?= 1
@@ -23,9 +23,9 @@ endif
 # Project files
 ################################################################################
 
-COM_SRCS	= pl0.cc pl0com.cc pl0int.cc token.cc driver.cc
+COM_SRCS	= driver.cc pl0.cc pl0com.cc pl0int.cc symbol.cc token.cc
 INT_SRCS	= pl0.cc pl0int.cc xpl0int.cc
-SRCS		= pl0.cc pl0com.cc pl0int.cc token.cc pl0int.cc xpl0int.cc driver.cc
+SRCS		= driver.cc pl0.cc pl0int.cc pl0com.cc token.cc xpl0int.cc
 
 COM_OBJS	= $(COM_SRCS:.cc=.o)
 INT_OBJS	= $(INT_SRCS:.cc=.o)
@@ -119,6 +119,6 @@ pr:
 
 test: all
 	./xpl0int
-	./pl0com < test.p
-	./pl0com < fact.p
+	./pl0com test.p
+	./pl0com fact.p
 
