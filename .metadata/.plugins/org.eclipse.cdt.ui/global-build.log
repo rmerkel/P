@@ -1,0 +1,328 @@
+22:35:41 **** Build of configuration Debug for project pl0c ****
+make all 
+Building file: ../driver.cc
+Invoking: GCC C++ Compiler
+g++ -O0 -g3 -Wall -Wextra -c -fmessage-length=0 -MMD -MP -MF"driver.d" -MT"driver.o" -o "driver.o" "../driver.cc"
+In file included from /usr/include/c++/5/cstdint:35:0,
+                 from ../pl0.h:12,
+                 from ../pl0com.h:42,
+                 from ../driver.cc:13:
+/usr/include/c++/5/bits/c++0x_warning.h:32:2: error: #error This file requires compiler and library support for the ISO C++ 2011 standard. This support must be enabled with the -std=c++11 or -std=gnu++11 compiler options.
+ #error This file requires compiler and library support \
+  ^
+In file included from ../pl0com.h:42:0,
+                 from ../driver.cc:13:
+../pl0.h:19:2: warning: scoped enums only available with -std=c++11 or -std=gnu++11
+  enum class OpCode : std::uint8_t {
+  ^
+../pl0.h:19:2: warning: elaborated-type-specifier for a scoped enum must not use the ‘class’ keyword
+../pl0.h:19:13: error: use of enum ‘OpCode’ without previous declaration
+  enum class OpCode : std::uint8_t {
+             ^
+../pl0.h:19:20: error: expected unqualified-id before ‘:’ token
+  enum class OpCode : std::uint8_t {
+                    ^
+../pl0.h:52:23: error: ‘OpCode’ was not declared in this scope
+  std::string toString(OpCode op);   ///< Return the name of the OpCode as a string
+                       ^
+../pl0.h:54:15: error: ‘int32_t’ in namespace ‘std’ does not name a type
+  typedef std::int32_t  Word;   ///< A data word or address
+               ^
+../pl0.h:55:22: error: ‘Word’ was not declared in this scope
+  typedef std::vector<Word> WordVector;  ///< A vector of Words
+                      ^
+../pl0.h:55:26: error: template argument 1 is invalid
+  typedef std::vector<Word> WordVector;  ///< A vector of Words
+                          ^
+../pl0.h:55:26: error: template argument 2 is invalid
+../pl0.h:60:4: error: ‘Word’ does not name a type
+    Word  addr;     ///< Address or data value
+    ^
+../pl0.h:61:4: error: ‘OpCode’ does not name a type
+    OpCode  op;      ///< Operation code
+    ^
+../pl0.h:62:4: error: ‘int8_t’ does not name a type
+    int8_t  level;     ///< level: 0..255
+    ^
+../pl0.h:69:16: error: expected ‘)’ before ‘o’
+   Instr(OpCode o, int8_t l = 0, Word a = 0) : addr{a}, op{o}, level{l} {}
+                ^
+../pl0.h:69:54: error: expected unqualified-id before ‘,’ token
+   Instr(OpCode o, int8_t l = 0, Word a = 0) : addr{a}, op{o}, level{l} {}
+                                                      ^
+../pl0.h:69:61: error: expected unqualified-id before ‘,’ token
+   Instr(OpCode o, int8_t l = 0, Word a = 0) : addr{a}, op{o}, level{l} {}
+                                                             ^
+../pl0.h:69:72: error: expected unqualified-id before ‘{’ token
+   Instr(OpCode o, int8_t l = 0, Word a = 0) : addr{a}, op{o}, level{l} {}
+                                                                        ^
+../pl0.h: In constructor ‘pl0::Instr::Instr()’:
+../pl0.h:66:13: error: class ‘pl0::Instr’ does not have any field named ‘addr’
+   Instr() : addr{0}, op{OpCode::pushConst}, level{0} {}
+             ^
+../pl0.h:66:17: warning: extended initializer lists only available with -std=c++11 or -std=gnu++11
+   Instr() : addr{0}, op{OpCode::pushConst}, level{0} {}
+                 ^
+../pl0.h:66:22: error: class ‘pl0::Instr’ does not have any field named ‘op’
+   Instr() : addr{0}, op{OpCode::pushConst}, level{0} {}
+                      ^
+../pl0.h:66:24: warning: extended initializer lists only available with -std=c++11 or -std=gnu++11
+   Instr() : addr{0}, op{OpCode::pushConst}, level{0} {}
+                        ^
+../pl0.h:66:25: error: ‘OpCode’ has not been declared
+   Instr() : addr{0}, op{OpCode::pushConst}, level{0} {}
+                         ^
+../pl0.h:66:45: error: class ‘pl0::Instr’ does not have any field named ‘level’
+   Instr() : addr{0}, op{OpCode::pushConst}, level{0} {}
+                                             ^
+../pl0.h:66:50: warning: extended initializer lists only available with -std=c++11 or -std=gnu++11
+   Instr() : addr{0}, op{OpCode::pushConst}, level{0} {}
+                                                  ^
+../pl0.h: At global scope:
+../pl0.h:74:2: error: ‘Word’ does not name a type
+  Word disasm(Word loc, const Instr& instr, const std::string label = "");
+  ^
+In file included from ../pl0com.h:43:0,
+                 from ../driver.cc:13:
+../token.h:27:14: warning: scoped enums only available with -std=c++11 or -std=gnu++11
+  enum Kind : char {
+              ^
+../token.h:82:7: error: ‘Word’ in namespace ‘pl0’ does not name a type
+  pl0::Word number_value;    ///< Kind == number
+       ^
+../token.h: In constructor ‘Token::Token(Token::Kind)’:
+../token.h:85:25: warning: extended initializer lists only available with -std=c++11 or -std=gnu++11
+     Token(Kind k) : kind{k}, number_value{0} {}
+                         ^
+../token.h:85:30: error: class ‘Token’ does not have any field named ‘number_value’
+     Token(Kind k) : kind{k}, number_value{0} {}
+                              ^
+../token.h:85:42: warning: extended initializer lists only available with -std=c++11 or -std=gnu++11
+     Token(Kind k) : kind{k}, number_value{0} {}
+                                          ^
+../token.h: At global scope:
+../token.h:136:36: warning: non-static data member initializers only available with -std=c++11 or -std=gnu++11
+    Token    ct { Token::Kind::none };
+                                    ^
+../token.h:136:16: warning: extended initializer lists only available with -std=c++11 or -std=gnu++11
+    Token    ct { Token::Kind::none };
+                ^
+../token.h:136:25: error: ‘Token::Kind’ is not a class or namespace
+    Token    ct { Token::Kind::none };
+                         ^
+../token.h:136:36: warning: extended initializer lists only available with -std=c++11 or -std=gnu++11
+    Token    ct { Token::Kind::none };
+                                    ^
+../token.h:136:36: error: could not convert ‘{<expression error>}’ from ‘<brace-enclosed initializer list>’ to ‘Token’
+../token.h: In constructor ‘TokenStream::TokenStream(std::istream&)’:
+../token.h:101:40: warning: extended initializer lists only available with -std=c++11 or -std=gnu++11
+  TokenStream(std::istream& s) : lineNum{1}, ip{&s}, owns{false} {}
+                                        ^
+../token.h:101:47: warning: extended initializer lists only available with -std=c++11 or -std=gnu++11
+  TokenStream(std::istream& s) : lineNum{1}, ip{&s}, owns{false} {}
+                                               ^
+../token.h:101:57: warning: extended initializer lists only available with -std=c++11 or -std=gnu++11
+  TokenStream(std::istream& s) : lineNum{1}, ip{&s}, owns{false} {}
+                                                         ^
+../token.h: In constructor ‘TokenStream::TokenStream(std::istream*)’:
+../token.h:104:40: warning: extended initializer lists only available with -std=c++11 or -std=gnu++11
+  TokenStream(std::istream* s) : lineNum{1}, ip{s}, owns{true} {}
+                                        ^
+../token.h:104:47: warning: extended initializer lists only available with -std=c++11 or -std=gnu++11
+  TokenStream(std::istream* s) : lineNum{1}, ip{s}, owns{true} {}
+                                               ^
+../token.h:104:56: warning: extended initializer lists only available with -std=c++11 or -std=gnu++11
+  TokenStream(std::istream* s) : lineNum{1}, ip{s}, owns{true} {}
+                                                        ^
+In file included from ../pl0com.h:44:0,
+                 from ../driver.cc:13:
+../symbol.h: At global scope:
+../symbol.h:21:14: warning: scoped enums only available with -std=c++11 or -std=gnu++11
+  enum Kind : char {
+              ^
+../symbol.h:32:7: error: ‘Word’ in namespace ‘pl0’ does not name a type
+  pl0::Word value;       ///< value (ident, constant) or address (Proc)
+       ^
+../symbol.h:39:40: error: ‘pl0::Word’ has not been declared
+  SymValue(Kind k, unsigned l = 0, pl0::Word v = 0) : kind{k}, level{l}, value{v}
+                                        ^
+../symbol.h: In constructor ‘SymValue::SymValue()’:
+../symbol.h:35:20: warning: extended initializer lists only available with -std=c++11 or -std=gnu++11
+  SymValue() : kind {none}, level {0}, value{0}
+                    ^
+../symbol.h:35:34: warning: extended initializer lists only available with -std=c++11 or -std=gnu++11
+  SymValue() : kind {none}, level {0}, value{0}
+                                  ^
+../symbol.h:35:39: error: class ‘SymValue’ does not have any field named ‘value’
+  SymValue() : kind {none}, level {0}, value{0}
+                                       ^
+../symbol.h:35:44: warning: extended initializer lists only available with -std=c++11 or -std=gnu++11
+  SymValue() : kind {none}, level {0}, value{0}
+                                            ^
+../symbol.h: In constructor ‘SymValue::SymValue(SymValue::Kind, unsigned int, int)’:
+../symbol.h:39:58: warning: extended initializer lists only available with -std=c++11 or -std=gnu++11
+  SymValue(Kind k, unsigned l = 0, pl0::Word v = 0) : kind{k}, level{l}, value{v}
+                                                          ^
+../symbol.h:39:68: warning: extended initializer lists only available with -std=c++11 or -std=gnu++11
+  SymValue(Kind k, unsigned l = 0, pl0::Word v = 0) : kind{k}, level{l}, value{v}
+                                                                    ^
+../symbol.h:39:73: error: class ‘SymValue’ does not have any field named ‘value’
+  SymValue(Kind k, unsigned l = 0, pl0::Word v = 0) : kind{k}, level{l}, value{v}
+                                                                         ^
+../symbol.h:39:78: warning: extended initializer lists only available with -std=c++11 or -std=gnu++11
+  SymValue(Kind k, unsigned l = 0, pl0::Word v = 0) : kind{k}, level{l}, value{v}
+                                                                              ^
+In file included from ../driver.cc:13:0:
+../pl0com.h: At global scope:
+../pl0com.h:65:25: error: ‘OpCode’ in namespace ‘pl0’ does not name a type
+  size_t emit(const pl0::OpCode op, int8_t level = 0, pl0::Word addr = 0);
+                         ^
+../pl0com.h:65:36: error: ‘int8_t’ has not been declared
+  size_t emit(const pl0::OpCode op, int8_t level = 0, pl0::Word addr = 0);
+                                    ^
+../pl0com.h:65:59: error: ‘pl0::Word’ has not been declared
+  size_t emit(const pl0::OpCode op, int8_t level = 0, pl0::Word addr = 0);
+                                                           ^
+In file included from ../driver.cc:14:0:
+../pl0int.h:62:2: error: ‘uint16_t’ does not name a type
+  uint16_t base(uint16_t lvl);
+  ^
+../pl0int.h: In constructor ‘PL0Interp::EAddr::EAddr()’:
+../pl0int.h:38:18: warning: extended initializer lists only available with -std=c++11 or -std=gnu++11
+   EAddr() : eaddr{0}, val{false} {}
+                  ^
+../pl0int.h:38:26: warning: extended initializer lists only available with -std=c++11 or -std=gnu++11
+   EAddr() : eaddr{0}, val{false} {}
+                          ^
+../driver.cc: At global scope:
+../driver.cc:23:25: warning: extended initializer lists only available with -std=c++11 or -std=gnu++11
+ static string inputFile {"-"};    ///< Source file name, or - for standard input
+                         ^
+../driver.cc:23:29: error: in C++98 ‘inputFile’ must be initialized by constructor, not by ‘{...}’
+ static string inputFile {"-"};    ///< Source file name, or - for standard input
+                             ^
+../driver.cc: In function ‘bool parseCommandline(const std::vector<std::__cxx11::basic_string<char> >&)’:
+../driver.cc:39:7: warning: ‘auto’ changes meaning in C++11; please remove it [-Wc++0x-compat]
+  for (auto arg : args) {
+       ^
+../driver.cc:39:12: error: ‘arg’ does not name a type
+  for (auto arg : args) {
+            ^
+../driver.cc:74:2: error: expected ‘;’ before ‘return’
+  return true;
+  ^
+../driver.cc:74:2: error: expected primary-expression before ‘return’
+../driver.cc:74:2: error: expected ‘;’ before ‘return’
+../driver.cc:74:2: error: expected primary-expression before ‘return’
+../driver.cc:74:2: error: expected ‘)’ before ‘return’
+../driver.cc: At global scope:
+../driver.cc:38:52: warning: unused parameter ‘args’ [-Wunused-parameter]
+ static bool parseCommandline(const vector<string>& args) {
+                                                    ^
+../driver.cc: In function ‘int main(int, char**)’:
+../driver.cc:89:14: warning: extended initializer lists only available with -std=c++11 or -std=gnu++11
+  PL0Comp comp{progName};  // The compiler...
+              ^
+../driver.cc:89:23: error: in C++98 ‘comp’ must be initialized by constructor, not by ‘{...}’
+  PL0Comp comp{progName};  // The compiler...
+                       ^
+../driver.cc: At global scope:
+../driver.cc:27:13: warning: ‘void help()’ defined but not used [-Wunused-function]
+ static void help() {
+             ^
+subdir.mk:33: recipe for target 'driver.o' failed
+make: *** [driver.o] Error 1
+22:36:42 **** Incremental Build of configuration Debug for project pl0c ****
+make all 
+Building file: ../driver.cc
+Invoking: GCC C++ Compiler
+g++ -std=c++0x -O0 -g3 -Wall -Wextra -c -fmessage-length=0 -MMD -MP -MF"driver.d" -MT"driver.o" -o "driver.o" "../driver.cc"
+Finished building: ../driver.cc
+ 
+Building file: ../pl0.cc
+Invoking: GCC C++ Compiler
+g++ -std=c++0x -O0 -g3 -Wall -Wextra -c -fmessage-length=0 -MMD -MP -MF"pl0.d" -MT"pl0.o" -o "pl0.o" "../pl0.cc"
+Finished building: ../pl0.cc
+ 
+Building file: ../pl0com.cc
+Invoking: GCC C++ Compiler
+g++ -std=c++0x -O0 -g3 -Wall -Wextra -c -fmessage-length=0 -MMD -MP -MF"pl0com.d" -MT"pl0com.o" -o "pl0com.o" "../pl0com.cc"
+Finished building: ../pl0com.cc
+ 
+Building file: ../pl0int.cc
+Invoking: GCC C++ Compiler
+g++ -std=c++0x -O0 -g3 -Wall -Wextra -c -fmessage-length=0 -MMD -MP -MF"pl0int.d" -MT"pl0int.o" -o "pl0int.o" "../pl0int.cc"
+Finished building: ../pl0int.cc
+ 
+Building file: ../symbol.cc
+Invoking: GCC C++ Compiler
+g++ -std=c++0x -O0 -g3 -Wall -Wextra -c -fmessage-length=0 -MMD -MP -MF"symbol.d" -MT"symbol.o" -o "symbol.o" "../symbol.cc"
+Finished building: ../symbol.cc
+ 
+Building file: ../token.cc
+Invoking: GCC C++ Compiler
+g++ -std=c++0x -O0 -g3 -Wall -Wextra -c -fmessage-length=0 -MMD -MP -MF"token.d" -MT"token.o" -o "token.o" "../token.cc"
+Finished building: ../token.cc
+ 
+Building target: pl0c
+Invoking: GCC C++ Linker
+g++  -o "pl0c"  ./driver.o ./pl0.o ./pl0com.o ./pl0int.o ./symbol.o ./token.o   
+Finished building target: pl0c
+ 
+22:38:24 **** Incremental Build of configuration Debug for project pl0c ****
+make all 
+make: Nothing to be done for 'all'.
+22:38:43 **** Incremental Build of configuration Debug for project pl0c ****
+make all 
+make: Nothing to be done for 'all'.
+22:42:05 **** Incremental Build of configuration Debug for project pl0c ****
+make all 
+make: Nothing to be done for 'all'.
+22:44:27 **** Clean-only build of configuration Debug for project pl0c ****
+make clean 
+rm -rf  ./driver.d ./pl0.d ./pl0com.d ./pl0int.d ./symbol.d ./token.d  ./driver.o ./pl0.o ./pl0com.o ./pl0int.o ./symbol.o ./token.o  pl0c
+ 
+22:45:55 **** Build of configuration Debug for project pl0c ****
+make all 
+Building file: ../driver.cc
+Invoking: GCC C++ Compiler
+g++ -std=c++0x -O0 -g3 -Wall -Wextra -c -fmessage-length=0 -MMD -MP -MF"driver.d" -MT"driver.o" -o "driver.o" "../driver.cc"
+Finished building: ../driver.cc
+ 
+Building file: ../pl0.cc
+Invoking: GCC C++ Compiler
+g++ -std=c++0x -O0 -g3 -Wall -Wextra -c -fmessage-length=0 -MMD -MP -MF"pl0.d" -MT"pl0.o" -o "pl0.o" "../pl0.cc"
+Finished building: ../pl0.cc
+ 
+Building file: ../pl0com.cc
+Invoking: GCC C++ Compiler
+g++ -std=c++0x -O0 -g3 -Wall -Wextra -c -fmessage-length=0 -MMD -MP -MF"pl0com.d" -MT"pl0com.o" -o "pl0com.o" "../pl0com.cc"
+Finished building: ../pl0com.cc
+ 
+Building file: ../pl0int.cc
+Invoking: GCC C++ Compiler
+g++ -std=c++0x -O0 -g3 -Wall -Wextra -c -fmessage-length=0 -MMD -MP -MF"pl0int.d" -MT"pl0int.o" -o "pl0int.o" "../pl0int.cc"
+Finished building: ../pl0int.cc
+ 
+Building file: ../symbol.cc
+Invoking: GCC C++ Compiler
+g++ -std=c++0x -O0 -g3 -Wall -Wextra -c -fmessage-length=0 -MMD -MP -MF"symbol.d" -MT"symbol.o" -o "symbol.o" "../symbol.cc"
+Finished building: ../symbol.cc
+ 
+Building file: ../token.cc
+Invoking: GCC C++ Compiler
+g++ -std=c++0x -O0 -g3 -Wall -Wextra -c -fmessage-length=0 -MMD -MP -MF"token.d" -MT"token.o" -o "token.o" "../token.cc"
+Finished building: ../token.cc
+ 
+Building target: pl0c
+Invoking: GCC C++ Linker
+g++  -o "pl0c"  ./driver.o ./pl0.o ./pl0com.o ./pl0int.o ./symbol.o ./token.o   
+Finished building target: pl0c
+ 
+22:47:25 **** Incremental Build of configuration Debug for project pl0c ****
+make all 
+make: Nothing to be done for 'all'.
+22:48:58 **** Clean-only build of configuration Debug for project pl0c ****
+make clean 
+rm -rf  ./driver.d ./pl0.d ./pl0com.d ./pl0int.d ./symbol.d ./token.d  ./driver.o ./pl0.o ./pl0com.o ./pl0int.o ./symbol.o ./token.o  pl0c
+ 
