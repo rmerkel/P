@@ -201,7 +201,6 @@
 			<F N="pl0com.cc"/>
 			<F N="pl0int.cc"/>
 			<F N="token.cc"/>
-			<F N="xpl0int.cc"/>
 		</Folder>
 		<Folder
 			Name="Header Files"
@@ -231,7 +230,7 @@
 			<F
 				N="Makefile"
 				Type="Makefile"/>
-			<F N="repeattest.p"/>
+			<F N="repeatst.p"/>
 			<F N="test.p"/>
 			<F N="testif.p"/>
 		</Folder>

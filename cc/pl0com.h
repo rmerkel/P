@@ -18,7 +18,7 @@
  *          | "begin" stmt {";" stmt } "end" 
  *          | "if" cond "then" stmt { "else" stmt }
  *  		| "while" cond "do" stmt ]
- *  		| "repeat" stmt "until" cond ;	*** TBD ***
+ *  		| "repeat" stmt "until" cond ;
  * 
  * cond = 	  "odd" expr
  * 		  	| expr ("="|"!="|"<"|"<="|">"|">=") expr ;
@@ -42,6 +42,8 @@
 #include "pl0.h"
 #include "token.h"
 #include "symbol.h"
+
+#include <string>
 
 /// A PL0 Compiler
 class PL0Comp {
