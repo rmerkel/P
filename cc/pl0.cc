@@ -12,7 +12,7 @@
 using namespace std;
 
 namespace pl0 {
-	string String(OpCode op) {
+	string toString(OpCode op) {
 		switch(op) {
     	case OpCode::pushConst:	return "pushConst";	break;
     	case OpCode::pushVar:	return "pushVar";	break;
@@ -50,11 +50,11 @@ namespace pl0 {
 	 * @return loc+1
 	 */
 	Word disasm(Word loc, const Instr& instr, const string label) {
-		const unsigned level = instr.level;		// so we don't diplay the level as a charactor
+		const int level = instr.level;		// so we don't diplay the level as a charactor
 		if (label.empty())
-			cout << setw(10) << loc << ": " << String(instr.op);
+			cout << setw(10) << loc << ": " << toString(instr.op);
 		else
-			cout << label << ": " << setw(5) << loc << ": " << String(instr.op);
+			cout << label << ": " << setw(5) << loc << ": " << toString(instr.op);
 
     	switch(instr.op) {
     	case OpCode::pushConst:	cout << " "                     << instr.addr;	break;

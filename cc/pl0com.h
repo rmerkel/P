@@ -17,7 +17,8 @@
  * 		  	| "!" expr 
  *          | "begin" stmt {";" stmt } "end" 
  *          | "if" cond "then" stmt { "else" stmt }
- *          | "while" cond "do" stmt ] ;
+ *  		| "while" cond "do" stmt ]
+ *  		| "repeat" stmt "until" cond ;	*** TBD ***
  * 
  * cond = 	  "odd" expr
  * 		  	| expr ("="|"!="|"<"|"<="|">"|">=") expr ;
@@ -43,7 +44,7 @@
 #include "symbol.h"
 
 /// A PL0 Compiler
-class PL0Compilier {
+class PL0Comp {
 	std::string			progName;		///< The owning programs name
 	unsigned			nErrors;		///< # of errors compiling all sources
 	bool				verbose;		///< Dump debugging information if true
@@ -55,7 +56,11 @@ protected:
 	void error(const std::string& s);
 	void error(const std::string& s, const std::string& t);
 	Token next();
-	size_t emit(const pl0::OpCode op, uint8_t level = 0, pl0::Word addr = 0);
+
+	/// Return the current token kind
+	Token::Kind current() 				{	return ts.current().kind;	}
+
+	size_t emit(const pl0::OpCode op, int8_t level = 0, pl0::Word addr = 0);
 	bool accept(Token::Kind k, bool get = true);
 	bool expect(Token::Kind k, bool get = true);
 	void identifier(unsigned level);
@@ -64,7 +69,9 @@ protected:
 	void expression(unsigned level);
 	void condition(unsigned level);
 	void assignStmt(unsigned level);
+	void callStmt(unsigned level);
 	void whileStmt(unsigned level);
+	void repeatStmt(unsigned level);
  	void ifStmt(unsigned level);
 	void statement(unsigned level);
 	void constDecl(unsigned level);
@@ -74,8 +81,8 @@ protected:
 	void run();
 
 public:
-	PL0Compilier(const std::string& pName);
-	virtual ~PL0Compilier() {}
+	PL0Comp(const std::string& pName);
+	virtual ~PL0Comp() {}
 
 	unsigned operator()(const std::string& inFile, pl0::InstrVector& code, bool verbose = false);
 };

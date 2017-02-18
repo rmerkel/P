@@ -46,6 +46,8 @@ struct Token {
 		Else,								///< "else"
 		While,								///< "while"
 		Do,									///< "do"
+		repeat,								///< "repeat"
+		until,								///< "until"
 		odd,								///< "odd"
 
 		// End of non-printing character codes for ASCII and UNICODE (ornial value 32)

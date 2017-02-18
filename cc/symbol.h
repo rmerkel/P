@@ -25,7 +25,7 @@ struct SymValue {
 		proc,									///< A procedure
 	};
 
-	static std::string String(Kind k);			///< Return k as a string
+	static std::string toString(Kind k);		///< Return k as a string
 
 	Kind		kind;							///< ident, constant, or procedure name
 	unsigned	level;							///< If kind == Proc

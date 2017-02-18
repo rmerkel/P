@@ -52,45 +52,63 @@ Token TokenStream::get() {
 		return ct;
 		break;
 
-		case '%':
-		case '(':
-		case ')':
-		case '*':
-		case '+':
-		case ',':
-		case '-':
-		case '.':
-		case '/':
-		case ';':
-		case '<':
-		case '>':
-		case '^':
-			return ct = { static_cast<Token::Kind>(ch) };
-
-		case '0': case '1': case '2': case '3': case '4':
-		case '5': case '6': case '7': case '8': case '9':
+	case '>':							// > or >=?
+		if (!ip->get(ch))	ct.kind = Token::gt;
+		else if ('=' == ch)	ct.kind = Token::gte;
+		else {
 			ip->putback(ch);
-			*ip >> ct.number_value;
-			ct.kind = Token::number;
+			ct.kind = Token::gt;
+		}
+		return ct;
+		break;
+
+	case '<':							// < or <=?
+		if (!ip->get(ch))	ct.kind = Token::lt;
+		else if ('=' == ch)	ct.kind = Token::lte;
+		else {
+			ip->putback(ch);
+			ct.kind = Token::lt;
+		}
+		return ct;
+		break;
+
+	case '%':
+	case '(':
+	case ')':
+	case '*':
+	case '+':
+	case ',':
+	case '-':
+	case '.':
+	case '/':
+	case ';':
+	case '^':
+		return ct = { static_cast<Token::Kind>(ch) };
+
+	case '0': case '1': case '2': case '3': case '4':
+	case '5': case '6': case '7': case '8': case '9':
+		ip->putback(ch);
+		*ip >> ct.number_value;
+		ct.kind = Token::number;
+		return ct;
+
+	default:							// ident, ident = or error
+		if (isalpha(ch)) {
+			ct.string_value = ch;
+			while (ip->get(ch) && isalnum(ch))
+				ct.string_value += ch;
+
+			ip->putback(ch);
+			auto it = keywords.find(ct.string_value);
+			if (keywords.end() != it)
+				ct.kind = it->second;
+			else
+				ct.kind = Token::identifier;
 			return ct;
+		}
 
-		default:							// ident, ident = or error
-			if (isalpha(ch)) {
-				ct.string_value = ch;
-				while (ip->get(ch) && isalnum(ch))
-					ct.string_value += ch;
-
-				ip->putback(ch);
-				auto it = keywords.find(ct.string_value);
-				if (keywords.end() != it)
-					ct.kind = it->second;
-				else
-					ct.kind = Token::identifier;
-				return ct;
-			}
-
-			cerr << "bad token: \'" << ch << "\'\n";	// TBD: Token::other or bad??
-			return ct = { Token::eof };
+		cerr << "bad token: \'" << ch << "\'\n";	// TBD: Token::other or bad??
+		return ct = { Token::eof };
 	}
 }
 
@@ -117,6 +135,8 @@ string Token::String(Token::Kind k) {
 	case Kind::Else:		return "else";		break;
 	case Kind::While:		return "while";		break;
 	case Kind::Do:			return "do";		break;
+	case Kind::repeat:		return "repeat";	break;
+	case Kind::until:		return "until";		break;
 	case Kind::odd:			return "odd";		break;
 	case Kind::Not:			return "not";		break;
 	case Kind::mod:			return "%";			break;
@@ -160,6 +180,8 @@ TokenStream::KeywordTable	TokenStream::keywords = {
 	{	"else",			Token::Else			},
 	{	"while",		Token::While		},
 	{	"do",			Token::Do			},
+	{	"repeat",		Token::repeat		},
+	{	"until",		Token::until		},
 	{	"odd",			Token::odd			},
 	{	"mod",			Token::mod			}
 };

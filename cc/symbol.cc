@@ -14,7 +14,7 @@ using namespace std;
 
 // public static
 
-string SymValue::String(SymValue::Kind k) {
+string SymValue::toString(SymValue::Kind k) {
 	switch(k) {
 	case SymValue::none:		return "none";
 	case SymValue::identifier:	return "identifier";
