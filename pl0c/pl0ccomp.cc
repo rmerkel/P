@@ -10,6 +10,8 @@
 #include <iomanip>
 #include <iostream>
 #include <fstream>
+#include <limits>
+#include <vector>
 
 using namespace std;
 using namespace pl0c;
@@ -112,7 +114,7 @@ size_t PL0CComp::emit(const OpCode op, int8_t level, Word addr) {
  *
  * @param	level	The current block level
  */
-void PL0CComp::identifier(unsigned level) {
+void PL0CComp::identifier(int level) {
 	const string name = ts.current().string_value;
 
 	if (expect(Token::identifier)) {
@@ -137,7 +139,7 @@ void PL0CComp::identifier(unsigned level) {
  *
  * @param	level	The current block level.
  */
-void PL0CComp::factor(unsigned level) {
+void PL0CComp::factor(int level) {
 	if (accept(Token::identifier, false))
 		identifier(level);
 
@@ -162,7 +164,7 @@ void PL0CComp::factor(unsigned level) {
  *
  * @param	level	The current block level.
  */
-void PL0CComp::terminal(unsigned level) {
+void PL0CComp::terminal(int level) {
 	factor(level);
 
 	for (Token::Kind k = current(); k == Token::mul || k == Token::div; k = current()) {
@@ -179,7 +181,7 @@ void PL0CComp::terminal(unsigned level) {
  *
  * @param	level	The current block level.
  */
-void PL0CComp::expression(unsigned level) {
+void PL0CComp::expression(int level) {
 	const Token::Kind unary = current();	// unary [ +|-]?
 	if (unary == Token::add || unary == Token::sub)
 		next();
@@ -202,7 +204,7 @@ void PL0CComp::expression(unsigned level) {
  *
  * @param	level	The current block level.
  */
-void PL0CComp::condition(unsigned level) {
+void PL0CComp::condition(int level) {
 	if (accept(Token::odd)) {
 		expression(level);
 		emit(OpCode::odd);
@@ -239,7 +241,7 @@ void PL0CComp::condition(unsigned level) {
  *
  * @param	level	The current block level.
  */
-void PL0CComp::assignStmt(unsigned level) {
+void PL0CComp::assignStmt(int level) {
 	// Save the identifier string and loop it up in the symbol table, before consuming it
 	const string name = ts.current().string_value;
 	next();												// Consume the identifier
@@ -266,15 +268,21 @@ void PL0CComp::assignStmt(unsigned level) {
 
 /** Call statement
  *  
- *  "call" identifier...
+ *  "call" ident "(" [ expr  { "," expr }] ")"...
  *  
  * @param	level	The current block level
  */ 
-void PL0CComp::callStmt(unsigned level) {
+void PL0CComp::callStmt(int level) {
 	const string name = ts.current().string_value;
 
 	expect(Token::identifier);
 	expect(Token::lparen);
+
+	if (!accept(Token::rparen, false))
+		do {									// [expr {, expr }]
+			expression(level);
+		} while (accept (Token::comma));
+
 	expect(Token::rparen);
 	auto range = symtbl.equal_range(name);
 	if (range.first == range.second)
@@ -298,8 +306,8 @@ void PL0CComp::callStmt(unsigned level) {
  *
  * @param	level	The current block level.
  */
- void PL0CComp::whileStmt(unsigned level) {
-	const size_t cond_pc = code->size();				// Start of while condition
+ void PL0CComp::whileStmt(int level) {
+	const size_t cond_pc = code->size();			// Start of while condition
 	condition(level);
 
 	const size_t jmp_pc = emit(OpCode::jneq, 0, 0);	// jump if condition false
@@ -310,14 +318,14 @@ void PL0CComp::callStmt(unsigned level) {
 
 	if (verbose)
 		cout << progName << ": patching address at " << jmp_pc << " to " << code->size() << "\n";
-	(*code)[jmp_pc].addr = code->size();				// Patch jump on condition false instruction
+	(*code)[jmp_pc].addr = code->size();			// Patch jump on condition false instruction
  }
 
 /** if statement
  *  
- *  "if" conditon "then" statement1 [ "else" statement2 ]
+ *  "if" condition "then" statement1 [ "else" statement2 ]
  */
- void PL0CComp::ifStmt(unsigned level) {
+ void PL0CComp::ifStmt(int level) {
 	condition(level);
 
 	const size_t jmp_pc = emit(OpCode::jneq, 0, 0);	// jump if condition false
@@ -348,7 +356,7 @@ void PL0CComp::callStmt(unsigned level) {
   *  
   * @param	level 	The current block level 
   */
- void PL0CComp::repeatStmt(unsigned level) {
+ void PL0CComp::repeatStmt(int level) {
 	 const size_t loop_pc = code->size();			// jump here until condition fails
 	 statement(level);
 	 expect(Token::until);
@@ -368,7 +376,7 @@ void PL0CComp::callStmt(unsigned level) {
  *
  * @param	level	The current block level.
  */
-void PL0CComp::statement(unsigned level) {
+void PL0CComp::statement(int level) {
 	if (accept(Token::identifier, false)) 			// assignment
 		assignStmt(level);
 
@@ -401,7 +409,7 @@ void PL0CComp::statement(unsigned level) {
  *
  * @param	level	The current block level.
  */
-void PL0CComp::constDecl(unsigned level) {
+void PL0CComp::constDecl(int level) {
 	// Capture the identifier name before consuming it...
 	const string name = ts.current().string_value;
 
@@ -435,7 +443,7 @@ void PL0CComp::constDecl(unsigned level) {
  * 
  * @return	Stack offset for the next varaible.
  */
-int PL0CComp::varDecl(int offset, unsigned level) {
+int PL0CComp::varDecl(int offset, int level) {
 	const string name = ts.current().string_value;
 
 	if (expect(Token::identifier)) {
@@ -446,7 +454,7 @@ int PL0CComp::varDecl(int offset, unsigned level) {
 				return offset;
 			}
 
-		symtbl.insert({ name, { SymValue::identifier, level, offset } });
+		symtbl.insert( { name, { SymValue::identifier, level, offset }} );
 		if (verbose) 
 			cout << progName << ": varDecl " << name << ": " << level << ", " << offset << "\n";
 		return offset + 1;
@@ -457,12 +465,13 @@ int PL0CComp::varDecl(int offset, unsigned level) {
 
 /** Procedure declaration
  *
- * { "procedure" ident ";" block ";" }
+ * { "procedure" ident "(" [ident {, "ident" }] ")" block ";" }
  *
  * @param	level	The current block level.
  */
-void PL0CComp::procDecl(unsigned level) {
-	const string name = ts.current().string_value;
+void PL0CComp::procDecl(int level) {
+	const 	string name = ts.current().string_value;
+			vector<string> args;		// proc arguments, if any
 
 	if (expect(Token::identifier)) {
 		auto range = symtbl.equal_range(name);
@@ -470,13 +479,33 @@ void PL0CComp::procDecl(unsigned level) {
 			if (it->second.level == level)
 				error("identifier has previously been defined", name);
 		
-		auto it = symtbl.insert({ name, { SymValue::proc, level, 0 } });
+		auto it = symtbl.insert( { name, { SymValue::proc, level, 0 }} );
 		if (verbose) 
 			cout << progName << ": procDecl " << name << ": " << level << ", 0\n";
 
 		expect(Token::lparen);	// procedure name "()"
+
+		if (accept(Token::identifier, false)) {		// identifier {, identifier }
+			int offset = 0;							// Record the arguments...
+			do {
+				args.push_back(ts.current().string_value);
+				--offset;							// -1, -2, ..., -n
+				accept(Token::identifier);			// Consume the identifier
+			} while (accept(Token::comma));
+
+			/**
+			 * Add the arguments, with negative offsets from the block/frame, so
+			 * that they have offsets of -n, ..., -2, -1. Note that their levels
+			 * must be the same as the following block.
+			 */
+			for (auto& x : args) {
+				const string& name = x;
+				symtbl.insert( { name, { SymValue::identifier, level+1, offset++ }});
+			}
+		}
+
 		expect(Token::rparen);
-		block(it, level+1);
+		block(it, level+1, args.size());
 		expect(Token::scomma);	// procedure declarations end with a ';'!
 	}
 }
@@ -488,14 +517,16 @@ void PL0CComp::procDecl(unsigned level) {
  *         	{ procedure ident ; block ; }
  *          stmt ;
  *  
- * @param	it	The blocks (procedures) symbol table entry
+ * @param	it		The blocks (procedures) symbol table entry
  * @param	level	The current block level.
+ * @param   nargs	The number of arguments, passed to the block, that must be
+ * 					poped on return.
  */
-void PL0CComp::block(SymbolTable::iterator it, unsigned level) {
-	auto 	jmp_pc	= emit(OpCode::jump, 0, 0);		// Addr to be patched below..
-	int		dx		= 3;							// Variable offset from block/frame
+void PL0CComp::block(SymbolTable::iterator it, int level, unsigned nargs) {
+	auto 	jmp_pc	= emit(OpCode::jump, 0, 0);	// Addr to be patched below..
+	int		dx		= 3;					// Variable offset from block/frame
 
-	if (accept(Token::constDecl)) {					// const ident = number, ...
+	if (accept(Token::constDecl)) {			// const ident = number, ...
 		do {
 			constDecl(level);
 
@@ -503,7 +534,7 @@ void PL0CComp::block(SymbolTable::iterator it, unsigned level) {
 		expect(Token::scomma);
 	}
 
-	if (accept(Token::varDecl)) {					// var ident, ...
+	if (accept(Token::varDecl)) {			// var ident, ...
 		do {
 			dx = varDecl(dx, level);
 
@@ -511,7 +542,7 @@ void PL0CComp::block(SymbolTable::iterator it, unsigned level) {
 		expect(Token::scomma);
 	}
 
-	while (accept(Token::procDecl))					// procedure ident; ...
+	while (accept(Token::procDecl))			// procedure ident; ...
 		procDecl(level);
 
 	/*
@@ -524,10 +555,12 @@ void PL0CComp::block(SymbolTable::iterator it, unsigned level) {
 	auto addr = emit(OpCode::enter, 0, dx);
 	if (verbose) cout << progName << ": patching address at " << jmp_pc << " to " << addr  << "\n";
 	(*code)[jmp_pc].addr = it->second.value = addr;
-	statement(level);								// block body...
-	emit(OpCode::ret);								// block postfix
+	statement(level);						// block body...
 
-	// Finally, remove symbols only visable to this level
+	assert(nargs < numeric_limits<int>::max());
+	emit(OpCode::ret, 0, nargs);			// block postfix
+
+	// Finally, remove symbols only visible in this level
 	for (auto i = symtbl.begin(); i != symtbl.end(); )
 		if (i->second.level == level) {
 			if (verbose) cout << ": purging " << i->first << " from the symbol table\n";
@@ -550,7 +583,7 @@ void PL0CComp::run() {
 	auto range = symtbl.equal_range("main");
 	assert(range.first != range.second);
 
-	block(range.first, 0);
+	block(range.first, 0, 0);
 	expect(Token::period);
 }
 

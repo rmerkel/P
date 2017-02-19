@@ -28,7 +28,7 @@ struct SymValue {
 	static std::string toString(Kind k);		///< Return k as a string
 
 	Kind		kind;							///< identifier, constant, or procedure name
-	unsigned	level;							///< If kind == proc
+	int			level;							///< If kind == proc
 	pl0c::Word	value;							///< value (identifier, constant) or address of a proc)
 
 	/// Default construction
@@ -36,7 +36,7 @@ struct SymValue {
 		{}
 
 	/// Constructor; create a SymValue from it's components
-	SymValue(Kind k, unsigned l = 0, pl0c::Word v = 0) : kind{k}, level{l}, value{v}
+	SymValue(Kind k, int l = 0, pl0c::Word v = 0) : kind{k}, level{l}, value{v}
 		{}
 };
 

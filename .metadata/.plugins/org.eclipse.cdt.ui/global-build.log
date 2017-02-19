@@ -1,45 +1,33 @@
-21:37:59 **** Clean-only build of configuration Debug for project pl0c ****
-make clean 
-rm -rf  ./driver.d ./pl0c.d ./pl0ccomp.d ./pl0cinterp.d ./symbol.d ./token.d  ./driver.o ./pl0c.o ./pl0ccomp.o ./pl0cinterp.o ./symbol.o ./token.o  pl0c
- 
-21:37:59 **** Build of configuration Debug for project pl0c ****
+10:42:00 **** Incremental Build of configuration Debug for project pl0c ****
 make all 
 Building file: ../driver.cc
 Invoking: GCC C++ Compiler
 g++ -std=c++0x -O0 -g3 -Wall -Wextra -c -fmessage-length=0 -MMD -MP -MF"driver.d" -MT"driver.o" -o "driver.o" "../driver.cc"
 Finished building: ../driver.cc
  
-Building file: ../pl0c.cc
-Invoking: GCC C++ Compiler
-g++ -std=c++0x -O0 -g3 -Wall -Wextra -c -fmessage-length=0 -MMD -MP -MF"pl0c.d" -MT"pl0c.o" -o "pl0c.o" "../pl0c.cc"
-Finished building: ../pl0c.cc
- 
 Building file: ../pl0ccomp.cc
 Invoking: GCC C++ Compiler
 g++ -std=c++0x -O0 -g3 -Wall -Wextra -c -fmessage-length=0 -MMD -MP -MF"pl0ccomp.d" -MT"pl0ccomp.o" -o "pl0ccomp.o" "../pl0ccomp.cc"
 Finished building: ../pl0ccomp.cc
- 
-Building file: ../pl0cinterp.cc
-Invoking: GCC C++ Compiler
-g++ -std=c++0x -O0 -g3 -Wall -Wextra -c -fmessage-length=0 -MMD -MP -MF"pl0cinterp.d" -MT"pl0cinterp.o" -o "pl0cinterp.o" "../pl0cinterp.cc"
-Finished building: ../pl0cinterp.cc
- 
-Building file: ../symbol.cc
-Invoking: GCC C++ Compiler
-g++ -std=c++0x -O0 -g3 -Wall -Wextra -c -fmessage-length=0 -MMD -MP -MF"symbol.d" -MT"symbol.o" -o "symbol.o" "../symbol.cc"
-Finished building: ../symbol.cc
- 
-Building file: ../token.cc
-Invoking: GCC C++ Compiler
-g++ -std=c++0x -O0 -g3 -Wall -Wextra -c -fmessage-length=0 -MMD -MP -MF"token.d" -MT"token.o" -o "token.o" "../token.cc"
-Finished building: ../token.cc
  
 Building target: pl0c
 Invoking: GCC C++ Linker
 g++  -o "pl0c"  ./driver.o ./pl0c.o ./pl0ccomp.o ./pl0cinterp.o ./symbol.o ./token.o   
 Finished building target: pl0c
  
-21:38:34 **** Clean-only build of configuration Debug for project pl0c ****
+10:44:27 **** Incremental Build of configuration Debug for project pl0c ****
+make all 
+Building file: ../pl0ccomp.cc
+Invoking: GCC C++ Compiler
+g++ -std=c++0x -O0 -g3 -Wall -Wextra -c -fmessage-length=0 -MMD -MP -MF"pl0ccomp.d" -MT"pl0ccomp.o" -o "pl0ccomp.o" "../pl0ccomp.cc"
+Finished building: ../pl0ccomp.cc
+ 
+Building target: pl0c
+Invoking: GCC C++ Linker
+g++  -o "pl0c"  ./driver.o ./pl0c.o ./pl0ccomp.o ./pl0cinterp.o ./symbol.o ./token.o   
+Finished building target: pl0c
+ 
+10:50:03 **** Clean-only build of configuration Debug for project pl0c ****
 make clean 
 rm -rf  ./driver.d ./pl0c.d ./pl0ccomp.d ./pl0cinterp.d ./symbol.d ./token.d  ./driver.o ./pl0c.o ./pl0ccomp.o ./pl0cinterp.o ./symbol.o ./token.o  pl0c
  

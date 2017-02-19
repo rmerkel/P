@@ -26,10 +26,11 @@ endif
 # Project files
 ################################################################################
 
-SRCS		= driver.cc pl0c.cc pl0ccomp.cc pl0cinterp.cc symbol.cc token.cc
-OBJS		= $(SRCS:.cc=.o)
-DEPS		= $(SRCS:.cc=.d)
-EXE			= pl0c
+SRCS	= driver.cc pl0c.cc pl0ccomp.cc pl0cinterp.cc symbol.cc token.cc
+ALLSRCS	= $(SRCS) $(wildcard *.h)
+OBJS	= $(SRCS:.cc=.o)
+DEPS	= $(SRCS:.cc=.d)
+EXE		= pl0c
 
 .PHONY:	all clean cleanall docs help pr test
 
@@ -72,7 +73,7 @@ cleanall: clean
 
 docs:	docs/html/index.html
 
-docs/html/index.html:	Doxyfile $(SRCS)
+docs/html/index.html:	Doxyfile $(ALLSRCS)
 	@doxygen
 
 ################################################################################
@@ -100,7 +101,7 @@ help:
 ################################################################################
 
 pr:
-	@pr $(SRCS) $(wildcard *.h) makefile | expand -4 | lpr
+	@pr $(ALLSRCS) Makefile | expand -4 | lpr
 
 ################################################################################
 # Bring up to date and run some tests...

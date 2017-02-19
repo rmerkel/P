@@ -2,35 +2,36 @@
  *
  * A PL/0 compiler...
  *
- * Grammar (EBNF)
+ * Grammar (EBNF):
  * --------------
- * prog =	block "." ;
- * 
- * block = 	[ "const" ident "=" number {"," ident "=" number} ";"]
- *         	[ "var" ident {"," ident} ";"]
- *         	{ "procedure" ident "()" block ";" }
- *          stmt ;
- * 
- * stmt = 	[ ident ":=" expr
- * 		  	| "call" ident "()" 
- *          | "?" ident 
- * 		  	| "!" expr 
- *          | "begin" stmt {";" stmt } "end" 
- *          | "if" cond "then" stmt { "else" stmt }
- *  		| "while" cond "do" stmt ]
- *  		| "repeat" stmt "until" cond ;
- * 
- * cond = 	  "odd" expr
- * 		  	| expr ("="|"!="|"<"|"<="|">"|">=") expr ;
- * 
- * expr = 	[ "+"|"-"] term { ("+"|"-") term } ;
- * 
- * term = 	fact {("*"|"/") fact} ;
- * 
- * fact = 	  ident
- *			| number
- *			| "(" expr ")" ;
- * 
+ *
+ *     prog =  block "." ;
+ *
+ *     block = [ "const" ident "=" number {"," ident "=" number} ";"]
+ *             [ "var" ident {"," ident} ";"]
+ *             { "procedure" ident "()" block ";" }
+ *             stmt ;
+ *
+ *     stmt =  [ ident ":=" expr
+ *             | "call" ident "()"
+ *             | "?" ident
+ *             | "!" expr
+ *             | "begin" stmt {";" stmt } "end"
+ *             | "if" cond "then" stmt { "else" stmt }
+ *             | "while" cond "do" stmt ]
+ *             | "repeat" stmt "until" cond ;
+ *
+ *     cond =  "odd" expr
+ *             | expr ("="|"!="|"<"|"<="|">"|">=") expr ;
+ *
+ *     expr =  [ "+"|"-"] term { ("+"|"-") term } ;
+ *
+ *     term =  fact {("*"|"/") fact} ;
+ *
+ *     fact =  ident
+ *             | number
+ *             | "(" expr ")" ;
+ *
  * Key
  * 	- {}	zero or more times
  * 	- []	zero or one times
@@ -65,21 +66,21 @@ protected:
 	bool expect(Token::Kind k, bool get = true);
 
 	size_t emit(const pl0c::OpCode op, int8_t level = 0, pl0c::Word addr = 0);
-	void identifier(unsigned level);
-	void factor(unsigned level);
-	void terminal(unsigned level);
-	void expression(unsigned level);
-	void condition(unsigned level);
-	void assignStmt(unsigned level);
-	void callStmt(unsigned level);
-	void whileStmt(unsigned level);
-	void repeatStmt(unsigned level);
- 	void ifStmt(unsigned level);
-	void statement(unsigned level);
-	void constDecl(unsigned level);
-	int varDecl(int offset, unsigned level);
-	void procDecl(unsigned level);
-	void block(SymbolTable::iterator it, unsigned level);
+	void identifier(int level);
+	void factor(int level);
+	void terminal(int level);
+	void expression(int level);
+	void condition(int level);
+	void assignStmt(int level);
+	void callStmt(int level);
+	void whileStmt(int level);
+	void repeatStmt(int level);
+ 	void ifStmt(int level);
+	void statement(int level);
+	void constDecl(int level);
+	int varDecl(int offset, int level);
+	void procDecl(int level);
+	void block(SymbolTable::iterator it, int level, unsigned nargs);
 	void run();
 
 public:

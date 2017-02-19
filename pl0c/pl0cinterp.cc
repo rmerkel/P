@@ -74,7 +74,7 @@ uint16_t PL0CInterp::base(uint16_t lvl) {
  *  @return	the number of machine cycles run
  */
 size_t PL0CInterp::run() {
-	size_t cycles = 0;							// # of instrucitons run to date
+	size_t cycles = 0;						// # of instructions run to date
 
 	if (verbose)
 		cout << "Reg  Addr Value/Instr\n"
@@ -86,61 +86,72 @@ size_t PL0CInterp::run() {
 		if (-1 != sp) assert(sp < static_cast<int>(stack.size()));
 
 
-		dump();									// Dump state and disasm the next instruction
-		ir = code[pc++];						// Fetch next instruction...
+		dump();								// Dump state and disasm the next instruction
+		ir = code[pc++];					// Fetch next instruction...
 		++cycles;
 
     	switch(ir.op) {
- 			// unary operations
 
-		case OpCode::neg:		stack[sp] = -stack[sp];							break;
-		case OpCode::odd:		stack[sp] = stack[sp] & 1;						break;
+ 		// unary operations
 
-			// binrary operations
+		case OpCode::neg:	stack[sp] = -stack[sp];						break;
+		case OpCode::odd:	stack[sp] = stack[sp] & 1;					break;
 
-    	case OpCode::add:		--sp; stack[sp] = stack[sp] + stack[sp+1];		break;
-    	case OpCode::sub:		--sp; stack[sp] = stack[sp] - stack[sp+1];		break;
-    	case OpCode::mul:		--sp; stack[sp] = stack[sp] * stack[sp+1];		break;
-    	case OpCode::div:		--sp; stack[sp] = stack[sp] / stack[sp+1];		break;
-    	case OpCode::equ:		--sp; stack[sp] = stack[sp] == stack[sp+1];		break;
-    	case OpCode::neq:		--sp; stack[sp] = stack[sp] != stack[sp+1];		break;
-    	case OpCode::lt:		--sp; stack[sp] = stack[sp]  < stack[sp+1];		break;
-    	case OpCode::gte:		--sp; stack[sp] = stack[sp] >= stack[sp+1];		break;
-    	case OpCode::gt:		--sp; stack[sp] = stack[sp]  > stack[sp+1];		break;
-		case OpCode::lte:		--sp; stack[sp] = stack[sp] <= stack[sp+1];		break;
+		// binrary operations
 
-			// push/pop
+    	case OpCode::add:	--sp; stack[sp] = stack[sp] + stack[sp+1];	break;
+    	case OpCode::sub:	--sp; stack[sp] = stack[sp] - stack[sp+1];	break;
+    	case OpCode::mul:	--sp; stack[sp] = stack[sp] * stack[sp+1];	break;
+    	case OpCode::div:	--sp; stack[sp] = stack[sp] / stack[sp+1];	break;
+    	case OpCode::equ:	--sp; stack[sp] = stack[sp] == stack[sp+1];	break;
+    	case OpCode::neq:	--sp; stack[sp] = stack[sp] != stack[sp+1];	break;
+    	case OpCode::lt:	--sp; stack[sp] = stack[sp]  < stack[sp+1];	break;
+    	case OpCode::gte:	--sp; stack[sp] = stack[sp] >= stack[sp+1];	break;
+    	case OpCode::gt:	--sp; stack[sp] = stack[sp]  > stack[sp+1];	break;
+		case OpCode::lte:	--sp; stack[sp] = stack[sp] <= stack[sp+1];	break;
 
-		case OpCode::pushConst:	stack[++sp] = ir.addr;							break;
-        case OpCode::pushVar:	stack[++sp] = stack[base(ir.level) + ir.addr];	break;
+		// push/pop
+
+		case OpCode::pushConst:
+			stack[++sp] = ir.addr;
+			break;
+
+        case OpCode::pushVar:
+        	stack[++sp] = stack[base(ir.level) + ir.addr];
+        	break;
+
         case OpCode::pop:
-			lastWrite = base(ir.level) + ir.addr;// Save the effective address for dump()
+        	// Save the effective address for dump()
+			lastWrite = base(ir.level) + ir.addr;
 			stack[lastWrite] = stack[sp--];
 			break;
 
-        case OpCode::call: 								// Call a procedure
-			// Create a new frame/mark block on the stack, which the bp register points to 
-        	stack[sp+1] = base(ir.level);				// Call the frame base
-			stack[sp+2] = bp;							// Save old bp register
-			stack[sp+3] = pc;							// Save return address
-        	bp = sp + 1;								// points to teh frame base
-			pc = ir.addr;								// Set the procedure address
+        case OpCode::call: 					// Call a procedure
+			// Create a new frame/mark block on the stack
+        	stack[sp+1] = base(ir.level);	// Sent previous frame base
+			stack[sp+2] = bp;				// Save bp register
+			stack[sp+3] = pc;				// Save return address
+        	bp = sp + 1;					// points to the frame base
+			pc = ir.addr;					// Set the procedure address
 			break;
 
-		case OpCode::ret: 							// Return from a procedure
-			sp = bp - 1; 								// Restore the previous sp
-			pc = stack[sp + 3]; 						// Restore the return address
-			bp = stack[sp + 2];							// Restore the previous bp
+		case OpCode::ret: 					// Return from a procedure
+			sp = bp - 1; 					// Restore the previous sp
+			pc = stack[sp + 3]; 			// Restore the return address
+			bp = stack[sp + 2];				// Restore the previous bp
+			sp -= ir.addr;					// Pop parameters
 			break;
 
-		case OpCode::enter:		sp += ir.addr;									break;
-        case OpCode::jump:		pc = ir.addr;									break;
-        case OpCode::jneq:		if (stack[sp--] == 0) pc = ir.addr;				break;
+		case OpCode::enter:	sp += ir.addr;								break;
+        case OpCode::jump:	pc = ir.addr;								break;
+        case OpCode::jneq:	if (stack[sp--] == 0) pc = ir.addr;			break;
 		default:
+			cerr << "Unknown op code: " << toString(ir.op) << endl;
 			assert(false);
 		};
 
 	} while (pc != 0);
+	dump();						// Dump the exit state
 
 	return cycles;
 }
