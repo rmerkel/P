@@ -1,7 +1,7 @@
 ################################################################################
 # @file makefile
 #
-# @brief makefile for pl0com (p/l 0 complier/interperter) 
+# @brief makefile for PL0C (p/l 0 complier/interperter) 
 ################################################################################
 
 ################################################################################
@@ -26,10 +26,10 @@ endif
 # Project files
 ################################################################################
 
-SRCS		= driver.cc pl0.cc pl0int.cc pl0com.cc symbol.cc token.cc
+SRCS		= driver.cc pl0c.cc pl0ccomp.cc pl0cinterp.cc symbol.cc token.cc
 OBJS		= $(SRCS:.cc=.o)
 DEPS		= $(SRCS:.cc=.d)
-EXE			= pl0com
+EXE			= pl0c
 
 .PHONY:	all clean cleanall docs help pr test
 
@@ -43,7 +43,7 @@ all:	$(EXE) docs
 # pl0com
 ################################################################################
 
-pl0com: $(OBJS)
+$(EXE): $(OBJS)
 	$(CXX) $(CXXFLAGS) -o $@ $(OBJS)
 
 ################################################################################
@@ -90,7 +90,7 @@ help:
 	@echo "    cleanll - to delete all targets and intermediates."
 	@echo "    docs    - to generate documentation."
 	@echo "    help    - prints this message."
-	@echo "    pl0com  - to build the compiler."
+	@echo "    pl0c    - to build the compiler."
 	@echo "    pr      - print source"
 	@echo "    test    - to bring calc upto date and run tests."
 	@echo ""

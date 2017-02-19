@@ -1,9 +1,9 @@
-/** @file pl0.h
+/** @file pl0c.cc
  *
  * PL/0 Machine utilities
  */
 
-#include "pl0.h"
+#include "pl0c.h"
 
 #include <iomanip>
 #include <iostream>
@@ -11,7 +11,7 @@
 
 using namespace std;
 
-namespace pl0 {
+namespace pl0c {
 	string toString(OpCode op) {
 		switch(op) {
     	case OpCode::pushConst:	return "pushConst";	break;
@@ -50,7 +50,7 @@ namespace pl0 {
 	 * @return loc+1
 	 */
 	Word disasm(Word loc, const Instr& instr, const string label) {
-		const int level = instr.level;		// so we don't diplay the level as a charactor
+		const int level = instr.level;		// so we don't display the level as a character
 		if (label.empty())
 			cout << setw(10) << loc << ": " << toString(instr.op);
 		else

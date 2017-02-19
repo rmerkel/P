@@ -1,8 +1,8 @@
-/** @file pl0int.cc
+/** @file pl0cinterp.cc
  *
  *	PL/0 interpreter in C++
  *
- *	Ported from p0com.p, from Algorithms + Data Structions = Programes. Changes include
+ *	Ported from p0com.p, from Algorithms + Data Structures = Programs. Changes include
  *	- index the stack (stack[0..maxstack-1]); thus the initial values for the t and b registers are
  *    -1 and 0.
  *  - replaced single letter variables, e.g., p is now pc.
@@ -18,15 +18,15 @@
 #include <iostream>
 #include <vector>
 
-#include "pl0int.h"
+#include "pl0cinterp.h"
 
 using namespace std;
-using namespace pl0;
+using namespace pl0c;
 
 // private:
 
 /// Dump the current machine state
-void PL0Interp::dump() {
+void PL0CInterp::dump() {
 	// Dump the last write
 	if (lastWrite.valid())
 		cout << "    " << setw(5) << lastWrite << ": " << stack[lastWrite] << std::endl;
@@ -62,7 +62,7 @@ void PL0Interp::dump() {
 // protected:
 
 /// Find the base 'lvl' levels (frames) up the stack
-uint16_t PL0Interp::base(uint16_t lvl) {
+uint16_t PL0CInterp::base(uint16_t lvl) {
 	uint16_t b = bp;
 	for (; lvl > 0; --lvl)
 		b = stack[b];
@@ -73,7 +73,7 @@ uint16_t PL0Interp::base(uint16_t lvl) {
 /** Run the machine from it's current state
  *  @return	the number of machine cycles run
  */
-size_t PL0Interp::run() {
+size_t PL0CInterp::run() {
 	size_t cycles = 0;							// # of instrucitons run to date
 
 	if (verbose)
@@ -151,7 +151,7 @@ size_t PL0Interp::run() {
  *
  *  @param	stacksz	Maximum depth of the data segment/stack, in machine Words
  */
-PL0Interp::PL0Interp(size_t stacksz) : stack(stacksz), verbose{false} {
+PL0CInterp::PL0CInterp(size_t stacksz) : stack(stacksz), verbose{false} {
 	reset();
 }
 
@@ -161,7 +161,7 @@ PL0Interp::PL0Interp(size_t stacksz) : stack(stacksz), verbose{false} {
  *	@param 	ver		True for verbose debugging messages
  *  @return	The number of machine cycles run
  */
-size_t PL0Interp::operator()(const InstrVector& program, bool ver) {
+size_t PL0CInterp::operator()(const InstrVector& program, bool ver) {
 	verbose = ver;
 
 	// Fill the stack with -1s for debugging...
@@ -173,7 +173,7 @@ size_t PL0Interp::operator()(const InstrVector& program, bool ver) {
 }
 
 /// Reset the machine back to it's initial state.
-void PL0Interp::reset() {
+void PL0CInterp::reset() {
 	pc = 0, bp = 0, sp = -1;	// Set up the initial mark block/frame...
 	stack[0] = stack[1] = stack[2] = 0;
 }

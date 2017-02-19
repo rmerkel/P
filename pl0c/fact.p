@@ -1,6 +1,6 @@
 	var p, n;
 
-    procedure factorial;
+    procedure factorial()
     begin
         p = 1;
         while n > 1 do begin
@@ -11,5 +11,5 @@
 
 begin
     n = 10;
-    call factorial
+    call factorial()
 end.

@@ -1,6 +1,6 @@
 /**	@file	symbol.cc
  *
- *	@brief	the Symbol table
+ *	@brief	The PL/0C Symbol table
  *
  *	Created by Randy Merkel on 6/7/2013.
  *  Copyright (c) 2016 Randy Merkel. All rights reserved.

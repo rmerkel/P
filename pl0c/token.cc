@@ -107,53 +107,53 @@ Token TokenStream::get() {
 			return ct;
 		}
 
-		cerr << "bad token: \'" << ch << "\'\n";	// TBD: Token::other or bad??
-		return ct = { Token::eof };
+		cerr << "bad token: \'" << ch << "\'\n";
+		return ct = { Token::none };
 	}
 }
 
 // public static
 
 /// Return a string with k's name
-string Token::String(Token::Kind k) {
+string Token::toString(Token::Kind k) {
 	switch(k) {
-	case Token::none:		return "none";		break;
-	case Token::identifier:	return "identifier";	break;
-	case Token::number:		return "number";	break;
-	case Kind::equ:			return "==";		break;
-	case Kind::neq:			return "!=";		break;
-	case Kind::lte:			return "<=";		break;
-	case Kind::gte:			return ">=";		break;
-	case Kind::constDecl:	return "const";		break;
-	case Kind::varDecl:		return "var";		break;
-	case Kind::procDecl:	return "procedure";	break;
-	case Kind::call:		return "call";		break;
-	case Kind::begin:		return "begin";		break;
-	case Kind::end:			return "end";		break;
-	case Kind::If:			return "if";		break;
-	case Kind::then:		return "then";		break;
-	case Kind::Else:		return "else";		break;
-	case Kind::While:		return "while";		break;
-	case Kind::Do:			return "do";		break;
-	case Kind::repeat:		return "repeat";	break;
-	case Kind::until:		return "until";		break;
-	case Kind::odd:			return "odd";		break;
-	case Kind::Not:			return "not";		break;
-	case Kind::mod:			return "%";			break;
-	case Kind::lparen:		return "(";			break;
-	case Kind::rparen:		return ")";			break;
-	case Kind::mul:			return "*";			break;
-	case Kind::add:			return "+";			break;
-	case Kind::comma:		return ",";			break;
-	case Kind::sub:			return "-";			break;
-	case Kind::period:		return ".";			break;
-	case Kind::div:			return "/";			break;
-	case Kind::scomma:		return ";";			break;
-	case Kind::lt:			return "<";			break;
-	case Kind::assign:		return "=";			break;
-	case Kind::gt:			return ">";			break;
-	case Kind::expo:		return "^";			break;
-	case Kind::eof:			return "eof";		break;
+	case Kind::none:		return "none";			break;
+	case Kind::identifier:	return "identifier";	break;
+	case Kind::number:		return "number";		break;
+	case Kind::equ:			return "==";			break;
+	case Kind::neq:			return "!=";			break;
+	case Kind::lte:			return "<=";			break;
+	case Kind::gte:			return ">=";			break;
+	case Kind::constDecl:	return "const";			break;
+	case Kind::varDecl:		return "var";			break;
+	case Kind::procDecl:	return "procedure";		break;
+	case Kind::call:		return "call";			break;
+	case Kind::begin:		return "begin";			break;
+	case Kind::end:			return "end";			break;
+	case Kind::If:			return "if";			break;
+	case Kind::then:		return "then";			break;
+	case Kind::Else:		return "else";			break;
+	case Kind::While:		return "while";			break;
+	case Kind::Do:			return "do";			break;
+	case Kind::repeat:		return "repeat";		break;
+	case Kind::until:		return "until";			break;
+	case Kind::odd:			return "odd";			break;
+	case Kind::Not:			return "not";			break;
+	case Kind::mod:			return "%";				break;
+	case Kind::lparen:		return "(";				break;
+	case Kind::rparen:		return ")";				break;
+	case Kind::mul:			return "*";				break;
+	case Kind::add:			return "+";				break;
+	case Kind::comma:		return ",";				break;
+	case Kind::sub:			return "-";				break;
+	case Kind::period:		return ".";				break;
+	case Kind::div:			return "/";				break;
+	case Kind::scomma:		return ";";				break;
+	case Kind::lt:			return "<";				break;
+	case Kind::assign:		return "=";				break;
+	case Kind::gt:			return ">";				break;
+	case Kind::expo:		return "^";				break;
+	case Kind::eof:			return "eof";			break;
 	default: {
 			ostringstream oss;
 			oss << "Unknown Kind: " << static_cast<unsigned>(k) <<  "!" << ends;

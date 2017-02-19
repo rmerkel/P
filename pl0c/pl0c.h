@@ -1,9 +1,9 @@
-/** @file pl0.h
+/** @file pl0c.h
  *  
- *  A description of the PL/0 Machine operation codes, instruction format and utilities used by
- *  both the compilier (PL0Comp) and the interpreter (PL0Interp). 
+ *  A description of the PL/0C Machine operation codes, instruction format and utilities used by
+ *  both the compiler (PL0Comp) and the interpreter (PL0Interp).
  *
- *	Ported from p0com.p, the compilier/interpeter from Algorithms + Data Structures = Programs.
+ *	Ported from p0com.p, the compiler/interpreter from Algorithms + Data Structures = Programs.
  */
 
 #ifndef	PL0_H
@@ -14,7 +14,7 @@
 #include <vector>
 
 /// The PL0 machine operation codes and instruction format.
-namespace pl0 {
+namespace pl0c {
 	/// Operation codes
 	enum class OpCode : std::uint8_t {
 

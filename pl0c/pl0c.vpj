@@ -2,15 +2,14 @@
 <Project
 	Version="10.0"
 	VendorName="SlickEdit"
-	TemplateName="Clang++"
-	WorkingDir="."
-	VCSProject="Git:">
+	TemplateName="GNU C/C++"
+	WorkingDir=".">
 	<Config
 		Name="Debug"
 		Type="gnuc"
-		DebugCallbackName="lldb"
+		DebugCallbackName="gdb"
 		Version="1"
-		OutputFile="%bdpl0"
+		OutputFile="%bdpl0c"
 		CompilerConfigName="Latest Version">
 		<Menu>
 			<Target
@@ -22,7 +21,7 @@
 				OutputExts="*.o"
 				SaveOption="SaveCurrent"
 				RunFromDir="%rw">
-				<Exec CmdLine='clang++ -c %xup  %defd -g -o "%bd%n%oe" %i "%f"'/>
+				<Exec CmdLine='g++ -c %xup  %defd -g -o "%bd%n%oe" %i "%f"'/>
 			</Target>
 			<Target
 				Name="Link"
@@ -33,7 +32,7 @@
 				Deletable="0"
 				SaveOption="SaveCurrent"
 				RunFromDir="%rw">
-				<Exec CmdLine='clang++ %xup -g -o "%o" %f %libs'/>
+				<Exec CmdLine='g++ %xup -g -o "%o" %f %libs'/>
 			</Target>
 			<Target
 				Name="Build"
@@ -82,16 +81,48 @@
 				<Exec/>
 			</Target>
 			<Target
-				Name="Clang Options"
-				MenuCaption="Clang &amp;Options..."
+				Name="GNU C Options"
+				MenuCaption="GNU C &amp;Options..."
 				ShowOnMenu="HideIfNoCmdLine"
 				Deletable="0"
 				SaveOption="SaveNone">
 				<Exec
-					CmdLine="clangoptions"
+					CmdLine="gnucoptions"
 					Type="Slick-C"/>
 			</Target>
 		</Menu>
+		<Rules Name="Compile">
+			<Rule
+				InputExts="*.ada"
+				OutputExts="*.o"
+				LinkObject="1">
+				<Exec CmdLine='gnat -g -c -o "%bd%n.o" "%f"'/>
+			</Rule>
+			<Rule
+				InputExts="*.adb"
+				OutputExts="*.o"
+				LinkObject="1">
+				<Exec CmdLine='gnat -g -c -o "%bd%n.o" "%f"'/>
+			</Rule>
+			<Rule
+				InputExts="*.f"
+				OutputExts="*.o"
+				LinkObject="1">
+				<Exec CmdLine='gfortran -c -g -o "%bd%n.o" "%f"'/>
+			</Rule>
+			<Rule
+				InputExts="*.f90"
+				OutputExts="*.o"
+				LinkObject="1">
+				<Exec CmdLine='gfortran -c -g -o "%bd%n.o" "%f"'/>
+			</Rule>
+			<Rule
+				InputExts="*.d"
+				OutputExts="*.o"
+				LinkObject="1">
+				<Exec CmdLine='gdc -c -g -o "%bd%n.o" "%f"'/>
+			</Rule>
+		</Rules>
 		<List Name="GNUC Options">
 			<Item
 				Name="LinkerOutputType"
@@ -101,9 +132,9 @@
 	<Config
 		Name="Release"
 		Type="gnuc"
-		DebugCallbackName="lldb"
+		DebugCallbackName="gdb"
 		Version="1"
-		OutputFile="%bdpl0"
+		OutputFile="%bdpl0c"
 		CompilerConfigName="Latest Version">
 		<Menu>
 			<Target
@@ -115,7 +146,7 @@
 				OutputExts="*.o"
 				SaveOption="SaveCurrent"
 				RunFromDir="%rw">
-				<Exec CmdLine='clang++ -c %xup %defd -o "%bd%n%oe" %i "%f"'/>
+				<Exec CmdLine='g++ -c %xup %defd -o "%bd%n%oe" %i "%f"'/>
 			</Target>
 			<Target
 				Name="Link"
@@ -126,7 +157,7 @@
 				Deletable="0"
 				SaveOption="SaveCurrent"
 				RunFromDir="%rw">
-				<Exec CmdLine='clang++ %xup -o "%o" %f %libs'/>
+				<Exec CmdLine='g++ %xup -o "%o" %f %libs'/>
 			</Target>
 			<Target
 				Name="Build"
@@ -175,16 +206,48 @@
 				<Exec/>
 			</Target>
 			<Target
-				Name="Clang Options"
-				MenuCaption="Clang &amp;Options..."
+				Name="GNU C Options"
+				MenuCaption="GNU C &amp;Options..."
 				ShowOnMenu="HideIfNoCmdLine"
 				Deletable="0"
 				SaveOption="SaveNone">
 				<Exec
-					CmdLine="clangoptions"
+					CmdLine="gnucoptions"
 					Type="Slick-C"/>
 			</Target>
 		</Menu>
+		<Rules Name="Compile">
+			<Rule
+				InputExts="*.ada"
+				OutputExts="*.o"
+				LinkObject="1">
+				<Exec CmdLine='gnat -O -c -o "%bd%n.o" "%f"'/>
+			</Rule>
+			<Rule
+				InputExts="*.adb"
+				OutputExts="*.o"
+				LinkObject="1">
+				<Exec CmdLine='gnat -O -c -o "%bd%n.o" "%f"'/>
+			</Rule>
+			<Rule
+				InputExts="*.f"
+				OutputExts="*.o"
+				LinkObject="1">
+				<Exec CmdLine='gfortran -O -g -o "%bd%n.o" "%f"'/>
+			</Rule>
+			<Rule
+				InputExts="*.f90"
+				OutputExts="*.o"
+				LinkObject="1">
+				<Exec CmdLine='gfortran -O -g -o "%bd%n.o" "%f"'/>
+			</Rule>
+			<Rule
+				InputExts="*.d"
+				OutputExts="*.o"
+				LinkObject="1">
+				<Exec CmdLine='gdc -c -g -o "%bd%n.o" "%f"'/>
+			</Rule>
+		</Rules>
 		<List Name="GNUC Options">
 			<Item
 				Name="LinkerOutputType"
@@ -195,41 +258,43 @@
 		<Folder
 			Name="Source Files"
 			Filters="*.c;*.C;*.cc;*.cpp;*.cp;*.cxx;*.c++;*.prg;*.pas;*.dpr;*.asm;*.s;*.bas;*.java;*.cs;*.sc;*.e;*.cob;*.html;*.rc;*.tcl;*.py;*.pl;*.d;*.m;*.mm;*.go;*.groovy;*.gsh"
-			GUID="{789D31F1-712F-49DB-BEEF-C89087079C48}">
+			GUID="{FD063192-20FE-4DBA-BB10-A1FC1215099C}">
 			<F N="driver.cc"/>
-			<F N="pl0.cc"/>
-			<F N="pl0com.cc"/>
-			<F N="pl0int.cc"/>
+			<F N="pl0c.cc"/>
+			<F N="pl0ccomp.cc"/>
+			<F N="pl0cinterp.cc"/>
+			<F N="symbol.cc"/>
 			<F N="token.cc"/>
 		</Folder>
 		<Folder
 			Name="Header Files"
 			Filters="*.h;*.H;*.hh;*.hpp;*.hxx;*.h++;*.inc;*.sh;*.cpy;*.if"
-			GUID="{034AE38A-A31A-4539-8672-9272F76EFBC8}">
-			<F N="pl0.h"/>
-			<F N="pl0com.h"/>
-			<F N="pl0int.h"/>
-			<F N="symbol.cc"/>
+			GUID="{80E58BB3-E835-4BC1-A967-786A1DC7CEA9}">
+			<F N="pl0c.h"/>
+			<F N="pl0ccomp.h"/>
+			<F N="pl0cinterp.h"/>
 			<F N="symbol.h"/>
 			<F N="token.h"/>
 		</Folder>
 		<Folder
 			Name="Resource Files"
 			Filters="*.ico;*.cur;*.dlg"
-			GUID="{CE0E42AE-65C2-45E0-A29E-6F46AA4952BF}"/>
+			GUID="{868C63A0-C4C4-424E-900E-0196DDFCCA61}"/>
 		<Folder
 			Name="Bitmaps"
 			Filters="*.bmp"
-			GUID="{EE4482D2-3E99-4693-8831-EFE41AECD6EA}"/>
+			GUID="{205EC326-23A8-4142-A407-26D34CF38CC8}"/>
 		<Folder
 			Name="Other Files"
 			Filters=""
-			GUID="{8D42B955-0023-4B73-9B66-CCE135C89D5D}">
+			GUID="{E2E32900-C0A4-4CAE-AA3C-FC024DC77863}">
 			<F N="Doxyfile"/>
 			<F N="fact.p"/>
 			<F
 				N="Makefile"
 				Type="Makefile"/>
+			<F N="pl0c.vpwistu"/>
+			<F N="pl0com"/>
 			<F N="repeatst.p"/>
 			<F N="test.p"/>
 			<F N="testif.p"/>

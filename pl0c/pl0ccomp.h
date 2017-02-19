@@ -1,4 +1,4 @@
-/** @file pl0com.h
+/** @file pl0ccomp.h
  *
  * A PL/0 compiler...
  *
@@ -8,7 +8,7 @@
  * 
  * block = 	[ "const" ident "=" number {"," ident "=" number} ";"]
  *         	[ "var" ident {"," ident} ";"]
- *         	{ "procedure" ident ";" block ";" }
+ *         	{ "procedure" ident "()" block ";" }
  *          stmt ;
  * 
  * stmt = 	[ ident ":=" expr
@@ -39,20 +39,20 @@
 #ifndef	PL0COM_H
 #define	PL0COM_H
 
-#include "pl0.h"
+#include "pl0c.h"
 #include "token.h"
 #include "symbol.h"
 
 #include <string>
 
-/// A PL0 Compiler
-class PL0Comp {
+/// A PL/0C Compiler
+class PL0CComp {
 	std::string			progName;		///< The owning programs name
 	unsigned			nErrors;		///< # of errors compiling all sources
 	bool				verbose;		///< Dump debugging information if true
-	pl0::InstrVector 	code;			///< Emitted code
 	TokenStream			ts;				///< Input token stream
 	SymbolTable			symtbl;			///< The symbol table
+	pl0c::InstrVector*	code;			///< The emitted code
 
 protected:
 	void error(const std::string& s);
@@ -61,10 +61,10 @@ protected:
 
 	/// Return the current token kind
 	Token::Kind current() 				{	return ts.current().kind;	}
-
-	size_t emit(const pl0::OpCode op, int8_t level = 0, pl0::Word addr = 0);
 	bool accept(Token::Kind k, bool get = true);
 	bool expect(Token::Kind k, bool get = true);
+
+	size_t emit(const pl0c::OpCode op, int8_t level = 0, pl0c::Word addr = 0);
 	void identifier(unsigned level);
 	void factor(unsigned level);
 	void terminal(unsigned level);
@@ -83,10 +83,10 @@ protected:
 	void run();
 
 public:
-	PL0Comp(const std::string& pName);
-	virtual ~PL0Comp() {}
+	PL0CComp(const std::string& pName);
+	virtual ~PL0CComp() {}
 
-	unsigned operator()(const std::string& inFile, pl0::InstrVector& code, bool verbose = false);
+	unsigned operator()(const std::string& inFile, pl0c::InstrVector& code, bool verbose = false);
 };
 
 #endif

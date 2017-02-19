@@ -15,14 +15,15 @@
 #include <map>
 #include <sstream>
 
-#include "pl0.h"
+#include "pl0c.h"
 
 /// A token kind/value pair
 struct Token {
 	/** Token kinds
 	 *  
-	 *  Token kinds are divided up into keywords, operators, identifiers and numbers, and are
-	 *  representated by the integer value of its character
+	 *  Token kinds are divided up into keywords, operators, identifiers and
+	 *  numbers. Single character tokens are represented by the integer value of
+	 *  its character
 	 */
 	enum Kind : char {
 		none,								///< Placeholder for a 'real' token
@@ -50,7 +51,7 @@ struct Token {
 		until,								///< "until"
 		odd,								///< "odd"
 
-		// End of non-printing character codes for ASCII and UNICODE (ornial value 32)
+		// End of non-printing character codes for ASCII and UNICODE (ordinal value 32)
 
 		Not			= '!',					///< Logical not
 
@@ -75,11 +76,11 @@ struct Token {
 		eof									///< End of stream
 	};
 
-	static std::string String(Kind k);		///< Return k's name
+	static std::string toString(Kind k);		///< Return k's name
 
 	Kind		kind;						///< Token type
 	std::string	string_value;				///< kind == ident
-	pl0::Word	number_value;				///< Kind == number
+	pl0c::Word	number_value;				///< Kind == number
 
 	/// Construct a token of type k, stirng value "", number value 0.
     Token(Kind k) : kind{k}, number_value{0} {}
@@ -89,13 +90,14 @@ struct Token {
  *
  *	Maintains the current Token read from the input stream.
  *
- *	Token streams may span multiple inputs; when the end of one input is seen, the current
- *	Token is equal to end of stream (Kind::end), a new input source maybe set via
- *	set_input(); get() will return the first Token of the new input.
+ *	Token streams may span multiple inputs; when the end of one input is seen,
+ *	the current Token is equal to end of stream (Kind::end), a new input source
+ *	maybe set via set_input(); get() will return the first Token of the new
+ *	input.
  */
 class TokenStream {
 public:
-	size_t			lineNum;				///< Line number of the current stream
+	size_t			lineNum;				///< Line # of the current stream
 
 	/// Initialize with an input stream which this does not own
 	TokenStream(std::istream& s) : lineNum{1}, ip{&s}, owns{false}	{}
@@ -130,7 +132,7 @@ private:
 	static	KeywordTable	keywords;
 
 			std::istream*	ip;				///< Pointer to an input stream
-			bool			owns;			///< Does the TokenStream own this istream?
+			bool			owns;			///< Does the TokenStream own ip?
 
 			/// Current token
 			Token 			ct { Token::Kind::none };

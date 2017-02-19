@@ -13,11 +13,11 @@
 #include <map>
 #include <sstream>
 
-#include "pl0.h"
+#include "pl0c.h"
 
 /// A Symbol table entry
 struct SymValue {
-	/// Token kinds are representated by the integer value of its character
+	/// Kinds of symbol table entries
 	enum Kind : char {
 		none,									///< Placeholder for a 'real' token
 		identifier,		  						///< An identifier
@@ -27,16 +27,16 @@ struct SymValue {
 
 	static std::string toString(Kind k);		///< Return k as a string
 
-	Kind		kind;							///< ident, constant, or procedure name
-	unsigned	level;							///< If kind == Proc
-	pl0::Word	value;							///< value (ident, constant) or address (Proc)
+	Kind		kind;							///< identifier, constant, or procedure name
+	unsigned	level;							///< If kind == proc
+	pl0c::Word	value;							///< value (identifier, constant) or address of a proc)
 
 	/// Default construction
 	SymValue() : kind {none}, level {0}, value{0}
 		{}
 
 	/// Constructor; create a SymValue from it's components
-	SymValue(Kind k, unsigned l = 0, pl0::Word v = 0) : kind{k}, level{l}, value{v}
+	SymValue(Kind k, unsigned l = 0, pl0c::Word v = 0) : kind{k}, level{l}, value{v}
 		{}
 };
 

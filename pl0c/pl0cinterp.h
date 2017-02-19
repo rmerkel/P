@@ -1,4 +1,4 @@
-/** @file pl0int.h
+/** @file pl0cinterp.h
  *
  *	PL/0 interpreter in C++
  *
@@ -17,15 +17,15 @@
 #include <cstdint>
 #include <vector>
 
-#include "pl0.h"
+#include "pl0c.h"
 
 /// A PL/0 machine...
-class PL0Interp {
+class PL0CInterp {
 public:
-	PL0Interp(std::size_t stacksz = 512);
-	virtual ~PL0Interp() {}
+	PL0CInterp(std::size_t stacksz = 512);
+	virtual ~PL0CInterp() {}
 
-	std::size_t operator()(const pl0::InstrVector& program, bool v = false);
+	std::size_t operator()(const pl0c::InstrVector& program, bool v = false);
 	void reset();
 
 private:
@@ -46,12 +46,12 @@ private:
 		void invalidate() 					{	val = false;	}
 	};
 
-	pl0::InstrVector	code;				///< Code segment, indexed by pc
-	pl0::WordVector		stack;				///< Data segment (the stack), index by bp and sp
+	pl0c::InstrVector	code;				///< Code segment, indexed by pc
+	pl0c::WordVector		stack;				///< Data segment (the stack), index by bp and sp
 	std::size_t			pc;					///< Program counter register; index of *next* instruction in code[]
 	int					bp;					///< Base pointer register; index of the current mark block/frame in stack[]
 	int					sp;					///< Top of stack register (stack[sp])
-	pl0::Instr			ir;					///< *Current* instruction register (code[pc-1])
+	pl0c::Instr			ir;					///< *Current* instruction register (code[pc-1])
 
 	EAddr				lastWrite;			///< Last write effective address (to stack[]), if valid
 	bool				verbose;			///< Verbose output if true
