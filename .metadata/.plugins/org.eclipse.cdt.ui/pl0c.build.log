@@ -1,0 +1,7 @@
+21:38:34 **** Clean-only build of configuration Debug for project pl0c ****
+make clean 
+rm -rf  ./driver.d ./pl0c.d ./pl0ccomp.d ./pl0cinterp.d ./symbol.d ./token.d  ./driver.o ./pl0c.o ./pl0ccomp.o ./pl0cinterp.o ./symbol.o ./token.o  pl0c
+ 
+
+21:38:34 Build Finished (took 130ms)
+

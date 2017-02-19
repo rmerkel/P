@@ -12,7 +12,7 @@
  *          stmt ;
  * 
  * stmt = 	[ ident ":=" expr
- * 		  	| "call" ident 
+ * 		  	| "call" ident "()" 
  *          | "?" ident 
  * 		  	| "!" expr 
  *          | "begin" stmt {";" stmt } "end" 
