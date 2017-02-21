@@ -21,7 +21,8 @@ namespace pl0c {
     	case OpCode::enter:		return "enter";		break;
     	case OpCode::jump:		return "jump";		break;
     	case OpCode::jneq:		return "jneq";		break;
-    	case OpCode::ret:		return "return";	break;	
+    	case OpCode::ret:		return "ret";		break;
+    	case OpCode::reti:		return "reti";		break;
 		case OpCode::neg:		return "neg";		break;
     	case OpCode::add:		return "add";		break;
     	case OpCode::sub:		return "sub";		break;
@@ -57,13 +58,21 @@ namespace pl0c {
 			cout << label << ": " << setw(5) << loc << ": " << toString(instr.op);
 
     	switch(instr.op) {
-    	case OpCode::pushConst:	cout << " "                     << instr.addr;	break;
-    	case OpCode::pushVar:	cout << " "	<< level << ", "	<< instr.addr;	break;
-    	case OpCode::pop:		cout << " "	<< level << ", "	<< instr.addr;	break;
-    	case OpCode::call:		cout << " "	<< level << ", "	<< instr.addr;	break;
-    	case OpCode::enter:		cout << " "						<< instr.addr;	break;
-    	case OpCode::jump:		cout << " "						<< instr.addr;	break;
-    	case OpCode::jneq:		cout << " "						<< instr.addr;	break;
+    	case OpCode::pushConst:
+    	case OpCode::enter:
+    	case OpCode::jump:
+    	case OpCode::jneq:
+    	case OpCode::ret:
+    	case OpCode::reti:
+    		cout << " " << instr.addr;
+    		break;
+
+    	case OpCode::pushVar:
+    	case OpCode::pop:
+    	case OpCode::call:
+    		cout << " "	<< level << ", " << instr.addr;
+    		break;
+
 		default:								// The rest don't use level or address
 		break;
 		}

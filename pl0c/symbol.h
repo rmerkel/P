@@ -23,6 +23,7 @@ struct SymValue {
 		identifier,		  						///< An identifier
 		constant,								///< A constant identifier
 		proc,									///< A procedure
+		function								///< A function
 	};
 
 	static std::string toString(Kind k);		///< Return k as a string

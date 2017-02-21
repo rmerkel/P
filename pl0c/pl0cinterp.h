@@ -60,6 +60,7 @@ private:
 
 protected:
 	uint16_t base(uint16_t lvl);
+	void ret();
 	std::size_t run();
 };
 

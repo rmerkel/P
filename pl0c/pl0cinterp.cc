@@ -68,7 +68,18 @@ uint16_t PL0CInterp::base(uint16_t lvl) {
 		b = stack[b];
 
 	return b;
- }
+}
+
+/** Return from subroutine
+ *
+ * Unlinks the stack frame, setting the return address as the next instruciton.
+ */
+void PL0CInterp::ret() {
+	sp = bp - 1; 					// Restore the previous sp
+	pc = stack[sp + 3]; 			// Restore the return address
+	bp = stack[sp + 2];				// Restore the previous bp
+	sp -= ir.addr;					// Pop parameters
+}
 
 /** Run the machine from it's current state
  *  @return	the number of machine cycles run
@@ -131,16 +142,23 @@ size_t PL0CInterp::run() {
         	stack[sp+1] = base(ir.level);	// Sent previous frame base
 			stack[sp+2] = bp;				// Save bp register
 			stack[sp+3] = pc;				// Save return address
+			stack[sp+4] = 0;				// Function return address
         	bp = sp + 1;					// points to the frame base
 			pc = ir.addr;					// Set the procedure address
 			break;
 
 		case OpCode::ret: 					// Return from a procedure
-			sp = bp - 1; 					// Restore the previous sp
-			pc = stack[sp + 3]; 			// Restore the return address
-			bp = stack[sp + 2];				// Restore the previous bp
-			sp -= ir.addr;					// Pop parameters
+			ret();
 			break;
+
+		case OpCode::reti: {				// Return integer from function
+											// Save the function result...
+				auto temp = stack[bp + rValue];
+				ret();						// Unlink the stack frame...
+				stack[++sp] = temp;			// Push the result
+			}
+			break;
+
 
 		case OpCode::enter:	sp += ir.addr;								break;
         case OpCode::jump:	pc = ir.addr;								break;
@@ -186,6 +204,6 @@ size_t PL0CInterp::operator()(const InstrVector& program, bool ver) {
 /// Reset the machine back to it's initial state.
 void PL0CInterp::reset() {
 	pc = 0, bp = 0, sp = -1;	// Set up the initial mark block/frame...
-	stack[0] = stack[1] = stack[2] = 0;
+	stack[0] = stack[1] = stack[2] = stack[3] = 0;
 }
 

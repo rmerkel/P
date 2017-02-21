@@ -1,6 +1,6 @@
 /** @file pl0ccomp.cc
  *  
- * The PL0C Compiler
+ * PL0C Compiler implementation
  */
 
 #include "pl0ccomp.h"
@@ -110,26 +110,45 @@ size_t PL0CComp::emit(const OpCode op, int8_t level, Word addr) {
 
 /** Factor identifier
  *
- * Push a variable or a constant value.
+ * Push a variable or a constant value, or invoke, and push the results, of a
+ * function.
+ *
+ * ident | ident "(" [ ident { "," ident } ] ")"
  *
  * @param	level	The current block level
  */
 void PL0CComp::identifier(int level) {
 	const string name = ts.current().string_value;
+	next();								// Consume the identifier
 
-	if (expect(Token::identifier)) {
-		auto range = symtbl.equal_range(name);
-		if (range.first == range.second)
-			error("Undefined identifier", name);
+	auto range = symtbl.equal_range(name);
+	if (range.first == range.second)
+		error("Undefined identifier", name);
 
+	else {
 		auto closest = range.first;
 		for (auto it = range.first; it != range.second; ++it)
 			if (it->second.level > closest->second.level)
 				closest = it;
-		if (closest->second.kind == SymValue::constant)
+
+		if (SymValue::constant == closest->second.kind)
 			emit(OpCode::pushConst, 0, closest->second.value);
-		else									// mutable variable
+
+		else if (SymValue::identifier == closest->second.kind)
 			emit(OpCode::pushVar, level - closest->second.level, closest->second.value);
+
+		else if (SymValue::function == closest->second.kind) {
+			expect(Token::lparen);
+			if (!accept(Token::rparen, false)) {
+				do
+					expression(level);
+				while (accept(Token::comma));
+			}
+			expect(Token::rparen);
+			emit(OpCode::call, level - closest->second.level, closest->second.value);
+
+		} else
+			error("Unknown symbol", name);
 	}
 }
 
@@ -239,66 +258,89 @@ void PL0CComp::condition(int level) {
  *
  * ident "=" expression
  *
+ * @param	name	The identifier value
+ * @param	val		The identifiers symbol table entry value
  * @param	level	The current block level.
  */
-void PL0CComp::assignStmt(int level) {
-	// Save the identifier string and loop it up in the symbol table, before consuming it
-	const string name = ts.current().string_value;
-	next();												// Consume the identifier
+void PL0CComp::assignStmt(const string& name, const SymValue& val, int level) {
+	expression(level);
 
-	auto range = symtbl.equal_range(name);
-	if (range.first == range.second)
-		error("undefined variable", name);
+	switch(val.kind) {
+	case SymValue::identifier:
+		emit(OpCode::pop, level - val.level, val.value);
+		break;
 
-	expect(Token::assign);								// Consume "="
-	expression(level);									// Process he expression
+	case SymValue::function:
+		emit(OpCode::pop, 0, rValue);
+		break;
 
-	if (range.first != range.second) {
-		auto closest = range.first;						// Find the closest identifier
-		for (auto it = range.first; it != range.second; ++it)
-			if (it->second.level > closest->second.level)
-				closest = it;
+	case SymValue::constant:
+		error("Can't assign to a constant", name);
+		break;
 
-		if (SymValue::identifier != closest->second.kind)
-			error("identifier is not mutable", name);
-		else
-			emit(OpCode::pop, level - closest->second.level, closest->second.value);
+	case SymValue::proc:
+		error("Can't assign to a procedure", name);
+		break;
+
+	default:
+		assert(false);
 	}
 }
 
 /** Call statement
  *  
  *  "call" ident "(" [ expr  { "," expr }] ")"...
- *  
+ *
+ * @param	name	The identifier value
+ * @param	val		The identifiers symbol table entry value
  * @param	level	The current block level
  */ 
-void PL0CComp::callStmt(int level) {
-	const string name = ts.current().string_value;
-
-	expect(Token::identifier);
-	expect(Token::lparen);
-
+void PL0CComp::callStmt(const string& name, const SymValue& val, int level) {
 	if (!accept(Token::rparen, false))
 		do {									// [expr {, expr }]
 			expression(level);
 		} while (accept (Token::comma));
 
 	expect(Token::rparen);
-	auto range = symtbl.equal_range(name);
+
+	if (SymValue::proc != val.kind)
+		error("Identifier is not a procedure", name);
+	else
+		emit(OpCode::call, level - val.level, val.value);
+}
+
+/** Identifier statement
+ *
+ * ident "=" expr | ident "(" [ ident { "," ident } ] ")"
+ *
+ * @param	level	The current block level
+ */
+void PL0CComp::identStmt(int level) {
+	// Save the identifier string before consuming it
+	const string name = ts.current().string_value;
+	next();
+
+	auto range = symtbl.equal_range(name);		// look it up....
 	if (range.first == range.second)
-		error("undefined identifier", name);
+		error("undefined variable", name);
 
 	else {
-		auto closest = range.first;
+		auto closest = range.first;				// Find the "closest" entry
 		for (auto it = range.first; it != range.second; ++it)
 			if (it->second.level > closest->second.level)
 				closest = it;
-			if (SymValue::proc != closest->second.kind)
-				error("Identifier is not a procedure", name);
-			else
-				emit(OpCode::call, level - closest->second.level, closest->second.value);
+
+		if (accept(Token::assign))			// ident "=" expression
+			assignStmt(closest->first, closest->second, level);
+
+		else if (accept(Token::lparen))		// proc "(" ... ")"
+			callStmt(closest->first, closest->second, level);
+
+		else
+			error("identifier is not a variable or a procedure", name);
 	}
 }
+
 
 /** While statement
  *
@@ -377,11 +419,8 @@ void PL0CComp::callStmt(int level) {
  * @param	level	The current block level.
  */
 void PL0CComp::statement(int level) {
-	if (accept(Token::identifier, false)) 			// assignment
-		assignStmt(level);
-
-	else if (accept(Token::call))					// procedure call
-		callStmt(level);
+	if (accept(Token::identifier, false)) 			// assignment or proc call
+		identStmt(level);
 
 	else if (accept(Token::begin)) {				// begin ... end
 		do {
@@ -463,15 +502,20 @@ int PL0CComp::varDecl(int offset, int level) {
 	return offset;
 }
 
-/** Procedure declaration
+/** Subroutine declaration
  *
- * { "procedure" ident "(" [ident {, "ident" }] ")" block ";" }
+ *   "procedure" ident "(" [ident {, "ident" }] ")" block ";"
+ * | "function"  ident "(" [ident {, "ident" }] ")" block ";"
  *
  * @param	level	The current block level.
  */
-void PL0CComp::procDecl(int level) {
+void PL0CComp::subDecl(int level) {
+	const	Token::Kind kind = current();	// proc or function decl
+	next();									// consume token...
+
+											// Save the identifier...
 	const 	string name = ts.current().string_value;
-			vector<string> args;		// proc arguments, if any
+			vector<string> args;			// formal arguments, if any
 
 	if (expect(Token::identifier)) {
 		auto range = symtbl.equal_range(name);
@@ -479,14 +523,21 @@ void PL0CComp::procDecl(int level) {
 			if (it->second.level == level)
 				error("identifier has previously been defined", name);
 		
-		auto it = symtbl.insert( { name, { SymValue::proc, level, 0 }} );
-		if (verbose) 
-			cout << progName << ": procDecl " << name << ": " << level << ", 0\n";
+		SymbolTable::iterator it;			// insert the new symbol...
+		if (Token::procDecl == kind) {
+			it = symtbl.insert( { name, { SymValue::proc, level, 0 }} );
+			if (verbose)
+				cout << progName << ": procDecl " << name << ": " << level << ", 0\n";
 
-		expect(Token::lparen);	// procedure name "()"
+		} else {							// funcDecl
+			it = symtbl.insert( { name, { SymValue::function, level, 0 }} );
+			if (verbose)
+				cout << progName << ": funcDecl " << name << ": " << level << ", 0\n";
+		}
 
-		if (accept(Token::identifier, false)) {		// identifier {, identifier }
-			int offset = 0;							// Record the arguments...
+		expect(Token::lparen);				// procedure name "()"
+		if (accept(Token::identifier, false)) { // identifier {, identifier }
+			int offset = 0;					// Record the arguments...
 			do {
 				args.push_back(ts.current().string_value);
 				--offset;							// -1, -2, ..., -n
@@ -505,28 +556,30 @@ void PL0CComp::procDecl(int level) {
 		}
 
 		expect(Token::rparen);
-		block(it, level+1, args.size());
+		block(it->second, level+1, args.size());
 		expect(Token::scomma);	// procedure declarations end with a ';'!
 	}
 }
 
 /** program block
  *
- * block = 	[ const ident = number {, ident = number} ;]
- *         	[ var ident {, ident} ;]
- *         	{ procedure ident ; block ; }
+ * block = 	[ const ident = number {, ident = number} ";"]
+ *         	[ var ident {, ident} ";" ]
+ *         	{ procedure ident "(" [ ident { "," ident } ] ")" block ";"
+ *         	 | function ident "(" [ ident { "," ident } ] ")" block ";" }
  *          stmt ;
  *  
- * @param	it		The blocks (procedures) symbol table entry
+ * @param	val		The blocks (procedures) symbol table entry value
  * @param	level	The current block level.
  * @param   nargs	The number of arguments, passed to the block, that must be
- * 					poped on return.
+ * 					popped on return.
  */
-void PL0CComp::block(SymbolTable::iterator it, int level, unsigned nargs) {
+void PL0CComp::block(SymValue& val, int level, unsigned nargs) {
 	auto 	jmp_pc	= emit(OpCode::jump, 0, 0);	// Addr to be patched below..
-	int		dx		= 3;					// Variable offset from block/frame
+												// Variable offset from block frame
+	int		dx		= static_cast<int>(Frame::size);
 
-	if (accept(Token::constDecl)) {			// const ident = number, ...
+	if (accept(Token::constDecl)) {				// const ident = number, ...
 		do {
 			constDecl(level);
 
@@ -534,7 +587,7 @@ void PL0CComp::block(SymbolTable::iterator it, int level, unsigned nargs) {
 		expect(Token::scomma);
 	}
 
-	if (accept(Token::varDecl)) {			// var ident, ...
+	if (accept(Token::varDecl)) {				// var ident, ...
 		do {
 			dx = varDecl(dx, level);
 
@@ -542,8 +595,8 @@ void PL0CComp::block(SymbolTable::iterator it, int level, unsigned nargs) {
 		expect(Token::scomma);
 	}
 
-	while (accept(Token::procDecl))			// procedure ident; ...
-		procDecl(level);
+	while (accept(Token::procDecl, false) || accept(Token::funcDecl, false))
+		subDecl(level);
 
 	/*
 	 * Block body
@@ -552,18 +605,23 @@ void PL0CComp::block(SymbolTable::iterator it, int level, unsigned nargs) {
 	 * patch the jump to it
 	 */
 
-	auto addr = emit(OpCode::enter, 0, dx);
-	if (verbose) cout << progName << ": patching address at " << jmp_pc << " to " << addr  << "\n";
-	(*code)[jmp_pc].addr = it->second.value = addr;
-	statement(level);						// block body...
+	auto addr = emit(OpCode::enter, 0, dx);	// prefix
+	if (verbose)
+		cout << progName << ": patching address at " << jmp_pc << " to " << addr  << "\n";
+	(*code)[jmp_pc].addr = val.value = addr;
 
-	assert(nargs < numeric_limits<int>::max());
-	emit(OpCode::ret, 0, nargs);			// block postfix
+	statement(level);
+
+	assert(nargs < numeric_limits<int>::max());	// postfix...
+	if (SymValue::function == val.kind)
+		emit(OpCode::reti, 0, nargs);			//	function...
+	else
+		emit(OpCode::ret, 0, nargs);			//	procedure...
 
 	// Finally, remove symbols only visible in this level
 	for (auto i = symtbl.begin(); i != symtbl.end(); )
 		if (i->second.level == level) {
-			if (verbose) cout << ": purging " << i->first << " from the symbol table\n";
+			if (verbose) cout << progName << ": purging " << i->first << " from the symbol table\n";
 			i = symtbl.erase(i);
 
 		} else
@@ -572,7 +630,7 @@ void PL0CComp::block(SymbolTable::iterator it, int level, unsigned nargs) {
 
 // public:
 
-/// Constructor; construct a compilier; use pName for errors
+/// Constructor; construct a compiler; use pName for errors
 PL0CComp::PL0CComp(const string& pName) : progName {pName}, nErrors{0}, verbose {false}, ts{cin} {
 	symtbl.insert({"main", { SymValue::proc, 0, 0 }});	// Install the "main" rountine declaraction
 }
@@ -583,7 +641,7 @@ void PL0CComp::run() {
 	auto range = symtbl.equal_range("main");
 	assert(range.first != range.second);
 
-	block(range.first, 0, 0);
+	block(range.first->second, 0, 0);
 	expect(Token::period);
 }
 

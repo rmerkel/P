@@ -5,30 +5,30 @@
  * Grammar (EBNF):
  * --------------
  *
- *     prog =  block "." ;
+ *     prog  =   block "." ;
  *
  *     block = [ "const" ident "=" number {"," ident "=" number} ";"]
- *             [ "var" ident {"," ident} ";"]
- *             { "procedure" ident "()" block ";" }
- *             stmt ;
+ *             [ "var" ident {"," ident } ";"]
+ *             { "procedure" ident "(" [ ident { "," ident } ] ")" block ";"
+ *              | "function" ident "(" [ ident { "," ident } } ")" block ";" }
+ *               stmt ;
  *
- *     stmt =  [ ident ":=" expr
- *             | "call" ident "()"
- *             | "?" ident
- *             | "!" expr
- *             | "begin" stmt {";" stmt } "end"
- *             | "if" cond "then" stmt { "else" stmt }
- *             | "while" cond "do" stmt ]
- *             | "repeat" stmt "until" cond ;
+ *     stmt  = [ ident "=" expr
+ *              |ident "(" [ expr { "," expr } ")"
+ *              |"begin" stmt {";" stmt } "end"
+ *              |"if" cond "then" stmt { "else" stmt }
+ *              |"while" cond "do" stmt
+ *              |"repeat" stmt "until" cond ] ;
  *
- *     cond =  "odd" expr
- *             | expr ("="|"!="|"<"|"<="|">"|">=") expr ;
+ *     cond  =   "odd" expr
+ *             | expr ("=="|"!="|"<"|"<="|">"|">=") expr ;
  *
- *     expr =  [ "+"|"-"] term { ("+"|"-") term } ;
+ *     expr  = [ "+"|"-"] term { ("+"|"-") term };
  *
- *     term =  fact {("*"|"/") fact} ;
+ *     term  =   fact {("*"|"/") fact} ;
  *
- *     fact =  ident
+ *     fact  =   ident
+ *             | ident "(" [ ident { "," ident } ] ")"
  *             | number
  *             | "(" expr ")" ;
  *
@@ -62,6 +62,7 @@ protected:
 
 	/// Return the current token kind
 	Token::Kind current() 				{	return ts.current().kind;	}
+
 	bool accept(Token::Kind k, bool get = true);
 	bool expect(Token::Kind k, bool get = true);
 
@@ -71,20 +72,24 @@ protected:
 	void terminal(int level);
 	void expression(int level);
 	void condition(int level);
-	void assignStmt(int level);
-	void callStmt(int level);
+	void assignStmt(const std::string& name, const SymValue& val, int level);
+	void callStmt(const std::string& name, const SymValue& val, int level);
+	void identStmt(int level);
 	void whileStmt(int level);
 	void repeatStmt(int level);
  	void ifStmt(int level);
 	void statement(int level);
 	void constDecl(int level);
-	int varDecl(int offset, int level);
-	void procDecl(int level);
-	void block(SymbolTable::iterator it, int level, unsigned nargs);
+	int  varDecl(int offset, int level);
+	void subDecl(int level);
+	void funcDecl(int level);
+	void block(SymValue& val, int level, unsigned nargs);
 	void run();
 
 public:
 	PL0CComp(const std::string& pName);
+
+	/// Destructor
 	virtual ~PL0CComp() {}
 
 	unsigned operator()(const std::string& inFile, pl0c::InstrVector& code, bool verbose = false);

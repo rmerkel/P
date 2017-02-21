@@ -1,14 +1,15 @@
-var p;
-
-procedure factorial(n)
+var result;
+function factorial(n)
+	var p;
     begin
         p = 1;
         while n > 1 do begin
             p = p * n;
             n = n - 1
-        end
+        end;
+		factorial = p;
     end;
 
 begin
-    factorial(10)
+    result = factorial(10)
 end.

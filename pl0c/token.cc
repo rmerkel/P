@@ -127,7 +127,7 @@ string Token::toString(Token::Kind k) {
 	case Kind::constDecl:	return "const";			break;
 	case Kind::varDecl:		return "var";			break;
 	case Kind::procDecl:	return "procedure";		break;
-	case Kind::call:		return "call";			break;
+	case Kind::funcDecl:	return "function";		break;
 	case Kind::begin:		return "begin";			break;
 	case Kind::end:			return "end";			break;
 	case Kind::If:			return "if";			break;
@@ -172,6 +172,7 @@ TokenStream::KeywordTable	TokenStream::keywords = {
 	{   "const",		Token::constDecl	},
 	{	"var",			Token::varDecl		},
 	{	"procedure",	Token::procDecl		},
+	{	"function",		Token::funcDecl		},
 	{	"call",			Token::call			},
 	{	"begin",		Token::begin		},
 	{	"end",			Token::end			},

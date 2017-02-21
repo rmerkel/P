@@ -110,6 +110,7 @@ pr:
 test: all
 	./$(EXE) test.p
 	./$(EXE) fact.p
+	./$(EXE) fact2.p
 	./$(EXE) testif.p
 	./$(EXE) repeatst.p
 

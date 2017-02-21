@@ -5,7 +5,7 @@
  *  (PL0Interp).
  *
  *	Ported from p0com.p, the compiler/interpreter from Algorithms + Data
- *	Structures = Programs.
+ *	Structures = Programs, Wirth.
  *
  * OpCode    | level? | addr?   | Notes
  * --------- | ------ | ------- | ---------------------------------------------
@@ -25,7 +25,8 @@
  * pushVar   | Yes    | offset  | Read and then push a variable on the stack
  * pop       | Yes    | offset  | Pop and write a variable off of the stack
  * call      | Yes    | address | Call procedure with base(level)
- * ret       |        | offset  | Return from procedure, pop offset
+ * ret       |        | offset  | Return from procedure, pop offset (args)
+ * reti      |        | offset  | Return integer from function, pop args
  * enter     |        | offset  | Allocate locals on the stack (sp+=offset)
  * jump      |        | address | Jump to address
  * jneq      |        | address | Jump to address if top-of-stack == false (0)
@@ -46,6 +47,16 @@
 
 /// The PL0 machine operation codes and instruction format.
 namespace pl0c {
+	/// Runtime block/stack frame layout
+	enum Frame {
+		base,								///< base(n)
+		oldfp,								///< Saved frame pointer register
+		rAddr,								///< Return from proc/func address
+		rValue,								///< Function return value
+
+		size								///< # of elements in the frame
+	};
+
 	/// Operation codes
 	enum class OpCode : std::uint8_t {
 
@@ -74,7 +85,8 @@ namespace pl0c {
 		pop,								///< Pop and write a variable off of the stack
 
 		call,								///< Call a procedure, setting up a activation block (frame)
-		ret,								///< Return (from procedure)
+		ret,								///< Return from procedure
+		reti,								///< Return from function
 		enter,								///< Allocate locals on the stack
 		jump,								///< Jump to a location
 		jneq								///< Jump if top-of-stack == false (0), pop

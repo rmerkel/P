@@ -39,6 +39,7 @@ struct Token {
 		constDecl,							///< "const"
 		varDecl,							///< "var"
 		procDecl,							///< "procedure"
+		funcDecl,							///< "function"
 		call,								///< "call"
 		begin,								///< "begin"
 		end,								///< "end"
