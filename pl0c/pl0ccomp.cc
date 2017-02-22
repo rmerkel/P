@@ -602,10 +602,10 @@ void PL0CComp::block(SymValue& val, int level, unsigned nargs) {
 	 * Block body
 	 *
 	 * Emit the block prefix, and then set the blocks staring address, and
-	 * patch the jump to it
+	 * patch the jump to it, followed by the postfix.
 	 */
 
-	auto addr = emit(OpCode::enter, 0, dx);	// prefix
+	auto addr = emit(OpCode::enter, 0, dx);		// prefix
 	if (verbose)
 		cout << progName << ": patching address at " << jmp_pc << " to " << addr  << "\n";
 	(*code)[jmp_pc].addr = val.value = addr;
@@ -619,13 +619,18 @@ void PL0CComp::block(SymValue& val, int level, unsigned nargs) {
 		emit(OpCode::ret, 0, nargs);			//	procedure...
 
 	// Finally, remove symbols only visible in this level
-	for (auto i = symtbl.begin(); i != symtbl.end(); )
+	for (auto i = symtbl.begin(); i != symtbl.end(); ) {
 		if (i->second.level == level) {
-			if (verbose) cout << progName << ": purging " << i->first << " from the symbol table\n";
+			if (verbose)
+				cout << progName << ": purging "
+				<< i->first << ": "
+				<< SymValue::toString(i->second.kind) << ", " << static_cast<int>(i->second.level) << ", " << i->second.value
+				<< " from the symbol table\n";
 			i = symtbl.erase(i);
 
 		} else
 			++i;
+	}
 }
 
 // public:

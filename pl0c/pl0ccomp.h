@@ -82,7 +82,6 @@ protected:
 	void constDecl(int level);
 	int  varDecl(int offset, int level);
 	void subDecl(int level);
-	void funcDecl(int level);
 	void block(SymValue& val, int level, unsigned nargs);
 	void run();
 
