@@ -148,7 +148,7 @@ string Token::toString(Token::Kind k) {
 	case Kind::sub:			return "-";				break;
 	case Kind::period:		return ".";				break;
 	case Kind::div:			return "/";				break;
-	case Kind::scomma:		return ";";				break;
+	case Kind::semicolon:		return ";";				break;
 	case Kind::lt:			return "<";				break;
 	case Kind::assign:		return "=";				break;
 	case Kind::gt:			return ">";				break;

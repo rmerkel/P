@@ -18,33 +18,25 @@ using namespace pl0c;
 
 // protected:
 
-/** Write a error message
- *
- * Writes a diagnostic onto standard error output, incrementing the error count. 
- *
- * @param s The error message
+/** 
+ * Writes a diagnostic on standard error output, and increments the error count. 
+ * @param msg The error message
  */
-void PL0CComp::error(const string& s) {
-	cerr << progName << ": " << s << " near line " << ts.lineNum << endl;
+void PL0CComp::error(const std::string& msg) {
+	cerr << progName << ": " << msg << " near line " << ts.lineNum << endl;
 	++nErrors;
 }
 
-/** Write a error message
- *
- * Writes a diagnostic, in the form "s 't'", onto standard error output, incrementing the error
- * count.
- *
- * @param s The error message
- * @param t Parameter to s.
+/**
+ * Writes a diagnostic in the form "msg 'name'", on standard error output, incrementing the error count.
+ * @param msg The error message
+ * @param name Parameter to msg.
  */
-void PL0CComp::error(const string& s, const string& t) {
-	error (s + " \'" + t + "\'");
+void PL0CComp::error(const std::string& msg, const std::string& name) {
+	error (msg + " \'" + name + "\'");
 }
 
-/** Read and return the next token from the token stream
- *  
- * @return The next token from the token stream 
- */ 
+/// @return The next token from the token stream
 Token PL0CComp::next() {
 	Token t = ts.get();
 
@@ -54,8 +46,7 @@ Token PL0CComp::next() {
 	return t;
 }
 
-/** Accept the next token
- *
+/**
  * Returns true, and optionally consumes the current token, if it's type is equal to kind.
  *
  * @param	kind	The token Kind to accept.
@@ -72,8 +63,7 @@ bool PL0CComp::accept(Token::Kind kind, bool get) {
 	return false;
 }
 
-/** Expect the next token
- *
+/**
  * Evaluate and return accept(kind, get). Generate an error if accept() returns false.
  *
  * @param	kind	The token Kind to accept.
@@ -230,6 +220,7 @@ void PL0CComp::condition(int level) {
 
 	} else {
 		expression(level);
+
 		const Token::Kind op = current();
 
 		if (accept(Token::lte)		||
@@ -425,7 +416,7 @@ void PL0CComp::statement(int level) {
 	else if (accept(Token::begin)) {				// begin ... end
 		do {
 			statement(level);
-		} while (accept(Token::scomma));
+		} while (accept(Token::semicolon));
 		expect(Token::end);
 
 	} else if (accept(Token::If)) 					// if condition...
@@ -557,7 +548,7 @@ void PL0CComp::subDecl(int level) {
 
 		expect(Token::rparen);
 		block(it->second, level+1, args.size());
-		expect(Token::scomma);	// procedure declarations end with a ';'!
+		expect(Token::semicolon);	// procedure declarations end with a ';'!
 	}
 }
 
@@ -584,7 +575,7 @@ void PL0CComp::block(SymValue& val, int level, unsigned nargs) {
 			constDecl(level);
 
 		} while (accept(Token::comma));
-		expect(Token::scomma);
+		expect(Token::semicolon);
 	}
 
 	if (accept(Token::varDecl)) {				// var ident, ...
@@ -592,7 +583,7 @@ void PL0CComp::block(SymValue& val, int level, unsigned nargs) {
 			dx = varDecl(dx, level);
 
 		} while (accept(Token::comma));
-		expect(Token::scomma);
+		expect(Token::semicolon);
 	}
 
 	while (accept(Token::procDecl, false) || accept(Token::funcDecl, false))
@@ -635,7 +626,7 @@ void PL0CComp::block(SymValue& val, int level, unsigned nargs) {
 
 // public:
 
-/// Constructor; construct a compiler; use pName for errors
+/// param pName The program named buy error().
 PL0CComp::PL0CComp(const string& pName) : progName {pName}, nErrors{0}, verbose {false}, ts{cin} {
 	symtbl.insert({"main", { SymValue::proc, 0, 0 }});	// Install the "main" rountine declaraction
 }
@@ -650,17 +641,15 @@ void PL0CComp::run() {
 	expect(Token::period);
 }
 
-/** Run the compiler
- *
+/**
  * @param	inFile	The source file name
  * @param	prog	The generated machine code is appended here
- * @param	v		Output verbose messages if true
- *
+ * @param	verb	Output verbose messages if true
  * @return	The number of errors encountered
  */
-unsigned PL0CComp::operator()(const string& inFile, InstrVector& prog, bool v) {
+unsigned PL0CComp::operator()(const string& inFile, InstrVector& prog, bool verb) {
 	code = &prog;
-	verbose = v;
+	verbose = verb;
 
 	if ("-" == inFile)  {							// "-" means standard input
 		ts.set_input(cin);

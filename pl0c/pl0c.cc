@@ -43,8 +43,7 @@ namespace pl0c {
 		}
 	}
 
-	/** Disassemble an instruction
-	 *
+	/**
 	 * @param	loc		Address of the instruction
 	 * @param	instr	The instruction to disassemble
 	 * @param	label	Display label

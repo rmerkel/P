@@ -1,6 +1,6 @@
 /** @file pl0c.h
  *  
- *  A description of the PL/0C Machine operation codes, instruction format and
+ *  A description of the PL/0C machines operation codes, instruction format and
  *  some utilities used by both the compiler (PL0Comp) and the interpreter
  *  (PL0Interp).
  *
@@ -115,6 +115,7 @@ namespace pl0c {
 	/// A vector of Instr's
 	typedef std::vector<Instr>	InstrVector;
 
+	/// Disassemble an instruction
 	Word disasm(Word loc, const Instr& instr, const std::string label = "");
 }
 

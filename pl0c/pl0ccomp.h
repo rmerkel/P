@@ -1,6 +1,6 @@
 /** @file pl0ccomp.h
  *
- * A PL/0 compiler...
+ * A PL/0C compiler...
  *
  * Grammar (EBNF):
  * --------------
@@ -56,14 +56,23 @@ class PL0CComp {
 	pl0c::InstrVector*	code;			///< The emitted code
 
 protected:
-	void error(const std::string& s);
-	void error(const std::string& s, const std::string& t);
+	/// Write a error message
+	void error(const std::string& msg);
+
+	/** Write a error message
+	 */
+	void error(const std::string& msg, const std::string& name);
+
+ 	/// Read and returns the next token from the current token stream.
 	Token next();
 
 	/// Return the current token kind
 	Token::Kind current() 				{	return ts.current().kind;	}
 
+	/// Accept the next token
 	bool accept(Token::Kind k, bool get = true);
+
+	/// Expect teh next token
 	bool expect(Token::Kind k, bool get = true);
 
 	size_t emit(const pl0c::OpCode op, int8_t level = 0, pl0c::Word addr = 0);
@@ -86,12 +95,11 @@ protected:
 	void run();
 
 public:
-	PL0CComp(const std::string& pName);
+	PL0CComp(const std::string& pName);	///< Constructor; use pName for error messages
+	virtual ~PL0CComp() {}				///< Destructor
 
-	/// Destructor
-	virtual ~PL0CComp() {}
-
-	unsigned operator()(const std::string& inFile, pl0c::InstrVector& code, bool verbose = false);
+	/// Run the compiler
+	unsigned operator()(const std::string& inFile, pl0c::InstrVector& prog, bool verb = false);
 };
 
 #endif
