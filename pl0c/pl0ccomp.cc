@@ -38,7 +38,7 @@ void PL0CComp::error(const std::string& msg, const std::string& name) {
 
 /// @return The next token from the token stream
 Token PL0CComp::next() {
-	Token t = ts.get();
+	const Token t = ts.get();
 
 	if (verbose)
 		cout << progName << ": getting '" << Token::toString(t.kind) << "', " << t.string_value << ", " << t.number_value << "\n";
@@ -78,8 +78,7 @@ bool PL0CComp::expect(Token::Kind kind, bool get) {
 	return false;
 }
 
-/** Emit an instruction
- *
+/**
  *	Appends (op, level, addr) on code, and returns it's address.
  *
  *	@param	op		The pl0 instruction operation code
@@ -95,7 +94,34 @@ size_t PL0CComp::emit(const OpCode op, int8_t level, Word addr) {
 				<< "\n";
 
 	code->push_back({op, level, addr});
+	indextbl.push_back(ts.lineNum);			// update the cross index
+
 	return code->size() - 1;				// so it's the address of just emitted instruction
+}
+
+/**
+ * Writes a listing on the output stream 
+ *  
+ * @param name		Name of the source file 
+ * @param source 	The source file stream 
+ * @param out		The listing file stream 
+ */
+ void PL0CComp::listing(const string& name, istream& source, ostream& out) {
+	string 		line;   					// Current source line
+	unsigned 	linenum = 1;				// source line number
+	unsigned 	addr = 0;					// code address (index)
+	
+	while (addr < indextbl.size()) {
+		while (linenum <= indextbl[addr]) {	// Print lines that lead up to code[addr]...
+   			getline(source, line);	++linenum;
+   			cout << left << setw(15) << name << " **** " << line << "\n" << internal;
+   		}
+   		
+   		disasm(out, addr, (*code)[addr]);	// Disasmble resulting instructions...
+   		while (linenum-1 == indextbl[++addr])
+   			disasm(out, addr, (*code)[addr]);
+	}
+	out << endl;
 }
 
 /** Factor identifier
@@ -642,7 +668,7 @@ void PL0CComp::run() {
 }
 
 /**
- * @param	inFile	The source file name
+ * @param	inFile	The source file name, where "-" means the standard input stream
  * @param	prog	The generated machine code is appended here
  * @param	verb	Output verbose messages if true
  * @return	The number of errors encountered
@@ -651,9 +677,13 @@ unsigned PL0CComp::operator()(const string& inFile, InstrVector& prog, bool verb
 	code = &prog;
 	verbose = verb;
 
-	if ("-" == inFile)  {							// "-" means standard input
+	if ("-" == inFile)  {						// "-" means standard input
 		ts.set_input(cin);
 		run();
+
+		// Just disasmemble as we can't rewind standard input!
+		for (unsigned loc = 0; loc < code->size(); ++loc)
+			disasm(cout, loc, (*code)[loc]);
 
 	} else {
 		ifstream ifile(inFile);
@@ -663,17 +693,12 @@ unsigned PL0CComp::operator()(const string& inFile, InstrVector& prog, bool verb
 		else {
 			ts.set_input(ifile);
 			run();
+
+			ifile.close();						// Rewind the source (seekg(0) isn't working!)...
+			ifile.open(inFile);
+			listing(inFile, ifile, cout);		// 	create a listing...
 		}
 	}
-
-	if (verbose) {									// Disassemble results
-		cout << "\n";
-		unsigned loc = 0;
-		for (auto it : *code)
-			disasm(loc++, it);
-		cout << endl;
-	}
-
 	code = 0;
 		
 	return nErrors;

@@ -19,54 +19,84 @@ using namespace std;
 
 // private:
 
+std::istream& TokenStream::getch(char& c) {
+	if (col == line.size()) {
+		col = 0;
+		line.clear();
+		if (getline(*ip, line))
+			line.push_back('\n');
+	}
+
+	if (col < line.size())
+		c = line[col++];
+
+	return *ip;
+}
+
+std::istream& TokenStream::unget() {
+	if (col > 0) --col;
+	return *ip;
+}
+
 /// Read and return the next token
 Token TokenStream::get() {
 	char ch = 0;
 
 	do {								// skip whitespace... 
-		if (!ip->get(ch))
+		if (!getch(ch))
 			return ct = { Token::eof };
 
-		if (ch == '\n') ++lineNum;		// Count lines...
+		if ('\n' == ch) ++lineNum;		// Count lines
 
 	} while (isspace(ch));
 
 	switch (ch) {
+#if	0	// bit And or logial And... TBD
+	case '&':							// & or &&
+		if (!getch(ch))	ct.kind = Token::bitAnd;
+		else if ('&' == ch)	ct.kind = Token::And;
+		else {
+			unget();
+			ct.kind = Token::bitAnd;
+		}
+		break;
+#endif
+
 	case '=':							// = or ==?
-		if (!ip->get(ch))	ct.kind = Token::assign;
+		if (!getch(ch))	ct.kind = Token::assign;
 		else if ('=' == ch) ct.kind = Token::equ;
 		else {
-			ip->putback(ch);
+			unget();
 			ct.kind = Token::assign;
 		}
 		return ct;
 		break;
 
 	case '!':							// ! or !=?
-		if (!ip->get(ch))	ct.kind = Token::Not;
+		if (!getch(ch))	ct.kind = Token::Not;
 		else if ('=' == ch) ct.kind = Token::neq;
 		else {
-			ip->putback(ch);
+			unget();
 			ct.kind = Token::Not;
 		}
 		return ct;
 		break;
 
 	case '>':							// > or >=?
-		if (!ip->get(ch))	ct.kind = Token::gt;
+		if (!getch(ch))	ct.kind = Token::gt;
 		else if ('=' == ch)	ct.kind = Token::gte;
 		else {
-			ip->putback(ch);
+			unget();
 			ct.kind = Token::gt;
 		}
 		return ct;
 		break;
 
 	case '<':							// < or <=?
-		if (!ip->get(ch))	ct.kind = Token::lt;
+		if (!getch(ch))	ct.kind = Token::lt;
 		else if ('=' == ch)	ct.kind = Token::lte;
 		else {
-			ip->putback(ch);
+			unget();
 			ct.kind = Token::lt;
 		}
 		return ct;
@@ -86,19 +116,24 @@ Token TokenStream::get() {
 		return ct = { static_cast<Token::Kind>(ch) };
 
 	case '0': case '1': case '2': case '3': case '4':
-	case '5': case '6': case '7': case '8': case '9':
-		ip->putback(ch);
-		*ip >> ct.number_value;
+	case '5': case '6': case '7': case '8': case '9': {
+		ct.string_value = ch;
+		while (getch(ch) && isdigit(ch))
+			ct.string_value += ch;
+		unget();
+		std::istringstream iss (ct.string_value);
+		iss >> ct.number_value;
 		ct.kind = Token::number;
 		return ct;
+	}
 
 	default:							// ident, ident = or error
 		if (isalpha(ch)) {
 			ct.string_value = ch;
-			while (ip->get(ch) && isalnum(ch))
+			while (getch(ch) && isalnum(ch))
 				ct.string_value += ch;
 
-			ip->putback(ch);
+			unget();
 			auto it = keywords.find(ct.string_value);
 			if (keywords.end() != it)
 				ct.kind = it->second;
@@ -108,7 +143,7 @@ Token TokenStream::get() {
 		}
 
 		cerr << "bad token: \'" << ch << "\'\n";
-		return ct = { Token::none };
+		return ct = { Token::eof };
 	}
 }
 
@@ -117,7 +152,6 @@ Token TokenStream::get() {
 /// Return a string with k's name
 string Token::toString(Token::Kind k) {
 	switch(k) {
-	case Kind::none:		return "none";			break;
 	case Kind::identifier:	return "identifier";	break;
 	case Kind::number:		return "number";		break;
 	case Kind::equ:			return "==";			break;
@@ -148,7 +182,7 @@ string Token::toString(Token::Kind k) {
 	case Kind::sub:			return "-";				break;
 	case Kind::period:		return ".";				break;
 	case Kind::div:			return "/";				break;
-	case Kind::semicolon:		return ";";				break;
+	case Kind::semicolon:	return ";";				break;
 	case Kind::lt:			return "<";				break;
 	case Kind::assign:		return "=";				break;
 	case Kind::gt:			return ">";				break;
@@ -161,10 +195,6 @@ string Token::toString(Token::Kind k) {
 		}
 	}
 }
-
-/************************************************************************************************
- *	Token Stream																				*
- ************************************************************************************************/
 
 // privite static
 

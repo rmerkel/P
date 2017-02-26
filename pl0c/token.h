@@ -26,8 +26,6 @@ struct Token {
 	 *  its character
 	 */
 	enum Kind : char {
-		none,							///< Placeholder for a 'real' token
-
 		identifier,	  		  			///< An identifier (string_value)
 		number,							///< literal number (number_value)
 											
@@ -102,13 +100,17 @@ public:
 	size_t			lineNum;			///< Line # of the current stream
 
 	/// Initialize with an input stream which this does not own
-	TokenStream(std::istream& s) : lineNum{1}, ip{&s}, owns{false}	{}
+	TokenStream(std::istream& s) : lineNum{1}, ip{&s}, owns{false}, col{0}	{}
 
 	/// Initialize with an input stream which this does own
-	TokenStream(std::istream* s) : lineNum{1}, ip{s}, owns{true}	{}
+	TokenStream(std::istream* s) : lineNum{1}, ip{s}, owns{true}, col{0}	{}
 
 	/// Destructor
 	virtual ~TokenStream()				{	close();	}
+
+	/// Return the next character from the stream. Sets eof in *ip and return *ip
+	std::istream& getch(char& c);
+	std::istream& unget();				///< Return last character to the stream
 
 	Token get();
 
@@ -136,9 +138,11 @@ private:
 
 	std::istream*	ip;					///< Pointer to an input stream
 	bool			owns;				///< Does *this* own ip?
+	size_t 			col;				///< Index into line for next character
+	std::string 	line;				///< last line read from the stream 
 
 	/// The current token
-	Token 			ct { Token::Kind::none };
+	Token 			ct { Token::Kind::eof };
 
 	/// If *this* owns ip, delete it.
 	void close()							{ if (owns) delete ip;	}

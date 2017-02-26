@@ -5,32 +5,32 @@
  * Grammar (EBNF):
  * --------------
  *
- *     prog  =   block "." ;
+ *     prog  =     block "." ;
  *
- *     block = [ "const" ident "=" number {"," ident "=" number} ";"]
- *             [ "var" ident {"," ident } ";"]
- *             { "procedure" ident "(" [ ident { "," ident } ] ")" block ";"
- *              | "function" ident "(" [ ident { "," ident } } ")" block ";" }
- *               stmt ;
+ *     block =  [  "const" ident "=" number {"," ident "=" number} ";"]
+ *              [  "var" ident {"," ident } ";"]
+ *              {  "procedure" ident "(" [ ident { "," ident } ] ")" block ";"
+ *               | "function" ident "(" [ ident { "," ident } ] ")" block ";" }
+ *                 stmt ;
  *
- *     stmt  = [ ident "=" expr
- *              |ident "(" [ expr { "," expr } ")"
- *              |"begin" stmt {";" stmt } "end"
- *              |"if" cond "then" stmt { "else" stmt }
- *              |"while" cond "do" stmt
- *              |"repeat" stmt "until" cond ] ;
+ *     stmt  = [   ident "=" expr
+ *              |  ident "(" [ expr { "," expr } ")"
+ *              |  "begin" stmt {";" stmt } "end"
+ *              |  "if" cond "then" stmt { "else" stmt }
+ *              |  "while" cond "do" stmt
+ *              |  "repeat" stmt "until" cond ] ;
  *
- *     cond  =   "odd" expr
- *             | expr ("=="|"!="|"<"|"<="|">"|">=") expr ;
+ *     cond  =    "odd" expr
+ *             |  expr ("=="|"!="|"<"|"<="|">"|">=") expr ;
  *
- *     expr  = [ "+"|"-"] term { ("+"|"-") term };
+ *     expr  = [  "+"|"-"] term { ("+"|"-") term };
  *
- *     term  =   fact {("*"|"/") fact} ;
+ *     term  =    fact {("*"|"/") fact} ;
  *
- *     fact  =   ident
- *             | ident "(" [ ident { "," ident } ] ")"
- *             | number
- *             | "(" expr ")" ;
+ *     fact  =    ident
+ *             |  ident "(" [ ident { "," ident } ] ")"
+ *             |  number
+ *             |  "(" expr ")" ;
  *
  * Key
  * 	- {}	zero or more times
@@ -48,34 +48,42 @@
 
 /// A PL/0C Compiler
 class PL0CComp {
+	/// A table, indexed by instruction address, yeilding source line numbers
+	typedef std::vector<unsigned> SourceIndex;
+
 	std::string			progName;		///< The owning programs name
 	unsigned			nErrors;		///< # of errors compiling all sources
 	bool				verbose;		///< Dump debugging information if true
 	TokenStream			ts;				///< Input token stream
 	SymbolTable			symtbl;			///< The symbol table
 	pl0c::InstrVector*	code;			///< The emitted code
+	SourceIndex			indextbl;		///< source index for listings
 
 protected:
-	/// Write a error message
+	/// Write a error message...
 	void error(const std::string& msg);
 
-	/** Write a error message
-	 */
+	/// Write a error message...
 	void error(const std::string& msg, const std::string& name);
 
- 	/// Read and returns the next token from the current token stream.
+ 	/// Read and returns the next token from the current token stream...
 	Token next();
 
-	/// Return the current token kind
+	/// Return the current token kind..
 	Token::Kind current() 				{	return ts.current().kind;	}
 
-	/// Accept the next token
+	/// Accept the next token..
 	bool accept(Token::Kind k, bool get = true);
 
-	/// Expect teh next token
+	/// Expect the next token...
 	bool expect(Token::Kind k, bool get = true);
 
+	/// Emit an instruction...
 	size_t emit(const pl0c::OpCode op, int8_t level = 0, pl0c::Word addr = 0);
+
+	/// Create a listing...
+	void listing(const std::string& name, std::istream& source, std::ostream& out);
+
 	void identifier(int level);
 	void factor(int level);
 	void terminal(int level);

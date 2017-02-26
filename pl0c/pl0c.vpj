@@ -10,7 +10,8 @@
 		DebugCallbackName="gdb"
 		Version="1"
 		OutputFile="%bdpl0c"
-		CompilerConfigName="Latest Version">
+		CompilerConfigName="Latest Version"
+		ObjectDir="/home/rmerkel/pascal/pl0/pl0c/">
 		<Menu>
 			<Target
 				Name="Compile"
@@ -60,7 +61,7 @@
 				CaptureOutputWith="ProcessBuffer"
 				Deletable="0"
 				SaveOption="SaveNone"
-				RunFromDir="%rw">
+				RunFromDir="/home/rmerkel/pascal/pl0/pl0c/">
 				<Exec CmdLine='vsdebugio -prog "%o"'/>
 			</Target>
 			<Target
@@ -71,7 +72,7 @@
 				CaptureOutputWith="ProcessBuffer"
 				Deletable="0"
 				SaveOption="SaveWorkspaceFiles"
-				RunFromDir="%rw">
+				RunFromDir="/home/rmerkel/pascal/pl0/pl0c/">
 				<Exec CmdLine='"%o"'/>
 			</Target>
 			<Target
@@ -185,7 +186,7 @@
 				CaptureOutputWith="ProcessBuffer"
 				Deletable="0"
 				SaveOption="SaveNone"
-				RunFromDir="%rw">
+				RunFromDir="/home/rmerkel/pascal/pl0/pl0c/">
 				<Exec CmdLine='vsdebugio -prog "%o"'/>
 			</Target>
 			<Target
@@ -196,7 +197,7 @@
 				CaptureOutputWith="ProcessBuffer"
 				Deletable="0"
 				SaveOption="SaveWorkspaceFiles"
-				RunFromDir="%rw">
+				RunFromDir="/home/rmerkel/pascal/pl0/pl0c/">
 				<Exec CmdLine='"%o"'/>
 			</Target>
 			<Target
@@ -264,6 +265,7 @@
 			<F N="pl0ccomp.cc"/>
 			<F N="pl0cinterp.cc"/>
 			<F N="symbol.cc"/>
+			<F N="../../../test.cc"/>
 			<F N="token.cc"/>
 		</Folder>
 		<Folder
@@ -293,8 +295,8 @@
 			<F
 				N="Makefile"
 				Type="Makefile"/>
+			<F N="pl0c"/>
 			<F N="pl0c.vpwistu"/>
-			<F N="pl0com"/>
 			<F N="repeatst.p"/>
 			<F N="test.p"/>
 			<F N="testif.p"/>

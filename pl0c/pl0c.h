@@ -116,7 +116,7 @@ namespace pl0c {
 	typedef std::vector<Instr>	InstrVector;
 
 	/// Disassemble an instruction
-	Word disasm(Word loc, const Instr& instr, const std::string label = "");
+	Word disasm(std::ostream& out, Word loc, const Instr& instr, const std::string label = "");
 }
 
 #endif

@@ -73,7 +73,6 @@ static bool parseCommandline(const vector<string>& args) {
 	return true;
 }
 
-
 /** PL/0C compiler and interpreter
  *  
  * Usage: PL0C [options] [file] 

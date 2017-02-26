@@ -43,18 +43,17 @@ namespace pl0c {
 		}
 	}
 
-	/**
+	/** 
+	 * @param	out		Where to write the results 
 	 * @param	loc		Address of the instruction
 	 * @param	instr	The instruction to disassemble
 	 * @param	label	Display label
 	 * @return loc+1
 	 */
-	Word disasm(Word loc, const Instr& instr, const string label) {
+	Word disasm(ostream& out, Word loc, const Instr& instr, const string label) {
 		const int level = instr.level;		// so we don't display the level as a character
-		if (label.empty())
-			cout << setw(10) << loc << ": " << toString(instr.op);
-		else
-			cout << label << ": " << setw(5) << loc << ": " << toString(instr.op);
+		if (label.size()) out << label << ": ";
+		out << setw(4) << loc << ": " << toString(instr.op);
 
     	switch(instr.op) {
     	case OpCode::pushConst:
@@ -63,19 +62,19 @@ namespace pl0c {
     	case OpCode::jneq:
     	case OpCode::ret:
     	case OpCode::reti:
-    		cout << " " << instr.addr;
+    		out << " " << instr.addr;
     		break;
 
     	case OpCode::pushVar:
     	case OpCode::pop:
     	case OpCode::call:
-    		cout << " "	<< level << ", " << instr.addr;
+    		out << " "	<< level << ", " << instr.addr;
     		break;
 
 		default:								// The rest don't use level or address
 		break;
 		}
-		cout << "\n";
+		out << "\n";
 
 		return loc+1;
 	}

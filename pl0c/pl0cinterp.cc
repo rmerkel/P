@@ -54,7 +54,7 @@ void PL0CInterp::dump() {
 		cout <<		"bp: " << setw(5) << bp << ": " << stack[bp] << endl;
 	}
 
-	disasm(pc, code[pc], "pc");
+	disasm(cout, pc, code[pc], "pc");
 
 	cout << endl;
 }
