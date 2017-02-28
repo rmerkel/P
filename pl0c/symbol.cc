@@ -20,6 +20,7 @@ string SymValue::toString(SymValue::Kind k) {
 	case SymValue::identifier:	return "identifier";
 	case SymValue::constant:	return "constant";
 	case SymValue::proc:		return "proc";
+	case SymValue::function:	return "function";
 	default:
 		assert(false);
 	}

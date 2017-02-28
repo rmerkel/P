@@ -74,7 +74,7 @@ cleanall: clean
 docs:	docs/html/index.html
 
 docs/html/index.html:	Doxyfile $(ALLSRCS)
-	@doxygen
+	doxygen
 
 ################################################################################
 # Print a help message...
@@ -92,7 +92,7 @@ help:
 	@echo "    docs    - to generate documentation."
 	@echo "    help    - prints this message."
 	@echo "    pl0c    - to build the compiler."
-	@echo "    pr      - print source"
+	@echo "    pr      - prepare source for printing"
 	@echo "    test    - to bring calc upto date and run tests."
 	@echo ""
 
@@ -101,7 +101,7 @@ help:
 ################################################################################
 
 pr:
-	@pr $(ALLSRCS) Makefile | expand -4 | lpr
+	@pr --expand-tabs=4 $(ALLSRCS) Makefile
 
 ################################################################################
 # Bring up to date and run some tests...
@@ -113,4 +113,5 @@ test: all
 	./$(EXE) fact2.p
 	./$(EXE) testif.p
 	./$(EXE) repeatst.p
-
+	./$(EXE) precedence.p
+	./$(EXE) comment.p

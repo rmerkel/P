@@ -25,7 +25,7 @@ static bool		verbose = false;				///< Verbose messages if true
 
 /// Print a usage message on standard error output
 static void help() {
-	cerr << "Usage: " << progName << ": [options filename]\n"
+	cerr << "Usage: " << progName << ": [options[ filename\n"
 		 << "Where options is zero or more of the following:\n"
 		 << "-?        Print this message and exit.\n"
 		 << "-help     Same as -?\n"
@@ -40,16 +40,20 @@ static void help() {
  */
 static bool parseCommandline(const vector<string>& args) {
 	for (auto arg : args) {
-		if (arg.empty()) continue;					// Skip ""
-		else if ("-" == arg) inputFile = arg;		// Read from standard input
+		if (arg.empty()) 
+			continue;							// skip ""
+												
+		else if ("-" == arg) 
+			inputFile = arg;					// read from standard input
 
 		else if ("-help" == arg) {
 			help();
 			return false;
 
-		} else if ("-verbose" == arg) verbose = true;
+		} else if ("-verbose" == arg) 
+			verbose = true;						// annoy the user with lots-o-messages...
 
-		else if ('-' == arg[0])	{				 	// parse -options...
+		else if ('-' == arg[0])	{				// parse -options...
 			for (unsigned n = 1; n < arg.size(); ++n)
 				switch(arg[n]) {
 				case '?':
@@ -67,7 +71,7 @@ static bool parseCommandline(const vector<string>& args) {
 				}
 
 		} else
-			inputFile = arg;						// Read from named file
+			inputFile = arg;				// Read from named file
 	}
 
 	return true;
@@ -92,11 +96,15 @@ int main(int argc, char* argv[]) {
 	vector<string> args;				// Parse the command line arguments...
 	for (int argn = 1; argn < argc; ++argn)
 		args.push_back(argv[argn]);
+
 	if (!parseCommandline(args))
 		++nErrors;
 
+	if (inputFile.empty()) {
+		cerr << progName << ": source file name was not found!\n";
+		++nErrors;
 										// Compile the source, run if no errors
-	else if (0 == (nErrors = comp(inputFile, code, verbose))) {
+	} else if (0 == (nErrors = comp(inputFile, code, verbose))) {
 		if (verbose) cout << progName << ": loading program from standard input, and starting pl/0...\n";
 		const size_t n = machine(code, verbose);
 		if (verbose) cout << progName << ": Ending pl/0 after " << n << " machine cycles\n";

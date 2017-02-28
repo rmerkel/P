@@ -113,13 +113,20 @@ size_t PL0CInterp::run() {
     	case OpCode::add:	--sp; stack[sp] = stack[sp] + stack[sp+1];	break;
     	case OpCode::sub:	--sp; stack[sp] = stack[sp] - stack[sp+1];	break;
     	case OpCode::mul:	--sp; stack[sp] = stack[sp] * stack[sp+1];	break;
-    	case OpCode::div:	--sp; stack[sp] = stack[sp] / stack[sp+1];	break;
+		case OpCode::div:	--sp; stack[sp] = stack[sp] / stack[sp+1];	break;
+
+		case OpCode::bor:	--sp; stack[sp] = stack[sp] | stack[sp+1];	break;
+		case OpCode::band:	--sp; stack[sp] = stack[sp] && stack[sp+1];	break;
+		case OpCode::bxor:	--sp; stack[sp] = stack[sp] ^ stack[sp+1];	break;
+
     	case OpCode::equ:	--sp; stack[sp] = stack[sp] == stack[sp+1];	break;
     	case OpCode::neq:	--sp; stack[sp] = stack[sp] != stack[sp+1];	break;
     	case OpCode::lt:	--sp; stack[sp] = stack[sp]  < stack[sp+1];	break;
     	case OpCode::gte:	--sp; stack[sp] = stack[sp] >= stack[sp+1];	break;
     	case OpCode::gt:	--sp; stack[sp] = stack[sp]  > stack[sp+1];	break;
 		case OpCode::lte:	--sp; stack[sp] = stack[sp] <= stack[sp+1];	break;
+		case OpCode::lor:	--sp; stack[sp] = stack[sp] || stack[sp+1];	break;
+		case OpCode::land:	--sp; stack[sp] = stack[sp] && stack[sp+1];	break;
 
 		// push/pop
 

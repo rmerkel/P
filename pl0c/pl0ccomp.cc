@@ -40,6 +40,13 @@ void PL0CComp::error(const std::string& msg, const std::string& name) {
 Token PL0CComp::next() {
 	const Token t = ts.get();
 
+	if (Token::unknown == t.kind) {
+		ostringstream oss;
+		oss << "Unknown token: '" << t.string_value << ", (0x" << hex << t.number_value << ")";
+		error(oss.str());
+		return next();
+	}
+
 	if (verbose)
 		cout << progName << ": getting '" << Token::toString(t.kind) << "', " << t.string_value << ", " << t.number_value << "\n";
 
@@ -114,20 +121,22 @@ size_t PL0CComp::emit(const OpCode op, int8_t level, Word addr) {
 	while (addr < indextbl.size()) {
 		while (linenum <= indextbl[addr]) {	// Print lines that lead up to code[addr]...
    			getline(source, line);	++linenum;
-   			cout << left << setw(15) << name << " **** " << line << "\n" << internal;
+   			cout << left << setw(15) << name << "(" << linenum << "): " << line << "\n" << internal;
    		}
    		
    		disasm(out, addr, (*code)[addr]);	// Disasmble resulting instructions...
    		while (linenum-1 == indextbl[++addr])
    			disasm(out, addr, (*code)[addr]);
 	}
+
+	while (getline(source, line))			// Any lines following '.'...
+		cout << left << setw(15) << name << "(" << linenum++ << "): " << line << "\n" << internal;
+
 	out << endl;
 }
 
-/** Factor identifier
- *
- * Push a variable or a constant value, or invoke, and push the results, of a
- * function.
+/** 
+ * Push a variable's value, a constant value, or invoke, and push the results, of a function.
  *
  * ident | ident "(" [ ident { "," ident } ] ")"
  *
@@ -168,8 +177,7 @@ void PL0CComp::identifier(int level) {
 	}
 }
 
-/** Factor
- *
+/**
  * factor = ident | number | "{" expression "}" ;
  *
  * @param	level	The current block level.
@@ -193,49 +201,36 @@ void PL0CComp::factor(int level) {
 	}
 }
 
-/** Terminal
- *
- * term = fact { (*|/) fact } ;
- *
- * @param	level	The current block level.
- */
-void PL0CComp::terminal(int level) {
-	factor(level);
-
-	for (Token::Kind k = current(); k == Token::mul || k == Token::div; k = current()) {
-		next();							// consume the token
-
-		factor(level);
-		Token::mul == k ? emit(OpCode::mul) : emit(OpCode::div);
-	}
-}
-
-/** Expression
- *
- * expr = [ +|-] term { (+|-) term } ;
+/**
+ * expr =	   [ ("+"|"-") ] fact { ("*"|"/"|"+"|"-") fact } ;
  *
  * @param	level	The current block level.
  */
 void PL0CComp::expression(int level) {
-	const Token::Kind unary = current();	// unary [ +|-]?
+	const Token::Kind unary = current();	// unary +|-?
 	if (unary == Token::add || unary == Token::sub)
-		next();
+		next();	
 
-	terminal(level);
+	factor(level);
+
 	if (Token::sub == unary)
 		emit(OpCode::neg);				// ignore unary +!
 
-	for (Token::Kind k = current(); k == Token::add || k == Token::sub; k = current()) {
-		next();							// consume the token
-
-		terminal(level);
-		Token::add == k ? emit(OpCode::add) : emit(OpCode::sub);
+	for (;;) {
+		if (accept(Token::mul))			{   factor(level);	emit(OpCode::mul);	}
+		else if (accept(Token::div)) 	{   factor(level);  emit(OpCode::div);  }
+		else if (accept(Token::add)) 	{   factor(level);	emit(OpCode::add);  }
+		else if (accept(Token::sub)) 	{   factor(level);	emit(OpCode::sub);  }
+		else if (accept(Token::bor))	{	factor(level);	emit(OpCode::bor);  }
+		else if (accept(Token::band))	{	factor(level);	emit(OpCode::band); }
+		else if (accept(Token::bxor))	{	factor(level);	emit(OpCode::bxor); }
+		else
+			break;
 	}
 }
 
-/** Condition
- *
- * cond =  "odd" expr | expr ("="|"!="|"<"|"<="|">"|">=") expr ;
+/**
+ * cond =  "odd" expr | expr ("="|"!="|"<"|"<="|">"|">="|"||"|"&&") expr ;
  *
  * @param	level	The current block level.
  */
@@ -247,32 +242,20 @@ void PL0CComp::condition(int level) {
 	} else {
 		expression(level);
 
-		const Token::Kind op = current();
-
-		if (accept(Token::lte)		||
-			accept(Token::lt)		||
-			accept(Token::equ)		||
-			accept(Token::gt)		||
-			accept(Token::gte)		||
-			accept(Token::neq))
-		{
-			expression(level);
-
-			switch(op) {
-			case Token::lte:		emit(OpCode::lte);	break;
-			case Token::lt:			emit(OpCode::lt);	break;
-			case Token::equ:		emit(OpCode::equ);	break;
-			case Token::gt:			emit(OpCode::gt);	break;
-			case Token::gte:		emit(OpCode::gte);	break;
-			case Token::neq:		emit(OpCode::neq);	break;
-			default:			assert(false);		// can't get here!
-			}
-		}
+		if (accept(Token::lte)) 		{   expression(level);  emit(OpCode::lte);  }
+		else if (accept(Token::lt)) 	{   expression(level);	emit(OpCode::lt);   }
+		else if (accept(Token::equ)) 	{   expression(level);	emit(OpCode::equ);  } 
+		else if (accept(Token::gt))		{	expression(level);	emit(OpCode::gt);   }
+		else if (accept(Token::gte)) 	{	expression(level);	emit(OpCode::gte);  }
+		else if (accept(Token::neq)) 	{	expression(level);	emit(OpCode::neq);  }
+		else if (accept(Token::lor)) 	{	expression(level);	emit(OpCode::lor);  }
+		else if (accept(Token::land)) 	{	expression(level);	emit(OpCode::land);	}
+		else
+			assert(false);						// can't get here!
 	}
 }
 
-/** Assignment statement
- *
+/**
  * ident "=" expression
  *
  * @param	name	The identifier value
@@ -304,8 +287,7 @@ void PL0CComp::assignStmt(const string& name, const SymValue& val, int level) {
 	}
 }
 
-/** Call statement
- *  
+/** 
  *  "call" ident "(" [ expr  { "," expr }] ")"...
  *
  * @param	name	The identifier value
@@ -326,8 +308,7 @@ void PL0CComp::callStmt(const string& name, const SymValue& val, int level) {
 		emit(OpCode::call, level - val.level, val.value);
 }
 
-/** Identifier statement
- *
+/**
  * ident "=" expr | ident "(" [ ident { "," ident } ] ")"
  *
  * @param	level	The current block level
@@ -359,8 +340,7 @@ void PL0CComp::identStmt(int level) {
 }
 
 
-/** While statement
- *
+/**
  * "while" condition "do" statement...
  *
  * @param	level	The current block level.
@@ -380,8 +360,7 @@ void PL0CComp::identStmt(int level) {
 	(*code)[jmp_pc].addr = code->size();			// Patch jump on condition false instruction
  }
 
-/** if statement
- *  
+/**
  *  "if" condition "then" statement1 [ "else" statement2 ]
  */
  void PL0CComp::ifStmt(int level) {
@@ -409,8 +388,7 @@ void PL0CComp::identStmt(int level) {
 	}
  }
 
- /** Repeat statement
-  *  
+ /**
   * [ "repeat" stmt "until" cond ] 
   *  
   * @param	level 	The current block level 
@@ -423,8 +401,7 @@ void PL0CComp::identStmt(int level) {
 	 emit(OpCode::jneq, 0, loop_pc);
  }
 
-/** Statement
- *
+/**
  * stmt =	[ ident ":=" expr
  * 		  	| "call" ident
  *          | "?" ident
@@ -457,8 +434,7 @@ void PL0CComp::statement(int level) {
 	// else: nothing
 }
 
-/** Constant declaration
- *
+/**
  * [ const ident = number {, ident = number} ; ]
  *
  * @note Doesn't emit any code; just stores the named value in the symbol table.
@@ -488,9 +464,7 @@ void PL0CComp::constDecl(int level) {
 	}
 }
 
-
-/** Variable declaration
- *
+/**
  * Allocate space on the stack for the variable and install it's offset from the block in the symbol
  * table.
  *  
@@ -519,8 +493,7 @@ int PL0CComp::varDecl(int offset, int level) {
 	return offset;
 }
 
-/** Subroutine declaration
- *
+/**
  *   "procedure" ident "(" [ident {, "ident" }] ")" block ";"
  * | "function"  ident "(" [ident {, "ident" }] ")" block ";"
  *
@@ -578,8 +551,7 @@ void PL0CComp::subDecl(int level) {
 	}
 }
 
-/** program block
- *
+/**
  * block = 	[ const ident = number {, ident = number} ";"]
  *         	[ var ident {, ident} ";" ]
  *         	{ procedure ident "(" [ ident { "," ident } ] ")" block ";"
@@ -652,12 +624,11 @@ void PL0CComp::block(SymValue& val, int level, unsigned nargs) {
 
 // public:
 
-/// param pName The program named buy error().
+/// @param pName The program named buy error().
 PL0CComp::PL0CComp(const string& pName) : progName {pName}, nErrors{0}, verbose {false}, ts{cin} {
 	symtbl.insert({"main", { SymValue::proc, 0, 0 }});	// Install the "main" rountine declaraction
 }
 
-/// Compile...
 void PL0CComp::run() {
 	next();
 	auto range = symtbl.equal_range("main");

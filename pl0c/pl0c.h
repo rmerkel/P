@@ -21,6 +21,8 @@
  * lte       |        |         | Binary is less than or equal?
  * gt        |        |         | Binary is greater than?
  * gte       |        |         | Binary greater than or equal?
+ * lor       |        |         | Binary logical or
+ * land      |        |         | Binary logical and
  * pushConst |        | value   | Push a constant value on the stack
  * pushVar   | Yes    | offset  | Read and then push a variable on the stack
  * pop       | Yes    | offset  | Pop and write a variable off of the stack
@@ -71,13 +73,20 @@ namespace pl0c {
 		sub,								///< Subtraction
 		mul,								///< Multiplication
 		div,								///< Division
+		
+		bor,								///< Bit or
+		band,								///< Bit and
+		bxor,								///< Bit xor
+										
 		equ,								///< Is equal?
 		neq,								///< Is not equal?
 		lt,									///< Less than?
 		lte,								///< Less then or equal?
 		gt,									///< Greater than?
 		gte,								///< Greater than or equal?
-		
+		lor,								///< Logical or
+		land,								///< logica and
+
 											// Push/pop
 
 		pushConst,							///< Push a constant literal on the stack
@@ -92,7 +101,7 @@ namespace pl0c {
 		jneq								///< Jump if top-of-stack == false (0), pop
 	};
 
-	std::string toString(OpCode op);		///< Return the name of the OpCode as a string
+	std::string toString(OpCode op);		///< Return the name of the OpCode as a string...
 
 	typedef std::int32_t		Word;		///< A data word or address
 	typedef std::vector<Word>	WordVector;	///< A vector of Words
@@ -105,17 +114,17 @@ namespace pl0c {
 			int8_t		level;				///< level: 0..255
 		};
 
-		/// Default constructor; results in pushConst 0, 0
+		/// Default constructor; results in pushConst 0, 0...
 		Instr() : addr{0}, op{OpCode::pushConst}, level{0}	{}
 
-		/// Construct an instruction from it's components
+		/// Construct an instruction from it's components...
 		Instr(OpCode o, int8_t l = 0, Word a = 0) : addr{a}, op{o}, level{l} {}
 	};
 
 	/// A vector of Instr's
 	typedef std::vector<Instr>	InstrVector;
 
-	/// Disassemble an instruction
+	/// Disassemble an instruction...
 	Word disasm(std::ostream& out, Word loc, const Instr& instr, const std::string label = "");
 }
 

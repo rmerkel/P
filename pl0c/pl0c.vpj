@@ -290,6 +290,7 @@
 			Name="Other Files"
 			Filters=""
 			GUID="{E2E32900-C0A4-4CAE-AA3C-FC024DC77863}">
+			<F N="comment.p"/>
 			<F N="Doxyfile"/>
 			<F N="fact.p"/>
 			<F
@@ -297,6 +298,7 @@
 				Type="Makefile"/>
 			<F N="pl0c"/>
 			<F N="pl0c.vpwistu"/>
+			<F N="precedence.p"/>
 			<F N="repeatst.p"/>
 			<F N="test.p"/>
 			<F N="testif.p"/>

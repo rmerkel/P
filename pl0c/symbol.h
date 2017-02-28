@@ -1,6 +1,6 @@
 /**	@file	symbol.h
  *
- *	@brief	the Symbol table
+ *	@brief	The P/L0C Symbol table
  *
  *	Created by Randy Merkel on 6/7/2013.
  *  Copyright (c) 2016 Randy Merkel. All rights reserved.
@@ -28,20 +28,29 @@ struct SymValue {
 
 	static std::string toString(Kind k);		///< Return k as a string
 
-	Kind		kind;							///< identifier, constant, or procedure name
-	int			level;							///< If kind == proc
-	pl0c::Word	value;							///< value (identifier, constant) or address of a proc)
+	Kind		kind;							///< identifier, constant, funciton, or procedure name
+	int			level;							///< Base/frame level If kind == proc or function
+	pl0c::Word	value;							///< value (identifier, constant) or address of a proc or function
 
 	/// Default construction
 	SymValue() : kind {none}, level {0}, value{0}
 		{}
 
-	/// Constructor; create a SymValue from it's components
-	SymValue(Kind k, int l = 0, pl0c::Word v = 0) : kind{k}, level{l}, value{v}
+	/** Constructor; create a SymValue from it's components 
+	 */
+
+
+	/** Construct a SymValue from it's components...
+	 * 
+	 * @param _kind		The token kind, e.g., identifier
+	 * @param _level	The token base/frame level, e.g., 0 for "current frame.
+	 * @param _value 	The token value, e.g., a procedure address
+	 */
+	SymValue(Kind _kind, int _level = 0, pl0c::Word _value = 0) : kind{_kind}, level{_level}, value{_value}
 		{}
 };
 
-/// A SymbolTable
+/// A SymbolTable; a multimap of symbol identifiers to SymValue's
 typedef std::multimap<std::string, SymValue> SymbolTable;
 
 #endif

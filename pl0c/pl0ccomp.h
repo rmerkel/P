@@ -21,11 +21,9 @@
  *              |  "repeat" stmt "until" cond ] ;
  *
  *     cond  =    "odd" expr
- *             |  expr ("=="|"!="|"<"|"<="|">"|">=") expr ;
- *
- *     expr  = [  "+"|"-"] term { ("+"|"-") term };
- *
- *     term  =    fact {("*"|"/") fact} ;
+ *             |  expr ("=="|"!="|"<"|"<="|">"|">="|"||"|"&&") expr ;
+ * 
+ *     expr =  [ ("+"|"-") ] fact { ("*"|"/"|"+"|"-") fact } ; 
  *
  *     fact  =    ident
  *             |  ident "(" [ ident { "," ident } ] ")"
@@ -51,23 +49,21 @@ class PL0CComp {
 	/// A table, indexed by instruction address, yeilding source line numbers
 	typedef std::vector<unsigned> SourceIndex;
 
-	std::string			progName;		///< The owning programs name
-	unsigned			nErrors;		///< # of errors compiling all sources
-	bool				verbose;		///< Dump debugging information if true
-	TokenStream			ts;				///< Input token stream
-	SymbolTable			symtbl;			///< The symbol table
-	pl0c::InstrVector*	code;			///< The emitted code
-	SourceIndex			indextbl;		///< source index for listings
+	std::string			progName;			///< The compilier's name, used in error messages
+	unsigned			nErrors;			///< Total # of compilier errors
+	bool				verbose;			///< Dump debugging information if true
+	TokenStream			ts;					///< The input token stream (the source)
+	SymbolTable			symtbl;				///< Symbol table
+	pl0c::InstrVector*	code;				///< Emitted code
+	SourceIndex			indextbl;			///< Source cross-index for listings
 
 protected:
-	/// Write a error message...
-	void error(const std::string& msg);
+	void error(const std::string& msg);		///< Write an error message...
 
-	/// Write a error message...
+	/// Write an error message...
 	void error(const std::string& msg, const std::string& name);
 
- 	/// Read and returns the next token from the current token stream...
-	Token next();
+	Token next();							///< Read and return the next token...
 
 	/// Return the current token kind..
 	Token::Kind current() 				{	return ts.current().kind;	}
@@ -84,23 +80,31 @@ protected:
 	/// Create a listing...
 	void listing(const std::string& name, std::istream& source, std::ostream& out);
 
-	void identifier(int level);
-	void factor(int level);
-	void terminal(int level);
-	void expression(int level);
-	void condition(int level);
+	void identifier(int level);				///< factor-identifier production...
+	void factor(int level);					///< factor production...
+	void expression(int level);				///< expression production...
+	void condition(int level);				///< condition production...
+
+	/// assignment-statement production...
 	void assignStmt(const std::string& name, const SymValue& val, int level);
+
+	/// call-statement production...
 	void callStmt(const std::string& name, const SymValue& val, int level);
-	void identStmt(int level);
-	void whileStmt(int level);
-	void repeatStmt(int level);
- 	void ifStmt(int level);
-	void statement(int level);
-	void constDecl(int level);
-	int  varDecl(int offset, int level);
-	void subDecl(int level);
+
+	void identStmt(int level);				///< identifier-statement production...
+	void whileStmt(int level);				///< while-statement production...
+	void repeatStmt(int level);				///< repeat-statement production...
+ 	void ifStmt(int level);					///< if-statement production...
+	void statement(int level);				///< statement production...
+
+	void constDecl(int level);				/// constant-declaration production...
+	int  varDecl(int offset, int level);	/// variable-declaration production...
+	void subDecl(int level);				/// subroutine-declaration production...
+
+	/// block production...
 	void block(SymValue& val, int level, unsigned nargs);
-	void run();
+
+	void run();								///< runs the compilier...
 
 public:
 	PL0CComp(const std::string& pName);	///< Constructor; use pName for error messages

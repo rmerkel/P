@@ -26,6 +26,9 @@ struct Token {
 	 *  its character
 	 */
 	enum Kind : char {
+		unknown,						///< Unknown token kind; (number_value)
+		badComment,						///> Unterminated comment, started at line # (number_value)
+			
 		identifier,	  		  			///< An identifier (string_value)
 		number,							///< literal number (number_value)
 											
@@ -33,6 +36,8 @@ struct Token {
 		neq,							///< Not equal? (!=)
 		lte,							///< Less than or equal? (<=)
 		gte,							///< Greater then or equal? (>=)
+		lor,							///< Or? (||)
+		land,							///< And? (&&)
 		
 		constDecl,						///< "const"
 		varDecl,						///< "var"
@@ -49,6 +54,8 @@ struct Token {
 		repeat,							///< "repeat"
 		until,							///< "until"
 		odd,							///< "odd"
+										
+		eof,							///< End of stream
 
 		// End of non-printing character codes for ASCII and UNICODE (ordinal value 32)
 
@@ -70,9 +77,11 @@ struct Token {
 		assign		= '=',				///< Assignment
 		gt			= '>',				///< Greater then
 
-		expo		= '^',				///< Exponentiation
-										
-		eof								///< End of stream
+		bxor		= '^',				///< Bit XOR
+
+		bor			= '|',				///< Bit or
+		band		= '&'				///< Bit and
+
 	};
 
 	static std::string toString(Kind k); ///< Return k's name

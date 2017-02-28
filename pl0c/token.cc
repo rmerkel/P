@@ -42,65 +42,64 @@ std::istream& TokenStream::unget() {
 Token TokenStream::get() {
 	char ch = 0;
 
-	do {								// skip whitespace... 
+	do {										// skip whitespace... 
 		if (!getch(ch))
 			return ct = { Token::eof };
 
-		if ('\n' == ch) ++lineNum;		// Count lines
+		if ('\n' == ch) ++lineNum;				// Count lines
 
 	} while (isspace(ch));
 
 	switch (ch) {
-#if	0	// bit And or logial And... TBD
-	case '&':							// & or &&
-		if (!getch(ch))	ct.kind = Token::bitAnd;
-		else if ('&' == ch)	ct.kind = Token::And;
-		else {
-			unget();
-			ct.kind = Token::bitAnd;
-		}
-		break;
-#endif
-
-	case '=':							// = or ==?
-		if (!getch(ch))	ct.kind = Token::assign;
+	case '=':									// = or ==?
+		if (!getch(ch))		ct.kind = Token::assign;
 		else if ('=' == ch) ct.kind = Token::equ;
-		else {
-			unget();
-			ct.kind = Token::assign;
-		}
+		else {	unget();	ct.kind = Token::assign;	}
 		return ct;
-		break;
 
-	case '!':							// ! or !=?
-		if (!getch(ch))	ct.kind = Token::Not;
+	case '!':									// ! or !=?
+		if (!getch(ch))		ct.kind = Token::Not;
 		else if ('=' == ch) ct.kind = Token::neq;
-		else {
-			unget();
-			ct.kind = Token::Not;
-		}
+		else {	unget();	ct.kind = Token::Not;	}
 		return ct;
-		break;
 
-	case '>':							// > or >=?
-		if (!getch(ch))	ct.kind = Token::gt;
+	case '>':									// > or >=?
+		if (!getch(ch))		ct.kind = Token::gt;
 		else if ('=' == ch)	ct.kind = Token::gte;
-		else {
-			unget();
-			ct.kind = Token::gt;
-		}
+		else {	unget();	ct.kind = Token::gt;	}
 		return ct;
-		break;
 
-	case '<':							// < or <=?
-		if (!getch(ch))	ct.kind = Token::lt;
+	case '<':									// < or <=?
+		if (!getch(ch))		ct.kind = Token::lt;
 		else if ('=' == ch)	ct.kind = Token::lte;
-		else {
-			unget();
-			ct.kind = Token::lt;
-		}
+		else {	unget();	ct.kind = Token::lt;	}
 		return ct;
-		break;
+
+	case '|':							// | or ||?
+		if (!getch(ch)) 	ct.kind = Token::bor;
+		else if ('|' == ch) ct.kind = Token::lor;
+		else {	unget();	ct.kind = Token::gt;	}
+		return ct;
+
+	case '&':							// & or &&?
+		if (!getch(ch)) 	ct.kind = Token::band;
+		else if ('&' == ch) ct.kind = Token::land;
+		else {	unget();	ct.kind = Token::band;  }
+		return ct;
+
+	case '{':									// comment; { ... }
+		ct.number_value = lineNum;				// remember where the comment stated...
+		do {									// eat everthhing up to the closing '}' 
+			if (!getch(ch)) {
+				ct.kind = Token::badComment;
+				return ct;
+			}
+
+			if ('\n' == ch) 
+				++lineNum;						// keep counting lines...
+
+		} while ('}' != ch);
+		return get();							// restart the scan..
 
 	case '%':
 	case '(':
@@ -140,10 +139,14 @@ Token TokenStream::get() {
 			else
 				ct.kind = Token::identifier;
 			return ct;
-		}
 
-		cerr << "bad token: \'" << ch << "\'\n";
-		return ct = { Token::eof };
+		} else {
+
+			ct.string_value = ch;
+			ct.number_value = ch;
+			ct.kind = Token::unknown;
+			return ct;
+		}
 	}
 }
 
@@ -152,12 +155,16 @@ Token TokenStream::get() {
 /// Return a string with k's name
 string Token::toString(Token::Kind k) {
 	switch(k) {
+	case Kind::unknown:		return "unknown";		break;
+	case Kind::badComment:	return "bad comment";	break;
 	case Kind::identifier:	return "identifier";	break;
 	case Kind::number:		return "number";		break;
 	case Kind::equ:			return "==";			break;
 	case Kind::neq:			return "!=";			break;
 	case Kind::lte:			return "<=";			break;
 	case Kind::gte:			return ">=";			break;
+	case Kind::lor:			return "||";			break;
+	case Kind::land:		return "&&";			break;
 	case Kind::constDecl:	return "const";			break;
 	case Kind::varDecl:		return "var";			break;
 	case Kind::procDecl:	return "procedure";		break;
@@ -172,7 +179,9 @@ string Token::toString(Token::Kind k) {
 	case Kind::repeat:		return "repeat";		break;
 	case Kind::until:		return "until";			break;
 	case Kind::odd:			return "odd";			break;
-	case Kind::Not:			return "not";			break;
+	case Kind::eof:			return "eof";			break;
+
+	case Kind::Not:			return "!";				break;
 	case Kind::mod:			return "%";				break;
 	case Kind::lparen:		return "(";				break;
 	case Kind::rparen:		return ")";				break;
@@ -186,8 +195,10 @@ string Token::toString(Token::Kind k) {
 	case Kind::lt:			return "<";				break;
 	case Kind::assign:		return "=";				break;
 	case Kind::gt:			return ">";				break;
-	case Kind::expo:		return "^";				break;
-	case Kind::eof:			return "eof";			break;
+	case Kind::bxor:		return "^";				break;
+	case Kind::bor:			return "|";				break;
+	case Kind::band:		return "&";				break;
+
 	default: {
 			ostringstream oss;
 			oss << "Unknown Kind: " << static_cast<unsigned>(k) <<  "!" << ends;
