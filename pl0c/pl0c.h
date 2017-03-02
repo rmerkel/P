@@ -1,15 +1,17 @@
 /** @file pl0c.h
  *  
- *  A description of the PL/0C machines operation codes, instruction format and
- *  some utilities used by both the compiler (PL0Comp) and the interpreter
- *  (PL0Interp).
- *
+ *  Definitions of the PL/0C machine operation codes, instruction format and utilities used by both
+ *  the compiler (pl0c::Comp) and the interpreter (pl0c::Interp).
+ * 
+ *  @section	instructions	PL/0C Machine instructions
+ * 
  *	Ported from p0com.p, the compiler/interpreter from Algorithms + Data
- *	Structures = Programs, Wirth.
+ *  Structures = Programs, 1st Edition, by Wirth, then modified to use one OpCode per operation,
+ *  i.e., removing the "OPR" instruction, and then adding more "C like" instructions, e.g., bit and
+ *  logical OR...
  *
  * OpCode    | level? | addr?   | Notes
  * --------- | ------ | ------- | ---------------------------------------------
- * odd       |        |         | Unary: is top-of-stack odd?
  * neg       |        |         | Unary: negate the top-of-stack
  * add       |        |         | Binary addition
  * sub       |        |         | Binary subtraction
@@ -38,25 +40,31 @@
  * - Binary - replace the top two items on the stack with the result.
  * - level/address - Effective address is base(level) + offset, where
  * base(level) is the base address n levels down the stack.
- */
+ * 
+ * @section pl0c-bugs Machine Bugs
+ * 
+ * - Lacks support for indirect addressing needed for a pointer based array implementation. Perhaps
+ *   pushEAddr (push effective address), pushIndirect (push variable whose address is on the
+ *   top-of-stack, and popIndirect (destination address is top-of-stack, value to store is next).
+ */ 
 
-#ifndef	PL0_H
-#define PL0_H
+#ifndef	PL0C_H
+#define PL0C_H
 
 #include <cstdint>
 #include <string>
 #include <vector>
 
-/// The PL0 machine operation codes and instruction format.
+/// The PL/0C Namespace
 namespace pl0c {
 	/// Runtime block/stack frame layout
 	enum Frame {
-		base,								///< base(n)
+		base,								///< Frame base; base(n)
 		oldfp,								///< Saved frame pointer register
 		rAddr,								///< Return from proc/func address
-		rValue,								///< Function return value
+		rValue,								///< Function return value, defaults to zero.
 
-		size								///< # of elements in the frame
+		size								///< Number of elements in the frame
 	};
 
 	/// Operation codes
@@ -64,7 +72,6 @@ namespace pl0c {
 
 		// Unary operations
 
-		odd,								///< is top-of-stack odd?
 		neg,								///< Negate the top-of-stack
 												 
 		// Binary operations
@@ -73,6 +80,7 @@ namespace pl0c {
 		sub,								///< Subtraction
 		mul,								///< Multiplication
 		div,								///< Division
+		rem,								///< Remainder
 		
 		bor,								///< Bit or
 		band,								///< Bit and

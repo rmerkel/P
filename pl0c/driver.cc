@@ -3,11 +3,23 @@
  * @mainpage PL/0C Programming Language
  *  
  * A compiler/interpreter, inspired by the original PL/0 language and machine from Algorithms + Data
- * Structures = Programs. Modified to use some C operators, e.g., check for equality with "==" and
- * assigned with "=", but otherwise using Pascal like syntax and program nesting. The result is a
- * dialect that I call "PL/0C".
+ * Structures = Programs, 1st Edition, by Wirth. Modified to use C/C++ operators, e.g., check for 
+ * equality with "==" and assigned with "=", but otherwise using Pascal "lite" syntax and program 
+ * nesting. The result is a dialect that I call "PL/0C". 
  *  
- * main() compiles input (PL0CComp), and if successful, runs it in the interpreter (PL0CInterp).
+ * Like PL/0, PL/0C is a combination compilier and interpreter. If the compiler (pl0c::Comp) 
+ * doesn't report any errors, then the generated code is run in the interpreter (pl0c::Interp). 
+ *  
+ * By default, pl0c::Comp writes a listing to standard output, but the verbose (-v) option will 
+ * also log tokens found and code emitted. 
+ *  
+ * By default, pl0c::Interp logs the writes ("pop's") on standard output, but the verbose (-v) 
+ * option will single step the program, writting a state report as well. 
+ *  
+ * @section	driver-bugs	Bugs 
+ *  
+ * - Currently, the only way to read from standard input is by way of the "-" file. It would be 
+ *   nice if standard input was the default.
  */
 
 #include "pl0ccomp.h"
@@ -17,7 +29,6 @@
 #include <vector>
 
 using namespace std;
-using namespace pl0c;
 
 static string	progName;						///< This programs name
 static string	inputFile {"-"};				///< Source file name, or - for standard input
@@ -30,7 +41,8 @@ static void help() {
 		 << "-?        Print this message and exit.\n"
 		 << "-help     Same as -?\n"
 		 << "-verbose  Set verbose mode.\n"
-		 << "-v        Same as -v.\n\n"
+		 << "-v        Same as -verbose.\n"
+		 << "\n"
 		 << "And where filename is the name of the source file, or '-' for standard input.\n";
 }
 
@@ -88,12 +100,12 @@ static bool parseCommandline(const vector<string>& args) {
 int main(int argc, char* argv[]) {
 	progName = argv[0];
 
-	PL0CComp		comp{progName};		// The compiler...
-	PL0CInterp 		machine;			// The machine...
-	InstrVector		code;				// Machine instructions...
-	unsigned 		nErrors = 0;
+	pl0c::Comp			comp{progName};			// The compiler...
+	pl0c::Interp 		machine;				// The machine...
+	pl0c::InstrVector	code;					// Machine instructions...
+	unsigned 			nErrors = 0;
 
-	vector<string> args;				// Parse the command line arguments...
+	vector<string> args;						// Parse the command line arguments...
 	for (int argn = 1; argn < argc; ++argn)
 		args.push_back(argv[argn]);
 
@@ -103,7 +115,7 @@ int main(int argc, char* argv[]) {
 	if (inputFile.empty()) {
 		cerr << progName << ": source file name was not found!\n";
 		++nErrors;
-										// Compile the source, run if no errors
+												// Compile the source, run if no errors
 	} else if (0 == (nErrors = comp(inputFile, code, verbose))) {
 		if (verbose) cout << progName << ": loading program from standard input, and starting pl/0...\n";
 		const size_t n = machine(code, verbose);

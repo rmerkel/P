@@ -38,8 +38,6 @@ namespace pl0c {
 		case OpCode::band:		return "band";		break;
 		case OpCode::bxor:		return "bxor";		break;
 
-		case OpCode::odd:		return "odd";		break;
-
     	case OpCode::equ:		return "equ";		break;
     	case OpCode::neq:		return "neq";		break;
     	case OpCode::lt:		return "lt";		break;

@@ -21,196 +21,201 @@
 #include "pl0cinterp.h"
 
 using namespace std;
-using namespace pl0c;
 
-// private:
+namespace pl0c {
+	// class Interp
 
-/// Dump the current machine state
-void PL0CInterp::dump() {
-	// Dump the last write
-	if (lastWrite.valid())
-		cout << "    " << setw(5) << lastWrite << ": " << stack[lastWrite] << std::endl;
-	lastWrite.invalidate();
+	// private:
 
-	if (!verbose) return;
+	/// Dump the current machine state
+	void Interp::dump() {
+		// Dump the last write
+		if (lastWrite.valid())
+			cout << "    " << setw(5) << lastWrite << ": " << stack[lastWrite] << std::endl;
+		lastWrite.invalidate();
 
-	// Dump the current mark block (frame)...
-	if (sp >= bp) {						// Block/frame established?
-		cout <<		"bp: " << setw(5) << bp << ": " << stack[bp] << endl;
-		for (int bl = bp+1; bl < sp; ++bl)
-			cout <<	"    " << setw(5) << bl << ": " << stack[bl] << endl;
+		if (!verbose) return;
 
-		if (sp != -1)
-			cout <<	"sp: " << setw(5) << sp << ": " << stack[sp] << endl;
-		else
-			cout <<	"sp: " << setw(5) << sp << endl;
+		// Dump the current mark block (frame)...
+		if (sp >= bp) {						// Block/frame established?
+			cout <<		"bp: " << setw(5) << bp << ": " << stack[bp] << endl;
+			for (int bl = bp+1; bl < sp; ++bl)
+				cout <<	"    " << setw(5) << bl << ": " << stack[bl] << endl;
 
-	} else {							// Procedure hasn't called 'int' yet
-		if (sp != -1)
-			cout <<	"sp: " << setw(5) << sp << ": " << stack[sp] << endl;
+			if (sp != -1)
+				cout <<	"sp: " << setw(5) << sp << ": " << stack[sp] << endl;
+			else
+				cout <<	"sp: " << setw(5) << sp << endl;
 
-		else
-			cout <<	"sp: " << setw(5) << sp << endl;
-		cout <<		"bp: " << setw(5) << bp << ": " << stack[bp] << endl;
+		} else {							// Procedure hasn't called 'int' yet
+			if (sp != -1)
+				cout <<	"sp: " << setw(5) << sp << ": " << stack[sp] << endl;
+
+			else
+				cout <<	"sp: " << setw(5) << sp << endl;
+			cout <<		"bp: " << setw(5) << bp << ": " << stack[bp] << endl;
+		}
+
+		disasm(cout, pc, code[pc], "pc");
+
+		cout << endl;
 	}
 
-	disasm(cout, pc, code[pc], "pc");
+	// protected:
 
-	cout << endl;
-}
+	/**
+	 * @param lvl Number of levels down
+	 * @return The base, lvl's down the stack
+	 */ 
+	uint16_t Interp::base(uint16_t lvl) {
+		uint16_t b = bp;
+		for (; lvl > 0; --lvl)
+			b = stack[b];
 
-// protected:
+		return b;
+	}
 
-/// Find the base 'lvl' levels (frames) up the stack
-uint16_t PL0CInterp::base(uint16_t lvl) {
-	uint16_t b = bp;
-	for (; lvl > 0; --lvl)
-		b = stack[b];
+	/**
+	 * Unlinks the stack frame, setting the return address as the next instruciton.
+	 */
+	void Interp::ret() {
+		sp = bp - 1; 					// Restore the previous sp
+		pc = stack[sp + 3]; 			// Restore the return address
+		bp = stack[sp + 2];				// Restore the previous bp
+		sp -= ir.addr;					// Pop parameters
+	}
 
-	return b;
-}
+	/**
+	 *  @return	the number of machine cycles run
+	 */
+	size_t Interp::run() {
+		size_t cycles = 0;						// # of instructions run to date
 
-/** Return from subroutine
- *
- * Unlinks the stack frame, setting the return address as the next instruciton.
- */
-void PL0CInterp::ret() {
-	sp = bp - 1; 					// Restore the previous sp
-	pc = stack[sp + 3]; 			// Restore the return address
-	bp = stack[sp + 2];				// Restore the previous bp
-	sp -= ir.addr;					// Pop parameters
-}
+		if (verbose)
+			cout << "Reg  Addr Value/Instr\n"
+				 << "---------------------\n";
 
-/** Run the machine from it's current state
- *  @return	the number of machine cycles run
- */
-size_t PL0CInterp::run() {
-	size_t cycles = 0;						// # of instructions run to date
-
-	if (verbose)
-		cout << "Reg  Addr Value/Instr\n"
-			 << "---------------------\n";
-
-  	do {
-		assert(pc < code.size());
-		// we assume that the stack size is less than numberic_limits<int>::max()!
-		if (-1 != sp) assert(sp < static_cast<int>(stack.size()));
+		do {
+			assert(pc < code.size());
+			// we assume that the stack size is less than numberic_limits<int>::max()!
+			if (-1 != sp) assert(sp < static_cast<int>(stack.size()));
 
 
-		dump();								// Dump state and disasm the next instruction
-		ir = code[pc++];					// Fetch next instruction...
-		++cycles;
+			dump();								// Dump state and disasm the next instruction
+			ir = code[pc++];					// Fetch next instruction...
+			++cycles;
 
-    	switch(ir.op) {
+			switch(ir.op) {
 
- 		// unary operations
+			// unary operations
 
-		case OpCode::neg:	stack[sp] = -stack[sp];						break;
-		case OpCode::odd:	stack[sp] = stack[sp] & 1;					break;
+			case OpCode::neg:	stack[sp] = -stack[sp];						break;
 
-		// binrary operations
+			// binrary operations
 
-    	case OpCode::add:	--sp; stack[sp] = stack[sp] + stack[sp+1];	break;
-    	case OpCode::sub:	--sp; stack[sp] = stack[sp] - stack[sp+1];	break;
-    	case OpCode::mul:	--sp; stack[sp] = stack[sp] * stack[sp+1];	break;
-		case OpCode::div:	--sp; stack[sp] = stack[sp] / stack[sp+1];	break;
+			case OpCode::add:	--sp; stack[sp] = stack[sp] + stack[sp+1];	break;
+			case OpCode::sub:	--sp; stack[sp] = stack[sp] - stack[sp+1];	break;
+			case OpCode::mul:	--sp; stack[sp] = stack[sp] * stack[sp+1];	break;
+			case OpCode::div:	--sp; stack[sp] = stack[sp] / stack[sp+1];	break;
+			case OpCode::rem: 	--sp; stack[sp] = stack[sp] % stack[sp+1];	break;
 
-		case OpCode::bor:	--sp; stack[sp] = stack[sp] | stack[sp+1];	break;
-		case OpCode::band:	--sp; stack[sp] = stack[sp] && stack[sp+1];	break;
-		case OpCode::bxor:	--sp; stack[sp] = stack[sp] ^ stack[sp+1];	break;
+			case OpCode::bor:	--sp; stack[sp] = stack[sp] | stack[sp+1];	break;
+			case OpCode::band:	--sp; stack[sp] = stack[sp] && stack[sp+1];	break;
+			case OpCode::bxor:	--sp; stack[sp] = stack[sp] ^ stack[sp+1];	break;
 
-    	case OpCode::equ:	--sp; stack[sp] = stack[sp] == stack[sp+1];	break;
-    	case OpCode::neq:	--sp; stack[sp] = stack[sp] != stack[sp+1];	break;
-    	case OpCode::lt:	--sp; stack[sp] = stack[sp]  < stack[sp+1];	break;
-    	case OpCode::gte:	--sp; stack[sp] = stack[sp] >= stack[sp+1];	break;
-    	case OpCode::gt:	--sp; stack[sp] = stack[sp]  > stack[sp+1];	break;
-		case OpCode::lte:	--sp; stack[sp] = stack[sp] <= stack[sp+1];	break;
-		case OpCode::lor:	--sp; stack[sp] = stack[sp] || stack[sp+1];	break;
-		case OpCode::land:	--sp; stack[sp] = stack[sp] && stack[sp+1];	break;
+			case OpCode::equ:	--sp; stack[sp] = stack[sp] == stack[sp+1];	break;
+			case OpCode::neq:	--sp; stack[sp] = stack[sp] != stack[sp+1];	break;
+			case OpCode::lt:	--sp; stack[sp] = stack[sp]  < stack[sp+1];	break;
+			case OpCode::gte:	--sp; stack[sp] = stack[sp] >= stack[sp+1];	break;
+			case OpCode::gt:	--sp; stack[sp] = stack[sp]  > stack[sp+1];	break;
+			case OpCode::lte:	--sp; stack[sp] = stack[sp] <= stack[sp+1];	break;
+			case OpCode::lor:	--sp; stack[sp] = stack[sp] || stack[sp+1];	break;
+			case OpCode::land:	--sp; stack[sp] = stack[sp] && stack[sp+1];	break;
 
-		// push/pop
+			// push/pop
 
-		case OpCode::pushConst:
-			stack[++sp] = ir.addr;
-			break;
+			case OpCode::pushConst:
+				stack[++sp] = ir.addr;
+				break;
 
-        case OpCode::pushVar:
-        	stack[++sp] = stack[base(ir.level) + ir.addr];
-        	break;
+			case OpCode::pushVar:
+				stack[++sp] = stack[base(ir.level) + ir.addr];
+				break;
 
-        case OpCode::pop:
-        	// Save the effective address for dump()
-			lastWrite = base(ir.level) + ir.addr;
-			stack[lastWrite] = stack[sp--];
-			break;
+			case OpCode::pop:
+				// Save the effective address for dump()
+				lastWrite = base(ir.level) + ir.addr;
+				stack[lastWrite] = stack[sp--];
+				break;
 
-        case OpCode::call: 					// Call a procedure
-			// Create a new frame/mark block on the stack
-        	stack[sp+1] = base(ir.level);	// Sent previous frame base
-			stack[sp+2] = bp;				// Save bp register
-			stack[sp+3] = pc;				// Save return address
-			stack[sp+4] = 0;				// Function return address
-        	bp = sp + 1;					// points to the frame base
-			pc = ir.addr;					// Set the procedure address
-			break;
+			case OpCode::call: 					// Call a procedure
+				// Create a new frame/mark block on the stack
+				stack[sp+1] = base(ir.level);	// Sent previous frame base
+				stack[sp+2] = bp;				// Save bp register
+				stack[sp+3] = pc;				// Save return address
+				stack[sp+4] = 0;				// Function return address
+				bp = sp + 1;					// points to the frame base
+				pc = ir.addr;					// Set the procedure address
+				break;
 
-		case OpCode::ret: 					// Return from a procedure
-			ret();
-			break;
+			case OpCode::ret: 					// Return from a procedure
+				ret();
+				break;
 
-		case OpCode::reti: {				// Return integer from function
-											// Save the function result...
-				auto temp = stack[bp + rValue];
-				ret();						// Unlink the stack frame...
-				stack[++sp] = temp;			// Push the result
-			}
-			break;
+			case OpCode::reti: {				// Return integer from function
+												// Save the function result...
+					auto temp = stack[bp + rValue];
+					ret();						// Unlink the stack frame...
+					stack[++sp] = temp;			// Push the result
+				}
+				break;
 
 
-		case OpCode::enter:	sp += ir.addr;								break;
-        case OpCode::jump:	pc = ir.addr;								break;
-        case OpCode::jneq:	if (stack[sp--] == 0) pc = ir.addr;			break;
-		default:
-			cerr << "Unknown op code: " << toString(ir.op) << endl;
-			assert(false);
-		};
+			case OpCode::enter:	sp += ir.addr;								break;
+			case OpCode::jump:	pc = ir.addr;								break;
+			case OpCode::jneq:	if (stack[sp--] == 0) pc = ir.addr;			break;
+			default:
+				cerr << "Unknown op code: " << toString(ir.op) << endl;
+				assert(false);
+			};
 
-	} while (pc != 0);
-	dump();						// Dump the exit state
+		} while (pc != 0);
+		dump();						// Dump the exit state
 
-	return cycles;
-}
+		return cycles;
+	}
 
-//public
+	//public
 
-/** Default constructor
- *
- *  @param	stacksz	Maximum depth of the data segment/stack, in machine Words
- */
-PL0CInterp::PL0CInterp(size_t stacksz) : stack(stacksz), verbose{false} {
-	reset();
-}
+	/** Default constructor
+	 *
+	 *  @param	stacksz	Maximum depth of the data segment/stack, in machine Words
+	 */
+	Interp::Interp(size_t stacksz) : stack(stacksz), verbose{false} {
+		reset();
+	}
 
-/** Load a applicaton and start the pl/0 machine running...
- *
- *	@param	program	The program to load and run
- *	@param 	ver		True for verbose debugging messages
- *  @return	The number of machine cycles run
- */
-size_t PL0CInterp::operator()(const InstrVector& program, bool ver) {
-	verbose = ver;
+	/** Load a applicaton and start the pl/0 machine running...
+	 *
+	 *	@param	program	The program to load and run
+	 *	@param 	ver		True for verbose debugging messages
+	 *  @return	The number of machine cycles run
+	 */
+	size_t Interp::operator()(const InstrVector& program, bool ver) {
+		verbose = ver;
 
-	// Fill the stack with -1s for debugging...
-	fill(stack.begin(), stack.end(), -1);
+		// Fill the stack with -1s for debugging...
+		fill(stack.begin(), stack.end(), -1);
 
-	code = program;
-	reset();
-	return run();
-}
+		code = program;
+		reset();
+		return run();
+	}
 
-/// Reset the machine back to it's initial state.
-void PL0CInterp::reset() {
-	pc = 0, bp = 0, sp = -1;	// Set up the initial mark block/frame...
-	stack[0] = stack[1] = stack[2] = stack[3] = 0;
+	/// Reset the machine back to it's initial state.
+	void Interp::reset() {
+		pc = 0, bp = 0, sp = -1;	// Set up the initial mark block/frame...
+		stack[0] = stack[1] = stack[2] = stack[3] = 0;
+	}
 }
 
