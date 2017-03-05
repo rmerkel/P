@@ -1,6 +1,9 @@
 /** @file pl0ccomp.cc
  *  
- * PL0C Compiler implementation
+ * PL0C Compiler implementation 
+ *  
+ * @author Randy Merkel, Slowly but Surly Software. 
+ * @copyright  (c) 2017 Slowly but Surly Software. All rights reserved. 
  */
 
 #include "pl0ccomp.h"
@@ -21,7 +24,7 @@ namespace pl0c {
 	// protected:
 
 	/** 
-	 * Write a diagnostic on standard error output, and increment the error count. 
+	 * Write a diagnostic on standard error output, incrementing the error count. 
 	 * @param msg The error message
 	 */
 	void Comp::error(const std::string& msg) {
@@ -30,8 +33,8 @@ namespace pl0c {
 	}
 
 	/**
-	 * Write a diagnostic in the form "msg 'name'", on standard error output, and then increment the 
-	 * error count. 
+	 * Write a diagnostic in the form "msg 'name'", on standard error output, incrementing the error 
+	 * count. 
 	 * @param msg The error message
 	 * @param name Parameter to msg.
 	 */
@@ -57,7 +60,7 @@ namespace pl0c {
 	}
 
 	/**
-	 * Returns true, and optionally consumes the current token, if it's type is equal to kind.
+	 * Returns true, and optionally consumes the current token, if the current tokens "kind" is equal to kind.
 	 *
 	 * @param	kind	The token Kind to accept.
 	 * @param	get		Consume the token, if true. Defaults true.
@@ -89,7 +92,7 @@ namespace pl0c {
 	}
 
 	/**
-	 *	Appends (op, level, addr) on code, and returns it's address.
+	 *	Appends (op, level, addr) on code, returning the new OpCodescode[] index (address)
 	 *
 	 *	@param	op		The pl0 instruction operation code
 	 *	@param	level	The pl0 instruction block level value. Defaults to zero.
@@ -138,6 +141,19 @@ namespace pl0c {
 		out << endl;
 	}
 
+	 /** 
+	  *  Local variables have an offset from the *end* of the current stack frame (bp), while parameters
+	  *  have a negative offset from the start of the frame. Offset locals by the size of the activation
+	  *  frame.
+	  *  
+	  *  @param	level	The current block level
+	  *  @param	val		The variable symbol table entry
+	  */ 
+	 void Comp::varRef(int level, const SymValue& val) {
+		const auto offset = val.value >= 0 ? val.value + FrameSize : val.value;
+		emit(OpCode::pushVar, level - val.level, offset);
+	 }
+
 	/** 
 	 * Push a variable's value, a constant value, or invoke, and push the results, of a function.
 	 *
@@ -163,7 +179,7 @@ namespace pl0c {
 				emit(OpCode::pushConst, 0, closest->second.value);
 
 			else if (SymValue::identifier == closest->second.kind) {
-				emit(OpCode::pushVar, level - closest->second.level, closest->second.value);
+				varRef(level, closest->second);
 				emit(OpCode::eval);
 
 			} else if (SymValue::function == closest->second.kind) {
@@ -321,13 +337,13 @@ namespace pl0c {
 
 		switch(val.kind) {
 		case SymValue::identifier:
-			emit(OpCode::pushVar, level - val.level, val.value);
+			varRef(level, val);
 			emit(OpCode::assign);
 			break;
 
-		case SymValue::function:
-			emit(OpCode::pushVar, 0, rValue);	// Push address of rValue
-			emit(OpCode::assign);				//	Now save the return value @ rValue
+		case SymValue::function:					// Save value in the frame's retValue element
+			emit(OpCode::pushVar, 0, FrameRetVal);
+			emit(OpCode::assign);
 			break;
 
 		case SymValue::constant:
@@ -621,8 +637,7 @@ namespace pl0c {
 	 */
 	void Comp::block(SymValue& val, int level, unsigned nargs) {
 		auto 	jmp_pc	= emit(OpCode::jump, 0, 0);	// Addr to be patched below..
-													// Variable offset from block frame
-		int		dx		= static_cast<int>(Frame::size);
+		int		dx		= 0;					// Variable offset from *end* of activation frame
 
 		if (accept(Token::constDecl)) {				// const ident = number, ...
 			do {
@@ -678,13 +693,6 @@ namespace pl0c {
 		}
 	}
 
-	// public:
-
-	/// @param pName The program named buy error().
-	Comp::Comp(const string& pName) : progName {pName}, nErrors{0}, verbose {false}, ts{cin} {
-		symtbl.insert({"main", { SymValue::proc, 0, 0 }});	// Install the "main" rountine declaraction
-	}
-
 	void Comp::run() {
 		next();
 		auto range = symtbl.equal_range("main");
@@ -694,7 +702,17 @@ namespace pl0c {
 		expect(Token::period);
 	}
 
-	/**
+	// public:
+
+	/** 
+	 * Construct a new compilier with the token stream initially bound to std::cin. 
+	 * @param	pName	The prefix string used by error and verbose/diagnostic messages. 
+	 */ 
+	Comp::Comp(const string& pName) : progName {pName}, nErrors{0}, verbose {false}, ts{cin} {
+		symtbl.insert({"main", { SymValue::proc, 0, 0 }});	// Install the "main" rountine declaraction
+	}
+
+	/** 
 	 * @param	inFile	The source file name, where "-" means the standard input stream
 	 * @param	prog	The generated machine code is appended here
 	 * @param	verb	Output verbose messages if true

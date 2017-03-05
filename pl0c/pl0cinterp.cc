@@ -1,14 +1,9 @@
 /** @file pl0cinterp.cc
  *
- *	PL/0 interpreter in C++
- *
- *	Ported from p0com.p, from Algorithms + Data Structures = Programs. Changes include
- *	- index the stack (stack[0..maxstack-1]); thus the initial values for the t and b registers are
- *    -1 and 0.
- *  - replaced single letter variables, e.g., p is now pc.
- *
- *	Currently loads and runs a sample/test program, dumping machine state before each instruction
- *	fetch.
+ * PL/0 interpreter in C++
+ *   
+ * @author Randy Merkel, Slowly but Surly Software. 
+ * @copyright  (c) 2017 Slowly but Surly Software. All rights reserved.
  */
 
 #include <algorithm>
@@ -23,37 +18,28 @@
 using namespace std;
 
 namespace pl0c {
-	// class Interp
-
 	// private:
 
 	/// Dump the current machine state
 	void Interp::dump() {
 		// Dump the last write
 		if (lastWrite.valid())
-			cout << "    " << setw(5) << lastWrite << ": " << stack[lastWrite] << std::endl;
+			cout << "    " << setw(5) << lastWrite << ": " << setw(10) << stack[lastWrite] << std::endl;
 		lastWrite.invalidate();
 
 		if (!verbose) return;
 
-		// Dump the current mark block (frame)...
-		if (sp >= bp) {						// Block/frame established?
-			cout <<		"bp: " << setw(5) << bp << ": " << stack[bp] << endl;
+		// Dump the current  activation frame...
+		if (sp == -1) {								// Happens after return from the main procedure
+			cout 	 <<	"sp:    "         << sp << ": " << right << setw(10) << stack[sp] << endl;
+			cout 	 <<	"bp: " << setw(5) << bp << ": " << right << setw(10) << stack[bp] << endl;
+
+		} else {
+			assert(sp >= bp);
+			cout     << "bp: " << setw(5) << bp << ": " << right << setw(10) << stack[bp] << endl;
 			for (int bl = bp+1; bl < sp; ++bl)
-				cout <<	"    " << setw(5) << bl << ": " << stack[bl] << endl;
-
-			if (sp != -1)
-				cout <<	"sp: " << setw(5) << sp << ": " << stack[sp] << endl;
-			else
-				cout <<	"sp: " << setw(5) << sp << endl;
-
-		} else {							// Procedure hasn't called 'int' yet
-			if (sp != -1)
-				cout <<	"sp: " << setw(5) << sp << ": " << stack[sp] << endl;
-
-			else
-				cout <<	"sp: " << setw(5) << sp << endl;
-			cout <<		"bp: " << setw(5) << bp << ": " << stack[bp] << endl;
+				cout <<	"    " << setw(5) << bl << ": " << right << setw(10) << stack[bl] << endl;
+			cout     << "sp: " << setw(5) << sp << ": " << right << setw(10) << stack[sp] << endl;
 		}
 
 		disasm(cout, pc, code[pc], "pc");
@@ -79,10 +65,10 @@ namespace pl0c {
 	 * Unlinks the stack frame, setting the return address as the next instruciton.
 	 */
 	void Interp::ret() {
-		sp = bp - 1; 					// Restore the previous sp
-		pc = stack[sp + 3]; 			// Restore the return address
-		bp = stack[sp + 2];				// Restore the previous bp
-		sp -= ir.addr;					// Pop parameters
+		sp = bp - 1; 					// "pop" the activaction frame
+		pc = stack[bp + FrameRetAddr];
+		bp = stack[bp + FrameOldBp];
+		sp -= ir.addr;					// Pop parameters, if any...
 	}
 
 	/**
@@ -137,7 +123,7 @@ namespace pl0c {
 			case OpCode::lor:		--sp; stack[sp] = stack[sp] || stack[sp+1];	break;
 			case OpCode::land:		--sp; stack[sp] = stack[sp] && stack[sp+1];	break;
 
-			// push/pop
+			// push/pop..
 
 			case OpCode::pushConst:
 				stack[++sp] = ir.addr;
@@ -158,14 +144,17 @@ namespace pl0c {
 				stack[lastWrite] = stack[sp--];
 				break;
 
-			case OpCode::call: 					// Call a procedure
-				// Create a new frame/mark block on the stack
-				stack[sp+1] = base(ir.level);	// Sent previous frame base
-				stack[sp+2] = bp;				// Save bp register
-				stack[sp+3] = pc;				// Save return address
-				stack[sp+4] = 0;				// Function return address
-				bp = sp + 1;					// points to the frame base
-				pc = ir.addr;					// Set the procedure address
+			// control flow...
+
+			case OpCode::call: 					// Call a subroutine
+				// Push a new activation frame block on the stack
+				stack[sp + 1 + FrameBase] 		= base(ir.level);
+				stack[sp + 1 + FrameOldBp] 		= bp;
+				stack[sp + 1 + FrameRetAddr]	= pc;
+				stack[sp + 1 + FrameRetVal] 	= 0;
+				bp = sp + 1;					// Points to start of the frame
+				sp += FrameSize;				// Points to the return value...
+				pc = ir.addr;					// Set the subroutine'saddress
 				break;
 
 			case OpCode::ret: 					// Return from a procedure
@@ -174,7 +163,7 @@ namespace pl0c {
 
 			case OpCode::reti: {				// Return integer from function
 												// Save the function result...
-					auto temp = stack[bp + rValue];
+					auto temp = stack[bp + FrameRetVal];
 					ret();						// Unlink the stack frame...
 					stack[++sp] = temp;			// Push the result
 				}
@@ -184,6 +173,7 @@ namespace pl0c {
 			case OpCode::enter:	sp += ir.addr;								break;
 			case OpCode::jump:	pc = ir.addr;								break;
 			case OpCode::jneq:	if (stack[sp--] == 0) pc = ir.addr;			break;
+
 			default:
 				cerr << "Unknown op code: " << toString(ir.op) << endl;
 				assert(false);
@@ -197,18 +187,16 @@ namespace pl0c {
 
 	//public
 
-	/** Default constructor
-	 *
+	/** 
 	 *  @param	stacksz	Maximum depth of the data segment/stack, in machine Words
 	 */
 	Interp::Interp(size_t stacksz) : stack(stacksz), verbose{false} {
 		reset();
 	}
 
-	/** Load a applicaton and start the pl/0 machine running...
-	 *
-	 *	@param	program	The program to load and run
-	 *	@param 	ver		True for verbose debugging messages
+	/**
+	 *	@param	program	The program to run
+	 *	@param 	ver		True for verbose/debugging messages
 	 *  @return	The number of machine cycles run
 	 */
 	size_t Interp::operator()(const InstrVector& program, bool ver) {
@@ -222,10 +210,12 @@ namespace pl0c {
 		return run();
 	}
 
-	/// Reset the machine back to it's initial state.
 	void Interp::reset() {
-		pc = 0, bp = 0, sp = -1;	// Set up the initial mark block/frame...
+		pc = 0;
+
+		// Set up the initial mark block/frame...
 		stack[0] = stack[1] = stack[2] = stack[3] = 0;
+		bp = 0; sp = 3;
 	}
 }
 

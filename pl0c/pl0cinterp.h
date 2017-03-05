@@ -1,22 +1,9 @@
 /** @file pl0cinterp.h
  *  
- * The PL/0C interpreter.
- * 
- * @section	interperter	The PL/0C Machine 
+ * The PL/0C interpreter. 
  *  
- *  Started life as a C++ port of the PL/0 machine described in Algorithms + Data Structures =
- *  Programs, 1st Edition, by Wirth, and then modified to provide "C like" instructions.
- * 
- *  @section plcinterp-bugs	Bugs
- * 
- *  - The stack length is fixed at construction and can't grow.
- *  - There is no out of range checking for the stack or code; references out-of-bounds leads to
- *    disaster.
- *  - There is no checks for divide by zero.
- *  - There is no input/output instructions.
- *  - There is no interactive mode for debugging; just automatic single stepping.
- * 
- * @author rmerkel (3/1/17) 
+ * @author Randy Merkel, Slowly but Surly Software. 
+ * @copyright  (c) 2017 Slowly but Surly Software. All rights reserved. 
  */ 
 
 #ifndef	PL0INT_H
@@ -28,14 +15,28 @@
 #include "pl0c.h"
 
 namespace pl0c {
-	/// A PL/0 machine...
+	/** A PL/0C Machine
+	 *  
+	 * A interperter that started life as a straight C/C++ port of the PL/0 machine described in Algorithms + Data Structures =
+	 * Programs, 1st Edition, by Wirth, and then modified to provide "C like" instructions. 
+	 *  
+	 * @section bugs	Bugs
+	 * 
+	 *  - The stack length is fixed at construction and can't grow.
+	 *  - There is no out of range checking for the stack or code; references out-of-bounds leads to
+	 *    disaster.
+	 *  - There are no checks for divide by zero.
+	 *  - There are no input/output instructions.
+	 *  - There is no interactive mode for debugging; just automatic single stepping (verbose == true)
+	 */
 	class Interp {
 	public:
 		Interp(std::size_t stacksz = 512);
 		virtual ~Interp() {}
 
+		/// Load a applicaton and start the pl/0 machine running...
 		std::size_t operator()(const pl0c::InstrVector& program, bool v = false);
-		void reset();
+		void reset();							///< Reset the machine back to it's initial state.
 
 	private:
 		/// A Effective Address that maybe invalidated

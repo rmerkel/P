@@ -1,11 +1,11 @@
 /**	@file	token.cc
  *
- *  TokenStream implementation. Started life as the Token and TokenStream classes from The C++
- *  Programming Language, 4th Edition, by Stroustrup, and then modified to work on the integer
- *  based PL/0C machine.
- *
- *	Created by Randy Merkel on 6/7/2013.
- *  Copyright (c) 2016 Randy Merkel. All rights reserved.
+ * TokenStream implementation. Started life as the Token and TokenStream classes from The C++
+ * Programming Language, 4th Edition, by Stroustrup, and then modified to work on the integer based
+ * PL/0C machine.
+ * 
+ * @author Randy Merkel, Slowly but Surly Software. 
+ * @copyright  (c) 2017 Slowly but Surly Software. All rights reserved.
  */
 
 #include "token.h"
@@ -211,6 +211,34 @@ namespace pl0c {
 		}
 	}
 
+	/************************************************************************************************
+	 *	TokenStream
+	 ************************************************************************************************/
+
+	// public
+
+	/**
+	 * Set the input stream to a reference to s.
+	 * @param	s	The new input stream
+	 */
+	void TokenStream::set_input(std::istream& s) {
+		close();
+		ip = &s;
+		owns = false;
+		lineNum = 1;
+	}
+
+	/**
+	 * Set th input stream to p, taking ownership of that stream.
+	 * @param	p	The new input stream
+	 */
+	void TokenStream::set_input(std::istream* p) {
+		close();
+		ip = p;
+		owns = true;
+		lineNum = 1;
+	}
+
 	// privite static
 
 	TokenStream::KeywordTable	TokenStream::keywords = {
@@ -218,7 +246,6 @@ namespace pl0c {
 		{	"var",			Token::varDecl		},
 		{	"procedure",	Token::procDecl		},
 		{	"function",		Token::funcDecl		},
-		{	"call",			Token::call			},
 		{	"begin",		Token::begin		},
 		{	"end",			Token::end			},
 		{	"if",			Token::If			},

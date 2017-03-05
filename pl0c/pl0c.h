@@ -1,15 +1,10 @@
 /** @file pl0c.h
  *  
- *  Definitions of the PL/0C machine operation codes, instruction format and utilities used by both
- *  the compiler (pl0c::Comp) and the interpreter (pl0c::Interp).
- * 
- *  @section	instructions	PL/0C Machine instructions
- * 
- *  Orignally ported from p0com.p, the compiler/interpreter from Algorithms + Data Structures =
- *  Programs, 1st Edition, by Wirth, modified to use one OpCode per operation, i.e., removed the
- *  "OPR" instruction, and then adding more "C like" instructions, e.g., bit and logical OR...
- *  Finally, converted to use the push variable (address), eval/assign type address from HOC, as
- *  described in The UNIX Programming Environment, by Kernighan and Pike.
+ * Definitions of the PL/0C machine operation codes, instruction format and utilities used by both
+ * the compiler (pl0c::Comp) and the interpreter (pl0c::Interp).
+ *   
+ * @author Randy Merkel, Slowly but Surly Software. 
+ * @copyright  (c) 2017 Slowly but Surly Software. All rights reserved.
  */ 
 
 #ifndef	PL0C_H
@@ -21,14 +16,18 @@
 
 /// The PL/0C Namespace
 namespace pl0c {
-	/// Activation frame layout as created by OpCode::call
-	enum Frame {
-		base,								///< Frame base; base(n)
-		oldfp,								///< Saved frame pointer register
-		rAddr,								///< Return address
-		rValue,								///< Function return value, defaults to zero.
+	typedef std::int32_t		Integer;	///< A data word or address
+	typedef std::uint32_t		Unsigned;	///< Data word as an unsigned integer
+	typedef std::vector<Integer> IntVector;	///< A vector of Integers...
 
-		size								///< Number of elements in the frame
+	/// Activation Frame layout as created by OpCode::call
+	enum Frame {
+		FrameBase,							///< 0: Frame base; base(n)
+		FrameOldBp,							///< 1: Saved frame pase pointer register
+		FrameRetAddr,						///< 2: Return address
+		FrameRetVal,						///< 3: Function return value, defaults to zero.
+
+		FrameSize							///< Number of entries in the frame (4)
 	};
 
 	/// Operation codes; restricted to 256 operations, max
@@ -65,7 +64,7 @@ namespace pl0c {
 		eval,								///< Evaluate variable TOS = address, replace with value
 		assign,								///< Assign; TOS = variable address, TOS-1 = value
 
-		call,								///< Call a procedure, create Frame
+		call,								///< Call a procedure, pushing a new acrivation Frame
 		enter,								///< Allocate locals on the stack
 		ret,								///< Return from procedure; unlink Frame
 		reti,								///< Return from function; unlink Frame and push result
@@ -75,16 +74,12 @@ namespace pl0c {
 
 	std::string toString(OpCode op);		///< Return the OpCode's name...
 
-	typedef std::int32_t		Integer;	///< A data word or address
-	typedef std::uint32_t		Unsigned;	///< Data word as an unsigned integer
-	typedef std::vector<Integer> IntVector;	///< A vector of Integers...
-
 	/// An Instruction
 	struct Instr {
 		struct {
-			Integer		addr;				///< Address or data value
+			Integer		addr;				///< Address, offset or data value
 			OpCode		op;					///< Operation code
-			int8_t		level;				///< level: 0..255
+			int8_t		level;				///< Base level: 0..255
 		};
 
 		/// Default constructor; results in pushConst 0, 0...

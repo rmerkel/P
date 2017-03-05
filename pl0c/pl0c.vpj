@@ -266,7 +266,6 @@
 			<F N="pl0ccomp.cc"/>
 			<F N="pl0cinterp.cc"/>
 			<F N="symbol.cc"/>
-			<F N="../../../test.cc"/>
 			<F N="token.cc"/>
 		</Folder>
 		<Folder

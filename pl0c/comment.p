@@ -5,7 +5,7 @@ begin
    f = 1;
    {	calculate factor (n)
 		comment continued on this line... }
-   while n < 15 do begin
+   while n < 10 do begin
       n = n + 1;
       f = f * n
    end

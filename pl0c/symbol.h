@@ -1,9 +1,9 @@
 /**	@file	symbol.h
  *
- *	@brief	The P/L0C Symbol table
- *
- *	Created by Randy Merkel on 6/7/2013.
- *  Copyright (c) 2016 Randy Merkel. All rights reserved.
+ * The P/L0C Symbol table
+ *	 
+ * @author Randy Merkel, Slowly but Surly Software. 
+ * @copyright  (c) 2017 Slowly but Surly Software. All rights reserved.
  */
 
 #ifndef SYMBOL_H

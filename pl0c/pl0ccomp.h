@@ -1,54 +1,9 @@
 /** @file pl0ccomp.h
  * 
- *  The PL/0C compiler.
+ * The PL/0C compiler. 
  *  
- *  @section	compilier	The PL/0C compilier
- * 
- *  Started life as a C++ port of the PL/0 compilier as desicribed in Algorithms + Data Structures
- *  = Programs, 1st Edition, by Wirth and the C parser example from
- *  https://en.wikipedia.org/wiki/Recursive_descent_parser, and then modified to provide more "C
- *  like" operators.
- * 
- * 	@section grammer Grammer (EBNF)
- *
- *     prog =		block "." ;
- *
- *     block =		[ "const" ident "=" number {"," ident "=" number} ";"]
- *  				[ "var" ident {"," ident } ";"]
- *  				{ "procedure" ident "(" [ ident { "," ident } ] ")" block ";"	|
- *					  "function"  ident "(" [ ident { "," ident } ] ")" block ";" 	}
- *  			  	  stmt ;
- *
- *     stmt =		[ ident "=" expr						|
- *  			  	  ident "(" [ expr { "," expr } ")" 	|
- *  			  	  "begin" stmt {";" stmt } "end"		|
- *  			  	  "if" cond "then" stmt { "else" stmt }	|
- *  			  	  "while" cond "do" stmt				|
- *  			  	  "repeat" stmt "until" cond ] ;
- *
- *     cond =		relat { ("||" | &&") relation } ;
- * 
- *     relat =		expr { ("==" | "!=" | "<" | "<=" | ">" | ">=") expr } ;
- * 
- *     expr =		shift-expr { ("|" | "&" | "^") shift-expr } ;
- *  
- *     shift-expr =	add-expr { ("<<" | ">>") add-expr } ;
- *  
- *     add-expr =	term { ("+" | "-") term } ;
- * 
- *     term =     	unary { ("*" | "/" | "%") unary } ;
- *  
- *     unary =		[ ("+"|"-") ] fact ;
- *  
- *     fact  =    	ident 									|
- *  				ident "(" [ ident { "," ident } ] ")"	|
- *					number  								|
- *					"(" expr ")" ;
- *
- * Key
- * 	- {}	zero or more times
- * 	- []	zero or one times
-
+ * @author Randy Merkel, Slowly but Surly Software. 
+ * @copyright  (c) 2017 Slowly but Surly Software. All rights reserved. 
  */
 
 #ifndef	PL0COM_H
@@ -61,7 +16,57 @@
 #include <string>
 
 namespace pl0c {
-	/// A PL/0C Compiler
+	/** A PL/0C Compilier
+	 *  
+	 * A recursive decent compilier evolved from
+	 * https://en.wikipedia.org/wiki/Recursive_descent_parser#C_implementation. Construction binds a
+	 * program name with the instance, used in error messages. The compilier is run via the call
+	 * operator which specifies the input stream, the location of the emitted code, and weather to emit 
+	 * a travlelog (verbose messages). 
+	 *  
+	 * @section grammer Grammer (EBNF)
+	 *
+	 *     prog =		block "." ;
+	 *
+	 *     block =		[ "const" ident "=" number {"," ident "=" number} ";"]
+	 *  				[ "var" ident {"," ident } ";"]
+	 *  				{ "procedure" ident "(" [ ident { "," ident } ] ")" block ";"	|
+	 *					  "function"  ident "(" [ ident { "," ident } ] ")" block ";" 	}
+	 *  			  	  stmt ;
+	 *
+	 *     stmt =		[ ident "=" expr						|
+	 *  			  	  ident "(" [ expr { "," expr } ")" 	|
+	 *  			  	  "begin" stmt {";" stmt } "end"		|
+	 *  			  	  "if" cond "then" stmt { "else" stmt }	|
+	 *  			  	  "while" cond "do" stmt				|
+	 *  			  	  "repeat" stmt "until" cond ] ;
+	 *
+	 *     cond =		relat { ("||" | &&") relation } ;
+	 * 
+	 *     relat =		expr { ("==" | "!=" | "<" | "<=" | ">" | ">=") expr } ;
+	 * 
+	 *     expr =		shift-expr { ("|" | "&" | "^") shift-expr } ;
+	 *  
+	 *     shift-expr =	add-expr { ("<<" | ">>") add-expr } ;
+	 *  
+	 *     add-expr =	term { ("+" | "-") term } ;
+	 * 
+	 *     term =     	unary { ("*" | "/" | "%") unary } ;
+	 *  
+	 *     unary =		[ ("+"|"-") ] fact ;
+	 *  
+	 *     fact  =    	ident 									|
+	 *  				ident "(" [ ident { "," ident } ] ")"	|
+	 *					number  								|
+	 *					"(" expr ")" ;
+	 *
+	 * Key
+	 * - {}	Repeat zero or more times
+	 * - []	Optional; zero or *one* times 
+	 * - () Grouping
+	 * - |  One of ...
+	 * - ;  End of production
+	 */
 	class Comp {
 		/// A table, indexed by instruction address, yeilding source line numbers
 		typedef std::vector<unsigned> SourceIndex;
@@ -96,6 +101,9 @@ namespace pl0c {
 
 		/// Create a listing...
 		void listing(const std::string& name, std::istream& source, std::ostream& out);
+
+		/// Emit a variable reference, e.g., an absolute address
+		void varRef(int level, const SymValue& val);
 
 		void identifier(int level);				///< factor-identifier production...
 		void unary(int level);					///< unary-expr production...

@@ -1,6 +1,9 @@
 /** @file pl0c.cc
  *
- * PL/0C utilities
+ * PL/0C utilities 
+ *  
+ * @author Randy Merkel, Slowly but Surly Software. 
+ * @copyright  (c) 2017 Slowly but Surly Software. All rights reserved. 
  */
 
 #include "pl0c.h"
@@ -73,7 +76,7 @@ namespace pl0c {
 	 * @return loc+1
 	 */
 	Integer disasm(ostream& out, Integer loc, const Instr& instr, const string label) {
-		const int level = instr.level;		// so we don't display the level as a character
+		const int level = instr.level;		// so we don't display level as a character
 		if (label.size()) out << label << ": ";
 		out << setw(5) << loc << ": " << toString(instr.op);
 

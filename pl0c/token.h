@@ -1,9 +1,13 @@
 /**	@file	token.h
  * 
  *  The PL/0C scanner.
- *
- *	Created by Randy Merkel on 6/7/2013.
- *  Copyright (c) 2016 Randy Merkel. All rights reserved.
+ * 
+ * Started life as the Token and TokenStream classes for the calulator example from The C++
+ * Programming Language, 4th Edition, by Stroustrup, modified in an initial port of Wirth's PL/0
+ * compilier, and then transformed to use more C/C++ operands yielding the PL/0C scanner.
+ *	 
+ * @author Randy Merkel, Slowly but Surly Software. 
+ * @copyright  (c) 2017 Slowly but Surly Software. All rights reserved.
  */
 
 #ifndef TOKEN_H
@@ -16,7 +20,7 @@
 #include "pl0c.h"
 
 namespace pl0c {
-	/// A token kind/value pair
+	/// A token "kind"/value pair
 	struct Token {
 		/** Token kinds
 		 *  
@@ -27,37 +31,35 @@ namespace pl0c {
 		enum Kind : char {
 			unknown,						///< Unknown token kind; (number_value)
 			badComment,						///< Unterminated comment, started at line # (number_value)
-				
+
+			eof,							///< End of stream
+
 			identifier,	  		  			///< An identifier (string_value)
-			number,							///< literal number (number_value)
-												
+			number,							///< literal number (number_value)									
+
 			equ,							///< Is equal? (==)
 			neq,							///< Not equal? (!=)
 			lte,							///< Less than or equal? (<=)
 			gte,							///< Greater then or equal? (>=)
-											
 			lor,							///< Or? (||)
 			land,							///< And? (&&)
-			
+
 			lshift,							///< Left shift "<<"
 			rshift,							///< Right shift ">>"
-									
-			constDecl,						///< "const"
-			varDecl,						///< "var"
-			procDecl,						///< "procedure"
-			funcDecl,						///< "function"
-			call,							///< "call"
-			begin,							///< "begin"
+
+			constDecl,						///< "const" constant declaration
+			varDecl,						///< "var" variable (mutable) declaration
+			procDecl,						///< "procedure" declaraction
+			funcDecl,						///< "function" declaration
+			begin,							///< "begin" ... "end"
 			end,							///< "end"
-			If,								///< "if"
+			If,								///< "if" condition "then" ...
 			then,							///< "then"
 			Else,							///< "else"
-			While,							///< "while"
+			While,							///< "while" ... "do"
 			Do,								///< "do"
-			repeat,							///< "repeat"
+			repeat,							///< "repeat" ... "until"
 			until,							///< "until"
-											
-			eof,							///< End of stream
 
 			// End of non-printing character codes for ASCII and UNICODE (ordinal value 32)
 
@@ -88,9 +90,9 @@ namespace pl0c {
 
 		static std::string toString(Kind k); ///< Return k's name
 
-		Kind		kind;					///< Token type
-		std::string	string_value;			///< kind == ident
-		pl0c::Integer	number_value;			///< Kind == number
+		Kind			kind;				///< Token type
+		std::string		string_value;		///< kind == ident
+		pl0c::Integer	number_value;		///< Kind == number
 
 		/// Construct a token of type k, stirng value "", number value 0.
 		Token(Kind k) : kind{k}, number_value{0} {}
@@ -128,22 +130,12 @@ namespace pl0c {
 		/// The current token
 		Token& current() 					{	return ct;	}
 
-		void set_input(std::istream& s) {	///< Set the input stream to s
-			close();
-			ip = &s;
-			owns = false;
-			lineNum = 1;
-		}
-
-		void set_input(std::istream* p) {	///< Set the input stream to p
-			close();
-			ip = p;
-			owns = true;
-			lineNum = 1;
-		}
+		void set_input(std::istream& s);	///< Set the input stream to s
+		void set_input(std::istream* p);	///< Set the input stream to p
 
 	private:								/// A map of keywords to their 'kind'
 		typedef	std::map<std::string, Token::Kind> KeywordTable;
+
 		static	KeywordTable	keywords;	///< The keyword table
 
 		std::istream*	ip;					///< Pointer to an input stream

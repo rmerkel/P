@@ -23,5 +23,6 @@ function factorial(n)
 	end;
 
 begin
+	{ The result is the 10th factorial; 3,628,000	}
     result = factorial(10)
 end.
