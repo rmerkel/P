@@ -1,6 +1,7 @@
 /** @file pl0cinterp.h
  *  
- *  The PL/0C interpreter.
+ * The PL/0C interpreter.
+ * 
  * @section	interperter	The PL/0C Machine 
  *  
  *  Started life as a C++ port of the PL/0 machine described in Algorithms + Data Structures =
@@ -59,7 +60,7 @@ namespace pl0c {
 		};
 
 		pl0c::InstrVector	code;				///< Code segment, indexed by pc
-		pl0c::WordVector	stack;				///< Data segment (the stack), index by bp and sp
+		pl0c::IntVector	stack;				///< Data segment (the stack), index by bp and sp
 		std::size_t			pc;					///< Program counter register; index of *next* instruction in code[]
 		int					bp;					///< Base pointer register; index of the current mark block/frame in stack[]
 		int					sp;					///< Top of stack register (stack[sp])

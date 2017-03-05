@@ -5,47 +5,11 @@
  * 
  *  @section	instructions	PL/0C Machine instructions
  * 
- *	Ported from p0com.p, the compiler/interpreter from Algorithms + Data
- *  Structures = Programs, 1st Edition, by Wirth, then modified to use one OpCode per operation,
- *  i.e., removing the "OPR" instruction, and then adding more "C like" instructions, e.g., bit and
- *  logical OR...
- *
- * OpCode    | level? | addr?   | Notes
- * --------- | ------ | ------- | ---------------------------------------------
- * neg       |        |         | Unary: negate the top-of-stack
- * add       |        |         | Binary addition
- * sub       |        |         | Binary subtraction
- * mul       |        |         | Binary multiplication
- * div       |        |         | Binary division
- * equ       |        |         | Binary is equal?
- * neq       |        |         | Binary is not equal?
- * lt        |        |         | Binary is less than?
- * lte       |        |         | Binary is less than or equal?
- * gt        |        |         | Binary is greater than?
- * gte       |        |         | Binary greater than or equal?
- * lor       |        |         | Binary logical or
- * land      |        |         | Binary logical and
- * pushConst |        | value   | Push a constant value on the stack
- * pushVar   | Yes    | offset  | Read and then push a variable on the stack
- * pop       | Yes    | offset  | Pop and write a variable off of the stack
- * call      | Yes    | address | Call procedure with base(level)
- * ret       |        | offset  | Return from procedure, pop offset (args)
- * reti      |        | offset  | Return integer from function, pop args
- * enter     |        | offset  | Allocate locals on the stack (sp+=offset)
- * jump      |        | address | Jump to address
- * jneq      |        | address | Jump to address if top-of-stack == false (0)
- *
- * Notes:
- * - Unary - replace the top-of-stack with the result
- * - Binary - replace the top two items on the stack with the result.
- * - level/address - Effective address is base(level) + offset, where
- * base(level) is the base address n levels down the stack.
- * 
- * @section pl0c-bugs Machine Bugs
- * 
- * - Lacks support for indirect addressing needed for a pointer based array implementation. Perhaps
- *   pushEAddr (push effective address), pushIndirect (push variable whose address is on the
- *   top-of-stack, and popIndirect (destination address is top-of-stack, value to store is next).
+ *  Orignally ported from p0com.p, the compiler/interpreter from Algorithms + Data Structures =
+ *  Programs, 1st Edition, by Wirth, modified to use one OpCode per operation, i.e., removed the
+ *  "OPR" instruction, and then adding more "C like" instructions, e.g., bit and logical OR...
+ *  Finally, converted to use the push variable (address), eval/assign type address from HOC, as
+ *  described in The UNIX Programming Environment, by Kernighan and Pike.
  */ 
 
 #ifndef	PL0C_H
@@ -57,67 +21,68 @@
 
 /// The PL/0C Namespace
 namespace pl0c {
-	/// Runtime block/stack frame layout
+	/// Activation frame layout as created by OpCode::call
 	enum Frame {
 		base,								///< Frame base; base(n)
 		oldfp,								///< Saved frame pointer register
-		rAddr,								///< Return from proc/func address
+		rAddr,								///< Return address
 		rValue,								///< Function return value, defaults to zero.
 
 		size								///< Number of elements in the frame
 	};
 
-	/// Operation codes
+	/// Operation codes; restricted to 256 operations, max
 	enum class OpCode : std::uint8_t {
-
-		// Unary operations
-
-		neg,								///< Negate the top-of-stack
-												 
-		// Binary operations
+		Not, 								///< Unary not
+		neg,								///< Unary negation
+		comp,								///< Unary one's compliment
 
 		add,								///< Addition
 		sub,								///< Subtraction
 		mul,								///< Multiplication
 		div,								///< Division
 		rem,								///< Remainder
-		
-		bor,								///< Bit or
-		band,								///< Bit and
-		bxor,								///< Bit xor
+
+		bor,								///< Bitwise inclusive or
+		band,								///< Bitwise and
+		bxor,								///< Bitwise eXclusive or
+
+		lshift,								///< Left shift
+		rshift,								///< Right shift
 										
-		equ,								///< Is equal?
-		neq,								///< Is not equal?
-		lt,									///< Less than?
-		lte,								///< Less then or equal?
-		gt,									///< Greater than?
-		gte,								///< Greater than or equal?
+		lt,									///< Less than
+		lte,								///< Less then or equal
+		equ,								///< Equality
+		gte,								///< Greater than or equal
+		gt,									///< Greater than
+		neq,								///< Inequality
+
 		lor,								///< Logical or
 		land,								///< logica and
 
-											// Push/pop
+		pushConst,							///< Push a constant value
+		pushVar,							///< Push variable address (base(level) + addr)
+		eval,								///< Evaluate variable TOS = address, replace with value
+		assign,								///< Assign; TOS = variable address, TOS-1 = value
 
-		pushConst,							///< Push a constant literal on the stack
-		pushVar,							///< Read and push a variable on the stack
-		pop,								///< Pop and write a variable off of the stack
-
-		call,								///< Call a procedure, setting up a activation block (frame)
-		ret,								///< Return from procedure
-		reti,								///< Return from function
+		call,								///< Call a procedure, create Frame
 		enter,								///< Allocate locals on the stack
+		ret,								///< Return from procedure; unlink Frame
+		reti,								///< Return from function; unlink Frame and push result
 		jump,								///< Jump to a location
-		jneq								///< Jump if top-of-stack == false (0), pop
+		jneq								///< Condition = pop(); Jump if condition == false (0)
 	};
 
-	std::string toString(OpCode op);		///< Return the name of the OpCode as a string...
+	std::string toString(OpCode op);		///< Return the OpCode's name...
 
-	typedef std::int32_t		Word;		///< A data word or address
-	typedef std::vector<Word>	WordVector;	///< A vector of Words
+	typedef std::int32_t		Integer;	///< A data word or address
+	typedef std::uint32_t		Unsigned;	///< Data word as an unsigned integer
+	typedef std::vector<Integer> IntVector;	///< A vector of Integers...
 
-	/// A Instruction
+	/// An Instruction
 	struct Instr {
 		struct {
-			Word		addr;				///< Address or data value
+			Integer		addr;				///< Address or data value
 			OpCode		op;					///< Operation code
 			int8_t		level;				///< level: 0..255
 		};
@@ -126,14 +91,14 @@ namespace pl0c {
 		Instr() : addr{0}, op{OpCode::pushConst}, level{0}	{}
 
 		/// Construct an instruction from it's components...
-		Instr(OpCode o, int8_t l = 0, Word a = 0) : addr{a}, op{o}, level{l} {}
+		Instr(OpCode o, int8_t l = 0, Integer a = 0) : addr{a}, op{o}, level{l} {}
 	};
 
 	/// A vector of Instr's
 	typedef std::vector<Instr>	InstrVector;
 
 	/// Disassemble an instruction...
-	Word disasm(std::ostream& out, Word loc, const Instr& instr, const std::string label = "");
+	Integer disasm(std::ostream& out, Integer loc, const Instr& instr, const std::string label = "");
 }
 
 #endif

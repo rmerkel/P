@@ -1,6 +1,6 @@
 /** @file pl0c.cc
  *
- * PL/0 Machine utilities
+ * PL/0C utilities
  */
 
 #include "pl0c.h"
@@ -18,34 +18,44 @@ namespace pl0c {
 	 */
 	string toString(OpCode op) {
 		switch(op) {
-    	case OpCode::pushConst:	return "pushConst";	break;
-    	case OpCode::pushVar:	return "pushVar";	break;
-		case OpCode::pop:		return "pop";		break;
-
-    	case OpCode::call:		return "call";		break;
-    	case OpCode::enter:		return "enter";		break;
-    	case OpCode::jump:		return "jump";		break;
-    	case OpCode::jneq:		return "jneq";		break;
-    	case OpCode::ret:		return "ret";		break;
-    	case OpCode::reti:		return "reti";		break;
+		case OpCode::Not:		return "not";		break;
 		case OpCode::neg:		return "neg";		break;
+		case OpCode::comp:		return "comp";		break;
 
-    	case OpCode::add:		return "add";		break;
-    	case OpCode::sub:		return "sub";		break;
-    	case OpCode::mul:		return "mul";		break;
+		case OpCode::add:		return "add";		break;
+		case OpCode::sub:		return "sub";		break;
+		case OpCode::mul:		return "mul";		break;
 		case OpCode::div:		return "div";		break;
+		case OpCode::rem:		return "rem";		break;
+
 		case OpCode::bor:		return "bor";		break;
 		case OpCode::band:		return "band";		break;
 		case OpCode::bxor:		return "bxor";		break;
 
-    	case OpCode::equ:		return "equ";		break;
-    	case OpCode::neq:		return "neq";		break;
-    	case OpCode::lt:		return "lt";		break;
-    	case OpCode::lte:		return "lte";		break;
-    	case OpCode::gt:		return "gt";		break;
+		case OpCode::lshift:	return "lshift";	break;
+		case OpCode::rshift:	return "rshift";	break;
+
+		case OpCode::lt:		return "lt";		break;
+		case OpCode::lte:		return "lte";		break;
+		case OpCode::equ:		return "equ";		break;
 		case OpCode::gte:		return "gte";		break;
+		case OpCode::gt:		return "gt";		break;
+		case OpCode::neq:		return "neq";		break;
+
 		case OpCode::lor:		return "lor";		break;
 		case OpCode::land:		return "land";		break;
+
+		case OpCode::pushConst:	return "pushConst";	break;
+		case OpCode::pushVar:	return "pushVar";	break;
+		case OpCode::eval:		return "eval";		break;
+		case OpCode::assign:	return "assign";	break;
+
+    	case OpCode::call:		return "call";		break;
+		case OpCode::enter:		return "enter";		break;
+		case OpCode::ret:		return "ret";		break;
+		case OpCode::reti:		return "reti";		break;
+    	case OpCode::jump:		return "jump";		break;
+		case OpCode::jneq:		return "jneq";		break;
 
 		default: {
 				ostringstream oss;
@@ -62,7 +72,7 @@ namespace pl0c {
 	 * @param	label	Display label
 	 * @return loc+1
 	 */
-	Word disasm(ostream& out, Word loc, const Instr& instr, const string label) {
+	Integer disasm(ostream& out, Integer loc, const Instr& instr, const string label) {
 		const int level = instr.level;		// so we don't display the level as a character
 		if (label.size()) out << label << ": ";
 		out << setw(5) << loc << ": " << toString(instr.op);
@@ -72,19 +82,16 @@ namespace pl0c {
     	case OpCode::enter:
     	case OpCode::jump:
     	case OpCode::jneq:
-    	case OpCode::ret:
-    	case OpCode::reti:
     		out << " " << instr.addr;
     		break;
 
     	case OpCode::pushVar:
-    	case OpCode::pop:
     	case OpCode::call:
     		out << " "	<< level << ", " << instr.addr;
     		break;
 
 		default:								// The rest don't use level or address
-		break;
+			break;
 		}
 		out << "\n";
 

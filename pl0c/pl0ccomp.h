@@ -11,33 +11,39 @@
  * 
  * 	@section grammer Grammer (EBNF)
  *
- *     prog  =     block "." ;
+ *     prog =		block "." ;
  *
- *     block =  [  "const" ident "=" number {"," ident "=" number} ";"]
- *              [  "var" ident {"," ident } ";"]
- *              {  "procedure" ident "(" [ ident { "," ident } ] ")" block ";"
- *               | "function"  ident "(" [ ident { "," ident } ] ")" block ";" }
- *                 stmt ;
+ *     block =		[ "const" ident "=" number {"," ident "=" number} ";"]
+ *  				[ "var" ident {"," ident } ";"]
+ *  				{ "procedure" ident "(" [ ident { "," ident } ] ")" block ";"	|
+ *					  "function"  ident "(" [ ident { "," ident } ] ")" block ";" 	}
+ *  			  	  stmt ;
  *
- *     stmt  = [   ident "=" expr
- *              |  ident "(" [ expr { "," expr } ")"
- *              |  "begin" stmt {";" stmt } "end"
- *              |  "if" cond "then" stmt { "else" stmt }
- *              |  "while" cond "do" stmt
- *              |  "repeat" stmt "until" cond ] ;
+ *     stmt =		[ ident "=" expr						|
+ *  			  	  ident "(" [ expr { "," expr } ")" 	|
+ *  			  	  "begin" stmt {";" stmt } "end"		|
+ *  			  	  "if" cond "then" stmt { "else" stmt }	|
+ *  			  	  "while" cond "do" stmt				|
+ *  			  	  "repeat" stmt "until" cond ] ;
  *
- *     cond  =     relational { ("||" | &&") relation } ;
+ *     cond =		relat { ("||" | &&") relation } ;
  * 
- *     relational= expr { ("==" | "!=" | "<" | "<=" | ">" | ">=") expr } ;
+ *     relat =		expr { ("==" | "!=" | "<" | "<=" | ">" | ">=") expr } ;
  * 
- *     expr =      [ ("+"|"-") ] add-expr { ("|" | "&" | "^") add-expr } ;
+ *     expr =		shift-expr { ("|" | "&" | "^") shift-expr } ;
+ *  
+ *     shift-expr =	add-expr { ("<<" | ">>") add-expr } ;
+ *  
+ *     add-expr =	term { ("+" | "-") term } ;
  * 
- *     add-expr = term { ("+" | "-") term } ;
- * 
- *     term =     fact { ("*" | "/" | "%") fact } ;
- * 
- *     fact  =    ident
- *  		   |  ident "(" [ ident { "," ident } ] ")" |  number |  "(" expr ")" ;
+ *     term =     	unary { ("*" | "/" | "%") unary } ;
+ *  
+ *     unary =		[ ("+"|"-") ] fact ;
+ *  
+ *     fact  =    	ident 									|
+ *  				ident "(" [ ident { "," ident } ] ")"	|
+ *					number  								|
+ *					"(" expr ")" ;
  *
  * Key
  * 	- {}	zero or more times
@@ -86,7 +92,7 @@ namespace pl0c {
 		bool expect(Token::Kind k, bool get = true);
 
 		/// Emit an instruction...
-		size_t emit(const pl0c::OpCode op, int8_t level = 0, pl0c::Word addr = 0);
+		size_t emit(const pl0c::OpCode op, int8_t level = 0, pl0c::Integer addr = 0);
 
 		/// Create a listing...
 		void listing(const std::string& name, std::istream& source, std::ostream& out);
@@ -96,6 +102,7 @@ namespace pl0c {
 		void factor(int level);					///< factor production...
 		void term(int level);					///< terminal production...
 		void addExpr(int level);				///< additive-expr production...
+		void shiftExpr(int level);				///< shift production...
 		void expression(int level);				///< expression production...
 		void relational(int level);				///< relational-expr production...
 		void condition(int level);				///< condition production...

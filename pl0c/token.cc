@@ -66,14 +66,16 @@ namespace pl0c {
 			else {	unget();	ct.kind = Token::Not;	}
 			return ct;
 
-		case '>':									// > or >=?
+		case '>':									// >, >> or >=?
 			if (!getch(ch))		ct.kind = Token::gt;
+			else if ('>' == ch)	ct.kind = Token::rshift;
 			else if ('=' == ch)	ct.kind = Token::gte;
 			else {	unget();	ct.kind = Token::gt;	}
 			return ct;
 
-		case '<':									// < or <=?
+		case '<':									// <, << or <=?
 			if (!getch(ch))		ct.kind = Token::lt;
+			else if ('<' == ch)	ct.kind = Token::lshift;
 			else if ('=' == ch)	ct.kind = Token::lte;
 			else {	unget();	ct.kind = Token::lt;	}
 			return ct;

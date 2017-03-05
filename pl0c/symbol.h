@@ -30,7 +30,7 @@ struct SymValue {
 
 	Kind		kind;							///< identifier, constant, funciton, or procedure name
 	int			level;							///< Base/frame level If kind == proc or function
-	pl0c::Word	value;							///< value (identifier, constant) or address of a proc or function
+	pl0c::Integer	value;							///< value (identifier, constant) or address of a proc or function
 
 	/// Default construction
 	SymValue() : kind {none}, level {0}, value{0}
@@ -46,7 +46,7 @@ struct SymValue {
 	 * @param _level	The token base/frame level, e.g., 0 for "current frame.
 	 * @param _value 	The token value, e.g., a procedure address
 	 */
-	SymValue(Kind _kind, int _level = 0, pl0c::Word _value = 0) : kind{_kind}, level{_level}, value{_value}
+	SymValue(Kind _kind, int _level = 0, pl0c::Integer _value = 0) : kind{_kind}, level{_level}, value{_value}
 		{}
 };
 

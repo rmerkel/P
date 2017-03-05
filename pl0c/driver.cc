@@ -15,11 +15,6 @@
  *  
  * By default, pl0c::Interp logs the writes ("pop's") on standard output, but the verbose (-v) 
  * option will single step the program, writting a state report as well. 
- *  
- * @section	driver-bugs	Bugs 
- *  
- * - Currently, the only way to read from standard input is by way of the "-" file. It would be 
- *   nice if standard input was the default.
  */
 
 #include "pl0ccomp.h"
@@ -36,14 +31,14 @@ static bool		verbose = false;				///< Verbose messages if true
 
 /// Print a usage message on standard error output
 static void help() {
-	cerr << "Usage: " << progName << ": [options[ filename\n"
+	cerr << "Usage: " << progName << ": [options[ [filename]\n"
 		 << "Where options is zero or more of the following:\n"
 		 << "-?        Print this message and exit.\n"
 		 << "-help     Same as -?\n"
 		 << "-verbose  Set verbose mode.\n"
 		 << "-v        Same as -verbose.\n"
 		 << "\n"
-		 << "And where filename is the name of the source file, or '-' for standard input.\n";
+		 << "filename  The name of the source file, or '-' or '' for standard input.\n";
 }
 
 /** Parse the command line arguments...
@@ -86,6 +81,8 @@ static bool parseCommandline(const vector<string>& args) {
 			inputFile = arg;				// Read from named file
 	}
 
+	if (inputFile.empty()) 
+		inputFile = "-";					// Default to standard input
 	return true;
 }
 
@@ -111,13 +108,15 @@ int main(int argc, char* argv[]) {
 
 	if (!parseCommandline(args))
 		++nErrors;
-
-	if (inputFile.empty()) {
-		cerr << progName << ": source file name was not found!\n";
-		++nErrors;
 												// Compile the source, run if no errors
-	} else if (0 == (nErrors = comp(inputFile, code, verbose))) {
-		if (verbose) cout << progName << ": loading program from standard input, and starting pl/0...\n";
+	else if (0 == (nErrors = comp(inputFile, code, verbose))) {
+		if (verbose) {
+			if (inputFile == "-")
+				cout << progName << ": loading program from standard input, and starting pl/0...\n";
+			else
+				cout << progName << ": loading program '" << inputFile << "', and starting pl/0...\n";
+		}
+
 		const size_t n = machine(code, verbose);
 		if (verbose) cout << progName << ": Ending pl/0 after " << n << " machine cycles\n";
 	}

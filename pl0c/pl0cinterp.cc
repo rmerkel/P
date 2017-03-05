@@ -109,28 +109,33 @@ namespace pl0c {
 
 			// unary operations
 
-			case OpCode::neg:	stack[sp] = -stack[sp];						break;
+			case OpCode::Not:		stack[sp] = !stack[sp];						break;
+			case OpCode::neg:		stack[sp] = -stack[sp];						break;
+			case OpCode::comp:		stack[sp] = ~stack[sp];						break;
 
 			// binrary operations
 
-			case OpCode::add:	--sp; stack[sp] = stack[sp] + stack[sp+1];	break;
-			case OpCode::sub:	--sp; stack[sp] = stack[sp] - stack[sp+1];	break;
-			case OpCode::mul:	--sp; stack[sp] = stack[sp] * stack[sp+1];	break;
-			case OpCode::div:	--sp; stack[sp] = stack[sp] / stack[sp+1];	break;
-			case OpCode::rem: 	--sp; stack[sp] = stack[sp] % stack[sp+1];	break;
+			case OpCode::add:		--sp; stack[sp] = stack[sp] + stack[sp+1];	break;
+			case OpCode::sub:		--sp; stack[sp] = stack[sp] - stack[sp+1];	break;
+			case OpCode::mul:		--sp; stack[sp] = stack[sp] * stack[sp+1];	break;
+			case OpCode::div:		--sp; stack[sp] = stack[sp] / stack[sp+1];	break;
+			case OpCode::rem: 		--sp; stack[sp] = stack[sp] % stack[sp+1];	break;
 
-			case OpCode::bor:	--sp; stack[sp] = stack[sp] | stack[sp+1];	break;
-			case OpCode::band:	--sp; stack[sp] = stack[sp] && stack[sp+1];	break;
-			case OpCode::bxor:	--sp; stack[sp] = stack[sp] ^ stack[sp+1];	break;
+			case OpCode::bor:		--sp; stack[sp] = stack[sp] | stack[sp+1];	break;
+			case OpCode::band:		--sp; stack[sp] = stack[sp] && stack[sp+1];	break;
+			case OpCode::bxor:		--sp; stack[sp] = stack[sp] ^ stack[sp+1];	break;
 
-			case OpCode::equ:	--sp; stack[sp] = stack[sp] == stack[sp+1];	break;
-			case OpCode::neq:	--sp; stack[sp] = stack[sp] != stack[sp+1];	break;
-			case OpCode::lt:	--sp; stack[sp] = stack[sp]  < stack[sp+1];	break;
-			case OpCode::gte:	--sp; stack[sp] = stack[sp] >= stack[sp+1];	break;
-			case OpCode::gt:	--sp; stack[sp] = stack[sp]  > stack[sp+1];	break;
-			case OpCode::lte:	--sp; stack[sp] = stack[sp] <= stack[sp+1];	break;
-			case OpCode::lor:	--sp; stack[sp] = stack[sp] || stack[sp+1];	break;
-			case OpCode::land:	--sp; stack[sp] = stack[sp] && stack[sp+1];	break;
+			case OpCode::lshift:	--sp; stack[sp] = stack[sp] << stack[sp+1];	break;
+			case OpCode::rshift:	--sp; stack[sp] = stack[sp] >> stack[sp+1];	break;
+
+			case OpCode::equ:		--sp; stack[sp] = stack[sp] == stack[sp+1];	break;
+			case OpCode::neq:		--sp; stack[sp] = stack[sp] != stack[sp+1];	break;
+			case OpCode::lt:		--sp; stack[sp] = stack[sp]  < stack[sp+1];	break;
+			case OpCode::gte:		--sp; stack[sp] = stack[sp] >= stack[sp+1];	break;
+			case OpCode::gt:		--sp; stack[sp] = stack[sp]  > stack[sp+1];	break;
+			case OpCode::lte:		--sp; stack[sp] = stack[sp] <= stack[sp+1];	break;
+			case OpCode::lor:		--sp; stack[sp] = stack[sp] || stack[sp+1];	break;
+			case OpCode::land:		--sp; stack[sp] = stack[sp] && stack[sp+1];	break;
 
 			// push/pop
 
@@ -139,12 +144,17 @@ namespace pl0c {
 				break;
 
 			case OpCode::pushVar:
-				stack[++sp] = stack[base(ir.level) + ir.addr];
+				stack[++sp] = base(ir.level) + ir.addr;
 				break;
 
-			case OpCode::pop:
-				// Save the effective address for dump()
-				lastWrite = base(ir.level) + ir.addr;
+			case OpCode::eval: {
+					auto ea = stack[sp];
+					stack[sp] = stack[ea];
+				}
+				break;
+
+			case OpCode::assign:
+				lastWrite = stack[sp--];		// Save the effective address for dump()
 				stack[lastWrite] = stack[sp--];
 				break;
 

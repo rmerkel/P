@@ -97,7 +97,7 @@ namespace pl0c {
 	 *
 	 *	@return The address (code[] index) of the new instruction.
 	 */
-	size_t Comp::emit(const OpCode op, int8_t level, Word addr) {
+	size_t Comp::emit(const OpCode op, int8_t level, Integer addr) {
 		if (verbose)
 			cout << progName << ": emitting " << code->size() << ": "
 					<< toString(op) << " " << static_cast<int>(level) << ", " << addr
@@ -162,10 +162,11 @@ namespace pl0c {
 			if (SymValue::constant == closest->second.kind)
 				emit(OpCode::pushConst, 0, closest->second.value);
 
-			else if (SymValue::identifier == closest->second.kind)
+			else if (SymValue::identifier == closest->second.kind) {
 				emit(OpCode::pushVar, level - closest->second.level, closest->second.value);
+				emit(OpCode::eval);
 
-			else if (SymValue::function == closest->second.kind) {
+			} else if (SymValue::function == closest->second.kind) {
 				expect(Token::lparen);
 				if (!accept(Token::rparen, false)) {
 					do
@@ -205,18 +206,15 @@ namespace pl0c {
 	}
 
 	/** 
-	 * urary = [ "+" | "-" ] fact 
+	 * urary = [ ("+" | "-" | "!" | "~") ] fact 
 	 * @param	level	The current block level 
 	 */ 
 	void Comp::unary(int level) {
-		const Token::Kind op = current();		// unary +|-?
-		if (accept(Token::add) || accept(Token::sub))
-			;									// consume the unary operator...
-
-		factor(level);
-
-		if (Token::sub == op)
-			emit(OpCode::neg);					// ignore unary +!
+		     if (accept(Token::add))	{	factor(level);	/* ignore + */		}
+		else if (accept(Token::sub))	{	factor(level);	emit(OpCode::neg);	}
+		else if (accept(Token::Not))	{	factor(level);	emit(OpCode::Not);	}
+		else if (accept(Token::comp))	{	factor(level);	emit(OpCode::comp);	}
+		else								factor(level);
 	}
 
 	/**
@@ -249,20 +247,31 @@ namespace pl0c {
 		}
 	}
 
-	/// TBD: shiftExpr (<< and >>)
+	/** 
+	 * shift = additive { ("<<" | ">>") additive } ; 
+	 * @param	level	The current block level. 
+	 */ 
+	void Comp::shiftExpr(int level) {
+		addExpr(level);
+		for (;;) {
+				 if (accept(Token::lshift))	{	addExpr(level);	emit(OpCode::lshift);	}
+			else if (accept(Token::rshift))	{	addExpr(level);	emit(OpCode::rshift);	}
+			else break;
+		}
+	}
 
 	/**
-	 * expr = additive { ("|" | "&" | "^") additive } ;
+	 * expr = shift { ("|" | "&" | "^") shift } ;
 	 *
 	 * @param	level	The current block level.
 	 */
 	void Comp::expression(int level) {
-		addExpr(level);
+		shiftExpr(level);
 
 		for (;;) {
-				 if (accept(Token::bor))	{	addExpr(level);	emit(OpCode::bor);  }
-			else if (accept(Token::band))	{	addExpr(level);	emit(OpCode::band); }
-			else if (accept(Token::bxor))	{	addExpr(level);	emit(OpCode::bxor); }
+				 if (accept(Token::bor))	{	shiftExpr(level); emit(OpCode::bor);  }
+			else if (accept(Token::band))	{	shiftExpr(level); emit(OpCode::band); }
+			else if (accept(Token::bxor))	{	shiftExpr(level); emit(OpCode::bxor); }
 			else break;
 		}
 	}
@@ -312,11 +321,13 @@ namespace pl0c {
 
 		switch(val.kind) {
 		case SymValue::identifier:
-			emit(OpCode::pop, level - val.level, val.value);
+			emit(OpCode::pushVar, level - val.level, val.value);
+			emit(OpCode::assign);
 			break;
 
 		case SymValue::function:
-			emit(OpCode::pop, 0, rValue);
+			emit(OpCode::pushVar, 0, rValue);	// Push address of rValue
+			emit(OpCode::assign);				//	Now save the return value @ rValue
 			break;
 
 		case SymValue::constant:
@@ -361,7 +372,7 @@ namespace pl0c {
 	void Comp::identStmt(int level) {
 		// Save the identifier string before consuming it
 		const string name = ts.current().string_value;
-		next();
+		accept(Token::identifier);
 
 		auto range = symtbl.equal_range(name);		// look it up....
 		if (range.first == range.second)

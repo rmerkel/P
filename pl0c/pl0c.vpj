@@ -3,7 +3,8 @@
 	Version="10.0"
 	VendorName="SlickEdit"
 	TemplateName="GNU C/C++"
-	WorkingDir=".">
+	WorkingDir="."
+	VCSProject="Git:">
 	<Config
 		Name="Debug"
 		Type="gnuc"
@@ -296,7 +297,6 @@
 			<F
 				N="Makefile"
 				Type="Makefile"/>
-			<F N="pl0c"/>
 			<F N="pl0c.vpwistu"/>
 			<F N="precedence.p"/>
 			<F N="repeatst.p"/>

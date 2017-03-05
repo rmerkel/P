@@ -35,9 +35,13 @@ namespace pl0c {
 			neq,							///< Not equal? (!=)
 			lte,							///< Less than or equal? (<=)
 			gte,							///< Greater then or equal? (>=)
+											
 			lor,							///< Or? (||)
 			land,							///< And? (&&)
 			
+			lshift,							///< Left shift "<<"
+			rshift,							///< Right shift ">>"
+									
 			constDecl,						///< "const"
 			varDecl,						///< "var"
 			procDecl,						///< "procedure"
@@ -77,15 +81,16 @@ namespace pl0c {
 
 			bxor		= '^',				///< Bit XOR
 			bor			= '|',				///< Bit or
-			band		= '&'				///< Bit and
+			band		= '&',				///< Bit and
 
+			comp		= '~'				///< 1's complament
 		};
 
 		static std::string toString(Kind k); ///< Return k's name
 
 		Kind		kind;					///< Token type
 		std::string	string_value;			///< kind == ident
-		pl0c::Word	number_value;			///< Kind == number
+		pl0c::Integer	number_value;			///< Kind == number
 
 		/// Construct a token of type k, stirng value "", number value 0.
 		Token(Kind k) : kind{k}, number_value{0} {}
