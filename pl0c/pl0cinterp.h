@@ -22,21 +22,29 @@ namespace pl0c {
 	 *  
 	 * @section bugs	Bugs
 	 * 
-	 *  - The stack length is fixed at construction and can't grow.
-	 *  - There is no out of range checking for the stack or code; references out-of-bounds leads to
-	 *    disaster.
-	 *  - There are no checks for divide by zero.
 	 *  - There are no input/output instructions.
 	 *  - There is no interactive mode for debugging; just automatic single stepping (verbose == true)
 	 */
 	class Interp {
 	public:
-		Interp(std::size_t stacksz = 512);
+		/// Interpeter results
+		enum class Result {
+			success,							///< No errors
+			divideByZero,						///< Divide by zero
+			badFetch,							///< Attempt to fetch uninitialized code
+			unknownInstr						///< Attempt to execute an undefined instruction
+		};
+
+		static std::string toString(Result r);	///< Return the results name
+
+		Interp();
 		virtual ~Interp() {}
 
 		/// Load a applicaton and start the pl/0 machine running...
-		std::size_t operator()(const pl0c::InstrVector& program, bool v = false);
+		Result operator()(const pl0c::InstrVector& program, bool v = false);
 		void reset();							///< Reset the machine back to it's initial state.
+		size_t cycles() const;					///< Return number of machine cycles run so far
+
 
 	private:
 		/// A Effective Address that maybe invalidated
@@ -61,21 +69,23 @@ namespace pl0c {
 		};
 
 		pl0c::InstrVector	code;				///< Code segment, indexed by pc
-		pl0c::IntVector	stack;				///< Data segment (the stack), index by bp and sp
+		pl0c::IntVector		stack;				///< Data segment (the stack), index by fp and sp
 		std::size_t			pc;					///< Program counter register; index of *next* instruction in code[]
-		int					bp;					///< Base pointer register; index of the current mark block/frame in stack[]
+		int					fp;					///< Frame pointer register; index of the current mark block/frame in stack[]
 		int					sp;					///< Top of stack register (stack[sp])
 		pl0c::Instr			ir;					///< *Current* instruction register (code[pc-1])
 
 		EAddr				lastWrite;			///< Last write effective address (to stack[]), if valid
 		bool				verbose;			///< Verbose output if true
+		size_t 				ncycles;			///< Number of machine cycles run since the last reset
 
 		void dump();
 
 	protected:
 		uint16_t base(uint16_t lvl);			///< Find the base 'lvl' levels (frames) up the stack...
+		void mkStackSpace(size_t n);			///< Make room for at least sp+n entries on the stack
 		void ret();								///< Return from subroutine...
-		std::size_t run();						///< Run the machine...
+		Result run();							///< Run the machine...
 	};
 }
 

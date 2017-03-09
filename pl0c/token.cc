@@ -47,7 +47,7 @@ namespace pl0c {
 
 		do {										// skip whitespace... 
 			if (!getch(ch))
-				return ct = { Token::eof };
+				return ct = { Token::EOS };
 
 			if ('\n' == ch) ++lineNum;				// Count lines
 
@@ -55,48 +55,48 @@ namespace pl0c {
 
 		switch (ch) {
 		case '=':									// = or ==?
-			if (!getch(ch))		ct.kind = Token::assign;
-			else if ('=' == ch) ct.kind = Token::equ;
-			else {	unget();	ct.kind = Token::assign;	}
+			if (!getch(ch))		ct.kind = Token::Assign;
+			else if ('=' == ch) ct.kind = Token::EQU;
+			else {	unget();	ct.kind = Token::Assign;	}
 			return ct;
 
 		case '!':									// ! or !=?
 			if (!getch(ch))		ct.kind = Token::Not;
-			else if ('=' == ch) ct.kind = Token::neq;
+			else if ('=' == ch) ct.kind = Token::NEQU;
 			else {	unget();	ct.kind = Token::Not;	}
 			return ct;
 
 		case '>':									// >, >> or >=?
-			if (!getch(ch))		ct.kind = Token::gt;
-			else if ('>' == ch)	ct.kind = Token::rshift;
-			else if ('=' == ch)	ct.kind = Token::gte;
-			else {	unget();	ct.kind = Token::gt;	}
+			if (!getch(ch))		ct.kind = Token::GreaterThan;
+			else if ('>' == ch)	ct.kind = Token::ShiftR;
+			else if ('=' == ch)	ct.kind = Token::GTE;
+			else {	unget();	ct.kind = Token::GreaterThan;	}
 			return ct;
 
 		case '<':									// <, << or <=?
-			if (!getch(ch))		ct.kind = Token::lt;
-			else if ('<' == ch)	ct.kind = Token::lshift;
-			else if ('=' == ch)	ct.kind = Token::lte;
-			else {	unget();	ct.kind = Token::lt;	}
+			if (!getch(ch))		ct.kind = Token::LessThan;
+			else if ('<' == ch)	ct.kind = Token::ShiftL;
+			else if ('=' == ch)	ct.kind = Token::LTE;
+			else {	unget();	ct.kind = Token::LessThan;	}
 			return ct;
 
 		case '|':							// | or ||?
-			if (!getch(ch)) 	ct.kind = Token::bor;
-			else if ('|' == ch) ct.kind = Token::lor;
-			else {	unget();	ct.kind = Token::gt;	}
+			if (!getch(ch)) 	ct.kind = Token::BitOR;
+			else if ('|' == ch) ct.kind = Token::OR;
+			else {	unget();	ct.kind = Token::GreaterThan;	}
 			return ct;
 
 		case '&':							// & or &&?
-			if (!getch(ch)) 	ct.kind = Token::band;
-			else if ('&' == ch) ct.kind = Token::land;
-			else {	unget();	ct.kind = Token::band;  }
+			if (!getch(ch)) 	ct.kind = Token::BitAND;
+			else if ('&' == ch) ct.kind = Token::AND;
+			else {	unget();	ct.kind = Token::BitAND;  }
 			return ct;
 
 		case '{':									// comment; { ... }
 			ct.number_value = lineNum;				// remember where the comment stated...
 			do {									// eat everthhing up to the closing '}' 
 				if (!getch(ch)) {
-					ct.kind = Token::badComment;
+					ct.kind = Token::BadComment;
 					return ct;
 				}
 
@@ -127,7 +127,7 @@ namespace pl0c {
 			unget();
 			std::istringstream iss (ct.string_value);
 			iss >> ct.number_value;
-			ct.kind = Token::number;
+			ct.kind = Token::Number;
 			return ct;
 		}
 
@@ -142,14 +142,14 @@ namespace pl0c {
 				if (keywords.end() != it)
 					ct.kind = it->second;
 				else
-					ct.kind = Token::identifier;
+					ct.kind = Token::Identifier;
 				return ct;
 
 			} else {
 
 				ct.string_value = ch;
 				ct.number_value = ch;
-				ct.kind = Token::unknown;
+				ct.kind = Token::Unknown;
 				return ct;
 			}
 		}
@@ -160,48 +160,54 @@ namespace pl0c {
 	/// Return a string with k's name
 	string Token::toString(Token::Kind k) {
 		switch(k) {
-		case Kind::unknown:		return "unknown";		break;
-		case Kind::badComment:	return "bad comment";	break;
-		case Kind::identifier:	return "identifier";	break;
-		case Kind::number:		return "number";		break;
-		case Kind::equ:			return "==";			break;
-		case Kind::neq:			return "!=";			break;
-		case Kind::lte:			return "<=";			break;
-		case Kind::gte:			return ">=";			break;
-		case Kind::lor:			return "||";			break;
-		case Kind::land:		return "&&";			break;
-		case Kind::constDecl:	return "const";			break;
-		case Kind::varDecl:		return "var";			break;
-		case Kind::procDecl:	return "procedure";		break;
-		case Kind::funcDecl:	return "function";		break;
-		case Kind::begin:		return "begin";			break;
-		case Kind::end:			return "end";			break;
+		case Kind::Unknown:		return "unknown";		break;
+		case Kind::BadComment:	return "bad comment";	break;
+
+		case Kind::Identifier:	return "identifier";	break;
+		case Kind::Number:		return "Number";		break;
+		case Kind::Constant:	return "const";			break;
+		case Kind::Variable:	return "var";			break;
+		case Kind::Procedure:	return "procedure";		break;
+		case Kind::Function:	return "function";		break;
+		case Kind::Begin:		return "begin";			break;
+		case Kind::End:			return "end";			break;
 		case Kind::If:			return "if";			break;
-		case Kind::then:		return "then";			break;
+		case Kind::Then:		return "then";			break;
 		case Kind::Else:		return "else";			break;
 		case Kind::While:		return "while";			break;
 		case Kind::Do:			return "do";			break;
-		case Kind::repeat:		return "repeat";		break;
-		case Kind::until:		return "until";			break;
-		case Kind::eof:			return "eof";			break;
+		case Kind::Repeat:		return "repeat";		break;
+		case Kind::Until:		return "until";			break;
+
+		case Kind::EOS:			return "EOS";			break;
+
+		case Kind::EQU:			return "==";			break;
+		case Kind::LTE:			return "<=";			break;
+		case Kind::GTE:			return ">=";			break;
+		case Kind::OR:			return "||";			break;
+		case Kind::AND:			return "&&";			break;
+		case Kind::NEQU:		return "!=";			break;
 
 		case Kind::Not:			return "!";				break;
-		case Kind::mod:			return "%";				break;
-		case Kind::lparen:		return "(";				break;
-		case Kind::rparen:		return ")";				break;
-		case Kind::mul:			return "*";				break;
-		case Kind::add:			return "+";				break;
-		case Kind::comma:		return ",";				break;
-		case Kind::sub:			return "-";				break;
-		case Kind::period:		return ".";				break;
-		case Kind::div:			return "/";				break;
-		case Kind::semicolon:	return ";";				break;
-		case Kind::lt:			return "<";				break;
-		case Kind::assign:		return "=";				break;
-		case Kind::gt:			return ">";				break;
-		case Kind::bxor:		return "^";				break;
-		case Kind::bor:			return "|";				break;
-		case Kind::band:		return "&";				break;
+		case Kind::LessThan:	return "<";				break;
+		case Kind::GreaterThan:	return ">";				break;
+
+		case Kind::BitXOR:		return "^";				break;
+		case Kind::BitOR:		return "|";				break;
+		case Kind::BitAND:		return "&";				break;	
+
+		case Kind::Add:			return "+";				break;
+		case Kind::Subtract:	return "-";				break;
+		case Kind::Multiply:	return "*";				break;
+		case Kind::Divide:		return "/";				break;
+		case Kind::Mod:			return "%";				break;
+
+		case Kind::OpenParen:	return "(";				break;
+		case Kind::CloseParen:	return ")";				break;
+		case Kind::Comma:		return ",";				break;
+		case Kind::Period:		return ".";				break;
+		case Kind::SemiColon:	return ";";				break;
+		case Kind::Assign:		return "=";				break;
 
 		default: {
 				ostringstream oss;
@@ -242,19 +248,19 @@ namespace pl0c {
 	// privite static
 
 	TokenStream::KeywordTable	TokenStream::keywords = {
-		{   "const",		Token::constDecl	},
-		{	"var",			Token::varDecl		},
-		{	"procedure",	Token::procDecl		},
-		{	"function",		Token::funcDecl		},
-		{	"begin",		Token::begin		},
-		{	"end",			Token::end			},
+		{   "const",		Token::Constant	},
+		{	"var",			Token::Variable		},
+		{	"procedure",	Token::Procedure		},
+		{	"function",		Token::Function		},
+		{	"begin",		Token::Begin		},
+		{	"end",			Token::End			},
 		{	"if",			Token::If			},
-		{	"then",			Token::then			},
+		{	"then",			Token::Then			},
 		{	"else",			Token::Else			},
 		{	"while",		Token::While		},
 		{	"do",			Token::Do			},
-		{	"repeat",		Token::repeat		},
-		{	"until",		Token::until		},
-		{	"mod",			Token::mod			}
+		{	"repeat",		Token::Repeat		},
+		{	"until",		Token::Until		},
+		{	"mod",			Token::Mod			}
 	};
 }

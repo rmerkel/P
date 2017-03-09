@@ -26,7 +26,8 @@
  * logs "assigns" on standard output, but the verbose (-v) option will single step the program, 
  * writing a state report as well. 
  * 
- * @version 1.0	- First release 
+ * @version 1.0f -	Added dynamicly sized stack; check that pc in in range; divide by zero check;
+ *  				Interp returns success or error indicator; renamed bp to fp. Cleaned up Token.
  * @author Randy Merkel, Slowly but Surly Software. 
  * @copyright  (c) 2017 Slowly but Surly Software. All rights reserved.
  */
@@ -59,7 +60,7 @@ static void help() {
 
 /// Print the version number as major.minor
 static void printVersion() {
-	cout << progName << ": verson: 1.0\n";	// makesure to update the verison in mainpage!!
+	cout << progName << ": verson: 1.0f\n";	// makesure to update the verison in mainpage!!
 }
 
 /** Parse the command line arguments...
@@ -145,8 +146,11 @@ int main(int argc, char* argv[]) {
 				cout << progName << ": loading program '" << inputFile << "', and starting pl/0...\n";
 		}
 
-		const size_t n = machine(code, verbose);
-		if (verbose) cout << progName << ": Ending pl/0 after " << n << " machine cycles\n";
+		const pl0c::Interp::Result r = machine(code, verbose);
+		if (pl0c::Interp::Result::success != r)
+			cerr << progName << ": runtime error: " << pl0c::Interp::toString(r) << "!\n";
+
+		if (verbose) cout << progName << ": Ending pl/0 after " << machine.cycles() << " machine cycles\n";
 	}
 
 	return nErrors;

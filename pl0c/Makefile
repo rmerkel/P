@@ -115,3 +115,4 @@ test: all
 	./$(EXE) repeatst.p
 	./$(EXE) precedence.p
 	./$(EXE) comment.p
+	./$(EXE) divbyzero.p

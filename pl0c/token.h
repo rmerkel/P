@@ -29,63 +29,61 @@ namespace pl0c {
 		 *  its character
 		 */
 		enum Kind : char {
-			unknown,						///< Unknown token kind; (number_value)
-			badComment,						///< Unterminated comment, started at line # (number_value)
+			Unknown,						///< Unknown token kind; (number_value)
+			BadComment,						///< Unterminated comment, started at line # (number_value)
 
-			eof,							///< End of stream
-
-			identifier,	  		  			///< An identifier (string_value)
-			number,							///< literal number (number_value)									
-
-			equ,							///< Is equal? (==)
-			neq,							///< Not equal? (!=)
-			lte,							///< Less than or equal? (<=)
-			gte,							///< Greater then or equal? (>=)
-			lor,							///< Or? (||)
-			land,							///< And? (&&)
-
-			lshift,							///< Left shift "<<"
-			rshift,							///< Right shift ">>"
-
-			constDecl,						///< "const" constant declaration
-			varDecl,						///< "var" variable (mutable) declaration
-			procDecl,						///< "procedure" declaraction
-			funcDecl,						///< "function" declaration
-			begin,							///< "begin" ... "end"
-			end,							///< "end"
+			Identifier,	  		  			///< An identifier (string_value)
+			Number,							///< literal number (number_value)									
+			Constant,						///< "const" constant declaration
+			Variable,						///< "var" variable (mutable) declaration
+			Procedure,						///< "procedure" declaraction
+			Function,						///< "function" declaration
+			Begin,							///< "begin" ... "end"
+			End,							///< "end"
 			If,								///< "if" condition "then" ...
-			then,							///< "then"
+			Then,							///< "then"
 			Else,							///< "else"
 			While,							///< "while" ... "do"
 			Do,								///< "do"
-			repeat,							///< "repeat" ... "until"
-			until,							///< "until"
+			Repeat,							///< "repeat" ... "until"
+			Until,							///< "until"
+
+			EQU,							///< Is equal? (==)
+			LTE,							///< Less than or equal? (<=)
+			GTE,							///< Greater then or equal? (>=)
+			OR,								///< Or? (||)
+			AND,							///< And? (&&)
+			NEQU,							///< Not equal? (!=)
+
+			ShiftL,							///< Left shift "<<"
+			ShiftR,							///< Right shift ">>"
+
+			EOS,							///< End of stream
 
 			// End of non-printing character codes for ASCII and UNICODE (ordinal value 32)
 
 			Not			= '!',				///< Logical not
+			LessThan	= '<',				///< Less than
+			GreaterThan	= '>',				///< Greater then
 
-			mod			= '%',				///< Modulus (remainder)
+			BitXOR		= '^',				///< Bit XOR
+			BitOR		= '|',				///< Bit or
+			BitAND		= '&',				///< Bit and
+			Complament	= '~',				///< 1's complament	
 
-			lparen		= '(',				///< Opening parentheses
-			rparen		= ')',				///< Closing parentheses
-			mul			= '*',				///< Multiplication
-			add			= '+',				///< Addition
-			comma		= ',',				///< Decl separator
-			sub			= '-',				///< Subtraction
-			period		= '.',				///< Period
-			div 		= '/',				///< Division
+			Add			= '+',				///< Addition
+			Subtract	= '-',				///< Subtraction
+			Multiply	= '*',				///< Multiplication
+			Divide 		= '/',				///< Division
+			Mod			= '%',				///< Modulus (remainder)
 
-			semicolon	= ';',				///< Statement separator
-			lt			= '<',				///< Less than
-			assign		= '=',				///< Assignment
-			gt			= '>',				///< Greater then
+			OpenParen	= '(',				///< Opening parentheses
+			CloseParen	= ')',				///< Closing parentheses
+			Comma		= ',',				///< Decl separator
+			Period		= '.',				///< Period
+			SemiColon	= ';',				///< Statement separator
+			Assign		= '='				///< Assignment
 
-			bxor		= '^',				///< Bit XOR
-			bor			= '|',				///< Bit or
-			band		= '&',				///< Bit and
-
-			comp		= '~'				///< 1's complament
 		};
 
 		static std::string toString(Kind k); ///< Return k's name
@@ -144,7 +142,7 @@ namespace pl0c {
 		std::string 	line;				///< last line read from the stream 
 
 		/// The current token
-		Token 			ct { Token::Kind::eof };
+		Token 			ct { Token::Kind::EOS };
 
 		/// If *this* owns ip, delete it.
 		void close()							{ if (owns) delete ip;	}

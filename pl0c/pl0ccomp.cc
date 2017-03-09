@@ -46,7 +46,7 @@ namespace pl0c {
 	Token Comp::next() {
 		const Token t = ts.get();
 
-		if (Token::unknown == t.kind) {
+		if (Token::Unknown == t.kind) {
 			ostringstream oss;
 			oss << "Unknown token: '" << t.string_value << ", (0x" << hex << t.number_value << ")";
 			error(oss.str());
@@ -183,13 +183,13 @@ namespace pl0c {
 				emit(OpCode::eval);
 
 			} else if (SymValue::function == closest->second.kind) {
-				expect(Token::lparen);
-				if (!accept(Token::rparen, false)) {
+				expect(Token::OpenParen);
+				if (!accept(Token::CloseParen, false)) {
 					do
 						expression(level);
-					while (accept(Token::comma));
+					while (accept(Token::Comma));
 				}
-				expect(Token::rparen);
+				expect(Token::CloseParen);
 				emit(OpCode::call, level - closest->second.level, closest->second.value);
 
 			} else
@@ -203,16 +203,16 @@ namespace pl0c {
 	 * @param	level	The current block level.
 	 */
 	void Comp::factor(int level) {
-		if (accept(Token::identifier, false))
+		if (accept(Token::Identifier, false))
 			identifier(level);
 
-		else if (accept(Token::number, false)) {
+		else if (accept(Token::Number, false)) {
 			emit(OpCode::pushConst, 0, ts.current().number_value);
-			expect(Token::number);
+			expect(Token::Number);
 
-		} else if (accept(Token::lparen)) {
+		} else if (accept(Token::OpenParen)) {
 			expression(level);
-			expect(Token::rparen);
+			expect(Token::CloseParen);
 
 		} else {
 			error("factor: syntax error; expected ident | num | { expr }, but got:",
@@ -226,10 +226,10 @@ namespace pl0c {
 	 * @param	level	The current block level 
 	 */ 
 	void Comp::unary(int level) {
-		     if (accept(Token::add))	{	factor(level);	/* ignore + */		}
-		else if (accept(Token::sub))	{	factor(level);	emit(OpCode::neg);	}
+		     if (accept(Token::Add))	{	factor(level);	/* ignore + */		}
+		else if (accept(Token::Subtract))	{	factor(level);	emit(OpCode::neg);	}
 		else if (accept(Token::Not))	{	factor(level);	emit(OpCode::Not);	}
-		else if (accept(Token::comp))	{	factor(level);	emit(OpCode::comp);	}
+		else if (accept(Token::Complament))	{	factor(level);	emit(OpCode::comp);	}
 		else								factor(level);
 	}
 
@@ -242,9 +242,9 @@ namespace pl0c {
 		unary(level);
 
 		for (;;) {
-				 if (accept(Token::mul))	{	unary(level);	emit(OpCode::mul);	}
-			else if (accept(Token::div))	{	unary(level);	emit(OpCode::div);	}
-			else if (accept(Token::mod))	{	unary(level);	emit(OpCode::rem);	}
+				 if (accept(Token::Multiply))	{	unary(level);	emit(OpCode::mul);	}
+			else if (accept(Token::Divide))	{	unary(level);	emit(OpCode::div);	}
+			else if (accept(Token::Mod))	{	unary(level);	emit(OpCode::rem);	}
 			else break;
 		}
 	}
@@ -257,8 +257,8 @@ namespace pl0c {
 		term(level);
 
 		for (;;) {
-				 if	(accept(Token::add)) 	{   term(level);	emit(OpCode::add);  }
-			else if (accept(Token::sub)) 	{   term(level);	emit(OpCode::sub);  }
+				 if	(accept(Token::Add)) 	{   term(level);	emit(OpCode::add);  }
+			else if (accept(Token::Subtract)) 	{   term(level);	emit(OpCode::sub);  }
 			else break;
 		}
 	}
@@ -270,8 +270,8 @@ namespace pl0c {
 	void Comp::shiftExpr(int level) {
 		addExpr(level);
 		for (;;) {
-				 if (accept(Token::lshift))	{	addExpr(level);	emit(OpCode::lshift);	}
-			else if (accept(Token::rshift))	{	addExpr(level);	emit(OpCode::rshift);	}
+				 if (accept(Token::ShiftL))	{	addExpr(level);	emit(OpCode::lshift);	}
+			else if (accept(Token::ShiftR))	{	addExpr(level);	emit(OpCode::rshift);	}
 			else break;
 		}
 	}
@@ -285,9 +285,9 @@ namespace pl0c {
 		shiftExpr(level);
 
 		for (;;) {
-				 if (accept(Token::bor))	{	shiftExpr(level); emit(OpCode::bor);  }
-			else if (accept(Token::band))	{	shiftExpr(level); emit(OpCode::band); }
-			else if (accept(Token::bxor))	{	shiftExpr(level); emit(OpCode::bxor); }
+				 if (accept(Token::BitOR))	{	shiftExpr(level); emit(OpCode::bor);  }
+			else if (accept(Token::BitAND))	{	shiftExpr(level); emit(OpCode::band); }
+			else if (accept(Token::BitXOR))	{	shiftExpr(level); emit(OpCode::bxor); }
 			else break;
 		}
 	}
@@ -300,12 +300,12 @@ namespace pl0c {
 		expression(level);
 
 		for (;;) {
-				 if (accept(Token::lte)) 	{   expression(level);  emit(OpCode::lte);  }
-			else if (accept(Token::lt)) 	{   expression(level);	emit(OpCode::lt);   }
-			else if (accept(Token::gt))		{	expression(level);	emit(OpCode::gt);   }
-			else if (accept(Token::gte)) 	{	expression(level);	emit(OpCode::gte);  }
-			else if (accept(Token::equ)) 	{   expression(level);	emit(OpCode::equ);  } 
-			else if (accept(Token::neq)) 	{	expression(level);	emit(OpCode::neq);  }		
+				 if (accept(Token::LTE)) 	{   expression(level);  emit(OpCode::lte);  }
+			else if (accept(Token::LessThan)) 	{   expression(level);	emit(OpCode::lt);   }
+			else if (accept(Token::GreaterThan))		{	expression(level);	emit(OpCode::gt);   }
+			else if (accept(Token::GTE)) 	{	expression(level);	emit(OpCode::gte);  }
+			else if (accept(Token::EQU)) 	{   expression(level);	emit(OpCode::equ);  } 
+			else if (accept(Token::NEQU)) 	{	expression(level);	emit(OpCode::neq);  }		
 			else break;
 		}
 	}
@@ -319,8 +319,8 @@ namespace pl0c {
 		relational(level);
 
 		for (;;) {
-				 if (accept(Token::lor)) 	{	relational(level);	emit(OpCode::lor);  }
-			else if (accept(Token::land)) 	{	relational(level);	emit(OpCode::land);	}
+				 if (accept(Token::OR)) 	{	relational(level);	emit(OpCode::lor);  }
+			else if (accept(Token::AND)) 	{	relational(level);	emit(OpCode::land);	}
 			else break;
 		}
 	}
@@ -367,12 +367,12 @@ namespace pl0c {
 	 * @param	level	The current block level
 	 */ 
 	void Comp::callStmt(const string& name, const SymValue& val, int level) {
-		if (!accept(Token::rparen, false))
+		if (!accept(Token::CloseParen, false))
 			do {									// [expr {, expr }]
 				expression(level);
-			} while (accept (Token::comma));
+			} while (accept (Token::Comma));
 
-		expect(Token::rparen);
+		expect(Token::CloseParen);
 
 		if (SymValue::proc != val.kind)
 			error("Identifier is not a procedure", name);
@@ -388,7 +388,7 @@ namespace pl0c {
 	void Comp::identStmt(int level) {
 		// Save the identifier string before consuming it
 		const string name = ts.current().string_value;
-		accept(Token::identifier);
+		accept(Token::Identifier);
 
 		auto range = symtbl.equal_range(name);		// look it up....
 		if (range.first == range.second)
@@ -400,10 +400,10 @@ namespace pl0c {
 				if (it->second.level > closest->second.level)
 					closest = it;
 
-			if (accept(Token::assign))			// ident "=" expression
+			if (accept(Token::Assign))			// ident "=" expression
 				assignStmt(closest->first, closest->second, level);
 
-			else if (accept(Token::lparen))		// proc "(" ... ")"
+			else if (accept(Token::OpenParen))		// proc "(" ... ")"
 				callStmt(closest->first, closest->second, level);
 
 			else
@@ -439,7 +439,7 @@ namespace pl0c {
 		condition(level);
 
 		const size_t jmp_pc = emit(OpCode::jneq, 0, 0);	// jump if condition false
-		expect(Token::then);							// Consume "then"
+		expect(Token::Then);							// Consume "then"
 		statement(level);
 
 		// Jump over else statement, but only if there is an else
@@ -468,7 +468,7 @@ namespace pl0c {
 	 void Comp::repeatStmt(int level) {
 		 const size_t loop_pc = code->size();			// jump here until condition fails
 		 statement(level);
-		 expect(Token::until);
+		 expect(Token::Until);
 		 condition(level);
 		 emit(OpCode::jneq, 0, loop_pc);
 	 }
@@ -485,14 +485,14 @@ namespace pl0c {
 	 * @param	level	The current block level.
 	 */
 	void Comp::statement(int level) {
-		if (accept(Token::identifier, false)) 			// assignment or proc call
+		if (accept(Token::Identifier, false)) 			// assignment or proc call
 			identStmt(level);
 
-		else if (accept(Token::begin)) {				// begin ... end
+		else if (accept(Token::Begin)) {				// begin ... end
 			do {
 				statement(level);
-			} while (accept(Token::semicolon));
-			expect(Token::end);
+			} while (accept(Token::SemiColon));
+			expect(Token::End);
 
 		} else if (accept(Token::If)) 					// if condition...
 			ifStmt(level);
@@ -500,7 +500,7 @@ namespace pl0c {
 		else if (accept(Token::While))					// "while" condition...
 			whileStmt(level);
 
-		else if (accept(Token::repeat))
+		else if (accept(Token::Repeat))
 			repeatStmt(level);
 
 		// else: nothing
@@ -517,9 +517,9 @@ namespace pl0c {
 		// Capture the identifier name before consuming it...
 		const string name = ts.current().string_value;
 
-		expect(Token::identifier);						// Consume the identifier
-		expect(Token::assign);							// Consume the "="
-		if (expect(Token::number, false)) {
+		expect(Token::Identifier);						// Consume the identifier
+		expect(Token::Assign);							// Consume the "="
+		if (expect(Token::Number, false)) {
 			auto number = ts.current().number_value;
 			next();										// Consume the number
 
@@ -548,7 +548,7 @@ namespace pl0c {
 	int Comp::varDecl(int offset, int level) {
 		const string name = ts.current().string_value;
 
-		if (expect(Token::identifier)) {
+		if (expect(Token::Identifier)) {
 			auto range = symtbl.equal_range(name);
 			for (auto it = range.first; it != range.second; ++it)
 				if (it->second.level == level) {
@@ -579,14 +579,14 @@ namespace pl0c {
 		const 	string name = ts.current().string_value;
 				vector<string> args;			// formal arguments, if any
 
-		if (expect(Token::identifier)) {
+		if (expect(Token::Identifier)) {
 			auto range = symtbl.equal_range(name);
 			for (auto it = range.first; it != range.second; ++it)
 				if (it->second.level == level)
 					error("identifier has previously been defined", name);
 			
 			SymbolTable::iterator it;			// insert the new symbol...
-			if (Token::procDecl == kind) {
+			if (Token::Procedure == kind) {
 				it = symtbl.insert( { name, { SymValue::proc, level, 0 }} );
 				if (verbose)
 					cout << progName << ": procDecl " << name << ": " << level << ", 0\n";
@@ -597,14 +597,14 @@ namespace pl0c {
 					cout << progName << ": funcDecl " << name << ": " << level << ", 0\n";
 			}
 
-			expect(Token::lparen);				// procedure name "()"
-			if (accept(Token::identifier, false)) { // identifier {, identifier }
+			expect(Token::OpenParen);				// procedure name "()"
+			if (accept(Token::Identifier, false)) { // identifier {, identifier }
 				int offset = 0;					// Record the arguments...
 				do {
 					args.push_back(ts.current().string_value);
 					--offset;							// -1, -2, ..., -n
-					accept(Token::identifier);			// Consume the identifier
-				} while (accept(Token::comma));
+					accept(Token::Identifier);			// Consume the identifier
+				} while (accept(Token::Comma));
 
 				/**
 				 * Add the arguments, with negative offsets from the block/frame, so
@@ -617,9 +617,9 @@ namespace pl0c {
 				}
 			}
 
-			expect(Token::rparen);
+			expect(Token::CloseParen);
 			block(it->second, level+1, args.size());
-			expect(Token::semicolon);	// procedure declarations end with a ';'!
+			expect(Token::SemiColon);	// procedure declarations end with a ';'!
 		}
 	}
 
@@ -639,23 +639,23 @@ namespace pl0c {
 		auto 	jmp_pc	= emit(OpCode::jump, 0, 0);	// Addr to be patched below..
 		int		dx		= 0;					// Variable offset from *end* of activation frame
 
-		if (accept(Token::constDecl)) {				// const ident = number, ...
+		if (accept(Token::Constant)) {				// const ident = number, ...
 			do {
 				constDecl(level);
 
-			} while (accept(Token::comma));
-			expect(Token::semicolon);
+			} while (accept(Token::Comma));
+			expect(Token::SemiColon);
 		}
 
-		if (accept(Token::varDecl)) {				// var ident, ...
+		if (accept(Token::Variable)) {				// var ident, ...
 			do {
 				dx = varDecl(dx, level);
 
-			} while (accept(Token::comma));
-			expect(Token::semicolon);
+			} while (accept(Token::Comma));
+			expect(Token::SemiColon);
 		}
 
-		while (accept(Token::procDecl, false) || accept(Token::funcDecl, false))
+		while (accept(Token::Procedure, false) || accept(Token::Function, false))
 			subDecl(level);
 
 		/*
@@ -699,7 +699,7 @@ namespace pl0c {
 		assert(range.first != range.second);
 
 		block(range.first->second, 0, 0);
-		expect(Token::period);
+		expect(Token::Period);
 	}
 
 	// public:
