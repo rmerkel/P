@@ -26,8 +26,7 @@
  * logs "assigns" on standard output, but the verbose (-v) option will single step the program, 
  * writing a state report as well. 
  * 
- * @version 1.0f -	Added dynamicly sized stack; check that pc in in range; divide by zero check;
- *  				Interp returns success or error indicator; renamed bp to fp. Cleaned up Token.
+ * @version 1.1
  * @author Randy Merkel, Slowly but Surly Software. 
  * @copyright  (c) 2017 Slowly but Surly Software. All rights reserved.
  */
@@ -60,7 +59,7 @@ static void help() {
 
 /// Print the version number as major.minor
 static void printVersion() {
-	cout << progName << ": verson: 1.0f\n";	// makesure to update the verison in mainpage!!
+	cout << progName << ": verson: 1.1\n";	// makesure to update the verison in mainpage!!
 }
 
 /** Parse the command line arguments...
