@@ -1,2 +1,7 @@
 .metadata
 RemoteSystemsTempFiles
+docs
+Debug
+Release
+*.o
+*.d
