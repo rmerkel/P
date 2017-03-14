@@ -1,17 +1,53 @@
-PL/0C
+PL/0C Programming Language
 
 Yet another small, interpreted, computer language... just for the fun of it!
 
-PL/0C start life as a port of Niklaus Wirth's PL/0, as described in Algorithms +
-Data Structures = Programs, ported to C++ byway of the example parser from
-https://en.wikipedia.org/wiki/Recursive_descent_parser, and modified to use C
-operators, e.g., check for equality with "==" and assigned with "=", but 
-otherwise using pl/0 syntax and program nesting. The result is a PL/0 dialect.
+A compiler/interpreter, inspired by the original PL/0 language and machine
+described in Algorithms + Data Structures = Programs, 1st Edition, by Wirth.
+Modified to use C/C++ operators, e.g., check for equality with "==" and
+assigned with "=", but otherwise using Pascal "lite" syntax and program
+nesting. The result is a dialect that I call "PL/0C".
 
-"make" will build the compiler/interpreter "pl0c" and create HTML documentation
-in docs/html, e.g., start at docs/html/index.html.
+Like PL/0, PL/0C is a combination compiler and interpreter; it first runs the
+compiler (pl0c::Comp), and if no errors where encountered, it runs the results
+in the interpreter (pl0c::Interp). A listing and machine output are written to
+standard output.
 
-Randy Merkel, Slowly but Surly Software. 
-rmerkel@acm.org
+The compiler started life as a copy of the C example at
+https://en.wikipedia.org/wiki/Recursive_descent_parser, modified to emit code
+per Wirth's interpret procedure while using the TokeStream from The C++
+Programming Language, 4th Edition, by Stroustrup. Finally modified to support
+the PL/0C dialect. By default, pl0c::Comp writes a listing to standard output,
+but the verbose (-v) option will also log tokens found and code emitted.
 
-Copyright  (c) 2017 Slowly but Surly Software. All rights reserved.
+The machine/interpreter stated life as a C/C++ port of Wirth's machine
+(procedure interpret), modified to use lest "weird" instruction names, modified
+to use indirect addressing per HOC, as described in The UNIX Programming
+Environment, by Kernighan and Pike. By default, pl0c::Interp logs "assigns" on
+standard output, but the verbose (-v) option will run the program in trace
+mode; disassembling and dumping the activation frame for each instruction
+single step the program.
+
+Bugs:
+ * No arrays or strings, just signed integers
+ * No constant statements, i.e., constants must be initialized with a simple 
+   number.
+ * No input/output instructions.
+ * No interactive mode for debugging; just automatic single stepping (verbose ==
+   true)
+
+Version
+    1.0 - Initial release
+    1.1
+    	* Added Pascal style comments
+    	* TokenString now returns unknown for an unknow token, or badComment for
+    	  an unterminted comment.
+    	* Folded factors into expressions
+    	* Added logical and, orr plus bitwise and, or, xor.
+    1.2 - Added halt instruction
+
+Author
+    Randy Merkel, Slowly but Surly Software.
+
+Copyright
+    (c) 2017 Slowly but Surly Software. All rights reserved.

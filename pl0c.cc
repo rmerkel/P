@@ -1,9 +1,9 @@
 /** @file pl0c.cc
  *
- * PL/0C utilities 
- *  
- * @author Randy Merkel, Slowly but Surly Software. 
- * @copyright  (c) 2017 Slowly but Surly Software. All rights reserved. 
+ * PL/0C utilities
+ *
+ * @author Randy Merkel, Slowly but Surly Software.
+ * @copyright  (c) 2017 Slowly but Surly Software. All rights reserved.
  */
 
 #include "pl0c.h"
@@ -15,70 +15,88 @@
 using namespace std;
 
 namespace pl0c {
+	// class OpCode Info privite static
+
+	/// A OpCodeInfo table, indexed by OpCode's
+	const OpCodeInfo::InfoMap OpCodeInfo::opInfoTbl {
+
+			// Unary operations
+
+		{ OpCode::Not,		OpCodeInfo{ "not",		1			}	},
+		{ OpCode::neg,		OpCodeInfo{ "neg",		1			}	},
+		{ OpCode::comp,		OpCodeInfo{ "comp",		1			}	},
+
+			// Binary operations
+
+		{ OpCode::sub,		OpCodeInfo{ "sub",		2			}	},
+		{ OpCode::mul,		OpCodeInfo{ "mul",		2			}	},
+		{ OpCode::div,		OpCodeInfo{ "div",		2			}	},
+		{ OpCode::rem,		OpCodeInfo{ "rem",		2			}	},
+
+		{ OpCode::bor,		OpCodeInfo{ "bor",		2			}	},
+		{ OpCode::band,		OpCodeInfo{ "band",		2			}	},
+		{ OpCode::bxor,		OpCodeInfo{ "bxor",		2			}	},
+		{ OpCode::lshift,	OpCodeInfo{ "lshift",	2			}	},
+		{ OpCode::rshift,	OpCodeInfo{ "rshift",	2			}	},
+
+		{ OpCode::lt,		OpCodeInfo{ "lt",		2			}	},
+		{ OpCode::lte,		OpCodeInfo{ "lte",		2			}	},
+		{ OpCode::equ,		OpCodeInfo{ "equ",		2			}	},
+		{ OpCode::gte,		OpCodeInfo{ "gte",		2			}	},
+		{ OpCode::gt,		OpCodeInfo{ "gt",		2			}	},
+		{ OpCode::neq,		OpCodeInfo{ "neq",		2			}	},
+
+		{ OpCode::lor,		OpCodeInfo{ "lor",		2			}	},
+		{ OpCode::land,		OpCodeInfo{ "land",		2			}	},
+
+			// Push/pop
+
+		{ OpCode::pushConst,OpCodeInfo{ "pushConst",1			}	},
+		{ OpCode::pushVar,	OpCodeInfo{ "pushVar",	1			}	},
+		{ OpCode::eval,		OpCodeInfo{ "eval",		2			}	},
+		{ OpCode::assign,	OpCodeInfo{ "assign",	2			}	},
+
+			// Call/return/jump...
+
+    	{ OpCode::call,		OpCodeInfo{ "call",		0			}	},
+		{ OpCode::enter,	OpCodeInfo{ "enter",	0			}	},	// Size isn't staticly know
+		{ OpCode::ret,		OpCodeInfo{ "ret",		FrameSize	}	},
+		{ OpCode::reti,		OpCodeInfo{ "reti",		FrameSize	}	}, 	// Pops frame, pushed value
+    	{ OpCode::jump,		OpCodeInfo{ "jump",		0			}	},
+		{ OpCode::jneq,		OpCodeInfo{ "jneq",		0			}	},
+
+		{ OpCode::halt,		OpCodeInfo{ "halt",		0			}   }
+	};
+
+	// public static
+
 	/**
-	 * @param op The OpCode, whose name we'll return 
-	 * @return 	op's name. 
+	 * @note Returns { "nnknown", 0 } if op is an illegal opcode
+	 * @param op	The OpCode to look u
+	 * @return		OpCodeInfo for op
 	 */
-	string toString(OpCode op) {
-		switch(op) {
-		case OpCode::Not:		return "not";		break;
-		case OpCode::neg:		return "neg";		break;
-		case OpCode::comp:		return "comp";		break;
+	const OpCodeInfo& OpCodeInfo::info(OpCode op) {
+		auto i = opInfoTbl.find(op);
+		if ((opInfoTbl.end() != i))
+			return i->second;
 
-		case OpCode::add:		return "add";		break;
-		case OpCode::sub:		return "sub";		break;
-		case OpCode::mul:		return "mul";		break;
-		case OpCode::div:		return "div";		break;
-		case OpCode::rem:		return "rem";		break;
-
-		case OpCode::bor:		return "bor";		break;
-		case OpCode::band:		return "band";		break;
-		case OpCode::bxor:		return "bxor";		break;
-
-		case OpCode::lshift:	return "lshift";	break;
-		case OpCode::rshift:	return "rshift";	break;
-
-		case OpCode::lt:		return "lt";		break;
-		case OpCode::lte:		return "lte";		break;
-		case OpCode::equ:		return "equ";		break;
-		case OpCode::gte:		return "gte";		break;
-		case OpCode::gt:		return "gt";		break;
-		case OpCode::neq:		return "neq";		break;
-
-		case OpCode::lor:		return "lor";		break;
-		case OpCode::land:		return "land";		break;
-
-		case OpCode::pushConst:	return "pushConst";	break;
-		case OpCode::pushVar:	return "pushVar";	break;
-		case OpCode::eval:		return "eval";		break;
-		case OpCode::assign:	return "assign";	break;
-
-    	case OpCode::call:		return "call";		break;
-		case OpCode::enter:		return "enter";		break;
-		case OpCode::ret:		return "ret";		break;
-		case OpCode::reti:		return "reti";		break;
-    	case OpCode::jump:		return "jump";		break;
-		case OpCode::jneq:		return "jneq";		break;
-
-		default: {
-				ostringstream oss;
-				oss << "Unknown OpCode: " << static_cast<unsigned>(op) <<  "!" << ends;
-				return oss.str();
-			}
+		else {
+			static const OpCodeInfo unknown("unknown", 0);
+			return unknown;
 		}
 	}
 
-	/** 
-	 * @param	out		Where to write the results 
+	/**
+	 * @param	out		Where to write the results
 	 * @param	loc		Address of the instruction
 	 * @param	instr	The instruction to disassemble
 	 * @param	label	Display label
-	 * @return loc+1
+	 * @return 	loc+1
 	 */
 	Integer disasm(ostream& out, Integer loc, const Instr& instr, const string label) {
 		const int level = instr.level;		// so we don't display level as a character
 		if (label.size()) out << label << ": ";
-		out << setw(5) << loc << ": " << toString(instr.op);
+		out << setw(5) << loc << ": " << OpCodeInfo::info(instr.op).name();
 
     	switch(instr.op) {
     	case OpCode::pushConst:

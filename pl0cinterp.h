@@ -1,10 +1,10 @@
 /** @file pl0cinterp.h
- *  
- * The PL/0C interpreter. 
- *  
- * @author Randy Merkel, Slowly but Surly Software. 
- * @copyright  (c) 2017 Slowly but Surly Software. All rights reserved. 
- */ 
+ *
+ * The PL/0C interpreter.
+ *
+ * @author Randy Merkel, Slowly but Surly Software.
+ * @copyright  (c) 2017 Slowly but Surly Software. All rights reserved.
+ */
 
 #ifndef	PL0INT_H
 #define PL0INT_H
@@ -16,14 +16,11 @@
 
 namespace pl0c {
 	/** A PL/0C Machine
-	 *  
+	 *
 	 * A interperter that started life as a straight C/C++ port of the PL/0 machine described in Algorithms + Data Structures =
-	 * Programs, 1st Edition, by Wirth, and then modified to provide "C like" instructions. 
-	 *  
-	 * @section bugs	Bugs
-	 * 
-	 *  - There are no input/output instructions.
-	 *  - There is no interactive mode for debugging; just automatic single stepping (verbose == true)
+	 * Programs, 1st Edition, by Wirth, and then modified to provide "C like" instructions.
+	 *
+
 	 */
 	class Interp {
 	public:
@@ -32,7 +29,10 @@ namespace pl0c {
 			success,							///< No errors
 			divideByZero,						///< Divide by zero
 			badFetch,							///< Attempt to fetch uninitialized code
-			unknownInstr						///< Attempt to execute an undefined instruction
+			unknownInstr,						///< Attempt to execute an undefined instruction
+			stackOverflow,						///< Attempt to access beyound the end of the statck
+			stackUnderflow,						///< Attempt to access an empty stack
+			halted								///< Machine has halted
 		};
 
 		static std::string toString(Result r);	///< Return the results name
@@ -70,9 +70,9 @@ namespace pl0c {
 
 		pl0c::InstrVector	code;				///< Code segment, indexed by pc
 		pl0c::IntVector		stack;				///< Data segment (the stack), index by fp and sp
-		std::size_t			pc;					///< Program counter register; index of *next* instruction in code[]
-		int					fp;					///< Frame pointer register; index of the current mark block/frame in stack[]
-		int					sp;					///< Top of stack register (stack[sp])
+		pl0c::Unsigned		pc;					///< Program counter register; index of *next* instruction in code[]
+		pl0c::Integer		fp;					///< Frame pointer register; index of the current mark block/frame in stack[]
+		pl0c::Integer		sp;					///< Top of stack register (stack[sp])
 		pl0c::Instr			ir;					///< *Current* instruction register (code[pc-1])
 
 		EAddr				lastWrite;			///< Last write effective address (to stack[]), if valid
@@ -84,7 +84,17 @@ namespace pl0c {
 	protected:
 		uint16_t base(uint16_t lvl);			///< Find the base 'lvl' levels (frames) up the stack...
 		void mkStackSpace(size_t n);			///< Make room for at least sp+n entries on the stack
-		void ret();								///< Return from subroutine...
+
+		Integer pop();							///< Pop an Integer from the top of stack
+		Unsigned popUnsigned();					///< Pop an Unsigned from the top of stack
+		void push(Integer i);					///< Push an Integer onto the stack
+		void push(Unsigned u);					///< Push an Unsigned onto the stack
+
+		void call(int8_t nlevel, Integer addr); ///< Call a subroutine...
+		void ret();								///< Return from procedure...
+		void reti();							///< Return from a function...
+
+		Result step();							///< Single step the machine...
 		Result run();							///< Run the machine...
 	};
 }

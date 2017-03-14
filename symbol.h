@@ -1,8 +1,8 @@
 /**	@file	symbol.h
  *
  * The P/L0C Symbol table
- *	 
- * @author Randy Merkel, Slowly but Surly Software. 
+ *
+ * @author Randy Merkel, Slowly but Surly Software.
  * @copyright  (c) 2017 Slowly but Surly Software. All rights reserved.
  */
 
@@ -28,20 +28,20 @@ struct SymValue {
 
 	static std::string toString(Kind k);		///< Return k as a string
 
-	Kind		kind;							///< identifier, constant, funciton, or procedure name
-	int			level;							///< Base/frame level If kind == proc or function
-	pl0c::Integer	value;							///< value (identifier, constant) or address of a proc or function
+	Kind			kind;						///< identifier, constant, funciton, or procedure name
+	int				level;						///< Base/frame level If kind == proc or function
+	pl0c::Integer	value;						///< value (identifier, constant) or address of a proc or function
 
 	/// Default construction
 	SymValue() : kind {none}, level {0}, value{0}
 		{}
 
-	/** Constructor; create a SymValue from it's components 
+	/** Constructor; create a SymValue from it's components
 	 */
 
 
 	/** Construct a SymValue from it's components...
-	 * 
+	 *
 	 * @param _kind		The token kind, e.g., identifier
 	 * @param _level	The token base/frame level, e.g., 0 for "current frame.
 	 * @param _value 	The token value, e.g., a procedure address

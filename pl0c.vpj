@@ -12,7 +12,7 @@
 		Version="1"
 		OutputFile="%bdpl0c"
 		CompilerConfigName="Latest Version"
-		ObjectDir="/home/rmerkel/pascal/pl0/pl0c/">
+		ObjectDir="/home/rmerkel/pascal/pl0c/">
 		<Menu>
 			<Target
 				Name="Compile"
@@ -61,8 +61,7 @@
 				BuildFirst="1"
 				CaptureOutputWith="ProcessBuffer"
 				Deletable="0"
-				SaveOption="SaveNone"
-				RunFromDir="/home/rmerkel/pascal/pl0/pl0c/">
+				SaveOption="SaveNone">
 				<Exec CmdLine='vsdebugio -prog "%o"'/>
 			</Target>
 			<Target
@@ -72,8 +71,7 @@
 				BuildFirst="1"
 				CaptureOutputWith="ProcessBuffer"
 				Deletable="0"
-				SaveOption="SaveWorkspaceFiles"
-				RunFromDir="/home/rmerkel/pascal/pl0/pl0c/">
+				SaveOption="SaveWorkspaceFiles">
 				<Exec CmdLine='"%o"'/>
 			</Target>
 			<Target
@@ -137,7 +135,8 @@
 		DebugCallbackName="gdb"
 		Version="1"
 		OutputFile="%bdpl0c"
-		CompilerConfigName="Latest Version">
+		CompilerConfigName="Latest Version"
+		ObjectDir="/home/rmerkel/pascal/pl0c/">
 		<Menu>
 			<Target
 				Name="Compile"
@@ -186,8 +185,7 @@
 				BuildFirst="1"
 				CaptureOutputWith="ProcessBuffer"
 				Deletable="0"
-				SaveOption="SaveNone"
-				RunFromDir="/home/rmerkel/pascal/pl0/pl0c/">
+				SaveOption="SaveNone">
 				<Exec CmdLine='vsdebugio -prog "%o"'/>
 			</Target>
 			<Target
@@ -197,8 +195,7 @@
 				BuildFirst="1"
 				CaptureOutputWith="ProcessBuffer"
 				Deletable="0"
-				SaveOption="SaveWorkspaceFiles"
-				RunFromDir="/home/rmerkel/pascal/pl0/pl0c/">
+				SaveOption="SaveWorkspaceFiles">
 				<Exec CmdLine='"%o"'/>
 			</Target>
 			<Target
@@ -291,6 +288,7 @@
 			Filters=""
 			GUID="{E2E32900-C0A4-4CAE-AA3C-FC024DC77863}">
 			<F N="comment.p"/>
+			<F N="divbyzero.p"/>
 			<F N="Doxyfile"/>
 			<F N="fact.p"/>
 			<F
@@ -298,9 +296,11 @@
 				Type="Makefile"/>
 			<F N="pl0c.vpwistu"/>
 			<F N="precedence.p"/>
+			<F N="README.md"/>
 			<F N="repeatst.p"/>
 			<F N="test.p"/>
 			<F N="testif.p"/>
+			<F N="unknown.p"/>
 		</Folder>
 	</Files>
 </Project>

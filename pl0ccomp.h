@@ -1,9 +1,9 @@
 /** @file pl0ccomp.h
- * 
- * The PL/0C compiler. 
- *  
- * @author Randy Merkel, Slowly but Surly Software. 
- * @copyright  (c) 2017 Slowly but Surly Software. All rights reserved. 
+ *
+ * The PL/0C compiler.
+ *
+ * @author Randy Merkel, Slowly but Surly Software.
+ * @copyright  (c) 2017 Slowly but Surly Software. All rights reserved.
  */
 
 #ifndef	PL0COM_H
@@ -17,13 +17,13 @@
 
 namespace pl0c {
 	/** A PL/0C Compilier
-	 *  
+	 *
 	 * A recursive decent compilier evolved from
 	 * https://en.wikipedia.org/wiki/Recursive_descent_parser#C_implementation. Construction binds a
 	 * program name with the instance, used in error messages. The compilier is run via the call
-	 * operator which specifies the input stream, the location of the emitted code, and weather to emit 
-	 * a travlelog (verbose messages). 
-	 *  
+	 * operator which specifies the input stream, the location of the emitted code, and weather to emit
+	 * a travlelog (verbose messages).
+	 *
 	 * @section grammer Grammer (EBNF)
 	 *
 	 *     prog =		block "." ;
@@ -42,19 +42,19 @@ namespace pl0c {
 	 *  			  	  "repeat" stmt "until" cond ] ;
 	 *
 	 *     cond =		relat { ("||" | &&") relation } ;
-	 * 
+	 *
 	 *     relat =		expr { ("==" | "!=" | "<" | "<=" | ">" | ">=") expr } ;
-	 * 
+	 *
 	 *     expr =		shift-expr { ("|" | "&" | "^") shift-expr } ;
-	 *  
+	 *
 	 *     shift-expr =	add-expr { ("<<" | ">>") add-expr } ;
-	 *  
+	 *
 	 *     add-expr =	term { ("+" | "-") term } ;
-	 * 
+	 *
 	 *     term =     	unary { ("*" | "/" | "%") unary } ;
-	 *  
+	 *
 	 *     unary =		[ ("+"|"-") ] fact ;
-	 *  
+	 *
 	 *     fact  =    	ident 									|
 	 *  				ident "(" [ ident { "," ident } ] ")"	|
 	 *					number  								|
@@ -62,7 +62,7 @@ namespace pl0c {
 	 *
 	 * Key
 	 * - {}	Repeat zero or more times
-	 * - []	Optional; zero or *one* times 
+	 * - []	Optional; zero or *one* times
 	 * - () Grouping
 	 * - |  One of ...
 	 * - ;  End of production

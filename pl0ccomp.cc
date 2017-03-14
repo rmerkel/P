@@ -1,9 +1,9 @@
 /** @file pl0ccomp.cc
- *  
- * PL0C Compiler implementation 
- *  
- * @author Randy Merkel, Slowly but Surly Software. 
- * @copyright  (c) 2017 Slowly but Surly Software. All rights reserved. 
+ *
+ * PL0C Compiler implementation
+ *
+ * @author Randy Merkel, Slowly but Surly Software.
+ * @copyright  (c) 2017 Slowly but Surly Software. All rights reserved.
  */
 
 #include "pl0ccomp.h"
@@ -23,8 +23,8 @@ namespace pl0c {
 
 	// protected:
 
-	/** 
-	 * Write a diagnostic on standard error output, incrementing the error count. 
+	/**
+	 * Write a diagnostic on standard error output, incrementing the error count.
 	 * @param msg The error message
 	 */
 	void Comp::error(const std::string& msg) {
@@ -33,8 +33,8 @@ namespace pl0c {
 	}
 
 	/**
-	 * Write a diagnostic in the form "msg 'name'", on standard error output, incrementing the error 
-	 * count. 
+	 * Write a diagnostic in the form "msg 'name'", on standard error output, incrementing the error
+	 * count.
 	 * @param msg The error message
 	 * @param name Parameter to msg.
 	 */
@@ -101,9 +101,10 @@ namespace pl0c {
 	 *	@return The address (code[] index) of the new instruction.
 	 */
 	size_t Comp::emit(const OpCode op, int8_t level, Integer addr) {
+		const int lvl = static_cast<int>(level);
 		if (verbose)
 			cout << progName << ": emitting " << code->size() << ": "
-					<< toString(op) << " " << static_cast<int>(level) << ", " << addr
+					<< OpCodeInfo::info(op).name() << " " << lvl << ", " << addr
 					<< "\n";
 
 		code->push_back({op, level, addr});
@@ -113,48 +114,48 @@ namespace pl0c {
 	}
 
 	/**
-	 * Writes a listing on the output stream 
-	 *  
-	 * @param name		Name of the source file 
-	 * @param source 	The source file stream 
-	 * @param out		The listing file stream 
+	 * Writes a listing on the output stream
+	 *
+	 * @param name		Name of the source file
+	 * @param source 	The source file stream
+	 * @param out		The listing file stream
 	 */
 	 void Comp::listing(const string& name, istream& source, ostream& out) {
 		string 		line;   					// Current source line
 		unsigned 	linenum = 1;				// source line number
 		unsigned 	addr = 0;					// code address (index)
-		
+
 		while (addr < indextbl.size()) {
 			while (linenum <= indextbl[addr]) {	// Print lines that lead up to code[addr]...
 				getline(source, line);	++linenum;
-				cout << left << setw(15) << name << "(" << linenum << "): " << line << "\n" << internal;
+				cout << "# " << name << ", " << linenum << ": " << line << "\n" << internal;
 			}
-			
+
 			disasm(out, addr, (*code)[addr]);	// Disasmble resulting instructions...
 			while (linenum-1 == indextbl[++addr])
 				disasm(out, addr, (*code)[addr]);
 		}
 
 		while (getline(source, line))			// Any lines following '.'...
-			cout << left << setw(15) << name << "(" << linenum++ << "): " << line << "\n" << internal;
+			cout << "#" << name << ", " << linenum++ << ": " << line << "\n" << internal;
 
 		out << endl;
 	}
 
-	 /** 
+	 /**
 	  *  Local variables have an offset from the *end* of the current stack frame (bp), while parameters
 	  *  have a negative offset from the start of the frame. Offset locals by the size of the activation
 	  *  frame.
-	  *  
+	  *
 	  *  @param	level	The current block level
 	  *  @param	val		The variable symbol table entry
-	  */ 
+	  */
 	 void Comp::varRef(int level, const SymValue& val) {
 		const auto offset = val.value >= 0 ? val.value + FrameSize : val.value;
 		emit(OpCode::pushVar, level - val.level, offset);
 	 }
 
-	/** 
+	/**
 	 * Push a variable's value, a constant value, or invoke, and push the results, of a function.
 	 *
 	 * ident | ident "(" [ ident { "," ident } ] ")"
@@ -221,10 +222,10 @@ namespace pl0c {
 		}
 	}
 
-	/** 
-	 * urary = [ ("+" | "-" | "!" | "~") ] fact 
-	 * @param	level	The current block level 
-	 */ 
+	/**
+	 * urary = [ ("+" | "-" | "!" | "~") ] fact
+	 * @param	level	The current block level
+	 */
 	void Comp::unary(int level) {
 		     if (accept(Token::Add))	{	factor(level);	/* ignore + */		}
 		else if (accept(Token::Subtract))	{	factor(level);	emit(OpCode::neg);	}
@@ -235,7 +236,7 @@ namespace pl0c {
 
 	/**
 	 * term =  fact { ("*" | "/" | "%") fact } ;
-	 * 
+	 *
 	 * @param level	The current block level
 	 */
 	void Comp::term(int level) {
@@ -249,10 +250,10 @@ namespace pl0c {
 		}
 	}
 
-	/** 
-	 * additive = term { ("+" | "-") term } ; 
-	 * @param	level	The curretn block level. 
-	 */ 
+	/**
+	 * additive = term { ("+" | "-") term } ;
+	 * @param	level	The curretn block level.
+	 */
 	void Comp::addExpr(int level) {
 		term(level);
 
@@ -263,10 +264,10 @@ namespace pl0c {
 		}
 	}
 
-	/** 
-	 * shift = additive { ("<<" | ">>") additive } ; 
-	 * @param	level	The current block level. 
-	 */ 
+	/**
+	 * shift = additive { ("<<" | ">>") additive } ;
+	 * @param	level	The current block level.
+	 */
 	void Comp::shiftExpr(int level) {
 		addExpr(level);
 		for (;;) {
@@ -304,8 +305,8 @@ namespace pl0c {
 			else if (accept(Token::LessThan)) 	{   expression(level);	emit(OpCode::lt);   }
 			else if (accept(Token::GreaterThan))		{	expression(level);	emit(OpCode::gt);   }
 			else if (accept(Token::GTE)) 	{	expression(level);	emit(OpCode::gte);  }
-			else if (accept(Token::EQU)) 	{   expression(level);	emit(OpCode::equ);  } 
-			else if (accept(Token::NEQU)) 	{	expression(level);	emit(OpCode::neq);  }		
+			else if (accept(Token::EQU)) 	{   expression(level);	emit(OpCode::equ);  }
+			else if (accept(Token::NEQU)) 	{	expression(level);	emit(OpCode::neq);  }
 			else break;
 		}
 	}
@@ -359,13 +360,13 @@ namespace pl0c {
 		}
 	}
 
-	/** 
+	/**
 	 *  "call" ident "(" [ expr  { "," expr }] ")"...
 	 *
 	 * @param	name	The identifier value
 	 * @param	val		The identifiers symbol table entry value
 	 * @param	level	The current block level
-	 */ 
+	 */
 	void Comp::callStmt(const string& name, const SymValue& val, int level) {
 		if (!accept(Token::CloseParen, false))
 			do {									// [expr {, expr }]
@@ -446,7 +447,7 @@ namespace pl0c {
 		const bool Else = accept(Token::Else);
 		size_t else_pc = 0;
 		if (Else) else_pc = emit(OpCode::jump, 0, 0);
-		
+
 		if (verbose)
 			cout << progName << ": patching address at " << jmp_pc << " to " << code->size() << "\n";
 		(*code)[jmp_pc].addr = code->size();				// Patch jump on condition false instruction
@@ -461,9 +462,9 @@ namespace pl0c {
 	 }
 
 	 /**
-	  * [ "repeat" stmt "until" cond ] 
-	  *  
-	  * @param	level 	The current block level 
+	  * [ "repeat" stmt "until" cond ]
+	  *
+	  * @param	level 	The current block level
 	  */
 	 void Comp::repeatStmt(int level) {
 		 const size_t loop_pc = code->size();			// jump here until condition fails
@@ -531,7 +532,7 @@ namespace pl0c {
 				}
 
 			symtbl.insert({ name, { SymValue::constant, level, number } });
-			if (verbose) 
+			if (verbose)
 				cout << progName << ": constDecl " << name << ": " << level << ", " << number << "\n";
 		}
 	}
@@ -539,10 +540,10 @@ namespace pl0c {
 	/**
 	 * Allocate space on the stack for the variable and install it's offset from the block in the symbol
 	 * table.
-	 *  
+	 *
 	 * @param	offset	Stack offset for the next varaible
 	 * @param	level	The current block level.
-	 * 
+	 *
 	 * @return	Stack offset for the next varaible.
 	 */
 	int Comp::varDecl(int offset, int level) {
@@ -557,7 +558,7 @@ namespace pl0c {
 				}
 
 			symtbl.insert( { name, { SymValue::identifier, level, offset }} );
-			if (verbose) 
+			if (verbose)
 				cout << progName << ": varDecl " << name << ": " << level << ", " << offset << "\n";
 			return offset + 1;
 		}
@@ -584,7 +585,7 @@ namespace pl0c {
 			for (auto it = range.first; it != range.second; ++it)
 				if (it->second.level == level)
 					error("identifier has previously been defined", name);
-			
+
 			SymbolTable::iterator it;			// insert the new symbol...
 			if (Token::Procedure == kind) {
 				it = symtbl.insert( { name, { SymValue::proc, level, 0 }} );
@@ -629,15 +630,17 @@ namespace pl0c {
 	 *         	{ procedure ident "(" [ ident { "," ident } ] ")" block ";"
 	 *         	 | function ident "(" [ ident { "," ident } ] ")" block ";" }
 	 *          stmt ;
-	 *  
+	 *
 	 * @param	val		The blocks (procedures) symbol table entry value
 	 * @param	level	The current block level.
 	 * @param   nargs	The number of arguments, passed to the block, that must be
 	 * 					popped on return.
 	 */
 	void Comp::block(SymValue& val, int level, unsigned nargs) {
-		auto 	jmp_pc	= emit(OpCode::jump, 0, 0);	// Addr to be patched below..
-		int		dx		= 0;					// Variable offset from *end* of activation frame
+		int		dx 		= 0;						// Variable offset from *end* of activation frame
+		auto 	call_pc	= emit(OpCode::call, 0, 0);	// Addr to be patched below
+
+		emit(OpCode::halt);
 
 		if (accept(Token::Constant)) {				// const ident = number, ...
 			do {
@@ -667,8 +670,8 @@ namespace pl0c {
 
 		auto addr = emit(OpCode::enter, 0, dx);		// prefix
 		if (verbose)
-			cout << progName << ": patching address at " << jmp_pc << " to " << addr  << "\n";
-		(*code)[jmp_pc].addr = val.value = addr;
+			cout << progName << ": patching address at " << call_pc << " to " << addr  << "\n";
+		(*code)[call_pc].addr = val.value = addr;
 
 		statement(level);
 
@@ -704,15 +707,15 @@ namespace pl0c {
 
 	// public:
 
-	/** 
-	 * Construct a new compilier with the token stream initially bound to std::cin. 
-	 * @param	pName	The prefix string used by error and verbose/diagnostic messages. 
-	 */ 
+	/**
+	 * Construct a new compilier with the token stream initially bound to std::cin.
+	 * @param	pName	The prefix string used by error and verbose/diagnostic messages.
+	 */
 	Comp::Comp(const string& pName) : progName {pName}, nErrors{0}, verbose {false}, ts{cin} {
 		symtbl.insert({"main", { SymValue::proc, 0, 0 }});	// Install the "main" rountine declaraction
 	}
 
-	/** 
+	/**
 	 * @param	inFile	The source file name, where "-" means the standard input stream
 	 * @param	prog	The generated machine code is appended here
 	 * @param	verb	Output verbose messages if true
@@ -745,7 +748,7 @@ namespace pl0c {
 			}
 		}
 		code = 0;
-			
+
 		return nErrors;
 	}
 }

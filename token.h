@@ -1,12 +1,12 @@
 /**	@file	token.h
- * 
+ *
  *  The PL/0C scanner.
- * 
+ *
  * Started life as the Token and TokenStream classes for the calulator example from The C++
  * Programming Language, 4th Edition, by Stroustrup, modified in an initial port of Wirth's PL/0
  * compilier, and then transformed to use more C/C++ operands yielding the PL/0C scanner.
- *	 
- * @author Randy Merkel, Slowly but Surly Software. 
+ *
+ * @author Randy Merkel, Slowly but Surly Software.
  * @copyright  (c) 2017 Slowly but Surly Software. All rights reserved.
  */
 
@@ -23,7 +23,7 @@ namespace pl0c {
 	/// A token "kind"/value pair
 	struct Token {
 		/** Token kinds
-		 *  
+		 *
 		 *  Token kinds are divided up into keywords, operators, identifiers and
 		 *  numbers. Single character tokens are represented by the integer value of
 		 *  its character
@@ -33,7 +33,7 @@ namespace pl0c {
 			BadComment,						///< Unterminated comment, started at line # (number_value)
 
 			Identifier,	  		  			///< An identifier (string_value)
-			Number,							///< literal number (number_value)									
+			Number,							///< literal number (number_value)
 			Constant,						///< "const" constant declaration
 			Variable,						///< "var" variable (mutable) declaration
 			Procedure,						///< "procedure" declaraction
@@ -69,7 +69,7 @@ namespace pl0c {
 			BitXOR		= '^',				///< Bit XOR
 			BitOR		= '|',				///< Bit or
 			BitAND		= '&',				///< Bit and
-			Complament	= '~',				///< 1's complament	
+			Complament	= '~',				///< 1's complament
 
 			Add			= '+',				///< Addition
 			Subtract	= '-',				///< Subtraction
@@ -90,7 +90,7 @@ namespace pl0c {
 
 		Kind			kind;				///< Token type
 		std::string		string_value;		///< kind == ident
-		pl0c::Integer	number_value;		///< Kind == number
+		int				number_value;		///< Kind == number
 
 		/// Construct a token of type k, stirng value "", number value 0.
 		Token(Kind k) : kind{k}, number_value{0} {}
@@ -139,7 +139,7 @@ namespace pl0c {
 		std::istream*	ip;					///< Pointer to an input stream
 		bool			owns;				///< Does *this* own ip?
 		size_t 			col;				///< Index into line for next character
-		std::string 	line;				///< last line read from the stream 
+		std::string 	line;				///< last line read from the stream
 
 		/// The current token
 		Token 			ct { Token::Kind::EOS };
