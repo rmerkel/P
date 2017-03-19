@@ -1,0 +1,73 @@
+# repeatst.p, 2: { Calculate 11 (0..10) factorials
+# repeatst.p, 3: {	 n		    n!	}
+# repeatst.p, 4: {  ---  ---------	}
+# repeatst.p, 5: {	 0		    0	}
+# repeatst.p, 6: {	 1		    1	}
+# repeatst.p, 7: {	 2		    2	}
+# repeatst.p, 8: {	 3		    6	}
+# repeatst.p, 9: {	...				}
+# repeatst.p, 10: {	 9	  362,880	}
+# repeatst.p, 11: {	10	3,628,800	}
+# repeatst.p, 12: 
+# repeatst.p, 13: var n, f;
+    0: call 0, 2
+    1: halt
+# repeatst.p, 14: begin
+    2: enter 2
+# repeatst.p, 15: 	n = 0;
+    3: pushConst 0
+    4: pushVar 0, 4
+    5: assign
+# repeatst.p, 16: 	f = 1;
+    6: pushConst 1
+    7: pushVar 0, 5
+    8: assign
+# repeatst.p, 17: 	repeat
+# repeatst.p, 18: 		begin
+# repeatst.p, 19: 			n = n + 1;
+    9: pushVar 0, 4
+   10: eval
+   11: pushConst 1
+   12: addi
+   13: pushVar 0, 4
+   14: assign
+# repeatst.p, 20: 			f = f * n
+   15: pushVar 0, 5
+   16: eval
+# repeatst.p, 21: 		end
+   17: pushVar 0, 4
+   18: eval
+   19: muli
+   20: pushVar 0, 5
+   21: assign
+# repeatst.p, 22: 	until n >= 10
+   22: pushVar 0, 4
+   23: eval
+   24: pushConst 10
+# repeatst.p, 23: end.
+   25: gte
+   26: jneq 9
+   27: ret
+
+        8:          0
+        9:          1
+        8:          1
+        9:          1
+        8:          2
+        9:          2
+        8:          3
+        9:          6
+        8:          4
+        9:         24
+        8:          5
+        9:        120
+        8:          6
+        9:        720
+        8:          7
+        9:       5040
+        8:          8
+        9:      40320
+        8:          9
+        9:     362880
+        8:         10
+        9:    3628800

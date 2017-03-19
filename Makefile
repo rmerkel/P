@@ -32,6 +32,9 @@ OBJS	= $(SRCS:.cc=.o)
 DEPS	= $(SRCS:.cc=.d)
 EXE		= pl0c
 
+TESTS 	= $(wildcard *p)
+LSTINGS = $(TESTS:.p=.p.lst)
+
 .PHONY:	all clean cleanall docs help pr test
 
 ################################################################################
@@ -58,7 +61,7 @@ $(EXE): $(OBJS)
 ################################################################################
 
 clean:
-	@rm -f $(OBJS) $(DEPS)
+	@rm -f $(OBJS) $(DEPS) $(LSTINGS)
 
 ################################################################################
 # Cleanup all targets and intermediates...
@@ -108,11 +111,5 @@ pr:
 ################################################################################
 
 test: all
-	./$(EXE) test.p
-	./$(EXE) fact.p
-	./$(EXE) fact2.p
-	./$(EXE) testif.p
-	./$(EXE) repeatst.p
-	./$(EXE) precedence.p
-	./$(EXE) comment.p
-	./$(EXE) divbyzero.p
+	./xpl0c.sh
+

@@ -1,0 +1,31 @@
+# precedence.p, 2: var x;
+    0: call 0, 2
+    1: halt
+# precedence.p, 3: begin
+    2: enter 1
+# precedence.p, 4: 	x = 1 + 2 * 3 - 4;	{	s/b 3	}
+    3: pushConst 1
+    4: pushConst 2
+    5: pushConst 3
+    6: muli
+    7: addi
+    8: pushConst 4
+    9: subi
+   10: pushVar 0, 4
+   11: assign
+# precedence.p, 5: 	x = -1 + 2 * 3 - 4	{	s/b 1	}
+   12: pushConst 1
+   13: negi
+   14: pushConst 2
+   15: pushConst 3
+   16: muli
+   17: addi
+   18: pushConst 4
+# precedence.p, 6: end .
+   19: subi
+   20: pushVar 0, 4
+   21: assign
+   22: ret
+
+        8:          3
+        8:          1

@@ -1,0 +1,78 @@
+# fact.p, 2: { Calculate 11 (0..10) factorials
+# fact.p, 3: {	 n		    n!	}
+# fact.p, 4: {  ---  ---------	}
+# fact.p, 5: {	 0		    0	}
+# fact.p, 6: {	 1		    1	}
+# fact.p, 7: {	 2		    2	}
+# fact.p, 8: {	 3		    6	}
+# fact.p, 9: {	...				}
+# fact.p, 10: {	 9	  362,880	}
+# fact.p, 11: {	10	3,628,800	}
+# fact.p, 12: 
+# fact.p, 13: var p;
+    0: call 0, 28
+    1: halt
+# fact.p, 14: procedure factorial(n)
+# fact.p, 15:     begin
+    2: call 0, 4
+    3: halt
+    4: enter 0
+# fact.p, 16:         p = 1;
+    5: pushConst 1
+    6: pushVar 1, 4
+    7: assign
+# fact.p, 17:         while n > 0 do begin
+    8: pushVar 0, -1
+    9: eval
+   10: pushConst 0
+   11: gt
+   12: jneq 27
+# fact.p, 18:             p = p * n;
+   13: pushVar 1, 4
+   14: eval
+   15: pushVar 0, -1
+   16: eval
+   17: muli
+   18: pushVar 1, 4
+   19: assign
+# fact.p, 19:             n = n - 1
+   20: pushVar 0, -1
+   21: eval
+   22: pushConst 1
+# fact.p, 20:         end
+   23: subi
+   24: pushVar 0, -1
+   25: assign
+# fact.p, 21:     end;
+   26: jump 8
+   27: ret
+# fact.p, 22: 
+# fact.p, 23: begin
+   28: enter 1
+# fact.p, 24:     factorial(10)
+   29: pushConst 10
+# fact.p, 25: end.
+   30: call 0, 4
+   31: ret
+
+        8:          1
+        8:         10
+        9:          9
+        8:         90
+        9:          8
+        8:        720
+        9:          7
+        8:       5040
+        9:          6
+        8:      30240
+        9:          5
+        8:     151200
+        9:          4
+        8:     604800
+        9:          3
+        8:    1814400
+        9:          2
+        8:    3628800
+        9:          1
+        8:    3628800
+        9:          0

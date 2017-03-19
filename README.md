@@ -28,9 +28,15 @@ standard output, but the verbose (-v) option will run the program in trace
 mode; disassembling and dumping the activation frame for each instruction
 single step the program.
 
+Release
+ * git add .
+ * git commit -m "vMajor.Minor; description..."
+ * git tag -a vMajor.Minor -m "vMajor.Minor; summary"
+ * git push --tags
+
 Bugs:
  * No arrays or strings, just signed integers
- * No constant statements, i.e., constants must be initialized with a simple 
+ * No constant statements, i.e., constants must be initialized with a simple
    number.
  * No input/output instructions.
  * No interactive mode for debugging; just automatic single stepping (verbose ==
@@ -39,15 +45,21 @@ Bugs:
 Version
     1.0 - Initial release
     1.1
-    	* Added Pascal style comments
-    	* TokenString now returns unknown for an unknow token, or badComment for
-    	  an unterminted comment.
-    	* Folded factors into expressions
-    	* Added logical and, orr plus bitwise and, or, xor.
+        * Added Pascal style comments
+        * TokenString now returns unknown for an unknow token, or badComment for
+          an unterminted comment.
+        * Folded factors into expressions
+        * Added logical and, orr plus bitwise and, or, xor.
     1.2 - Added halt instruction
+    1.3
+        * Interp registers are now pl0c::Unsigned
+        * Added xpl0c.sh to run regression tests
+        * Added Datum, the stack data type, as a step towards adding types to 
+          pl0c and for unsigned bit operations.
 
 Author
     Randy Merkel, Slowly but Surly Software.
 
 Copyright
-    (c) 2017 Slowly but Surly Software. All rights reserved.
+    (c) 2017 Slowly but Surly Software.
+    All rights reserved.

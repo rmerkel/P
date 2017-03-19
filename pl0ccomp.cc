@@ -123,7 +123,7 @@ namespace pl0c {
 	 void Comp::listing(const string& name, istream& source, ostream& out) {
 		string 		line;   					// Current source line
 		unsigned 	linenum = 1;				// source line number
-		unsigned 	addr = 0;					// code address (index)
+		Unsigned 	addr = 0;					// code address (index)
 
 		while (addr < indextbl.size()) {
 			while (linenum <= indextbl[addr]) {	// Print lines that lead up to code[addr]...
@@ -228,8 +228,8 @@ namespace pl0c {
 	 */
 	void Comp::unary(int level) {
 		     if (accept(Token::Add))	{	factor(level);	/* ignore + */		}
-		else if (accept(Token::Subtract))	{	factor(level);	emit(OpCode::neg);	}
-		else if (accept(Token::Not))	{	factor(level);	emit(OpCode::Not);	}
+		else if (accept(Token::Subtract))	{	factor(level);	emit(OpCode::negi);	}
+		else if (accept(Token::Not))	{	factor(level);	emit(OpCode::noti);	}
 		else if (accept(Token::Complament))	{	factor(level);	emit(OpCode::comp);	}
 		else								factor(level);
 	}
@@ -243,9 +243,9 @@ namespace pl0c {
 		unary(level);
 
 		for (;;) {
-				 if (accept(Token::Multiply))	{	unary(level);	emit(OpCode::mul);	}
-			else if (accept(Token::Divide))	{	unary(level);	emit(OpCode::div);	}
-			else if (accept(Token::Mod))	{	unary(level);	emit(OpCode::rem);	}
+				 if (accept(Token::Multiply))	{	unary(level);	emit(OpCode::muli);	}
+			else if (accept(Token::Divide))	{	unary(level);	emit(OpCode::divi);	}
+			else if (accept(Token::Mod))	{	unary(level);	emit(OpCode::remi);	}
 			else break;
 		}
 	}
@@ -258,8 +258,8 @@ namespace pl0c {
 		term(level);
 
 		for (;;) {
-				 if	(accept(Token::Add)) 	{   term(level);	emit(OpCode::add);  }
-			else if (accept(Token::Subtract)) 	{   term(level);	emit(OpCode::sub);  }
+				 if	(accept(Token::Add)) 	{   term(level);	emit(OpCode::addi);  }
+			else if (accept(Token::Subtract)) 	{   term(level);	emit(OpCode::subi);  }
 			else break;
 		}
 	}

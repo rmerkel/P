@@ -3,8 +3,8 @@
  * TokenStream implementation. Started life as the Token and TokenStream classes from The C++
  * Programming Language, 4th Edition, by Stroustrup, and then modified to work on the integer based
  * PL/0C machine.
- * 
- * @author Randy Merkel, Slowly but Surly Software. 
+ *
+ * @author Randy Merkel, Slowly but Surly Software.
  * @copyright  (c) 2017 Slowly but Surly Software. All rights reserved.
  */
 
@@ -45,7 +45,7 @@ namespace pl0c {
 	Token TokenStream::get() {
 		char ch = 0;
 
-		do {										// skip whitespace... 
+		do {										// skip whitespace...
 			if (!getch(ch))
 				return ct = { Token::EOS };
 
@@ -94,13 +94,13 @@ namespace pl0c {
 
 		case '{':									// comment; { ... }
 			ct.number_value = lineNum;				// remember where the comment stated...
-			do {									// eat everthhing up to the closing '}' 
+			do {									// eat everthhing up to the closing '}'
 				if (!getch(ch)) {
 					ct.kind = Token::BadComment;
 					return ct;
 				}
 
-				if ('\n' == ch) 
+				if ('\n' == ch)
 					++lineNum;						// keep counting lines...
 
 			} while ('}' != ch);
@@ -194,7 +194,7 @@ namespace pl0c {
 
 		case Kind::BitXOR:		return "^";				break;
 		case Kind::BitOR:		return "|";				break;
-		case Kind::BitAND:		return "&";				break;	
+		case Kind::BitAND:		return "&";				break;
 
 		case Kind::Add:			return "+";				break;
 		case Kind::Subtract:	return "-";				break;

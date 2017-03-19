@@ -1,0 +1,90 @@
+# fact2.p, 2: { Calculate 11 (0..10) factorials
+# fact2.p, 3: {	 n		    n!	}
+# fact2.p, 4: {  ---  ---------	}
+# fact2.p, 5: {	 0		    0	}
+# fact2.p, 6: {	 1		    1	}
+# fact2.p, 7: {	 2		    2	}
+# fact2.p, 8: {	 3		    6	}
+# fact2.p, 9: {	...				}
+# fact2.p, 10: {	 9	  362,880	}
+# fact2.p, 11: {	10	3,628,800	}
+# fact2.p, 12: 
+# fact2.p, 13: var result;
+    0: call 0, 32
+    1: halt
+# fact2.p, 14: function factorial(n)
+# fact2.p, 15: 	var p;
+    2: call 0, 4
+    3: halt
+# fact2.p, 16: 
+# fact2.p, 17: 	begin
+    4: enter 1
+# fact2.p, 18: 		p = 1;
+    5: pushConst 1
+    6: pushVar 0, 4
+    7: assign
+# fact2.p, 19: 		while n > 0 do begin
+    8: pushVar 0, -1
+    9: eval
+   10: pushConst 0
+   11: gt
+   12: jneq 27
+# fact2.p, 20: 			p = p * n;
+   13: pushVar 0, 4
+   14: eval
+   15: pushVar 0, -1
+   16: eval
+   17: muli
+   18: pushVar 0, 4
+   19: assign
+# fact2.p, 21: 			n = n - 1
+   20: pushVar 0, -1
+   21: eval
+   22: pushConst 1
+# fact2.p, 22: 		end;
+   23: subi
+   24: pushVar 0, -1
+   25: assign
+   26: jump 8
+# fact2.p, 23: 		factorial = p;
+   27: pushVar 0, 4
+   28: eval
+   29: pushVar 0, 3
+   30: assign
+# fact2.p, 24: 	end;
+   31: reti
+# fact2.p, 25: 
+# fact2.p, 26: begin
+   32: enter 1
+# fact2.p, 27: 	{ The result is the 10th factorial; 3,628,000	}
+# fact2.p, 28:     result = factorial(10)
+   33: pushConst 10
+# fact2.p, 29: end.
+   34: call 0, 4
+   35: pushVar 0, 4
+   36: assign
+   37: ret
+
+       14:          1
+       14:         10
+        9:          9
+       14:         90
+        9:          8
+       14:        720
+        9:          7
+       14:       5040
+        9:          6
+       14:      30240
+        9:          5
+       14:     151200
+        9:          4
+       14:     604800
+        9:          3
+       14:    1814400
+        9:          2
+       14:    3628800
+        9:          1
+       14:    3628800
+        9:          0
+       13:    3628800
+        8:    3628800

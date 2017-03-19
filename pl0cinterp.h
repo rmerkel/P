@@ -69,28 +69,29 @@ namespace pl0c {
 		};
 
 		pl0c::InstrVector	code;				///< Code segment, indexed by pc
-		pl0c::IntVector		stack;				///< Data segment (the stack), index by fp and sp
+		pl0c::DatumVector	stack;				///< Data segment (stack), indexed by fp and sp
 		pl0c::Unsigned		pc;					///< Program counter register; index of *next* instruction in code[]
-		pl0c::Integer		fp;					///< Frame pointer register; index of the current mark block/frame in stack[]
-		pl0c::Integer		sp;					///< Top of stack register (stack[sp])
+		pl0c::Unsigned		fp;					///< Frame pointer register; index of the current mark block/frame in stack[]
+		pl0c::Unsigned		sp;					///< Top of stack register (stack[sp])
 		pl0c::Instr			ir;					///< *Current* instruction register (code[pc-1])
 
 		EAddr				lastWrite;			///< Last write effective address (to stack[]), if valid
 		bool				verbose;			///< Verbose output if true
-		size_t 				ncycles;			///< Number of machine cycles run since the last reset
+		unsigned  			ncycles;			///< Number of machine cycles run since the last reset
 
 		void dump();
 
 	protected:
-		uint16_t base(uint16_t lvl);			///< Find the base 'lvl' levels (frames) up the stack...
-		void mkStackSpace(size_t n);			///< Make room for at least sp+n entries on the stack
+		///< Find the activation base 'lvl' levels up the stack...
+		pl0c::Unsigned base(pl0c::Unsigned lvl);
 
-		Integer pop();							///< Pop an Integer from the top of stack
-		Unsigned popUnsigned();					///< Pop an Unsigned from the top of stack
-		void push(Integer i);					///< Push an Integer onto the stack
-		void push(Unsigned u);					///< Push an Unsigned onto the stack
+		void mkStackSpace(pl0c::Unsigned n);	///< Make room for more stack entries...
 
-		void call(int8_t nlevel, Integer addr); ///< Call a subroutine...
+		Datum pop();							///< Pop a Datum from the top of stack...
+		void push(Datum d);						///< Push a Datum onto the stack...
+
+		/// Call a subroutine...
+		void call(int8_t nlevel, pl0c::Unsigned addr);
 		void ret();								///< Return from procedure...
 		void reti();							///< Return from a function...
 

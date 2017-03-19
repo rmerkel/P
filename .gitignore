@@ -3,5 +3,7 @@ RemoteSystemsTempFiles
 docs
 Debug
 Release
+pl0c
 *.o
 *.d
+*.lst

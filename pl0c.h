@@ -15,17 +15,10 @@
 #include <string>
 #include <vector>
 
+#include "datum.h"
+
 /// The PL/0C Namespace
 namespace pl0c {
-	/// A signed integer or offset
-	typedef std::int32_t					Integer;
-
-	/// An unsigned integer or address
-	typedef std::uint32_t					Unsigned;
-
-	/// A vector of Integers
-	typedef std::vector<Integer> 			IntVector;
-
 	/** Activation Frame layout
 	 *
 	 * Word offsets from the start of a activaction frame, as created by OpCode::call
@@ -41,15 +34,15 @@ namespace pl0c {
 
 	/// Operation codes; restricted to 256 operations, maximum
 	enum class OpCode : std::uint8_t {
-		Not, 								///< Unary not
-		neg,								///< Unary negation
+		noti, 								///< Unary integer not
+		negi,								///< Unary integer negation
 		comp,								///< Unary one's compliment
 
-		add,								///< Addition
-		sub,								///< Subtraction
-		mul,								///< Multiplication
-		div,								///< Division
-		rem,								///< Remainder
+		addi,								///< Interger addition
+		subi,								///< Interger subtraction
+		muli,								///< Interger multiplication
+		divi,								///< Interger division
+		remi,								///< Integer remainder
 
 		bor,								///< Bitwise inclusive or
 		band,								///< Bitwise and
@@ -94,20 +87,20 @@ namespace pl0c {
 		static const InfoMap	opInfoTbl;	///< A table of OpCode information
 
 		std::string		_name;				///< The OpCodes name, e.g., "add"
-		Integer			_nElements;			///< Number of stack elements used , e.g, 2
+		unsigned		_nElements;			///< Number of stack elements used , e.g, 2
 
 	public:
 		OpCodeInfo() : _nElements{0} {}		///< Construct an empty element
 
 		/// Construct a OpCodeInfo from it's components
-		OpCodeInfo(const std::string& name, Integer nelements)
+		OpCodeInfo(const std::string& name, unsigned nelements)
 			: _name{name}, _nElements{nelements} {}
 
 		/// Return the OpCode name string
 		const std::string name() const		{	return _name;   	}
 
 		/// Return the number of stack elements the OpCode uses
-		Integer nElements() const			{	return _nElements;  }
+		unsigned nElements() const			{	return _nElements;  }
 
 		/// Return information about an OpCode
 		static const OpCodeInfo& info(OpCode op);	///< Return information about op
@@ -115,24 +108,31 @@ namespace pl0c {
 
 	/// An Instruction
 	struct Instr {
-		struct {
-			Integer		addr;				///< Address, offset or data value
-			OpCode		op;					///< Operation code
-			int8_t		level;				///< Base level: 0..255
+		union {
+			Integer		value;				///< As a data value
+			Unsigned	addr;				///< As a memory address
 		};
+		int8_t			level;				///< Base level: 0..255
+		OpCode			op;					///< Operation code
 
 		/// Default constructor; results in pushConst 0, 0...
-		Instr() : addr{0}, op{OpCode::pushConst}, level{0}	{}
+		Instr() : value{0}, level{0}, op{OpCode::pushConst}
+			{}
 
 		/// Construct an instruction from it's components...
-		Instr(OpCode o, int8_t l = 0, Integer a = 0) : addr{a}, op{o}, level{l} {}
+		Instr(OpCode o, int8_t l = 0, Integer v = 0) : value{v}, level{l}, op{o}
+			{}
+
+		/// Construct an instruction from it's components...
+		Instr(OpCode o, int8_t l = 0, Unsigned a = 0) : addr{a}, level{l}, op{o}
+			{}
 	};
 
 	/// A vector of Instr's (instructions)
 	typedef std::vector<Instr>					InstrVector;
 
 	/// Disassemble an instruction...
-	Integer disasm(std::ostream& out, Integer loc, const Instr& instr, const std::string label = "");
+	Unsigned disasm(std::ostream& out, Unsigned loc, const Instr& instr, const std::string label = "");
 }
 
 #endif

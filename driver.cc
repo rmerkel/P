@@ -43,6 +43,11 @@
  *  - Folded factors into expressions
  *  - Added logical and, orr plus bitwise and, or, xor.
  * @version 1.2 - Added halt instruction
+ * @version 1.3
+ *	- Interp registers are now all vector<T>size_type
+ *  - Added xpl0c.sh to run regression tests
+ *  - Added Datum, the stack data type, as a step towards adding types to pl0c, and for unsigned
+ *    binary operations.
  *
  * @author Randy Merkel, Slowly but Surly Software.
  * @copyright  (c) 2017 Slowly but Surly Software. All rights reserved.
@@ -76,7 +81,7 @@ static void help() {
 
 /// Print the version number as major.minor
 static void printVersion() {
-	cout << progName << ": verson: 1.2\n";	// makesure to update the verison in mainpage!!
+	cout << progName << ": verson: 1.3\n";	// makesure to update the verison in mainpage!!
 }
 
 /** Parse the command line arguments...

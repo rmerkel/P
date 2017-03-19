@@ -20,18 +20,19 @@ namespace pl0c {
 	/// A OpCodeInfo table, indexed by OpCode's
 	const OpCodeInfo::InfoMap OpCodeInfo::opInfoTbl {
 
-			// Unary operations
+		// Unary operations
 
-		{ OpCode::Not,		OpCodeInfo{ "not",		1			}	},
-		{ OpCode::neg,		OpCodeInfo{ "neg",		1			}	},
+		{ OpCode::noti,		OpCodeInfo{ "noti",		1			}	},
+		{ OpCode::negi,		OpCodeInfo{ "negi",		1			}	},
 		{ OpCode::comp,		OpCodeInfo{ "comp",		1			}	},
 
-			// Binary operations
+		// Binary operations
 
-		{ OpCode::sub,		OpCodeInfo{ "sub",		2			}	},
-		{ OpCode::mul,		OpCodeInfo{ "mul",		2			}	},
-		{ OpCode::div,		OpCodeInfo{ "div",		2			}	},
-		{ OpCode::rem,		OpCodeInfo{ "rem",		2			}	},
+		{ OpCode::addi,		OpCodeInfo{ "addi",		2   		}	},
+		{ OpCode::subi,		OpCodeInfo{ "subi",		2			}	},
+		{ OpCode::muli,		OpCodeInfo{ "muli",		2			}	},
+		{ OpCode::divi,		OpCodeInfo{ "divi",		2			}	},
+		{ OpCode::remi,		OpCodeInfo{ "remi",		2			}	},
 
 		{ OpCode::bor,		OpCodeInfo{ "bor",		2			}	},
 		{ OpCode::band,		OpCodeInfo{ "band",		2			}	},
@@ -49,14 +50,14 @@ namespace pl0c {
 		{ OpCode::lor,		OpCodeInfo{ "lor",		2			}	},
 		{ OpCode::land,		OpCodeInfo{ "land",		2			}	},
 
-			// Push/pop
+		// Push/pop
 
 		{ OpCode::pushConst,OpCodeInfo{ "pushConst",1			}	},
 		{ OpCode::pushVar,	OpCodeInfo{ "pushVar",	1			}	},
 		{ OpCode::eval,		OpCodeInfo{ "eval",		2			}	},
 		{ OpCode::assign,	OpCodeInfo{ "assign",	2			}	},
 
-			// Call/return/jump...
+		// Call/return/jump...
 
     	{ OpCode::call,		OpCodeInfo{ "call",		0			}	},
 		{ OpCode::enter,	OpCodeInfo{ "enter",	0			}	},	// Size isn't staticly know
@@ -93,25 +94,30 @@ namespace pl0c {
 	 * @param	label	Display label
 	 * @return 	loc+1
 	 */
-	Integer disasm(ostream& out, Integer loc, const Instr& instr, const string label) {
+	Unsigned disasm(ostream& out, Unsigned loc, const Instr& instr, const string label) {
 		const int level = instr.level;		// so we don't display level as a character
-		if (label.size()) out << label << ": ";
-		out << setw(5) << loc << ": " << OpCodeInfo::info(instr.op).name();
 
+		if (label.size())
+			out << label << ": ";
+
+		out << setw(5) << loc << ": " << OpCodeInfo::info(instr.op).name();
     	switch(instr.op) {
     	case OpCode::pushConst:
     	case OpCode::enter:
     	case OpCode::jump:
     	case OpCode::jneq:
-    		out << " " << instr.addr;
+    		out << " " << instr.value;
     		break;
 
     	case OpCode::pushVar:
+			out << " "	<< level << ", " << instr.value;
+			break;
+
     	case OpCode::call:
     		out << " "	<< level << ", " << instr.addr;
     		break;
 
-		default:								// The rest don't use level or address
+		default:								// The rest don't use level, address or value
 			break;
 		}
 		out << "\n";

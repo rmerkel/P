@@ -25,23 +25,17 @@ namespace pl0c {
 	void Interp::dump() {
 		// Dump the last write
 		if (lastWrite.valid())
-			cout << "    " << setw(5) << lastWrite << ": " << setw(10) << stack[lastWrite] << std::endl;
+			cout << "    " << setw(5) << lastWrite << ": " << setw(10) << stack[lastWrite].i << std::endl;
 		lastWrite.invalidate();
 
 		if (!verbose) return;
 
 		// Dump the current  activation frame...
-		if (sp == -1) {								// Happens after return from the main procedure
-			cout 	 <<	"sp:    "         << sp << ": " << right << setw(10) << stack[sp] << endl;
-			cout 	 <<	"fp: " << setw(5) << fp << ": " << right << setw(10) << stack[fp] << endl;
-
-		} else {
-			assert(sp >= fp);
-			cout     << "fp: " << setw(5) << fp << ": " << right << setw(10) << stack[fp] << endl;
-			for (int bl = fp+1; bl < sp; ++bl)
-				cout <<	"    " << setw(5) << bl << ": " << right << setw(10) << stack[bl] << endl;
-			cout     << "sp: " << setw(5) << sp << ": " << right << setw(10) << stack[sp] << endl;
-		}
+		assert(sp >= fp);
+		cout     << "fp: " << setw(5) << fp << ": " << right << setw(10) << stack[fp].u << endl;
+		for (auto bl = fp+1; bl < sp; ++bl)
+			cout <<	"    " << setw(5) << bl << ": " << right << setw(10) << stack[bl].i << endl;
+		cout     << "sp: " << setw(5) << sp << ": " << right << setw(10) << stack[sp].i << endl;
 
 		disasm(cout, pc, code[pc], "pc");
 
@@ -54,52 +48,41 @@ namespace pl0c {
 	 * @param lvl Number of levels down
 	 * @return The base, lvl's down the stack
 	 */
-	uint16_t Interp::base(uint16_t lvl) {
-		uint16_t b = fp;
+	pl0c::Unsigned Interp::base(pl0c::Unsigned lvl) {
+		auto b = fp;
 		for (; lvl > 0; --lvl)
-			b = stack[b];
+			b = stack[b].u;
 
 		return b;
 	}
 
 	/**
-	 * Make sure that there is room for n elements in the stack.
-	 * @param	n	Number of entries that will be pushed down on the stack
+	 * Make sure that there is room for at least sp+n elements in the stack.
+	 * @param	n	Maximum number of entries pushed down on the stack, if necessary, to make
+	 *  		    sufficient room for sp+n entries.
 	 */
-	void Interp::mkStackSpace(size_t n) {
+	void Interp::mkStackSpace(pl0c::Unsigned n) {
 		while (stack.size() <= static_cast<unsigned> (sp + n))
 			stack.push_back(-1);
 	}
 
 	/// @return the top-of-stack
-	Integer Interp::pop() {
+	Datum Interp::pop() {
 		assert(sp >= 0);
 		return stack[sp--];
 	}
 
-	/// @return the top-of-stack as an Unsigned
-	Unsigned Interp::popUnsigned() {
-		assert(sp >= 0);
-		return static_cast<Unsigned>(stack[sp--]);
-	}
-
-	/// @param i	Value to push on to the stack
-	void Interp::push(Integer i) {
+	/// @param d	Datum to push on to the stack
+	void Interp::push(Datum d) {
 		mkStackSpace(1);
-		stack[++sp] = i;
-	}
-
-	/// @param	u	Value to push on to the stack
-	void Interp::push(Unsigned u) {
-		mkStackSpace(1);
-		stack[++sp] = static_cast<Integer>(u);
+		stack[++sp] = d;
 	}
 
 	/**
 	 * @param 	nlevel	Set the subroutines frame base nlevel's down
 	 * @param 	addr 	The address of the subroutine.
 	 */
-	void Interp::call(int8_t nlevel, Integer addr) {
+	void Interp::call(int8_t nlevel, pl0c::Unsigned addr) {
 		mkStackSpace(FrameSize);
 
 		const auto oldFp = fp;			// Save a copy before we modify it
@@ -112,7 +95,7 @@ namespace pl0c {
 
 		push(oldFp);					//	FrameOldFp
 		push(pc);						//	FrameRetAddr
-		push(0);						//	FrameRetVal
+		push(0u);						//	FrameRetVal
 
 		pc = addr;
 	}
@@ -122,8 +105,8 @@ namespace pl0c {
 	 */
 	void Interp::ret() {
 		sp = fp - 1; 					// "pop" the activaction frame
-		pc = stack[fp + FrameRetAddr];
-		fp = stack[fp + FrameOldFp];
+		pc = stack[fp + FrameRetAddr].u;
+		fp = stack[fp + FrameOldFp].u;
 		sp -= ir.addr;					// Pop parameters, if any...
 	}
 
@@ -147,59 +130,56 @@ namespace pl0c {
 			return Result::stackUnderflow;
 		}
 
-		Integer		rhand;					// righthand side of a binary operation
-		Unsigned	urhand;					// 		"		 of a unsigned op
+		Datum		rhand;					// righthand side of a binary operation
 
 		switch(ir.op) {
-		case OpCode::Not:		stack[sp] = !stack[sp];					break;
-		case OpCode::neg:		stack[sp] = -stack[sp];					break;
-		case OpCode::comp:
-			stack[sp] = static_cast<Unsigned>(~static_cast<Unsigned>(stack[sp]));
-			break;
-		case OpCode::add:   	rhand = pop(); push(pop() + rhand); 	break;
-		case OpCode::sub:		rhand = pop(); push(pop() - rhand); 	break;
-		case OpCode::mul:		rhand = pop(); push(pop() * rhand); 	break;
-		case OpCode::div:
-			if (0 != (rhand = pop()))	push(pop() / rhand);
+		case OpCode::noti:		stack[sp].i = !stack[sp].i;				break;
+		case OpCode::negi:		stack[sp].i = -stack[sp].i;				break;
+		case OpCode::comp:		stack[sp].u = ~stack[sp].u; 			break;
+		case OpCode::addi:   	rhand = pop(); push(pop().i + rhand.i); break;
+		case OpCode::subi:		rhand = pop(); push(pop().i - rhand.i); break;
+		case OpCode::muli:		rhand = pop(); push(pop().i * rhand.i);	break;
+		case OpCode::divi:
+			if (0 != (rhand = pop()).i)	push(pop().i / rhand.i);
 			else {
 				cerr << "Attempt to divide by zero @ pc (" << prevPc << ")!\n";
 				return Result::divideByZero;
 			}
 			break;
-		case OpCode::rem:
-			if (0 != (rhand = pop()))	push(pop() % rhand);
+		case OpCode::remi:
+			if (0 != (rhand = pop()).i)	push(pop().i % rhand.i);
 			else {
 				cerr << "attempt to divide by zero @ pc (" << prevPc << ")!\n";
 				return Result::divideByZero;
 			}
 			break;
-		case OpCode::bor:	 	urhand = popUnsigned(); push(popUnsigned()  | urhand);	break;
-		case OpCode::band:   	urhand = popUnsigned(); push(popUnsigned()  & urhand);	break;
-		case OpCode::bxor:   	urhand = popUnsigned(); push(popUnsigned()  ^ urhand);	break;
-		case OpCode::lshift: 	urhand = popUnsigned(); push(popUnsigned() << urhand);	break;
-		case OpCode::rshift: 	urhand = popUnsigned(); push(popUnsigned() >> urhand);	break;
+		case OpCode::bor:	 	rhand = pop(); push(pop().u  | rhand.u); break;
+		case OpCode::band:   	rhand = pop(); push(pop().u  & rhand.u); break;
+		case OpCode::bxor:   	rhand = pop(); push(pop().u  ^ rhand.u); break;
+		case OpCode::lshift: 	rhand = pop(); push(pop().u << rhand.u); break;
+		case OpCode::rshift:	rhand = pop(); push(pop().u >> rhand.u); break;
 
-		case OpCode::lte:   	rhand = pop(); push(pop() <= rhand);	break;
-		case OpCode::lt:		rhand = pop(); push(pop()  < rhand);	break;
-		case OpCode::equ:   	rhand = pop(); push(pop() == rhand);	break;
-		case OpCode::gt:		rhand = pop(); push(pop()  > rhand);	break;
-		case OpCode::gte:   	rhand = pop(); push(pop() >= rhand);  	break;
-		case OpCode::neq:   	rhand = pop(); push(pop() != rhand);	break;
-		case OpCode::lor:   	rhand = pop(); push(pop() || rhand);	break;
-		case OpCode::land:  	rhand = pop(); push(pop() && rhand);	break;
-		case OpCode::pushConst: push(ir.addr);							break;
-		case OpCode::pushVar:	push(base(ir.level) + ir.addr);			break;
-		case OpCode::eval: 		{   auto ea = pop(); push(stack[ea]); } break;
+		case OpCode::lte:   	rhand = pop(); push(pop().i <= rhand.i); break;
+		case OpCode::lt:		rhand = pop(); push(pop().i  < rhand.i); break;
+		case OpCode::equ:   	rhand = pop(); push(pop().i == rhand.i); break;
+		case OpCode::gt:		rhand = pop(); push(pop().i  > rhand.i); break;
+		case OpCode::gte:   	rhand = pop(); push(pop().i >= rhand.i); break;
+		case OpCode::neq:   	rhand = pop(); push(pop().i != rhand.i); break;
+		case OpCode::lor:   	rhand = pop(); push(pop().i || rhand.i); break;
+		case OpCode::land:  	rhand = pop(); push(pop().i && rhand.i); break;
+		case OpCode::pushConst: push(ir.value);							break;
+		case OpCode::pushVar:	push(base(ir.level) + ir.value);		break;
+		case OpCode::eval:	{   auto ea = pop(); push(stack[ea.u]);	}	break;
 		case OpCode::assign:
-			lastWrite = pop();				// Save the effective address for dump()...
-			stack[lastWrite] = pop();
+			lastWrite = pop().u;	// Save the effective address for dump()...
+			stack[lastWrite].i = pop().i;
 			break;
 		case OpCode::call: 		call(ir.level, ir.addr);				break;
 		case OpCode::ret:   	ret();  								break;
 		case OpCode::reti: 		reti();									break;
 		case OpCode::enter: 	mkStackSpace(ir.addr);	sp += ir.addr;  break;
 		case OpCode::jump:		pc = ir.addr;							break;
-		case OpCode::jneq:		if (pop() == 0) pc = ir.addr;			break;
+		case OpCode::jneq:		if (pop().i == 0) pc = ir.addr;			break;
 		case OpCode::halt:		return Result::halted;					break;
 
 		default:
@@ -225,7 +205,7 @@ namespace pl0c {
 				cerr << "pc (" << pc << ") is out of range: [0.." << code.size() << ")!\n";
 				status = Result::badFetch;
 
-			} else if (sp >= static_cast<Integer> (stack.size())) {
+			} else if (sp >= stack.size()) {
 				cerr << "sp (" << sp << ") is out of range [0.." << stack.size() << ")!\n";
 				status = Result::stackUnderflow;
 

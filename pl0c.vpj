@@ -269,6 +269,7 @@
 			Name="Header Files"
 			Filters="*.h;*.H;*.hh;*.hpp;*.hxx;*.h++;*.inc;*.sh;*.cpy;*.if"
 			GUID="{80E58BB3-E835-4BC1-A967-786A1DC7CEA9}">
+			<F N="datum.h"/>
 			<F N="pl0c.h"/>
 			<F N="pl0ccomp.h"/>
 			<F N="pl0cinterp.h"/>
@@ -301,6 +302,7 @@
 			<F N="test.p"/>
 			<F N="testif.p"/>
 			<F N="unknown.p"/>
+			<F N="xpl0c.sh"/>
 		</Folder>
 	</Files>
 </Project>
