@@ -1,46 +1,47 @@
 # comment.p, 2: { "main" starts here... }
-# comment.p, 3: var n, f;	{ var z; parser doesn't see 'z' }
+# comment.p, 3: const nFacts = 10;
     0: call 0, 2
     1: halt
-# comment.p, 4: begin
+# comment.p, 4: var n, f : integer;	{ var z; parser doesn't see 'z' }
+# comment.p, 5: begin
     2: enter 2
-# comment.p, 5:    n = 0;
+# comment.p, 6:    n = 0;
     3: pushConst 0
     4: pushVar 0, 4
     5: assign
-# comment.p, 6:    f = 1;
+# comment.p, 7:    f = 1;
     6: pushConst 1
     7: pushVar 0, 5
     8: assign
-# comment.p, 7:    {	calculate factor (n)
-# comment.p, 8: 		comment continued on this line... }
-# comment.p, 9:    while n < 10 do begin
+# comment.p, 8:    {	calculate factor (n)
+# comment.p, 9: 		comment continued on this line... }
+# comment.p, 10:    while n < nFacts do begin
     9: pushVar 0, 4
    10: eval
    11: pushConst 10
    12: lt
    13: jneq 28
-# comment.p, 10:       n = n + 1;
+# comment.p, 11:       n = n + 1;
    14: pushVar 0, 4
    15: eval
    16: pushConst 1
    17: addi
    18: pushVar 0, 4
    19: assign
-# comment.p, 11:       f = f * n
+# comment.p, 12:       f = f * n
    20: pushVar 0, 5
    21: eval
-# comment.p, 12:    end
+# comment.p, 13:    end
    22: pushVar 0, 4
    23: eval
    24: muli
    25: pushVar 0, 5
    26: assign
-# comment.p, 13: end.
+# comment.p, 14: end.
    27: jump 9
    28: ret
-#comment.p, 13: 
-#comment.p, 14: {	unterminated comment, but we don't care as it follows the period!
+#comment.p, 14: 
+#comment.p, 15: {	unterminated comment, but we don't care as it follows the period!
 
         8:          0
         9:          1

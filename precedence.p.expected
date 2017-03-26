@@ -1,4 +1,4 @@
-# precedence.p, 2: var x;
+# precedence.p, 2: var x : integer;
     0: call 0, 2
     1: halt
 # precedence.p, 3: begin

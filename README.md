@@ -5,7 +5,7 @@ Yet another small, interpreted, computer language... just for the fun of it!
 A compiler/interpreter, inspired by the original PL/0 language and machine
 described in Algorithms + Data Structures = Programs, 1st Edition, by Wirth.
 Modified to use C/C++ operators, e.g., check for equality with "==" and
-assigned with "=", but otherwise using Pascal "lite" syntax and program
+assigned with "=", but otherwise using Pascal "light" syntax and program
 nesting. The result is a dialect that I call "PL/0C".
 
 Like PL/0, PL/0C is a combination compiler and interpreter; it first runs the
@@ -15,10 +15,11 @@ standard output.
 
 The compiler started life as a copy of the C example at
 https://en.wikipedia.org/wiki/Recursive_descent_parser, modified to emit code
-per Wirth's interpret procedure while using the TokeStream from The C++
-Programming Language, 4th Edition, by Stroustrup. Finally modified to support
-the PL/0C dialect. By default, pl0c::Comp writes a listing to standard output,
-but the verbose (-v) option will also log tokens found and code emitted.
+per Wirth's interpret procedure while using the TokenStream (pl0c::TokenStream)
+from The C++ Programming Language, 4th Edition, by Stroustrup. Finally
+modified to support the PL/0C dialect. By default, pl0c::Comp writes a listing
+to standard output, but the verbose (-v) option will also log tokens found and
+code emitted.
 
 The machine/interpreter stated life as a C/C++ port of Wirth's machine
 (procedure interpret), modified to use lest "weird" instruction names, modified
@@ -54,8 +55,9 @@ Version
     1.3
         * Interp registers are now pl0c::Unsigned
         * Added xpl0c.sh to run regression tests
-        * Added Datum, the stack data type, as a step towards adding types to 
+        * Added Datum, the stack data type, as a step towards adding types to
           pl0c and for unsigned bit operations.
+	1.3a - internal release; adding types.
 
 Author
     Randy Merkel, Slowly but Surly Software.

@@ -1,13 +1,13 @@
-./pl0c: Unknown token: '#, (0x23) near line 3
+./pl0c: Unknown token: '#', (0x23) near line 3
 ./pl0c: identifier is not a variable or a procedure 'x' near line 3
 ./pl0c: expected 'end' got 'Number' near line 3
 ./pl0c: expected '.' got 'Number' near line 3
-# unknown.p, 2: var x;
+# unknown.p, 2: var x : integer;
     0: call 0, 2
     1: halt
 # unknown.p, 3: begin
     2: enter 1
-# unknown.p, 4: 	x # 123;
+# unknown.p, 4: 	x # 123;	{	unknown operator "#"!
     3: ret
 #unknown.p, 4: end .
 

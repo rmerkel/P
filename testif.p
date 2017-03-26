@@ -1,4 +1,4 @@
-var x, y, z;
+var x, y, z : integer;
 begin
 	x = 1;
 	y = 2;

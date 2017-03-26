@@ -106,15 +106,15 @@ namespace pl0c {
     	case OpCode::enter:
     	case OpCode::jump:
     	case OpCode::jneq:
-    		out << " " << instr.value;
+			out << " " << instr.addr.u;
     		break;
 
     	case OpCode::pushVar:
-			out << " "	<< level << ", " << instr.value;
+			out << " "	<< level << ", " << instr.addr.i;
 			break;
 
     	case OpCode::call:
-    		out << " "	<< level << ", " << instr.addr;
+    		out << " "	<< level << ", " << instr.addr.u;
     		break;
 
 		default:								// The rest don't use level, address or value

@@ -13,6 +13,7 @@
 #include <map>
 #include <sstream>
 
+#include "datum.h"
 #include "pl0c.h"
 
 /// A Symbol table entry
@@ -30,15 +31,11 @@ struct SymValue {
 
 	Kind			kind;						///< identifier, constant, funciton, or procedure name
 	int				level;						///< Base/frame level If kind == proc or function
-	pl0c::Integer	value;						///< value (identifier, constant) or address of a proc or function
+	pl0c::Datum		value;						///< value (identifier, constant) or address of a proc or function
 
 	/// Default construction
 	SymValue() : kind {none}, level {0}, value{0}
 		{}
-
-	/** Constructor; create a SymValue from it's components
-	 */
-
 
 	/** Construct a SymValue from it's components...
 	 *

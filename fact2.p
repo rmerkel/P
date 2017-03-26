@@ -9,9 +9,10 @@
 {	 9	  362,880	}
 {	10	3,628,800	}
 
-var result;
+const nFacts = 10;
+var result : integer;
 function factorial(n)
-	var p;
+	var p : integer;
 
 	begin
 		p = 1;
@@ -24,5 +25,5 @@ function factorial(n)
 
 begin
 	{ The result is the 10th factorial; 3,628,000	}
-    result = factorial(10)
+    result = factorial(nFacts)
 end.

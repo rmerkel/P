@@ -9,7 +9,7 @@
  * A compiler/interpreter, inspired by the original PL/0 language and machine described in
  * *Algorithms + Data Structures = Programs*, 1st Edition, by Wirth. Modified to use C/C++
  * operators, e.g., check for equality with "==" and assigned with "=", but otherwise using Pascal
- * "lite" syntax and program nesting. The result is a dialect that I call "PL/0C".
+ * "light" syntax and program nesting. The result is a dialect that I call "PL/0C".
  *
  * Like PL/0, PL/0C is a combination compiler and interpreter; it first runs the compiler
  * (pl0c::Comp), and if no errors where encountered, it runs the results in the interpreter
@@ -17,10 +17,10 @@
  *
  * The compiler started life as a copy of the C example at
  * https://en.wikipedia.org/wiki/Recursive_descent_parser, modified to emit code per Wirth's
- * interpret procedure while using the TokeStream from *The C++ Programming Language*, 4th
- * Edition, by Stroustrup. Finally modified to support the PL/0C dialect. By default, pl0c::Comp
- * writes a listing to standard output, but the verbose (-v) option will also log tokens found and
- * code emitted.
+ * interpret procedure while using the TokenStream class (pl0c::TokenStream) from *The C++
+ * Programming Language*, 4th Edition, by Stroustrup. Finally modified to support the PL/0C
+ * dialect. By default, pl0c::Comp writes a listing to standard output, but the verbose (-v) option
+ * will also log tokens found and code emitted.
  *
  * The machine/interpreter stated life as a C/C++ port of Wirth's machine (procedure interpret),
  * modified to use lest "weird" instruction names, modified to use indirect addressing per HOC, as
@@ -48,6 +48,12 @@
  *  - Added xpl0c.sh to run regression tests
  *  - Added Datum, the stack data type, as a step towards adding types to pl0c, and for unsigned
  *    binary operations.
+ *  - Parser now understands, but ignores type names for variables, but not functions.
+ *
+ * @version 1.3a
+ *  - Symbol table values are now Datums; another step towareds adding types.
+ *  - Optimize block prefix by omitting if the block has no local variables.
+ *  - Parser reconizes var identifiers... : type, but type is ignored and assumed to be integer.
  *
  * @author Randy Merkel, Slowly but Surly Software.
  * @copyright  (c) 2017 Slowly but Surly Software. All rights reserved.
@@ -61,9 +67,9 @@
 
 using namespace std;
 
-static 			string	progName;				///< This programs name
-static 			string	inputFile {"-"};		///< Source file name, or - for standard input
-static 			bool	verbose = false;		///< Verbose messages if true
+static	string	progName;						///< This programs name
+static 	string	inputFile {"-"};				///< Source file name, or - for standard input
+static 	bool	verbose = false;				///< Verbose messages if true
 
 /// Print a usage message on standard error output
 static void help() {
@@ -81,7 +87,7 @@ static void help() {
 
 /// Print the version number as major.minor
 static void printVersion() {
-	cout << progName << ": verson: 1.3\n";	// makesure to update the verison in mainpage!!
+	cout << progName << ": verson: 1.3a\n";	// makesure to update the verison in mainpage!!
 }
 
 /** Parse the command line arguments...

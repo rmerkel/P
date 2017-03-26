@@ -9,7 +9,7 @@
 # repeatst.p, 10: {	 9	  362,880	}
 # repeatst.p, 11: {	10	3,628,800	}
 # repeatst.p, 12: 
-# repeatst.p, 13: var n, f;
+# repeatst.p, 13: var n, f : integer;
     0: call 0, 2
     1: halt
 # repeatst.p, 14: begin

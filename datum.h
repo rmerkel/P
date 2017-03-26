@@ -37,13 +37,16 @@ namespace pl0c {
 		  Kind 			kind;						///< What kind of datum?
 
 		/// Construct from an integer, defaults to zero
-		Datum(int value = 0)	: kind{Kind::Integer} 	{	i = value;	}
+		Datum(int value = 0)		: kind{Kind::Integer} 	{	i = value;	}
 
 		/// Construct from an unsigned integer
-		Datum(unsigned value)	: kind{Kind::Unsigned} 	{	u = value;	}
+		Datum(unsigned value)		: kind{Kind::Unsigned} 	{	u = value;	}
+
+		/// Construct from an unsigned long integer
+		Datum(unsigned long value) 	: kind{Kind::Unsigned} 	{	u = value;	}
 
 		/// Constuct from a double
-		Datum(double value) 	: kind{Kind::Real} 	{	r = value;	}
+		Datum(double value) 		: kind{Kind::Real} 		{	r = value;	}
 	};
 
 	/// A vector of Datums

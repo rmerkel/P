@@ -1,4 +1,4 @@
-# divbyzero.p, 2: var x, y, z;
+# divbyzero.p, 2: var x, y, z : integer;
     0: call 0, 2
     1: halt
 # divbyzero.p, 3: 

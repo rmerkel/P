@@ -9,7 +9,8 @@
 {	 9	  362,880	}
 {	10	3,628,800	}
 
-var p;
+const nFacts = 10;
+var p : integer;
 procedure factorial(n)
     begin
         p = 1;
@@ -20,5 +21,5 @@ procedure factorial(n)
     end;
 
 begin
-    factorial(10)
+    factorial(nFacts)
 end.

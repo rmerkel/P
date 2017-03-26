@@ -48,7 +48,7 @@ namespace pl0c {
 
 		if (Token::Unknown == t.kind) {
 			ostringstream oss;
-			oss << "Unknown token: '" << t.string_value << ", (0x" << hex << t.number_value << ")";
+			oss << "Unknown token: '" << t.string_value << "', (0x" << hex << t.number_value << ")";
 			error(oss.str());
 			return next();
 		}
@@ -100,11 +100,11 @@ namespace pl0c {
 	 *
 	 *	@return The address (code[] index) of the new instruction.
 	 */
-	size_t Comp::emit(const OpCode op, int8_t level, Integer addr) {
+	size_t Comp::emit(const OpCode op, int8_t level, Datum addr) {
 		const int lvl = static_cast<int>(level);
 		if (verbose)
 			cout << progName << ": emitting " << code->size() << ": "
-					<< OpCodeInfo::info(op).name() << " " << lvl << ", " << addr
+					<< OpCodeInfo::info(op).name() << " " << lvl << ", " << addr.i
 					<< "\n";
 
 		code->push_back({op, level, addr});
@@ -151,7 +151,7 @@ namespace pl0c {
 	  *  @param	val		The variable symbol table entry
 	  */
 	 void Comp::varRef(int level, const SymValue& val) {
-		const auto offset = val.value >= 0 ? val.value + FrameSize : val.value;
+		const auto offset = val.value.i >= 0 ? val.value.i + FrameSize : val.value.i;
 		emit(OpCode::pushVar, level - val.level, offset);
 	 }
 
@@ -177,7 +177,7 @@ namespace pl0c {
 					closest = it;
 
 			if (SymValue::constant == closest->second.kind)
-				emit(OpCode::pushConst, 0, closest->second.value);
+				emit(OpCode::pushConst, 0, closest->second.value.i);
 
 			else if (SymValue::identifier == closest->second.kind) {
 				varRef(level, closest->second);
@@ -419,10 +419,10 @@ namespace pl0c {
 	 * @param	level	The current block level.
 	 */
 	 void Comp::whileStmt(int level) {
-		const size_t cond_pc = code->size();			// Start of while condition
+		const auto cond_pc = code->size();			// Start of while condition
 		condition(level);
 
-		const size_t jmp_pc = emit(OpCode::jneq, 0, 0);	// jump if condition false
+		const auto jmp_pc = emit(OpCode::jneq, 0, 0);	// jump if condition false
 		expect(Token::Do);								// consume "do"
 		statement(level);
 
@@ -508,32 +508,45 @@ namespace pl0c {
 	}
 
 	/**
-	 * [ const ident = number {, ident = number} ; ]
+	 * name = ident ":" integer | real ;
+	 * @param 	level	The current block level.
+	 * @return 	<identifier, true> if a legal identifer was found, <identifier, false) if not.
+	 */
+	const std::pair<std::string, bool> Comp::name(int level) {
+		const string id = ts.current().string_value;			// Copy the identifer
+		if (expect(Token::Identifier)) {						// Consume the identifier
+			auto range = symtbl.equal_range(id);				// Already defined?
+			for (auto it = range.first; it != range.second; ++it)
+				if (it->second.level == level) {
+					error("identifier previously defined", id);
+					return make_pair(id, false);
+				}
+		}
+
+		return std::make_pair(id, true);
+	}
+
+	/**
+	 * [ const name = number {, name = number} ; ]
+	 *   name = 		ident ":" "integer" | "real" ;
 	 *
 	 * @note Doesn't emit any code; just stores the named value in the symbol table.
 	 *
 	 * @param	level	The current block level.
 	 */
 	void Comp::constDecl(int level) {
-		// Capture the identifier name before consuming it...
-		const string name = ts.current().string_value;
+		const auto ident = name(level);
 
-		expect(Token::Identifier);						// Consume the identifier
 		expect(Token::Assign);							// Consume the "="
 		if (expect(Token::Number, false)) {
 			auto number = ts.current().number_value;
 			next();										// Consume the number
 
-			auto range = symtbl.equal_range(name);
-			for (auto it = range.first; it != range.second; ++it)
-				if (it->second.level == level) {
-					error("identifier has previously been defined", name);
-					return;
-				}
-
-			symtbl.insert({ name, { SymValue::constant, level, number } });
-			if (verbose)
-				cout << progName << ": constDecl " << name << ": " << level << ", " << number << "\n";
+			if (ident.second) {							// Insert into the symbol table if successful
+				symtbl.insert({ ident.first, { SymValue::constant, level, number } });
+				if (verbose)
+					cout << progName << ": constDecl " << ident.first << ": " << level << ", " << number << "\n";
+			}
 		}
 	}
 
@@ -541,26 +554,34 @@ namespace pl0c {
 	 * Allocate space on the stack for the variable and install it's offset from the block in the symbol
 	 * table.
 	 *
+	 * var ident { "," ident} ":" type ";"
+	 *
 	 * @param	offset	Stack offset for the next varaible
 	 * @param	level	The current block level.
 	 *
 	 * @return	Stack offset for the next varaible.
 	 */
 	int Comp::varDecl(int offset, int level) {
-		const string name = ts.current().string_value;
+		vector<string>	identifiers;					// List of variable identifiers
+		do {
+			const auto ident = name(level);
+			if (ident.second)							// Insert into the symbol table if successful
+				identifiers.push_back(ident.first);
+		} while (accept(Token::Comma));
 
-		if (expect(Token::Identifier)) {
-			auto range = symtbl.equal_range(name);
-			for (auto it = range.first; it != range.second; ++it)
-				if (it->second.level == level) {
-					error("identifer has previously been defined", name);
-					return offset;
-				}
+		expect(Token::Colon);
+		if (!accept(Token::Integer) && !accept(Token::Real))
+			error("excped 'integer' or 'real', got neither");
 
-			symtbl.insert( { name, { SymValue::identifier, level, offset }} );
+		// TBD: record the type to insert into the symbol table below
+
+		expect(Token::SemiColon);
+
+		for (const auto& id : identifiers) {
+			symtbl.insert( { id, { SymValue::identifier, level, offset }} );
 			if (verbose)
-				cout << progName << ": varDecl " << name << ": " << level << ", " << offset << "\n";
-			return offset + 1;
+				cout << progName << ": varDecl " << id << ": " << level << ", " << offset << "\n";
+			++offset;									// Allocate another local @ level
 		}
 
 		return offset;
@@ -576,30 +597,25 @@ namespace pl0c {
 		const	Token::Kind kind = current();	// proc or function decl
 		next();									// consume token...
 
-												// Save the identifier...
-		const 	string name = ts.current().string_value;
-				vector<string> args;			// formal arguments, if any
+		vector<string> args;					// formal arguments, if any
+		SymbolTable::iterator it;				// Will point to the new symbol table entry...
 
-		if (expect(Token::Identifier)) {
-			auto range = symtbl.equal_range(name);
-			for (auto it = range.first; it != range.second; ++it)
-				if (it->second.level == level)
-					error("identifier has previously been defined", name);
-
-			SymbolTable::iterator it;			// insert the new symbol...
+		const auto& ident = name(level);
+		if (ident.second) {						// Insert the new symbol if successful...
 			if (Token::Procedure == kind) {
-				it = symtbl.insert( { name, { SymValue::proc, level, 0 }} );
+				it = symtbl.insert( { ident.first, { SymValue::proc, level, 0 }} );
 				if (verbose)
-					cout << progName << ": procDecl " << name << ": " << level << ", 0\n";
+					cout << progName << ": procDecl " << ident.first << ": " << level << ", 0\n";
 
 			} else {							// funcDecl
-				it = symtbl.insert( { name, { SymValue::function, level, 0 }} );
+				it = symtbl.insert( { ident.first, { SymValue::function, level, 0 }} );
 				if (verbose)
-					cout << progName << ": funcDecl " << name << ": " << level << ", 0\n";
+					cout << progName << ": funcDecl " << ident.first << ": " << level << ", 0\n";
 			}
 
-			expect(Token::OpenParen);				// procedure name "()"
-			if (accept(Token::Identifier, false)) { // identifier {, identifier }
+			// Process forrmal auguments, if any...
+			expect(Token::OpenParen);			// procedure name "()"
+			if (accept(Token::Identifier, false)) {
 				int offset = 0;					// Record the arguments...
 				do {
 					args.push_back(ts.current().string_value);
@@ -610,11 +626,11 @@ namespace pl0c {
 				/**
 				 * Add the arguments, with negative offsets from the block/frame, so
 				 * that they have offsets of -n, ..., -2, -1. Note that their levels
-				 * must be the same as the following block.
+				 * must be the same as the *following* block!
 				 */
 				for (auto& x : args) {
-					const string& name = x;
-					symtbl.insert( { name, { SymValue::identifier, level+1, offset++ }});
+					const string& ident = x;
+					symtbl.insert( { ident, { SymValue::identifier, level+1, offset++ }});
 				}
 			}
 
@@ -642,7 +658,7 @@ namespace pl0c {
 
 		emit(OpCode::halt);
 
-		if (accept(Token::Constant)) {				// const ident = number, ...
+		if (accept(Token::Constant)) {				// const ident = number, ... ;
 			do {
 				constDecl(level);
 
@@ -650,13 +666,8 @@ namespace pl0c {
 			expect(Token::SemiColon);
 		}
 
-		if (accept(Token::Variable)) {				// var ident, ...
-			do {
-				dx = varDecl(dx, level);
-
-			} while (accept(Token::Comma));
-			expect(Token::SemiColon);
-		}
+		if (accept(Token::Variable))				// var ident, ... : type ;
+			dx = varDecl(dx, level);
 
 		while (accept(Token::Procedure, false) || accept(Token::Function, false))
 			subDecl(level);
@@ -664,11 +675,12 @@ namespace pl0c {
 		/*
 		 * Block body
 		 *
-		 * Emit the block prefix, and then set the blocks staring address, and
-		 * patch the jump to it, followed by the postfix.
+		 * Emit the block prefix, and then set the blocks staring address, patching the call to
+		 * it, followed by the postfix. Omit the postfix if dx == 0 (the subroutine has zero
+		 * locals.
 		 */
 
-		auto addr = emit(OpCode::enter, 0, dx);		// prefix
+		auto addr = dx > 0 ? emit(OpCode::enter, 0, dx) : code->size();
 		if (verbose)
 			cout << progName << ": patching address at " << call_pc << " to " << addr  << "\n";
 		(*code)[call_pc].addr = val.value = addr;
@@ -687,7 +699,7 @@ namespace pl0c {
 				if (verbose)
 					cout << progName << ": purging "
 					<< i->first << ": "
-					<< SymValue::toString(i->second.kind) << ", " << static_cast<int>(i->second.level) << ", " << i->second.value
+					<< SymValue::toString(i->second.kind) << ", " << static_cast<int>(i->second.level) << ", " << i->second.value.i
 					<< " from the symbol table\n";
 				i = symtbl.erase(i);
 

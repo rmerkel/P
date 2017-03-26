@@ -289,19 +289,28 @@
 			Filters=""
 			GUID="{E2E32900-C0A4-4CAE-AA3C-FC024DC77863}">
 			<F N="comment.p"/>
+			<F N="comment.p.expected"/>
 			<F N="divbyzero.p"/>
+			<F N="divbyzero.p.expected"/>
 			<F N="Doxyfile"/>
 			<F N="fact.p"/>
+			<F N="fact.p.expected"/>
+			<F N="fact2.p.expected"/>
 			<F
 				N="Makefile"
 				Type="Makefile"/>
 			<F N="pl0c.vpwistu"/>
 			<F N="precedence.p"/>
+			<F N="precedence.p.expected"/>
 			<F N="README.md"/>
 			<F N="repeatst.p"/>
+			<F N="repeatst.p.expected"/>
 			<F N="test.p"/>
+			<F N="test.p.expected"/>
 			<F N="testif.p"/>
+			<F N="testif.p.expected"/>
 			<F N="unknown.p"/>
+			<F N="unknown.p.expected"/>
 			<F N="xpl0c.sh"/>
 		</Folder>
 	</Files>

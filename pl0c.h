@@ -108,23 +108,16 @@ namespace pl0c {
 
 	/// An Instruction
 	struct Instr {
-		union {
-			Integer		value;				///< As a data value
-			Unsigned	addr;				///< As a memory address
-		};
+		Datum			addr;				///< A data value or memory address
 		int8_t			level;				///< Base level: 0..255
 		OpCode			op;					///< Operation code
 
 		/// Default constructor; results in pushConst 0, 0...
-		Instr() : value{0}, level{0}, op{OpCode::pushConst}
+		Instr() : addr{0}, level{0}, op{OpCode::pushConst}
 			{}
 
 		/// Construct an instruction from it's components...
-		Instr(OpCode o, int8_t l = 0, Integer v = 0) : value{v}, level{l}, op{o}
-			{}
-
-		/// Construct an instruction from it's components...
-		Instr(OpCode o, int8_t l = 0, Unsigned a = 0) : addr{a}, level{l}, op{o}
+		Instr(OpCode o, int8_t l = 0, Datum d = 0) : addr{d}, level{l}, op{o}
 			{}
 	};
 

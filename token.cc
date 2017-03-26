@@ -115,6 +115,7 @@ namespace pl0c {
 		case '-':
 		case '.':
 		case '/':
+		case ':':
 		case ';':
 		case '^':
 			return ct = { static_cast<Token::Kind>(ch) };
@@ -146,7 +147,6 @@ namespace pl0c {
 				return ct;
 
 			} else {
-
 				ct.string_value = ch;
 				ct.number_value = ch;
 				ct.kind = Token::Unknown;
@@ -165,6 +165,7 @@ namespace pl0c {
 
 		case Kind::Identifier:	return "identifier";	break;
 		case Kind::Number:		return "Number";		break;
+
 		case Kind::Constant:	return "const";			break;
 		case Kind::Variable:	return "var";			break;
 		case Kind::Procedure:	return "procedure";		break;
@@ -178,6 +179,9 @@ namespace pl0c {
 		case Kind::Do:			return "do";			break;
 		case Kind::Repeat:		return "repeat";		break;
 		case Kind::Until:		return "until";			break;
+
+		case Kind::Integer:		return "integer";		break;
+		case Kind::Real:		return "real";			break;
 
 		case Kind::EOS:			return "EOS";			break;
 
@@ -206,6 +210,7 @@ namespace pl0c {
 		case Kind::CloseParen:	return ")";				break;
 		case Kind::Comma:		return ",";				break;
 		case Kind::Period:		return ".";				break;
+		case Kind::Colon:		return ":";				break;
 		case Kind::SemiColon:	return ";";				break;
 		case Kind::Assign:		return "=";				break;
 
@@ -261,6 +266,8 @@ namespace pl0c {
 		{	"do",			Token::Do			},
 		{	"repeat",		Token::Repeat		},
 		{	"until",		Token::Until		},
-		{	"mod",			Token::Mod			}
+		{	"mod",			Token::Mod			},
+		{	"integer",		Token::Integer		},
+		{	"real",			Token::Real			}
 	};
 }

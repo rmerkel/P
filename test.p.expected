@@ -8,45 +8,46 @@
 # test.p, 9: {	...				}
 # test.p, 10: {	 9	  362,880	}
 # test.p, 11: {	10	3,628,800	}
-# test.p, 12: var n, f;
+# test.p, 12: const nFacts = 10;
     0: call 0, 2
     1: halt
-# test.p, 13: begin
+# test.p, 13: var n, f : integer;	
+# test.p, 14: begin
     2: enter 2
-# test.p, 14:    n = 0;
+# test.p, 15:    n = 0;
     3: pushConst 0
     4: pushVar 0, 4
     5: assign
-# test.p, 15:    f = 1;
+# test.p, 16:    f = 1;
     6: pushConst 1
     7: pushVar 0, 5
     8: assign
-# test.p, 16:    while n < 10 do begin
+# test.p, 17:    while n < nFacts do begin
     9: pushVar 0, 4
    10: eval
    11: pushConst 10
    12: lt
    13: jneq 28
-# test.p, 17:       n = n + 1;
+# test.p, 18:       n = n + 1;
    14: pushVar 0, 4
    15: eval
    16: pushConst 1
    17: addi
    18: pushVar 0, 4
    19: assign
-# test.p, 18:       f = f * n
+# test.p, 19:       f = f * n
    20: pushVar 0, 5
    21: eval
-# test.p, 19:    end
+# test.p, 20:    end
    22: pushVar 0, 4
    23: eval
    24: muli
    25: pushVar 0, 5
    26: assign
-# test.p, 20: end.
+# test.p, 21: end.
    27: jump 9
    28: ret
-#test.p, 20: 
+#test.p, 21: 
 
         8:          0
         9:          1

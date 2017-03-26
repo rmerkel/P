@@ -48,6 +48,9 @@ namespace pl0c {
 			Repeat,							///< "repeat" ... "until"
 			Until,							///< "until"
 
+			Integer,						///< "integer"
+			Real,							///< "real
+
 			EQU,							///< Is equal? (==)
 			LTE,							///< Less than or equal? (<=)
 			GTE,							///< Greater then or equal? (>=)
@@ -81,6 +84,7 @@ namespace pl0c {
 			CloseParen	= ')',				///< Closing parentheses
 			Comma		= ',',				///< Decl separator
 			Period		= '.',				///< Period
+			Colon		= ':',				///< Identifier ':' type
 			SemiColon	= ';',				///< Statement separator
 			Assign		= '='				///< Assignment
 

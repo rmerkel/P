@@ -9,11 +9,12 @@
 #ifndef	PL0COM_H
 #define	PL0COM_H
 
+#include <string>
+#include <utility>
+
 #include "pl0c.h"
 #include "token.h"
 #include "symbol.h"
-
-#include <string>
 
 namespace pl0c {
 	/** A PL/0C Compilier
@@ -29,17 +30,19 @@ namespace pl0c {
 	 *     prog =		block "." ;
 	 *
 	 *     block =		[ "const" ident "=" number {"," ident "=" number} ";"]
-	 *  				[ "var" ident {"," ident } ";"]
+	 *  				[ "var" itent {"," ident } ":" type ";"]
 	 *  				{ "procedure" ident "(" [ ident { "," ident } ] ")" block ";"	|
 	 *					  "function"  ident "(" [ ident { "," ident } ] ")" block ";" 	}
 	 *  			  	  stmt ;
 	 *
+	 *     type = 		"integer" | "real" ;
+	 *
 	 *     stmt =		[ ident "=" expr						|
-	 *  			  	  ident "(" [ expr { "," expr } ")" 	|
-	 *  			  	  "begin" stmt {";" stmt } "end"		|
-	 *  			  	  "if" cond "then" stmt { "else" stmt }	|
-	 *  			  	  "while" cond "do" stmt				|
-	 *  			  	  "repeat" stmt "until" cond ] ;
+	 *  				  ident "(" [ expr { "," expr } ")" 	|
+	 *  				  "begin" stmt {";" stmt } "end"		|
+	 *  				  "if" cond "then" stmt { "else" stmt } |
+	 *  				  "while" cond "do" stmt 				|
+	 *  				  "repeat" stmt "until" cond ] ;
 	 *
 	 *     cond =		relat { ("||" | &&") relation } ;
 	 *
@@ -97,7 +100,7 @@ namespace pl0c {
 		bool expect(Token::Kind k, bool get = true);
 
 		/// Emit an instruction...
-		size_t emit(const pl0c::OpCode op, int8_t level = 0, pl0c::Integer addr = 0);
+		size_t emit(const pl0c::OpCode op, int8_t level = 0, pl0c::Datum addr = 0);
 
 		/// Create a listing...
 		void listing(const std::string& name, std::istream& source, std::ostream& out);
@@ -126,6 +129,9 @@ namespace pl0c {
 		void repeatStmt(int level);				///< repeat-statement production...
 		void ifStmt(int level);					///< if-statement production...
 		void statement(int level);				///< statement production...
+
+		/// variable or constant name-declaration production...
+		const std::pair<std::string, bool> name(int level);
 
 		void constDecl(int level);				/// constant-declaration production...
 		int  varDecl(int offset, int level);	/// variable-declaration production...

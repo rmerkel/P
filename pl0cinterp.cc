@@ -107,7 +107,7 @@ namespace pl0c {
 		sp = fp - 1; 					// "pop" the activaction frame
 		pc = stack[fp + FrameRetAddr].u;
 		fp = stack[fp + FrameOldFp].u;
-		sp -= ir.addr;					// Pop parameters, if any...
+		sp -= ir.addr.u;				// Pop parameters, if any...
 	}
 
 	/// Unlink the stack frame, set the return address, and then push the function result
@@ -167,19 +167,19 @@ namespace pl0c {
 		case OpCode::neq:   	rhand = pop(); push(pop().i != rhand.i); break;
 		case OpCode::lor:   	rhand = pop(); push(pop().i || rhand.i); break;
 		case OpCode::land:  	rhand = pop(); push(pop().i && rhand.i); break;
-		case OpCode::pushConst: push(ir.value);							break;
-		case OpCode::pushVar:	push(base(ir.level) + ir.value);		break;
+		case OpCode::pushConst: push(ir.addr.i);						break;
+		case OpCode::pushVar:	push(base(ir.level) + ir.addr.i);		break;
 		case OpCode::eval:	{   auto ea = pop(); push(stack[ea.u]);	}	break;
 		case OpCode::assign:
 			lastWrite = pop().u;	// Save the effective address for dump()...
 			stack[lastWrite].i = pop().i;
 			break;
-		case OpCode::call: 		call(ir.level, ir.addr);				break;
+		case OpCode::call: 		call(ir.level, ir.addr.u);				break;
 		case OpCode::ret:   	ret();  								break;
 		case OpCode::reti: 		reti();									break;
-		case OpCode::enter: 	mkStackSpace(ir.addr);	sp += ir.addr;  break;
-		case OpCode::jump:		pc = ir.addr;							break;
-		case OpCode::jneq:		if (pop().i == 0) pc = ir.addr;			break;
+		case OpCode::enter: 	mkStackSpace(ir.addr.u); sp+=ir.addr.u;	break;
+		case OpCode::jump:		pc = ir.addr.u;							break;
+		case OpCode::jneq:		if (pop().i == 0) pc = ir.addr.u;		break;
 		case OpCode::halt:		return Result::halted;					break;
 
 		default:

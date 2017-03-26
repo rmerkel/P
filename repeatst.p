@@ -9,7 +9,7 @@
 {	 9	  362,880	}
 {	10	3,628,800	}
 
-var n, f;
+var n, f : integer;
 begin
 	n = 0;
 	f = 1;

@@ -1,4 +1,4 @@
-# testif.p, 2: var x, y, z;
+# testif.p, 2: var x, y, z : integer;
     0: call 0, 2
     1: halt
 # testif.p, 3: begin
