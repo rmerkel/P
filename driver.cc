@@ -51,9 +51,8 @@
  *  - Parser now understands, but ignores type names for variables, but not functions.
  *
  * @version 1.3a
- *  - Symbol table values are now Datums; another step towareds adding types.
- *  - Optimize block prefix by omitting if the block has no local variables.
- *  - Parser reconizes var identifiers... : type, but type is ignored and assumed to be integer.
+ *  - Adding types "integer" and real...
+ *  - Adding arrayws...
  *
  * @author Randy Merkel, Slowly but Surly Software.
  * @copyright  (c) 2017 Slowly but Surly Software. All rights reserved.
@@ -87,7 +86,7 @@ static void help() {
 
 /// Print the version number as major.minor
 static void printVersion() {
-	cout << progName << ": verson: 1.3a\n";	// makesure to update the verison in mainpage!!
+	cout << progName << ": verson: 1.3b\n";	// makesure to update the verison in mainpage!!
 }
 
 /** Parse the command line arguments...

@@ -157,14 +157,13 @@ namespace pl0c {
 
 	/**
 	 * Push a variable's value, a constant value, or invoke, and push the results, of a function.
-	 *
-	 * ident | ident "(" [ ident { "," ident } ] ")"
+	 *      ident | ident "(" [ ident { "," ident } ] ")"
 	 *
 	 * @param	level	The current block level
 	 */
 	void Comp::identifier(int level) {
 		const string name = ts.current().string_value;
-		next();								// Consume the identifier
+		expect(Token::Identifier);					// Consume the identifier
 
 		auto range = symtbl.equal_range(name);
 		if (range.first == range.second)
@@ -184,17 +183,10 @@ namespace pl0c {
 				emit(OpCode::eval);
 
 			} else if (SymValue::function == closest->second.kind) {
-				expect(Token::OpenParen);
-				if (!accept(Token::CloseParen, false)) {
-					do
-						expression(level);
-					while (accept(Token::Comma));
-				}
-				expect(Token::CloseParen);
-				emit(OpCode::call, level - closest->second.level, closest->second.value);
+				callStmt(closest->first, closest->second, level);
 
 			} else
-				error("Unknown symbol", name);
+				error("Identifier is not a constant, variable or function", name);
 		}
 	}
 
@@ -252,7 +244,7 @@ namespace pl0c {
 
 	/**
 	 * additive = term { ("+" | "-") term } ;
-	 * @param	level	The curretn block level.
+	 * @param	level	The current block level.
 	 */
 	void Comp::addExpr(int level) {
 		term(level);
@@ -351,7 +343,7 @@ namespace pl0c {
 			error("Can't assign to a constant", name);
 			break;
 
-		case SymValue::proc:
+		case SymValue::procedure:
 			error("Can't assign to a procedure", name);
 			break;
 
@@ -368,28 +360,39 @@ namespace pl0c {
 	 * @param	level	The current block level
 	 */
 	void Comp::callStmt(const string& name, const SymValue& val, int level) {
+		expect(Token::OpenParen);
+
+		unsigned nParams = 0;						// Count parameters
 		if (!accept(Token::CloseParen, false))
 			do {									// [expr {, expr }]
 				expression(level);
+				++nParams;
 			} while (accept (Token::Comma));
 
 		expect(Token::CloseParen);
 
-		if (SymValue::proc != val.kind)
-			error("Identifier is not a procedure", name);
-		else
-			emit(OpCode::call, level - val.level, val.value);
+		if (nParams != val.nArgs) {					// Is the caller passing right # of params?
+			ostringstream oss;
+			oss << "passing " << nParams << " parameters where " << val.nArgs << " where expected";
+			error(oss.str());
+		}
+
+		if (SymValue::procedure != val.kind && SymValue::function != val.kind)
+			error("Identifier is not a function or procedure", name);
+
+		emit(OpCode::call, level - val.level, val.value);
 	}
 
 	/**
 	 * ident "=" expr | ident "(" [ ident { "," ident } ] ")"
+
 	 *
 	 * @param	level	The current block level
 	 */
 	void Comp::identStmt(int level) {
 		// Save the identifier string before consuming it
 		const string name = ts.current().string_value;
-		accept(Token::Identifier);
+		expect(Token::Identifier);
 
 		auto range = symtbl.equal_range(name);		// look it up....
 		if (range.first == range.second)
@@ -404,11 +407,11 @@ namespace pl0c {
 			if (accept(Token::Assign))			// ident "=" expression
 				assignStmt(closest->first, closest->second, level);
 
-			else if (accept(Token::OpenParen))		// proc "(" ... ")"
-				callStmt(closest->first, closest->second, level);
+			else if (SymValue::function == closest->second.kind)
+				error("callign function with out assignment");
 
 			else
-				error("identifier is not a variable or a procedure", name);
+				callStmt(closest->first, closest->second, level);
 		}
 	}
 
@@ -508,22 +511,28 @@ namespace pl0c {
 	}
 
 	/**
-	 * name = ident ":" integer | real ;
+	 * Scans and returns the next token in the stream which is expected to be an identifier. Checks to
+	 * see, and reports, if the identifier has allready been delcared in this scope (level).
 	 * @param 	level	The current block level.
-	 * @return 	<identifier, true> if a legal identifer was found, <identifier, false) if not.
+	 * @return 	the next identifer in the token stream, "unknown" if the next token wasn't an
+	 *  		identifier.
 	 */
-	const std::pair<std::string, bool> Comp::name(int level) {
+	const std::string Comp::nameDecl(int level) {
 		const string id = ts.current().string_value;			// Copy the identifer
+
 		if (expect(Token::Identifier)) {						// Consume the identifier
 			auto range = symtbl.equal_range(id);				// Already defined?
-			for (auto it = range.first; it != range.second; ++it)
+			for (auto it = range.first; it != range.second; ++it) {
 				if (it->second.level == level) {
 					error("identifier previously defined", id);
-					return make_pair(id, false);
+					break;
 				}
+			}
+
+			return id;
 		}
 
-		return std::make_pair(id, true);
+		return "unknown";
 	}
 
 	/**
@@ -535,18 +544,17 @@ namespace pl0c {
 	 * @param	level	The current block level.
 	 */
 	void Comp::constDecl(int level) {
-		const auto ident = name(level);
+		const auto ident = nameDecl(level);
 
 		expect(Token::Assign);							// Consume the "="
 		if (expect(Token::Number, false)) {
 			auto number = ts.current().number_value;
 			next();										// Consume the number
 
-			if (ident.second) {							// Insert into the symbol table if successful
-				symtbl.insert({ ident.first, { SymValue::constant, level, number } });
-				if (verbose)
-					cout << progName << ": constDecl " << ident.first << ": " << level << ", " << number << "\n";
-			}
+			// Insert ident into the symbol table
+			symtbl.insert({ ident, { SymValue::constant, level, number } });
+			if (verbose)
+				cout << progName << ": constDecl " << ident << ": " << level << ", " << number << "\n";
 		}
 	}
 
@@ -564,9 +572,7 @@ namespace pl0c {
 	int Comp::varDecl(int offset, int level) {
 		vector<string>	identifiers;					// List of variable identifiers
 		do {
-			const auto ident = name(level);
-			if (ident.second)							// Insert into the symbol table if successful
-				identifiers.push_back(ident.first);
+			identifiers.push_back(nameDecl(level));			// add it to the list...
 		} while (accept(Token::Comma));
 
 		expect(Token::Colon);
@@ -588,56 +594,73 @@ namespace pl0c {
 	}
 
 	/**
-	 *   "procedure" ident "(" [ident {, "ident" }] ")" block ";"
-	 * | "function"  ident "(" [ident {, "ident" }] ")" block ";"
+	 * Process the common subroutine delcaration for procedures and functions:
+	 *
+	 * ident "(" [ name { "," name } ] ")" ...
 	 *
 	 * @param	level	The current block level.
+	 * @param 	kind	The type of subroutine, e.g., procedure or fuction
+	 * @return	subrountine's symbol table entry
 	 */
-	void Comp::subDecl(int level) {
-		const	Token::Kind kind = current();	// proc or function decl
-		next();									// consume token...
+	SymValue& Comp::subroutineDecl(int level, SymValue::Kind kind) {
+		vector<string> 			args;			// formal arguments, if any
+		SymbolTable::iterator	it;				// Will point to the new symbol table entry...
 
-		vector<string> args;					// formal arguments, if any
-		SymbolTable::iterator it;				// Will point to the new symbol table entry...
+		const auto& ident = nameDecl(level);		// insert the name into the symbol table
+		it = symtbl.insert( { ident, { kind, level, 0 }} );
+		if (verbose)
+			cout << progName << ": subrountine-decl " << ident << ": " << level << ", 0\n";
 
-		const auto& ident = name(level);
-		if (ident.second) {						// Insert the new symbol if successful...
-			if (Token::Procedure == kind) {
-				it = symtbl.insert( { ident.first, { SymValue::proc, level, 0 }} );
-				if (verbose)
-					cout << progName << ": procDecl " << ident.first << ": " << level << ", 0\n";
+		// Process the formal auguments, if any...
+		expect(Token::OpenParen);
+		if (accept(Token::Identifier, false)) {
+			int offset = 0;					// Record the arguments...
+			do {
+				args.push_back(ts.current().string_value);
+				--offset;					// -1, -2, ..., -n
+				accept(Token::Identifier);	// Consume the identifier
 
-			} else {							// funcDecl
-				it = symtbl.insert( { ident.first, { SymValue::function, level, 0 }} );
-				if (verbose)
-					cout << progName << ": funcDecl " << ident.first << ": " << level << ", 0\n";
+			} while (accept(Token::Comma));
+
+			/**
+			 * Add the arguments to the symbol table, but with negative offsets from the block/frame, so that
+			 * they have offsets of -n, ..., -2, -1. Note that their activation frame levels must be the same
+			 * as the *following* block!
+			 */
+			for (auto& x : args) {
+				const string& ident = x;
+				symtbl.insert( { ident, { SymValue::identifier, level+1, offset++	}});
 			}
-
-			// Process forrmal auguments, if any...
-			expect(Token::OpenParen);			// procedure name "()"
-			if (accept(Token::Identifier, false)) {
-				int offset = 0;					// Record the arguments...
-				do {
-					args.push_back(ts.current().string_value);
-					--offset;							// -1, -2, ..., -n
-					accept(Token::Identifier);			// Consume the identifier
-				} while (accept(Token::Comma));
-
-				/**
-				 * Add the arguments, with negative offsets from the block/frame, so
-				 * that they have offsets of -n, ..., -2, -1. Note that their levels
-				 * must be the same as the *following* block!
-				 */
-				for (auto& x : args) {
-					const string& ident = x;
-					symtbl.insert( { ident, { SymValue::identifier, level+1, offset++ }});
-				}
-			}
-
-			expect(Token::CloseParen);
-			block(it->second, level+1, args.size());
-			expect(Token::SemiColon);	// procedure declarations end with a ';'!
 		}
+		expect(Token::CloseParen);
+
+		it->second.nArgs = args.size();		// Update subroutine entry with # of arguments
+		return it->second;
+	}
+
+	/**
+	 * "procedure" ident "(" [ident {, "ident" }] ")" block ";
+	 * @param	level	The current block level.
+	 */
+	void Comp::procDecl(int level) {
+		auto& val = subroutineDecl(level, SymValue::procedure);
+		blockDecl(val, level + 1);
+		expect(Token::SemiColon);	// procedure declarations end with a ';'!
+	}
+
+	/**
+	 * "function"  ident "(" [ident {, "ident" }] ")" block ";"
+	 * @param	level	The current block level.
+	 */
+	void Comp::funcDecl(int level) {
+		auto& val = subroutineDecl(level, SymValue::function);
+
+		expect(Token::Colon);
+		if (!accept(Token::Integer) && !accept(Token::Real))
+			error("expected 'integer' or 'real'");
+
+		blockDecl(val, level + 1);
+		expect(Token::SemiColon);	// procedure declarations end with a ';'!
 	}
 
 	/**
@@ -649,14 +672,15 @@ namespace pl0c {
 	 *
 	 * @param	val		The blocks (procedures) symbol table entry value
 	 * @param	level	The current block level.
-	 * @param   nargs	The number of arguments, passed to the block, that must be
-	 * 					popped on return.
 	 */
-	void Comp::block(SymValue& val, int level, unsigned nargs) {
-		int		dx 		= 0;						// Variable offset from *end* of activation frame
-		auto 	call_pc	= emit(OpCode::call, 0, 0);	// Addr to be patched below
+	void Comp::blockDecl(SymValue& val, int level) {
 
+		// Emit call to block, halt
+
+		auto call_pc = emit(OpCode::call, 0, 0);	// Addr to be patched below
 		emit(OpCode::halt);
+
+		// Delcarations...
 
 		if (accept(Token::Constant)) {				// const ident = number, ... ;
 			do {
@@ -666,17 +690,24 @@ namespace pl0c {
 			expect(Token::SemiColon);
 		}
 
+		int	dx = 0;									// Variable offset from end of activation frame
 		if (accept(Token::Variable))				// var ident, ... : type ;
 			dx = varDecl(dx, level);
 
-		while (accept(Token::Procedure, false) || accept(Token::Function, false))
-			subDecl(level);
+		for (;;) {									// "function..." or "procedure..."?
+			if (accept(Token::Procedure))
+				procDecl(level);
+			else if (accept(Token::Function))
+				funcDecl(level);
+			else
+				break;
+		}
 
 		/*
 		 * Block body
 		 *
-		 * Emit the block prefix, and then set the blocks staring address, patching the call to
-		 * it, followed by the postfix. Omit the postfix if dx == 0 (the subroutine has zero
+		 * Emit the block's prefix, and set the blocks staring address, patching the call to it (
+		 * above), followed by the postfix. Omit the prefix if dx == 0 (the subroutine has zero
 		 * locals.
 		 */
 
@@ -685,13 +716,15 @@ namespace pl0c {
 			cout << progName << ": patching address at " << call_pc << " to " << addr  << "\n";
 		(*code)[call_pc].addr = val.value = addr;
 
-		statement(level);
+		statement(level);							// block body proper..
 
-		assert(nargs < numeric_limits<int>::max());	// postfix...
+		// block post fix...
+
+		assert(val.nArgs < numeric_limits<int>::max());    // postfix...
 		if (SymValue::function == val.kind)
-			emit(OpCode::reti, 0, nargs);			//	function...
+			emit(OpCode::reti, 0, val.nArgs);		//	function...
 		else
-			emit(OpCode::ret, 0, nargs);			//	procedure...
+			emit(OpCode::ret, 0, val.nArgs);        //	procedure...
 
 		// Finally, remove symbols only visible in this level
 		for (auto i = symtbl.begin(); i != symtbl.end(); ) {
@@ -713,7 +746,7 @@ namespace pl0c {
 		auto range = symtbl.equal_range("main");
 		assert(range.first != range.second);
 
-		block(range.first->second, 0, 0);
+		blockDecl(range.first->second, 0);
 		expect(Token::Period);
 	}
 
@@ -724,7 +757,7 @@ namespace pl0c {
 	 * @param	pName	The prefix string used by error and verbose/diagnostic messages.
 	 */
 	Comp::Comp(const string& pName) : progName {pName}, nErrors{0}, verbose {false}, ts{cin} {
-		symtbl.insert({"main", { SymValue::proc, 0, 0 }});	// Install the "main" rountine declaraction
+		symtbl.insert({"main", { SymValue::procedure, 0, 0 }});	// Install the "main" rountine declaraction
 	}
 
 	/**

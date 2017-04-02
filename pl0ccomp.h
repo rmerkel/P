@@ -27,41 +27,56 @@ namespace pl0c {
 	 *
 	 * @section grammer Grammer (EBNF)
 	 *
-	 *     prog =		block "." ;
+	 *     prog =           block "." ;
 	 *
-	 *     block =		[ "const" ident "=" number {"," ident "=" number} ";"]
-	 *  				[ "var" itent {"," ident } ":" type ";"]
-	 *  				{ "procedure" ident "(" [ ident { "," ident } ] ")" block ";"	|
-	 *					  "function"  ident "(" [ ident { "," ident } ] ")" block ";" 	}
-	 *  			  	  stmt ;
+	 *     block =          [ "const" const-decl-list { ";" const-decl-list } ";" ]
+	 *                      [ "var" var-decl-list ]
+	 *                      { proc-decl | funct-decl }
+	 *                      ;
 	 *
-	 *     type = 		"integer" | "real" ;
+	 *     const-decl-list= const-decl { "," const-decl } ;
 	 *
-	 *     stmt =		[ ident "=" expr						|
-	 *  				  ident "(" [ expr { "," expr } ")" 	|
-	 *  				  "begin" stmt {";" stmt } "end"		|
-	 *  				  "if" cond "then" stmt { "else" stmt } |
-	 *  				  "while" cond "do" stmt 				|
-	 *  				  "repeat" stmt "until" cond ] ;
+	 *     const-decl =     ident "=" ( number | ident } ;
 	 *
-	 *     cond =		relat { ("||" | &&") relation } ;
+	 *     proc-decl =      "procedure" ident param-decl-list          block ";" ;
 	 *
-	 *     relat =		expr { ("==" | "!=" | "<" | "<=" | ">" | ">=") expr } ;
+	 *     func-decl =      "function"  ident param-decl-list ":" type block ";" ;
 	 *
-	 *     expr =		shift-expr { ("|" | "&" | "^") shift-expr } ;
+	 *     param-decl-list= { "(" var-decl-list ")" } ;
 	 *
-	 *     shift-expr =	add-expr { ("<<" | ">>") add-expr } ;
+	 *     var-decl-list =  var-decl { ";" var-decl } ";" ;
 	 *
-	 *     add-expr =	term { ("+" | "-") term } ;
+	 *     var-decl =       ident { "," ident } ":" type ;
 	 *
-	 *     term =     	unary { ("*" | "/" | "%") unary } ;
+	 *     type =            "integer" | "real" ;
 	 *
-	 *     unary =		[ ("+"|"-") ] fact ;
+	 *     stmt =           [ ident "=" expr                        |
+	 *                        ident "(" [ expr { "," expr } ")"     |
+	 *                        "begin" stmt {";" stmt } "end"        |
+	 *                        "if" cond "then" stmt { "else" stmt } |
+	 *                        "while" cond "do" stmt                |
+	 *                        "repeat" stmt "until" cond ]
+	 *                      ;
 	 *
-	 *     fact  =    	ident 									|
-	 *  				ident "(" [ ident { "," ident } ] ")"	|
-	 *					number  								|
-	 *					"(" expr ")" ;
+	 *     cond =           relat { ("||" | &&") relation } ;
+	 *
+	 *     relat =          expr { ("==" | "!=" | "<" | "<=" | ">" | ">=") expr } ;
+	 *
+	 *     expr =           shift-expr { ("|" | "&" | "^") shift-expr } ;
+	 *
+	 *     shift-expr =     add-expr { ("<<" | ">>") add-expr } ;
+	 *
+	 *     add-expr =       term { ("+" | "-") term } ;
+	 *
+	 *     term =           unary { ("*" | "/" | "%") unary } ;
+	 *
+	 *     unary =          [ ("+"|"-") ] fact ;
+	 *
+	 *     fact  =          ident                                   |
+	 *                      ident "(" [ ident { "," ident } ] ")"   |
+	 *                      number                                  |
+	 *                      "(" expr ")"
+	 *                      ;
 	 *
 	 * Key
 	 * - {}	Repeat zero or more times
@@ -130,15 +145,19 @@ namespace pl0c {
 		void ifStmt(int level);					///< if-statement production...
 		void statement(int level);				///< statement production...
 
-		/// variable or constant name-declaration production...
-		const std::pair<std::string, bool> name(int level);
+		const std::string nameDecl(int level);		///< name (identifier) check...
 
-		void constDecl(int level);				/// constant-declaration production...
-		int  varDecl(int offset, int level);	/// variable-declaration production...
-		void subDecl(int level);				/// subroutine-declaration production...
+		void constDecl(int level);				///< constant-declaration production...
+		int  varDecl(int offset, int level);	///< variable-declaration production...
 
-		/// block production...
-		void block(SymValue& val, int level, unsigned nargs);
+		///< Subroutine-declaration production...
+		SymValue& subroutineDecl(int level, SymValue::Kind kind);
+
+		void procDecl(int level);				///< procedure-declaration production...
+		void funcDecl(int level);				///< function-declaration production...
+
+		/// block-declaration production...
+		void blockDecl(SymValue& val, int level);
 
 		void run();								///< runs the compilier...
 

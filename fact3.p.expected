@@ -1,0 +1,70 @@
+./pl0c: passing 2 parameters where 1 where expected near line 29
+# fact3.p, 2: { Calculate 11 (0..10) factorials
+# fact3.p, 3: {	 n		    n!	}
+# fact3.p, 4: {  ---  ---------	}
+# fact3.p, 5: {	 0		    0	}
+# fact3.p, 6: {	 1		    1	}
+# fact3.p, 7: {	 2		    2	}
+# fact3.p, 8: {	 3		    6	}
+# fact3.p, 9: {	...				}
+# fact3.p, 10: {	 9	  362,880	}
+# fact3.p, 11: {	10	3,628,800	}
+# fact3.p, 12: 
+# fact3.p, 13: const nFacts = 10;
+    0: call 0, 32
+    1: halt
+# fact3.p, 14: var result : integer;
+# fact3.p, 15: function factorial(n) : integer
+# fact3.p, 16: 	var p : integer;
+    2: call 0, 4
+    3: halt
+# fact3.p, 17: 
+# fact3.p, 18: 	begin
+    4: enter 1
+# fact3.p, 19: 		p = 1;
+    5: pushConst 1
+    6: pushVar 0, 4
+    7: assign
+# fact3.p, 20: 		while n > 0 do begin
+    8: pushVar 0, -1
+    9: eval
+   10: pushConst 0
+   11: gt
+   12: jneq 27
+# fact3.p, 21: 			p = p * n;
+   13: pushVar 0, 4
+   14: eval
+   15: pushVar 0, -1
+   16: eval
+   17: muli
+   18: pushVar 0, 4
+   19: assign
+# fact3.p, 22: 			n = n - 1
+   20: pushVar 0, -1
+   21: eval
+   22: pushConst 1
+# fact3.p, 23: 		end;
+   23: subi
+   24: pushVar 0, -1
+   25: assign
+   26: jump 8
+# fact3.p, 24: 		factorial = p;
+   27: pushVar 0, 4
+   28: eval
+   29: pushVar 0, 3
+   30: assign
+# fact3.p, 25: 	end;
+   31: reti
+# fact3.p, 26: 
+# fact3.p, 27: begin
+   32: enter 1
+# fact3.p, 28: 	{ call with wrong number of parameters! }
+# fact3.p, 29:     result = factorial(nFacts, nFacts)
+   33: pushConst 10
+   34: pushConst 10
+# fact3.p, 30: end.
+   35: call 0, 4
+   36: pushVar 0, 4
+   37: assign
+   38: ret
+

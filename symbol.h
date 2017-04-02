@@ -23,18 +23,19 @@ struct SymValue {
 		none,									///< Placeholder for a 'real' token
 		identifier,		  						///< An identifier
 		constant,								///< A constant identifier
-		proc,									///< A procedure
+		procedure,									///< A procedure
 		function								///< A function
 	};
 
 	static std::string toString(Kind k);		///< Return k as a string
 
-	Kind			kind;						///< identifier, constant, funciton, or procedure name
+	Kind			kind;						///< identifier, constant, funcition, or procedure name
 	int				level;						///< Base/frame level If kind == proc or function
 	pl0c::Datum		value;						///< value (identifier, constant) or address of a proc or function
+	std::size_t		nArgs;						///< function or precedure; # of formal arguments
 
 	/// Default construction
-	SymValue() : kind {none}, level {0}, value{0}
+	SymValue() : kind {none}, level {0}, value{0}, nArgs{0}
 		{}
 
 	/** Construct a SymValue from it's components...
@@ -42,9 +43,10 @@ struct SymValue {
 	 * @param _kind		The token kind, e.g., identifier
 	 * @param _level	The token base/frame level, e.g., 0 for "current frame.
 	 * @param _value 	The token value, e.g., a procedure address
+	 * @param _nArgs	The number of subroutine parameters.
 	 */
-	SymValue(Kind _kind, int _level = 0, pl0c::Integer _value = 0) : kind{_kind}, level{_level}, value{_value}
-		{}
+	SymValue(Kind _kind, int _level = 0, pl0c::Integer _value = 0, std::size_t _nArgs = 0)
+		: kind{_kind}, level{_level}, value{_value}, nArgs{_nArgs}	{}
 };
 
 /// A SymbolTable; a multimap of symbol identifiers to SymValue's

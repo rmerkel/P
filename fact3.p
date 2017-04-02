@@ -24,6 +24,6 @@ function factorial(n) : integer
 	end;
 
 begin
-	{ The result is the 10th factorial; 3,628,000	}
-    result = factorial(nFacts)
+	{ call with wrong number of parameters! }
+    result = factorial(nFacts, nFacts)
 end.

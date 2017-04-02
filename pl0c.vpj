@@ -296,6 +296,8 @@
 			<F N="fact.p"/>
 			<F N="fact.p.expected"/>
 			<F N="fact2.p.expected"/>
+			<F N="fact3.p"/>
+			<F N="fact3.p.expected"/>
 			<F
 				N="Makefile"
 				Type="Makefile"/>
