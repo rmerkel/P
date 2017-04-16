@@ -37,7 +37,10 @@ public:
 	SymValue();									///< Default constructor
 
 	/// Construct a SymValue from it's components...
-	SymValue(Kind kind, int level = 0, pl0c::Datum value = pl0c::Datum{}, std::size_t nArgs = 0);
+	SymValue(Kind 			kind, 
+			 int 			level = 0, 
+			 pl0c::Datum	value = pl0c::Datum{}, 
+			 std::size_t 	nArgs = 0);
 
 	/// Descructor
 	virtual ~SymValue()							{}
@@ -51,12 +54,16 @@ public:
 
 	std::size_t nArgs(std::size_t value);		///< Set my formal parameter count
 	std::size_t nArgs() const;					///< Return my formal parameter count
+	
+	pl0c::Type type(pl0c::Type value);			///< Set my functoin return type
+	pl0c::Type type() const;					///< Return my function return type
 
 private:
 	Kind			k;							///< Identifier, ConstInt...
 	int				l;							///< Activation frame level for Variables and subroutines.
 	pl0c::Datum		v;							///< Variable frame offset, Constant value or subroutine address
 	std::size_t		n;							///< Subrountine formal argument count
+	pl0c::Type		t;							///< Function return type
 
 };
 

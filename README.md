@@ -57,7 +57,9 @@ Version
         * Added xpl0c.sh to run regression tests
         * Added Datum, the stack data type, as a step towards adding types to
           pl0c and for unsigned bit operations.
-	1.3b - internal release; adding types "integer" and "real". Adding arrays.
+	1.3d - internal release; adding types "integer" and "real", arrays.
+		* Function decl return types
+ 		* No longer emits calls to every function decl, just to "main".
 
 Author
     Randy Merkel, Slowly but Surly Software.

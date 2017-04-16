@@ -219,9 +219,9 @@ namespace pl0c {
 	 * @param	level	The current block level
 	 */
 	void Comp::unary(int level) {
-		     if (accept(Token::Add))	{	factor(level);	/* ignore + */		}
+		     if (accept(Token::Add))		{	factor(level);	/* ignore + */		}
 		else if (accept(Token::Subtract))	{	factor(level);	emit(OpCode::negi);	}
-		else if (accept(Token::Not))	{	factor(level);	emit(OpCode::noti);	}
+		else if (accept(Token::Not))		{	factor(level);	emit(OpCode::noti);	}
 		else if (accept(Token::Complament))	{	factor(level);	emit(OpCode::comp);	}
 		else								factor(level);
 	}
@@ -236,8 +236,8 @@ namespace pl0c {
 
 		for (;;) {
 				 if (accept(Token::Multiply))	{	unary(level);	emit(OpCode::muli);	}
-			else if (accept(Token::Divide))	{	unary(level);	emit(OpCode::divi);	}
-			else if (accept(Token::Mod))	{	unary(level);	emit(OpCode::remi);	}
+			else if (accept(Token::Divide))		{	unary(level);	emit(OpCode::divi);	}
+			else if (accept(Token::Mod))		{	unary(level);	emit(OpCode::remi);	}
 			else break;
 		}
 	}
@@ -293,12 +293,12 @@ namespace pl0c {
 		expression(level);
 
 		for (;;) {
-				 if (accept(Token::LTE)) 	{   expression(level);  emit(OpCode::lte);  }
+				 if (accept(Token::LTE)) 		{   expression(level);  emit(OpCode::lte);  }
 			else if (accept(Token::LessThan)) 	{   expression(level);	emit(OpCode::lt);   }
-			else if (accept(Token::GreaterThan))		{	expression(level);	emit(OpCode::gt);   }
-			else if (accept(Token::GTE)) 	{	expression(level);	emit(OpCode::gte);  }
-			else if (accept(Token::EQU)) 	{   expression(level);	emit(OpCode::equ);  }
-			else if (accept(Token::NEQU)) 	{	expression(level);	emit(OpCode::neq);  }
+			else if (accept(Token::GreaterThan))	{	expression(level);	emit(OpCode::gt);   }
+			else if (accept(Token::GTE)) 		{	expression(level);	emit(OpCode::gte);  }
+			else if (accept(Token::EQU)) 		{   expression(level);	emit(OpCode::equ);  }
+			else if (accept(Token::NEQU)) 		{	expression(level);	emit(OpCode::neq);  }
 			else break;
 		}
 	}
@@ -668,7 +668,9 @@ namespace pl0c {
 		auto& val = subroutineDecl(level, SymValue::Function);
 
 		expect(Token::Colon);
-		if (!accept(Token::Integer) && !accept(Token::Real))
+			 if (accept(Token::Integer))	val.type(Type::Integer);
+		else if (accept(Token::Real))   	val.type(Type::Real);
+		else	 
 			error("expected 'integer' or 'real'");
 
 		blockDecl(val, level + 1);
@@ -683,17 +685,10 @@ namespace pl0c {
 	 *          stmt ;
 	 *
 	 * @param	val		The blocks (procedures) symbol table entry value
-	 * @param	level	The current block level.
+	 * @param	level	The current block level. 
+	 * @return 	Entry point address 
 	 */
-	void Comp::blockDecl(SymValue& val, int level) {
-
-		// Emit call to block, halt
-
-		auto call_pc = emit(OpCode::call, 0, 0);	// Addr to be patched below
-		emit(OpCode::halt);
-
-		// Delcarations...
-
+	Unsigned Comp::blockDecl(SymValue& val, int level) {
 		if (accept(Token::Constant)) {				// [ "const" const-decl-list { ";" const-decl-list } ";" ]
 			do {
 				constDecl(level);
@@ -717,27 +712,25 @@ namespace pl0c {
 		/*
 		 * Block body
 		 *
-		 * Emit the block's prefix, and set the blocks staring address, patching the call to it (
-		 * above), followed by the postfix. Omit the prefix if dx == 0 (the subroutine has zero
-		 * locals.
+		 * Emit the block's prefix, saving and return its address, followed by the postfix. Omit the prefix
+		 * if dx == 0 (the subroutine has zero locals.
 		 */
 
-		auto addr = dx > 0 ? emit(OpCode::enter, 0, dx) : code->size();
-		if (verbose)
-			cout << progName << ": patching address at " << call_pc << " to " << addr  << "\n";
-		(*code)[call_pc].addr = val.value(addr);
+		const auto addr = dx > 0 ? emit(OpCode::enter, 0, dx) : code->size();
+		val.value(addr);
 
 		statement(level);							// block body proper..
 
 		// block post fix...
 
-		assert(val.nArgs() < numeric_limits<int>::max());    // postfix...
+		assert(val.nArgs() < numeric_limits<int>::max());
 		if (SymValue::Function == val.kind())
 			emit(OpCode::reti, 0, val.nArgs());		//	function...
 		else
-			emit(OpCode::ret, 0, val.nArgs());        //	procedure...
+			emit(OpCode::ret, 0, val.nArgs());     	//	procedure...
 
 		// Finally, remove symbols only visible in this level
+
 		for (auto i = symtbl.begin(); i != symtbl.end(); ) {
 			if (i->second.level() == level) {
 				if (verbose)
@@ -750,14 +743,26 @@ namespace pl0c {
 			} else
 				++i;
 		}
+
+		return addr;
 	}
 
 	void Comp::run() {
-		next();
+		next();										// Fetch the 1st token
 		auto range = symtbl.equal_range("main");
 		assert(range.first != range.second);
 
-		blockDecl(range.first->second, 0);
+		// Emit a call to the main procedure, followed by a halt
+		const auto call_pc = emit(OpCode::call, 0, 0);
+		emit(OpCode::halt);
+
+		// emit the first block (block 0)
+
+		const auto addr = blockDecl(range.first->second, 0);
+		if (verbose)
+			cout << progName << ": patching call to main at " << call_pc << " to " << addr  << "\n";
+
+		(*code)[call_pc].addr = addr;
 		expect(Token::Period);
 	}
 

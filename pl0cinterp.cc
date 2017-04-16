@@ -80,10 +80,7 @@ namespace pl0c {
 	}
 
 	/// @return the top-of-stack
-	Datum Interp::pop() {
-		assert(sp >= 0);
-		return stack[sp--];
-	}
+	Datum Interp::pop()					{	return stack[sp--];		}
 
 	/// @param d	Datum to push on to the stack
 	void Interp::push(Datum d) {

@@ -50,9 +50,9 @@
  *    binary operations.
  *  - Parser now understands, but ignores type names for variables, but not functions.
  *
- * @version 1.3b
- *  - Adding types "integer" and real...
- *  - Adding arrayws...
+ * @version 1.3d - Adding types "integer" and real, arrays...
+ *  - Function decl return type
+ *  - No longer emits calls to every function decl, just to "main".
  *
  * @author Randy Merkel, Slowly but Surly Software.
  * @copyright  (c) 2017 Slowly but Surly Software. All rights reserved.
@@ -86,7 +86,7 @@ static void help() {
 
 /// Print the version number as major.minor
 static void printVersion() {
-	cout << progName << ": verson: 1.3b\n";	// makesure to update the verison in mainpage!!
+	cout << progName << ": verson: 1.3d\n";	// makesure to update the verison in mainpage!!
 }
 
 /** Parse the command line arguments...
