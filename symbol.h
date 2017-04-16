@@ -14,39 +14,50 @@
 #include <sstream>
 
 #include "datum.h"
-#include "pl0c.h"
 
-/// A Symbol table entry
-struct SymValue {
+/** A Symbol table entry
+ *
+ *  Describes a variable location (activation frame offset), a constant value or a subroutine
+ *  (procedure or function) entry point and parameter count.
+ */
+class SymValue {
+public:
 	/// Kinds of symbol table entries
 	enum Kind : char {
-		none,									///< Placeholder for a 'real' token
-		identifier,		  						///< An identifier
-		constant,								///< A constant identifier
-		procedure,									///< A procedure
-		function								///< A function
+		None,									///< Placeholder for a valid kind...
+		Variable,		  						///< An identifier
+		ConstInt,								///< A constant integer value
+		ConstReal,								///< A constant floating point value
+		Procedure,								///< A procedure
+		Function								///< A function
 	};
 
 	static std::string toString(Kind k);		///< Return k as a string
 
-	Kind			kind;						///< identifier, constant, funcition, or procedure name
-	int				level;						///< Base/frame level If kind == proc or function
-	pl0c::Datum		value;						///< value (identifier, constant) or address of a proc or function
-	std::size_t		nArgs;						///< function or precedure; # of formal arguments
+	SymValue();									///< Default constructor
 
-	/// Default construction
-	SymValue() : kind {none}, level {0}, value{0}, nArgs{0}
-		{}
+	/// Construct a SymValue from it's components...
+	SymValue(Kind kind, int level = 0, pl0c::Datum value = pl0c::Datum{}, std::size_t nArgs = 0);
 
-	/** Construct a SymValue from it's components...
-	 *
-	 * @param _kind		The token kind, e.g., identifier
-	 * @param _level	The token base/frame level, e.g., 0 for "current frame.
-	 * @param _value 	The token value, e.g., a procedure address
-	 * @param _nArgs	The number of subroutine parameters.
-	 */
-	SymValue(Kind _kind, int _level = 0, pl0c::Integer _value = 0, std::size_t _nArgs = 0)
-		: kind{_kind}, level{_level}, value{_value}, nArgs{_nArgs}	{}
+	/// Descructor
+	virtual ~SymValue()							{}
+
+	/// Return my Kind...
+	Kind kind() const;							///< Return my kind
+	int level() const;							///< Return my activation frame level
+
+	pl0c::Datum value(pl0c::Datum value);		///< Set my value
+	pl0c::Datum value() const;					///< Return my value
+
+	std::size_t nArgs(std::size_t value);		///< Set my formal parameter count
+	std::size_t nArgs() const;					///< Return my formal parameter count
+
+private:
+	Kind			k;							///< Identifier, ConstInt...
+	int				l;							///< Activation frame level for Variables and subroutines.
+	pl0c::Datum		v;							///< Variable frame offset, Constant value or subroutine address
+	std::size_t		n;							///< Subrountine formal argument count
+
 };
 
 /// A SymbolTable; a multimap of symbol identifiers to SymValue's

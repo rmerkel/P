@@ -48,13 +48,13 @@ namespace pl0c {
 
 		if (Token::Unknown == t.kind) {
 			ostringstream oss;
-			oss << "Unknown token: '" << t.string_value << "', (0x" << hex << t.number_value << ")";
+			oss << "Unknown token: '" << t.string_value << "', (0x" << hex << t.integer_value << ")";
 			error(oss.str());
 			return next();
 		}
 
 		if (verbose)
-			cout << progName << ": getting '" << Token::toString(t.kind) << "', " << t.string_value << ", " << t.number_value << "\n";
+			cout << progName << ": getting '" << Token::toString(t.kind) << "', " << t.string_value << ", " << t.integer_value << "\n";
 
 		return t;
 	}
@@ -151,8 +151,8 @@ namespace pl0c {
 	  *  @param	val		The variable symbol table entry
 	  */
 	 void Comp::varRef(int level, const SymValue& val) {
-		const auto offset = val.value.i >= 0 ? val.value.i + FrameSize : val.value.i;
-		emit(OpCode::pushVar, level - val.level, offset);
+		const auto offset = val.value().i >= 0 ? val.value().i + FrameSize : val.value().i;
+		emit(OpCode::pushVar, level - val.level(), offset);
 	 }
 
 	/**
@@ -172,17 +172,17 @@ namespace pl0c {
 		else {
 			auto closest = range.first;
 			for (auto it = range.first; it != range.second; ++it)
-				if (it->second.level > closest->second.level)
+				if (it->second.level() > closest->second.level())
 					closest = it;
 
-			if (SymValue::constant == closest->second.kind)
-				emit(OpCode::pushConst, 0, closest->second.value.i);
+			if (SymValue::ConstInt == closest->second.kind())
+				emit(OpCode::pushConst, 0, closest->second.value());
 
-			else if (SymValue::identifier == closest->second.kind) {
+			else if (SymValue::Variable == closest->second.kind()) {
 				varRef(level, closest->second);
 				emit(OpCode::eval);
 
-			} else if (SymValue::function == closest->second.kind) {
+			} else if (SymValue::Function == closest->second.kind()) {
 				callStmt(closest->first, closest->second, level);
 
 			} else
@@ -199,9 +199,9 @@ namespace pl0c {
 		if (accept(Token::Identifier, false))
 			identifier(level);
 
-		else if (accept(Token::Number, false)) {
-			emit(OpCode::pushConst, 0, ts.current().number_value);
-			expect(Token::Number);
+		else if (accept(Token::IntegerNum, false)) {
+			emit(OpCode::pushConst, 0, ts.current().integer_value);
+			expect(Token::IntegerNum);
 
 		} else if (accept(Token::OpenParen)) {
 			expression(level);
@@ -328,22 +328,22 @@ namespace pl0c {
 	void Comp::assignStmt(const string& name, const SymValue& val, int level) {
 		expression(level);
 
-		switch(val.kind) {
-		case SymValue::identifier:
+		switch(val.kind()) {
+		case SymValue::Variable:
 			varRef(level, val);
 			emit(OpCode::assign);
 			break;
 
-		case SymValue::function:					// Save value in the frame's retValue element
+		case SymValue::Function:					// Save value in the frame's retValue element
 			emit(OpCode::pushVar, 0, FrameRetVal);
 			emit(OpCode::assign);
 			break;
 
-		case SymValue::constant:
+		case SymValue::ConstInt:
 			error("Can't assign to a constant", name);
 			break;
 
-		case SymValue::procedure:
+		case SymValue::Procedure:
 			error("Can't assign to a procedure", name);
 			break;
 
@@ -371,21 +371,20 @@ namespace pl0c {
 
 		expect(Token::CloseParen);
 
-		if (nParams != val.nArgs) {					// Is the caller passing right # of params?
+		if (nParams != val.nArgs()) {					// Is the caller passing right # of params?
 			ostringstream oss;
-			oss << "passing " << nParams << " parameters where " << val.nArgs << " where expected";
+			oss << "passing " << nParams << " parameters where " << val.nArgs() << " where expected";
 			error(oss.str());
 		}
 
-		if (SymValue::procedure != val.kind && SymValue::function != val.kind)
+		if (SymValue::Procedure != val.kind() && SymValue::Function != val.kind())
 			error("Identifier is not a function or procedure", name);
 
-		emit(OpCode::call, level - val.level, val.value);
+		emit(OpCode::call, level - val.level(), val.value());
 	}
 
 	/**
 	 * ident "=" expr | ident "(" [ ident { "," ident } ] ")"
-
 	 *
 	 * @param	level	The current block level
 	 */
@@ -401,13 +400,13 @@ namespace pl0c {
 		else {
 			auto closest = range.first;				// Find the "closest" entry
 			for (auto it = range.first; it != range.second; ++it)
-				if (it->second.level > closest->second.level)
+				if (it->second.level() > closest->second.level())
 					closest = it;
 
 			if (accept(Token::Assign))			// ident "=" expression
 				assignStmt(closest->first, closest->second, level);
 
-			else if (SymValue::function == closest->second.kind)
+			else if (SymValue::Function == closest->second.kind())
 				error("callign function with out assignment");
 
 			else
@@ -512,7 +511,7 @@ namespace pl0c {
 
 	/**
 	 * Scans and returns the next token in the stream which is expected to be an identifier. Checks to
-	 * see, and reports, if the identifier has allready been delcared in this scope (level).
+	 * see, and reports, if the identifier has already been delcared in this scope (level).
 	 * @param 	level	The current block level.
 	 * @return 	the next identifer in the token stream, "unknown" if the next token wasn't an
 	 *  		identifier.
@@ -523,7 +522,7 @@ namespace pl0c {
 		if (expect(Token::Identifier)) {						// Consume the identifier
 			auto range = symtbl.equal_range(id);				// Already defined?
 			for (auto it = range.first; it != range.second; ++it) {
-				if (it->second.level == level) {
+				if (it->second.level() == level) {
 					error("identifier previously defined", id);
 					break;
 				}
@@ -547,14 +546,27 @@ namespace pl0c {
 		const auto ident = nameDecl(level);
 
 		expect(Token::Assign);							// Consume the "="
-		if (expect(Token::Number, false)) {
-			auto number = ts.current().number_value;
+		if (accept(Token::IntegerNum, false)) {
+			const auto number = ts.current().integer_value;
 			next();										// Consume the number
 
 			// Insert ident into the symbol table
-			symtbl.insert({ ident, { SymValue::constant, level, number } });
+			symtbl.insert({ ident, { SymValue::ConstInt, level, number	} });
 			if (verbose)
 				cout << progName << ": constDecl " << ident << ": " << level << ", " << number << "\n";
+
+		} else if (accept(Token::RealNum, false)) {
+			const auto number = ts.current().real_value;
+			next();										// Consume the number
+
+			/// Insert ident into the symbol table
+			symtbl.insert({	ident, { SymValue::ConstReal, level, number	}	});
+			if (verbose)
+				cout << progName << ": constDecl " << ident << ": " << level << ", " << number << "\n";
+
+		} else {
+			error("expected an interger or real literal, got neither", ts.current().string_value);
+			next();
 		}
 	}
 
@@ -584,7 +596,7 @@ namespace pl0c {
 		expect(Token::SemiColon);
 
 		for (const auto& id : identifiers) {
-			symtbl.insert( { id, { SymValue::identifier, level, offset }} );
+			symtbl.insert( { id, { SymValue::Variable, level, offset }} );
 			if (verbose)
 				cout << progName << ": varDecl " << id << ": " << level << ", " << offset << "\n";
 			++offset;									// Allocate another local @ level
@@ -629,12 +641,12 @@ namespace pl0c {
 			 */
 			for (auto& x : args) {
 				const string& ident = x;
-				symtbl.insert( { ident, { SymValue::identifier, level+1, offset++	}});
+				symtbl.insert( { ident, { SymValue::Variable, level+1, offset++	}});
 			}
 		}
 		expect(Token::CloseParen);
 
-		it->second.nArgs = args.size();		// Update subroutine entry with # of arguments
+		it->second.nArgs(args.size());		// Update subroutine entry with # of arguments
 		return it->second;
 	}
 
@@ -643,7 +655,7 @@ namespace pl0c {
 	 * @param	level	The current block level.
 	 */
 	void Comp::procDecl(int level) {
-		auto& val = subroutineDecl(level, SymValue::procedure);
+		auto& val = subroutineDecl(level, SymValue::Procedure);
 		blockDecl(val, level + 1);
 		expect(Token::SemiColon);	// procedure declarations end with a ';'!
 	}
@@ -653,7 +665,7 @@ namespace pl0c {
 	 * @param	level	The current block level.
 	 */
 	void Comp::funcDecl(int level) {
-		auto& val = subroutineDecl(level, SymValue::function);
+		auto& val = subroutineDecl(level, SymValue::Function);
 
 		expect(Token::Colon);
 		if (!accept(Token::Integer) && !accept(Token::Real))
@@ -682,10 +694,9 @@ namespace pl0c {
 
 		// Delcarations...
 
-		if (accept(Token::Constant)) {				// const ident = number, ... ;
+		if (accept(Token::Constant)) {				// [ "const" const-decl-list { ";" const-decl-list } ";" ]
 			do {
 				constDecl(level);
-
 			} while (accept(Token::Comma));
 			expect(Token::SemiColon);
 		}
@@ -714,25 +725,25 @@ namespace pl0c {
 		auto addr = dx > 0 ? emit(OpCode::enter, 0, dx) : code->size();
 		if (verbose)
 			cout << progName << ": patching address at " << call_pc << " to " << addr  << "\n";
-		(*code)[call_pc].addr = val.value = addr;
+		(*code)[call_pc].addr = val.value(addr);
 
 		statement(level);							// block body proper..
 
 		// block post fix...
 
-		assert(val.nArgs < numeric_limits<int>::max());    // postfix...
-		if (SymValue::function == val.kind)
-			emit(OpCode::reti, 0, val.nArgs);		//	function...
+		assert(val.nArgs() < numeric_limits<int>::max());    // postfix...
+		if (SymValue::Function == val.kind())
+			emit(OpCode::reti, 0, val.nArgs());		//	function...
 		else
-			emit(OpCode::ret, 0, val.nArgs);        //	procedure...
+			emit(OpCode::ret, 0, val.nArgs());        //	procedure...
 
 		// Finally, remove symbols only visible in this level
 		for (auto i = symtbl.begin(); i != symtbl.end(); ) {
-			if (i->second.level == level) {
+			if (i->second.level() == level) {
 				if (verbose)
 					cout << progName << ": purging "
 					<< i->first << ": "
-					<< SymValue::toString(i->second.kind) << ", " << static_cast<int>(i->second.level) << ", " << i->second.value.i
+					<< SymValue::toString(i->second.kind()) << ", " << static_cast<int>(i->second.level()) << ", " << i->second.value().i
 					<< " from the symbol table\n";
 				i = symtbl.erase(i);
 
@@ -757,7 +768,7 @@ namespace pl0c {
 	 * @param	pName	The prefix string used by error and verbose/diagnostic messages.
 	 */
 	Comp::Comp(const string& pName) : progName {pName}, nErrors{0}, verbose {false}, ts{cin} {
-		symtbl.insert({"main", { SymValue::procedure, 0, 0 }});	// Install the "main" rountine declaraction
+		symtbl.insert({"main", { SymValue::Procedure, 0, 0 }});	// Install the "main" rountine declaraction
 	}
 
 	/**

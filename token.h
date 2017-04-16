@@ -29,11 +29,12 @@ namespace pl0c {
 		 *  its character
 		 */
 		enum Kind : char {
-			Unknown,						///< Unknown token kind; (number_value)
-			BadComment,						///< Unterminated comment, started at line # (number_value)
+			Unknown,						///< Unknown token kind; (integer_value)
+			BadComment,						///< Unterminated comment, started at line # (integer_value)
 
 			Identifier,	  		  			///< An identifier (string_value)
-			Number,							///< literal number (number_value)
+			IntegerNum,						///< Integer literal number (integer_value)
+			RealNum,						///< Real literal number (real_value)
 			Constant,						///< "const" constant declaration
 			Variable,						///< "var" variable (mutable) declaration
 			Procedure,						///< "procedure" declaraction
@@ -93,11 +94,12 @@ namespace pl0c {
 		static std::string toString(Kind k); ///< Return k's name
 
 		Kind			kind;				///< Token type
-		std::string		string_value;		///< kind == ident
-		int				number_value;		///< Kind == number
+		std::string		string_value;		///< kind == Identifier
+		pl0c::Integer	integer_value;      ///< Kind == IntegerNum
+		pl0c::Real		real_value;			///< Kind == RealNum
 
 		/// Construct a token of type k, stirng value "", number value 0.
-		Token(Kind k) : kind{k}, number_value{0} {}
+		Token(Kind k) : kind{k}, integer_value{0} {}
 		virtual ~Token() {}					///< Destructor
 	};
 

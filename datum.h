@@ -8,45 +8,42 @@
 #ifndef	DATUM_H
 #define DATUM_H
 
+#include <cstdint>
 #include <vector>
 
 namespace pl0c {
-		/// A signed integer value or memory offset
-	typedef int32_t							Integer;
+	/// A signed integer value or memory offset
+	typedef std::int32_t					Integer;
 
 	/// An unsigned integer value or memory address
-	typedef uint32_t						Unsigned;
+	typedef std::uint32_t					Unsigned;
 
 	/// A floating point value
 	typedef double							Real;
 
-	/// A single signed or unsigned integer, or a float (real)
-	struct Datum {
-		/// Data kinds
-		enum class Kind {
-			Integer, 								///< A signed integer
-			Unsigned, 								///< A unsigned integer
-			Real									///< A floating point/real
-		};
+	/// PL0C data types
+	enum class Type {
+		Integer,							///< Signed integer
+		Real								///< Floating point number
+	};
 
-		union {
-			int 		i;							///< Value if type == Integer
-			unsigned	u;							///< Value if type == Unsigned
-			double      r;							///< Value if type == Real
-		  };
-		  Kind 			kind;						///< What kind of datum?
+	/** A PL0C Data Value
+	 *
+	 *  A signed, or unsigned, integer, or a floating point (real) value.
+	 *
+	 *  @note No discrimunator is necessary as the union only contains simple types, and there is no
+	 *  	  requirement for runtime type promotion or demotion.
+	 */
+	union Datum {
+		pl0c::Integer	i;							///< As a signed integer
+		pl0c::Unsigned	u;							///< As a unsigned integer
+		pl0c::Real		r;							///< As a real
 
-		/// Construct from an integer, defaults to zero
-		Datum(int value = 0)		: kind{Kind::Integer} 	{	i = value;	}
-
-		/// Construct from an unsigned integer
-		Datum(unsigned value)		: kind{Kind::Unsigned} 	{	u = value;	}
-
-		/// Construct from an unsigned long integer
-		Datum(unsigned long value) 	: kind{Kind::Unsigned} 	{	u = value;	}
-
-		/// Constuct from a double
-		Datum(double value) 		: kind{Kind::Real} 		{	r = value;	}
+		/// Construct from a signed integer, defaults to zero
+		Datum(pl0c::Integer value = 0);
+		Datum(pl0c::Unsigned value);				///< Construct an unsigned integer
+		Datum(std::size_t value);					///< Construct an unsigned (size_t)
+		Datum(pl0c::Real value);					///< Constuct from a double
 	};
 
 	/// A vector of Datums

@@ -50,7 +50,7 @@
  *    binary operations.
  *  - Parser now understands, but ignores type names for variables, but not functions.
  *
- * @version 1.3a
+ * @version 1.3b
  *  - Adding types "integer" and real...
  *  - Adding arrayws...
  *

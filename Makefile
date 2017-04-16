@@ -1,12 +1,12 @@
 ################################################################################
 # @file makefile
 #
-# @brief makefile for PL0C (p/l 0 complier/interperter) 
+# @brief makefile for PL0C (p/l 0 complier/interperter)
 ################################################################################
 
 ################################################################################
 # Build a debug (DEBUG=1: default) or release (DEBUG=0) binary?
-# 
+#
 # Switch between GCC and CLang with
 #   sudo update-alternatives --config c++
 ################################################################################
@@ -26,7 +26,7 @@ endif
 # Project files
 ################################################################################
 
-SRCS	= driver.cc pl0c.cc pl0ccomp.cc pl0cinterp.cc symbol.cc token.cc
+SRCS	= datum.cc driver.cc pl0c.cc pl0ccomp.cc pl0cinterp.cc symbol.cc token.cc
 ALLSRCS	= $(SRCS) $(wildcard *.h)
 OBJS	= $(SRCS:.cc=.o)
 DEPS	= $(SRCS:.cc=.d)

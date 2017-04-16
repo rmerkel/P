@@ -25,17 +25,30 @@ namespace pl0c {
 	void Interp::dump() {
 		// Dump the last write
 		if (lastWrite.valid())
-			cout << "    " << setw(5) << lastWrite << ": " << setw(10) << stack[lastWrite].i << std::endl;
+			cout
+				<< "    "
+				<< setw(5)	<< lastWrite << ": "
+				<< setw(10) << stack[lastWrite].i
+				<< std::endl;
 		lastWrite.invalidate();
 
 		if (!verbose) return;
 
 		// Dump the current  activation frame...
 		assert(sp >= fp);
-		cout     << "fp: " << setw(5) << fp << ": " << right << setw(10) << stack[fp].u << endl;
+		cout    << "fp: " 	<< setw(5) 	<< fp << ": "
+				<< right 	<< setw(10) << stack[fp].u
+				<< endl;
+
 		for (auto bl = fp+1; bl < sp; ++bl)
-			cout <<	"    " << setw(5) << bl << ": " << right << setw(10) << stack[bl].i << endl;
-		cout     << "sp: " << setw(5) << sp << ": " << right << setw(10) << stack[sp].i << endl;
+			cout
+				<<	"    "	<< setw(5)	<< bl << ": "
+				<< right << setw(10) 	<< stack[bl].i
+				<< endl;
+
+		cout    << "sp: " 	<< setw(5) 	<< sp << ": "
+				<< right << setw(10) 	<< stack[sp].i
+				<< endl;
 
 		disasm(cout, pc, code[pc], "pc");
 
@@ -133,12 +146,12 @@ namespace pl0c {
 		Datum		rhand;					// righthand side of a binary operation
 
 		switch(ir.op) {
-		case OpCode::noti:		stack[sp].i = !stack[sp].i;				break;
-		case OpCode::negi:		stack[sp].i = -stack[sp].i;				break;
-		case OpCode::comp:		stack[sp].u = ~stack[sp].u; 			break;
-		case OpCode::addi:   	rhand = pop(); push(pop().i + rhand.i); break;
-		case OpCode::subi:		rhand = pop(); push(pop().i - rhand.i); break;
-		case OpCode::muli:		rhand = pop(); push(pop().i * rhand.i);	break;
+		case OpCode::noti:		stack[sp] = !stack[sp].i;					break;
+		case OpCode::negi:		stack[sp] = -stack[sp].i;					break;
+		case OpCode::comp:		stack[sp] = ~stack[sp].u; 					break;
+		case OpCode::addi:   	rhand = pop(); push(pop().i + rhand.i); 	break;
+		case OpCode::subi:		rhand = pop(); push(pop().i - rhand.i); 	break;
+		case OpCode::muli:		rhand = pop(); push(pop().i * rhand.i);		break;
 		case OpCode::divi:
 			if (0 != (rhand = pop()).i)	push(pop().i / rhand.i);
 			else {
@@ -146,6 +159,7 @@ namespace pl0c {
 				return Result::divideByZero;
 			}
 			break;
+
 		case OpCode::remi:
 			if (0 != (rhand = pop()).i)	push(pop().i % rhand.i);
 			else {
@@ -153,35 +167,35 @@ namespace pl0c {
 				return Result::divideByZero;
 			}
 			break;
-		case OpCode::bor:	 	rhand = pop(); push(pop().u  | rhand.u); break;
-		case OpCode::band:   	rhand = pop(); push(pop().u  & rhand.u); break;
-		case OpCode::bxor:   	rhand = pop(); push(pop().u  ^ rhand.u); break;
-		case OpCode::lshift: 	rhand = pop(); push(pop().u << rhand.u); break;
-		case OpCode::rshift:	rhand = pop(); push(pop().u >> rhand.u); break;
 
-		case OpCode::lte:   	rhand = pop(); push(pop().i <= rhand.i); break;
-		case OpCode::lt:		rhand = pop(); push(pop().i  < rhand.i); break;
-		case OpCode::equ:   	rhand = pop(); push(pop().i == rhand.i); break;
-		case OpCode::gt:		rhand = pop(); push(pop().i  > rhand.i); break;
-		case OpCode::gte:   	rhand = pop(); push(pop().i >= rhand.i); break;
-		case OpCode::neq:   	rhand = pop(); push(pop().i != rhand.i); break;
-		case OpCode::lor:   	rhand = pop(); push(pop().i || rhand.i); break;
-		case OpCode::land:  	rhand = pop(); push(pop().i && rhand.i); break;
-		case OpCode::pushConst: push(ir.addr.i);						break;
-		case OpCode::pushVar:	push(base(ir.level) + ir.addr.i);		break;
-		case OpCode::eval:	{   auto ea = pop(); push(stack[ea.u]);	}	break;
+		case OpCode::bor:	 	rhand = pop(); push(pop().u  | rhand.u);	break;
+		case OpCode::band:   	rhand = pop(); push(pop().u  & rhand.u); 	break;
+		case OpCode::bxor:   	rhand = pop(); push(pop().u  ^ rhand.u); 	break;
+		case OpCode::lshift: 	rhand = pop(); push(pop().u << rhand.u); 	break;
+		case OpCode::rshift:	rhand = pop(); push(pop().u >> rhand.u); 	break;
+		case OpCode::lte:   	rhand = pop(); push(pop().i <= rhand.i); 	break;
+		case OpCode::lt:		rhand = pop(); push(pop().i  < rhand.i); 	break;
+		case OpCode::equ:   	rhand = pop(); push(pop().i == rhand.i); 	break;
+		case OpCode::gt:		rhand = pop(); push(pop().i  > rhand.i); 	break;
+		case OpCode::gte:   	rhand = pop(); push(pop().i >= rhand.i); 	break;
+		case OpCode::neq:   	rhand = pop(); push(pop().i != rhand.i); 	break;
+		case OpCode::lor:   	rhand = pop(); push(pop().i || rhand.i); 	break;
+		case OpCode::land:  	rhand = pop(); push(pop().i && rhand.i); 	break;
+		case OpCode::pushConst: push(ir.addr.i);							break;
+		case OpCode::pushVar:	push(base(ir.level) + ir.addr.i);			break;
+		case OpCode::eval:	{   auto ea = pop(); push(stack[ea.u]);	}		break;
 		case OpCode::assign:
 			lastWrite = pop().u;	// Save the effective address for dump()...
-			stack[lastWrite].i = pop().i;
+			stack[lastWrite] = pop();
 			break;
-		case OpCode::call: 		call(ir.level, ir.addr.u);				break;
-		case OpCode::ret:   	ret();  								break;
-		case OpCode::reti: 		reti();									break;
-		case OpCode::enter: 	mkStackSpace(ir.addr.u); sp+=ir.addr.u;	break;
-		case OpCode::jump:		pc = ir.addr.u;							break;
-		case OpCode::jneq:		if (pop().i == 0) pc = ir.addr.u;		break;
-		case OpCode::halt:		return Result::halted;					break;
 
+		case OpCode::call: 		call(ir.level, ir.addr.u);					break;
+		case OpCode::ret:   	ret();  									break;
+		case OpCode::reti: 		reti();										break;
+		case OpCode::enter: 	mkStackSpace(ir.addr.u); sp+=ir.addr.u;		break;
+		case OpCode::jump:		pc = ir.addr.u;								break;
+		case OpCode::jneq:		if (pop().i == 0) pc = ir.addr.u;			break;
+		case OpCode::halt:		return Result::halted;						break;
 		default:
 			cerr 	<< "Unknown op code: " << OpCodeInfo::info(ir.op).name()
 					<< " found at pc (" << prevPc << ")!\n" << endl;

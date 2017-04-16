@@ -27,36 +27,33 @@ namespace pl0c {
 	 *
 	 * @section grammer Grammer (EBNF)
 	 *
-	 *     prog =           block "." ;
+	 *     program =        block-decl "." ;
 	 *
-	 *     block =          [ "const" const-decl-list { ";" const-decl-list } ";" ]
-	 *                      [ "var" var-decl-list ]
-	 *                      { proc-decl | funct-decl }
-	 *                      ;
-	 *
-	 *     const-decl-list= const-decl { "," const-decl } ;
+	 *     block-decl =     [ "const" const-decl { "," const-decl } ";" ]
+	 *  					[ "var" var-decl-list ";" ]
+	 *  					{ proc-decl | funct-decl }
+	 *  					stmt ;
 	 *
 	 *     const-decl =     ident "=" ( number | ident } ;
 	 *
-	 *     proc-decl =      "procedure" ident param-decl-list          block ";" ;
+	 *     proc-decl =      "procedure" ident param-decl-list          block-decl ";" ;
 	 *
-	 *     func-decl =      "function"  ident param-decl-list ":" type block ";" ;
+	 *     func-decl =      "function"  ident param-decl-list ":" type block-decl ";" ;
 	 *
-	 *     param-decl-list= { "(" var-decl-list ")" } ;
+	 *     param-decl-list= "(" [ var-decl-list ] ")" ;
 	 *
-	 *     var-decl-list =  var-decl { ";" var-decl } ";" ;
+	 *     var-decl-list =  var-decl { "," var-decl } ;
 	 *
 	 *     var-decl =       ident { "," ident } ":" type ;
 	 *
-	 *     type =            "integer" | "real" ;
+	 *     type =           "integer" | "real" ;
 	 *
 	 *     stmt =           [ ident "=" expr                        |
 	 *                        ident "(" [ expr { "," expr } ")"     |
 	 *                        "begin" stmt {";" stmt } "end"        |
 	 *                        "if" cond "then" stmt { "else" stmt } |
 	 *                        "while" cond "do" stmt                |
-	 *                        "repeat" stmt "until" cond ]
-	 *                      ;
+	 *                        "repeat" stmt "until" cond ] ;
 	 *
 	 *     cond =           relat { ("||" | &&") relation } ;
 	 *
@@ -115,7 +112,7 @@ namespace pl0c {
 		bool expect(Token::Kind k, bool get = true);
 
 		/// Emit an instruction...
-		size_t emit(const pl0c::OpCode op, int8_t level = 0, pl0c::Datum addr = 0);
+		size_t emit(const pl0c::OpCode op, int8_t level = 0, pl0c::Datum addr = pl0c::Integer{0});
 
 		/// Create a listing...
 		void listing(const std::string& name, std::istream& source, std::ostream& out);

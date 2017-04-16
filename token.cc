@@ -93,7 +93,7 @@ namespace pl0c {
 			return ct;
 
 		case '{':									// comment; { ... }
-			ct.number_value = lineNum;				// remember where the comment stated...
+			ct.integer_value = lineNum;				// remember where the comment stated...
 			do {									// eat everthhing up to the closing '}'
 				if (!getch(ch)) {
 					ct.kind = Token::BadComment;
@@ -106,29 +106,50 @@ namespace pl0c {
 			} while ('}' != ch);
 			return get();							// restart the scan..
 
-		case '%':
-		case '(':
-		case ')':
-		case '*':
-		case '+':
-		case ',':
-		case '-':
-		case '.':
-		case '/':
-		case ':':
-		case ';':
-		case '^':
+		case '%': case '(': case ')': case '*':
+		case '+': case ',': case '-': case '/':
+		case ':': case ';': case '^':
 			return ct = { static_cast<Token::Kind>(ch) };
 
+		case '.': 									// real number, or just a '.'
+			ct.string_value = ch;
+			if (!getch(ch) || !isdigit(ch))
+				ct.kind = Token::Period;
+
+			else {									// Real...
+				ct.string_value = ch;
+				ct.kind = Token::RealNum;
+				while (getch(ch) && (isdigit(ch) || 'e' == ch || 'E' == ch))
+					ct.string_value += ch;
+				unget();
+
+				std::istringstream iss (ct.string_value);
+				iss >> ct.real_value;
+				return ct;
+			}
+			return ct;
+													// integer or real number
 		case '0': case '1': case '2': case '3': case '4':
 		case '5': case '6': case '7': case '8': case '9': {
+			ct.kind = Token::IntegerNum;			// Assume integer value...
 			ct.string_value = ch;
-			while (getch(ch) && isdigit(ch))
+			while (getch(ch)) {
+				if ('.' == ch || 'e' == ch || 'E' == ch)
+					ct.kind = Token::RealNum;
+
+				else if (!isdigit(ch))
+					break;
+
 				ct.string_value += ch;
+			}
 			unget();
+
 			std::istringstream iss (ct.string_value);
-			iss >> ct.number_value;
-			ct.kind = Token::Number;
+			if (Token::RealNum == ct.kind)
+				iss >> ct.real_value;
+
+			else
+				iss >> ct.integer_value;
 			return ct;
 		}
 
@@ -148,7 +169,7 @@ namespace pl0c {
 
 			} else {
 				ct.string_value = ch;
-				ct.number_value = ch;
+				ct.integer_value = ch;
 				ct.kind = Token::Unknown;
 				return ct;
 			}
@@ -164,7 +185,7 @@ namespace pl0c {
 		case Kind::BadComment:	return "bad comment";	break;
 
 		case Kind::Identifier:	return "identifier";	break;
-		case Kind::Number:		return "Number";		break;
+		case Kind::IntegerNum:		return "Number";		break;
 
 		case Kind::Constant:	return "const";			break;
 		case Kind::Variable:	return "var";			break;

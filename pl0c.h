@@ -113,11 +113,11 @@ namespace pl0c {
 		OpCode			op;					///< Operation code
 
 		/// Default constructor; results in pushConst 0, 0...
-		Instr() : addr{0}, level{0}, op{OpCode::pushConst}
+		Instr() : level{0}, op{OpCode::halt}
 			{}
 
 		/// Construct an instruction from it's components...
-		Instr(OpCode o, int8_t l = 0, Datum d = 0) : addr{d}, level{l}, op{o}
+		Instr(OpCode o, int8_t l = 0, Datum d = Datum{0}) : addr{d}, level{l}, op{o}
 			{}
 	};
 
