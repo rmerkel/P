@@ -20,14 +20,14 @@
 namespace pl0c {
 	/** A PL/0C Compilier
 	 *
-	 * A recursive decent compilier evolved from 
-	 * https://en.wikipedia.org/wiki/Recursive_descent_parser#C_implementation. Construction binds 
-	 * a program name with the instance, used in error messages. The compilier is run via the call 
+	 * A recursive decent compilier evolved from
+	 * https://en.wikipedia.org/wiki/Recursive_descent_parser#C_implementation. Construction binds
+	 * a program name with the instance, used in error messages. The compilier is run via the call
 	 * operator which specifies the input stream, the location of the emitted code, and weather to
 	 * emit a travlelog (verbose messages).
 	 *
 	 * @section grammer Grammer (EBNF)
-	 * 
+	 *
 	 *     program =		block-decl "." ;
 	 *     block-decl =     [ "const" const-decl-blk ";" ]
 	 *  					[ "var" var-decl-blk ";" ]
@@ -146,7 +146,7 @@ namespace pl0c {
 		void constDecl(int level);				///< constant-declaration production...
 
 		int varDeclBlock(int level);			///< variable-declaration-block production...
-		
+
 		/// variable-declaration-list production...
 		int varDeclList(int offset, int level, bool);
 
@@ -166,8 +166,8 @@ namespace pl0c {
 		void run();								///< runs the compilier...
 
 	public:
-		Comp(const std::string& pName);	///< Constructor; use pName for error messages
-		virtual ~Comp() {}				///< Destructor
+		Comp(const std::string& pName);			///< Constructor; use pName for error messages
+		virtual ~Comp() {}						///< Destructor
 
 		/// Run the compiler
 		unsigned operator()(const std::string& inFile, pl0c::InstrVector& prog, bool verb = false);

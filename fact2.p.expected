@@ -1,4 +1,4 @@
-# fact2.p, 2: { Calculate 11 (0..10) factorials
+# fact2.p, 2: { Calculate 11 (0..10) factorials	}
 # fact2.p, 3: {	 n		    n!	}
 # fact2.p, 4: {  ---  ---------	}
 # fact2.p, 5: {	 0		    0	}
