@@ -1,0 +1,18 @@
+# simple.p, 2: var x, y : integer;
+    0: call 0, 2
+    1: halt
+# simple.p, 3: begin
+    2: enter 2
+# simple.p, 4: 	x = 0;
+    3: pushConst 0
+    4: pushVar 0, 4
+    5: assign
+# simple.p, 5: 	y = 1
+    6: pushConst 1
+# simple.p, 6: end.
+    7: pushVar 0, 5
+    8: assign
+    9: ret
+
+        8:          0
+        9:          1

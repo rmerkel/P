@@ -30,21 +30,23 @@ string SymValue::toString(SymValue::Kind k) {
 
 // public
 
-SymValue::SymValue() : k {None}, l {0}, n{0} {}
+SymValue::SymValue() : k {None}, l {0}, t{Type::Integer}, n{0} {}
 
 /**
  * @param kind	The token kind, e.g., identifier
  * @param level	The token base/frame level, e.g., 0 for "current frame. Default: 0.
  * @param value The token value, e.g., a procedure address. Default: 0
+ * @param type  The value type. Default Type::Integer 
  * @param nArgs	The number of subroutine parameters. Default 0 
  */
 SymValue::SymValue(
-	Kind	kind, 
-	int 	level,
-	Datum 	value,
-	std::size_t 	nArgs)
-	: k{kind}, l{level}, v{value}, n{nArgs}, t{Type::Integer}
-{}
+	Kind		kind, 
+	int 		level,
+	Datum 		value,
+	pl0c::Type	type,
+	std::size_t	nArgs) : k{kind}, l{level}, v{value}, t{type}, n{nArgs}
+{
+}
 
 /// @return my current Kind
 SymValue::Kind SymValue::kind() const				{	return k;   		}

@@ -11,8 +11,7 @@
 
 const nFacts = 10;
 var p : integer;
-procedure factorial(n)
-    begin
+procedure factorial(n : integer) begin
         p = 1;
         while n > 0 do begin
             p = p * n;

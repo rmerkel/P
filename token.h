@@ -16,6 +16,7 @@
 #include <cstdint>
 #include <map>
 #include <sstream>
+#include <set>
 
 #include "pl0c.h"
 
@@ -24,7 +25,7 @@ namespace pl0c {
 	struct Token {
 		/** Token kinds
 		 *
-		 *  Token kinds are divided up into keywords, operators, identifiers and
+		 *  Token kinds are divided up into keywords, operators, identifiers andNumber
 		 *  numbers. Single character tokens are represented by the integer value of
 		 *  its character
 		 */
@@ -35,10 +36,10 @@ namespace pl0c {
 			Identifier,	  		  			///< An identifier (string_value)
 			IntegerNum,						///< Integer literal number (integer_value)
 			RealNum,						///< Real literal number (real_value)
-			Constant,						///< "const" constant declaration
-			Variable,						///< "var" variable (mutable) declaration
-			Procedure,						///< "procedure" declaraction
-			Function,						///< "function" declaration
+			ConsDecl,						///< "const" constant declaration
+			VarDecl,						///< "var" variable (mutable) declaration
+			ProcDecl,						///< "procedure" declaraction
+			FuncDecl,						///< "function" declaration
 			Begin,							///< "begin" ... "end"
 			End,							///< "end"
 			If,								///< "if" condition "then" ...
@@ -60,7 +61,7 @@ namespace pl0c {
 			NEQU,							///< Not equal? (!=)
 
 			ShiftL,							///< Left shift "<<"
-			ShiftR,							///< Right shift ">>"
+			ShiftR,							///< Right shift ">>"Number
 
 			EOS,							///< End of stream
 
@@ -88,8 +89,10 @@ namespace pl0c {
 			Colon		= ':',				///< Identifier ':' type
 			SemiColon	= ';',				///< Statement separator
 			Assign		= '='				///< Assignment
-
 		};
+
+		/// A set of Token kinds
+		typedef std::set<Kind>	KindSet;
 
 		static std::string toString(Kind k); ///< Return k's name
 

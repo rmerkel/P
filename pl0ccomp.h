@@ -9,6 +9,7 @@
 #ifndef	PL0COM_H
 #define	PL0COM_H
 
+#include <set>
 #include <string>
 #include <utility>
 
@@ -19,56 +20,45 @@
 namespace pl0c {
 	/** A PL/0C Compilier
 	 *
-	 * A recursive decent compilier evolved from
-	 * https://en.wikipedia.org/wiki/Recursive_descent_parser#C_implementation. Construction binds a
-	 * program name with the instance, used in error messages. The compilier is run via the call
-	 * operator which specifies the input stream, the location of the emitted code, and weather to emit
-	 * a travlelog (verbose messages).
+	 * A recursive decent compilier evolved from 
+	 * https://en.wikipedia.org/wiki/Recursive_descent_parser#C_implementation. Construction binds 
+	 * a program name with the instance, used in error messages. The compilier is run via the call 
+	 * operator which specifies the input stream, the location of the emitted code, and weather to
+	 * emit a travlelog (verbose messages).
 	 *
 	 * @section grammer Grammer (EBNF)
-	 *
-	 *     program =        block-decl "." ;
-	 *
-	 *     block-decl =     [ "const" const-decl { "," const-decl } ";" ]
-	 *  					[ "var" var-decl-list ";" ]
+	 * 
+	 *     program =		block-decl "." ;
+	 *     block-decl =     [ "const" const-decl-blk ";" ]
+	 *  					[ "var" var-decl-blk ";" ]
 	 *  					{ proc-decl | funct-decl }
-	 *  					stmt ;
-	 *
-	 *     const-decl =     ident "=" ( number | ident } ;
-	 *
-	 *     proc-decl =      "procedure" ident param-decl-list          block-decl ";" ;
-	 *
-	 *     func-decl =      "function"  ident param-decl-list ":" type block-decl ";" ;
-	 *
-	 *     param-decl-list= "(" [ var-decl-list ] ")" ;
-	 *
-	 *     var-decl-list =  var-decl { "," var-decl } ;
-	 *
-	 *     var-decl =       ident { "," ident } ":" type ;
-	 *
-	 *     type =           "integer" | "real" ;
-	 *
-	 *     stmt =           [ ident "=" expr                        |
-	 *                        ident "(" [ expr { "," expr } ")"     |
-	 *                        "begin" stmt {";" stmt } "end"        |
-	 *                        "if" cond "then" stmt { "else" stmt } |
-	 *                        "while" cond "do" stmt                |
-	 *                        "repeat" stmt "until" cond ] ;
-	 *
-	 *     cond =           relat { ("||" | &&") relation } ;
-	 *
+	 *  					{ stmt-lst }
+	 *  					;
+	 *     const-decl-blk = const-decl-lst { ";" const-decl-lst } ;
+	 *     const-decl-lst = const-decl { "," const-decl } ;
+	 *     const-decl =     ident "=" number | ident ;
+	 *     param-decl-lst = "(" [ var-decl-blk ] ")" ;
+	 *     var-decl-blk =	var-decl-lst { ";" var-decl-lst } ;
+	 *     var-decl-lst =	ident-list : type ;
+	 *     ident-list =		ident { "," ident }
+	 *     proc-decl =      "procedure" ident param-decl-lst block-decl ";" ;
+	 *     func-decl =      "function"  ident param-decl-lst ":" type block-decl ";" ;
+	 *     type ; type =    "integer" | "real" ;
+	 *     stmt =           [ ident "=" expr 						|
+	 *						  ident "(" [ expr { "," expr } ")"     |
+	 *  					  stmt-lst								|
+	 *  					  "if" cond "then" stmt { "else" stmt } |
+	 *                        "while" cond "do" stmt 				|
+	 *  					  "repeat" stmt "until" cond ]
+	 *                      ;
+	 *     stme-lst =		"begin" stmt {";" stmt } "end" ;
+	 *     cond =           relat { ("||" | &&") relat } ;
 	 *     relat =          expr { ("==" | "!=" | "<" | "<=" | ">" | ">=") expr } ;
-	 *
 	 *     expr =           shift-expr { ("|" | "&" | "^") shift-expr } ;
-	 *
 	 *     shift-expr =     add-expr { ("<<" | ">>") add-expr } ;
-	 *
 	 *     add-expr =       term { ("+" | "-") term } ;
-	 *
 	 *     term =           unary { ("*" | "/" | "%") unary } ;
-	 *
 	 *     unary =          [ ("+"|"-") ] fact ;
-	 *
 	 *     fact  =          ident                                   |
 	 *                      ident "(" [ ident { "," ident } ] ")"   |
 	 *                      number                                  |
@@ -103,19 +93,24 @@ namespace pl0c {
 		Token next();							///< Read and return the next token...
 
 		/// Return the current token kind..
-		Token::Kind current() 				{	return ts.current().kind;	}
+		Token::Kind current() 					{	return ts.current().kind;	}
 
-		/// Accept the next token..
+		/// Accept the next token if it's a k...
 		bool accept(Token::Kind k, bool get = true);
 
-		/// Expect the next token...
+		/// Expect the next token to be a k...
 		bool expect(Token::Kind k, bool get = true);
+
+		bool oneOf(Token::KindSet set);			///< Is the current token one of the given set?
 
 		/// Emit an instruction...
 		size_t emit(const pl0c::OpCode op, int8_t level = 0, pl0c::Datum addr = pl0c::Integer{0});
 
 		/// Create a listing...
 		void listing(const std::string& name, std::istream& source, std::ostream& out);
+
+		/// Purge symtbl of entries from a given block level
+		void purge(int level);
 
 		/// Emit a variable reference, e.g., an absolute address
 		void varRef(int level, const SymValue& val);
@@ -141,17 +136,29 @@ namespace pl0c {
 		void repeatStmt(int level);				///< repeat-statement production...
 		void ifStmt(int level);					///< if-statement production...
 		void statement(int level);				///< statement production...
+		void statementListTail(int level);	///< partial statement-list-production...
 
-		const std::string nameDecl(int level);		///< name (identifier) check...
+		const std::string nameDecl(int level);	///< name (identifier) check...
+		pl0c::Type typeDecl();					///< type decal production...
 
+		void constDeclBlock(int level);			///< const-declaration-block production...
+		void constDeclList(int level);			///< const-declaration-list production...
 		void constDecl(int level);				///< constant-declaration production...
-		int  varDecl(int offset, int level);	///< variable-declaration production...
 
-		///< Subroutine-declaration production...
-		SymValue& subroutineDecl(int level, SymValue::Kind kind);
+		int varDeclBlock(int level);			///< variable-declaration-block production...
+		
+		/// variable-declaration-list production...
+		int varDeclList(int offset, int level, bool);
+
+		/// variable-declaraction productions...
+		int varDecl(int offset, int level, bool params);
+
+		/// Subroutine-declaration production...
+		SymValue& subPrefixDecl(int level, SymValue::Kind kind);
 
 		void procDecl(int level);				///< procedure-declaration production...
 		void funcDecl(int level);				///< function-declaration production...
+		void subrountineDecls(int level);		///< function/procedue declaraction productions...
 
 		/// block-declaration production...
 		Unsigned blockDecl(SymValue& val, int level);

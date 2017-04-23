@@ -185,12 +185,13 @@ namespace pl0c {
 		case Kind::BadComment:	return "bad comment";	break;
 
 		case Kind::Identifier:	return "identifier";	break;
-		case Kind::IntegerNum:		return "Number";		break;
+		case Kind::IntegerNum:	return "IntegerNum";	break;
+		case Kind::RealNum:		return "RealNum";		break;
 
-		case Kind::Constant:	return "const";			break;
-		case Kind::Variable:	return "var";			break;
-		case Kind::Procedure:	return "procedure";		break;
-		case Kind::Function:	return "function";		break;
+		case Kind::ConsDecl:	return "const";			break;
+		case Kind::VarDecl:		return "var";			break;
+		case Kind::ProcDecl:	return "procedure";		break;
+		case Kind::FuncDecl:	return "function";		break;
 		case Kind::Begin:		return "begin";			break;
 		case Kind::End:			return "end";			break;
 		case Kind::If:			return "if";			break;
@@ -274,10 +275,10 @@ namespace pl0c {
 	// privite static
 
 	TokenStream::KeywordTable	TokenStream::keywords = {
-		{   "const",		Token::Constant	},
-		{	"var",			Token::Variable		},
-		{	"procedure",	Token::Procedure		},
-		{	"function",		Token::Function		},
+		{   "const",		Token::ConsDecl	},
+		{	"var",			Token::VarDecl		},
+		{	"procedure",	Token::ProcDecl		},
+		{	"function",		Token::FuncDecl		},
 		{	"begin",		Token::Begin		},
 		{	"end",			Token::End			},
 		{	"if",			Token::If			},

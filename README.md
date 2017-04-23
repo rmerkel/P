@@ -33,7 +33,7 @@ Release
  * git add .
  * git commit -m "vMajor.Minor; description..."
  * git tag -a vMajor.Minor -m "vMajor.Minor; summary"
- * git push --tags
+ * git push --tags origin <branch>
 
 Bugs:
  * No arrays or strings, just signed integers
@@ -57,9 +57,14 @@ Version
         * Added xpl0c.sh to run regression tests
         * Added Datum, the stack data type, as a step towards adding types to
           pl0c and for unsigned bit operations.
-	1.3d - internal release; adding types "integer" and "real", arrays.
-		* Function decl return types
- 		* No longer emits calls to every function decl, just to "main".
+    1.3i - internal release; adding types "integer" and "real", arrays.
+        * Function decl return types
+        * No longer emits calls to every function decl, just to "main".
+        * Now sets type for const, var and funciton.
+        * block-decl "begin" statement-list "end".
+		* Pascal like constant and varialble lists
+		* Subrountine formal now have the same format as variables
+		* Added support for stop token sets, fahr.p is temporally integer only
 
 Author
     Randy Merkel, Slowly but Surly Software.

@@ -1,5 +1,5 @@
 ./pl0c: Unknown token: '#', (0x23) near line 3
-./pl0c: expected '(' got 'Number' near line 3
+./pl0c: expected '(' got 'IntegerNum' near line 3
 ./pl0c: expected ')' got ';' near line 3
 ./pl0c: passing 1 parameters where 0 where expected near line 3
 ./pl0c: Identifier is not a function or procedure 'x' near line 3

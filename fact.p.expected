@@ -13,19 +13,18 @@
     0: call 0, 25
     1: halt
 # fact.p, 14: var p : integer;
-# fact.p, 15: procedure factorial(n)
-# fact.p, 16:     begin
-# fact.p, 17:         p = 1;
+# fact.p, 15: procedure factorial(n : integer) begin
+# fact.p, 16:         p = 1;
     2: pushConst 1
     3: pushVar 1, 4
     4: assign
-# fact.p, 18:         while n > 0 do begin
+# fact.p, 17:         while n > 0 do begin
     5: pushVar 0, -1
     6: eval
     7: pushConst 0
     8: gt
     9: jneq 24
-# fact.p, 19:             p = p * n;
+# fact.p, 18:             p = p * n;
    10: pushVar 1, 4
    11: eval
    12: pushVar 0, -1
@@ -33,23 +32,23 @@
    14: muli
    15: pushVar 1, 4
    16: assign
-# fact.p, 20:             n = n - 1
+# fact.p, 19:             n = n - 1
    17: pushVar 0, -1
    18: eval
    19: pushConst 1
-# fact.p, 21:         end
+# fact.p, 20:         end
    20: subi
    21: pushVar 0, -1
    22: assign
-# fact.p, 22:     end;
+# fact.p, 21:     end;
    23: jump 5
    24: ret
-# fact.p, 23: 
-# fact.p, 24: begin
+# fact.p, 22: 
+# fact.p, 23: begin
    25: enter 1
-# fact.p, 25:     factorial(nFacts)
+# fact.p, 24:     factorial(nFacts)
    26: pushConst 10
-# fact.p, 26: end.
+# fact.p, 25: end.
    27: call 0, 2
    28: ret
 

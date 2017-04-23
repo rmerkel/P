@@ -13,7 +13,7 @@
     0: call 0, 30
     1: halt
 # fact2.p, 14: var result : integer;
-# fact2.p, 15: function factorial(n) : integer
+# fact2.p, 15: function factorial(n : integer) : integer
 # fact2.p, 16: 	var p : integer;
 # fact2.p, 17: 
 # fact2.p, 18: 	begin

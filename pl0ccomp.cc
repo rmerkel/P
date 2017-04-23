@@ -92,13 +92,24 @@ namespace pl0c {
 	}
 
 	/**
-	 *	Appends (op, level, addr) on code, returning the new OpCodescode[] index (address)
+	 * @param set	Token kind set to test 
+	 * @return true if current() is a member of set. 
+	 */
+	bool Comp::oneOf(Token::KindSet set) {
+		return set.end() != set.find(current());
+	}
+
+	/**
+	 * Assembles op, level, addr into a new instruction, and then appends the instruciton on
+	 * the end of code[], returning it's address/index in code[].
 	 *
-	 *	@param	op		The pl0 instruction operation code
-	 *	@param	level	The pl0 instruction block level value. Defaults to zero.
-	 *	@param	addr	The pl0 instructions address/value. Defaults to zero.
+	 * Side effect; updates the cross index for the listing.
 	 *
-	 *	@return The address (code[] index) of the new instruction.
+	 * @param	op		The pl0 instruction operation code
+	 * @param	level	The pl0 instruction block level value. Defaults to zero.
+	 * @param	addr	The pl0 instructions address/value. Defaults to zero.
+	 *
+	 * @return The address (code[] index) of the new instruction.
 	 */
 	size_t Comp::emit(const OpCode op, int8_t level, Datum addr) {
 		const int lvl = static_cast<int>(level);
@@ -114,7 +125,7 @@ namespace pl0c {
 	}
 
 	/**
-	 * Writes a listing on the output stream
+	 * Uses the cross index to write a listing on the output stream
 	 *
 	 * @param name		Name of the source file
 	 * @param source 	The source file stream
@@ -136,16 +147,36 @@ namespace pl0c {
 				disasm(out, addr, (*code)[addr]);
 		}
 
-		while (getline(source, line))			// Any lines following '.'...
+		while (getline(source, line))			// Any lines following '.' ...
 			cout << "#" << name << ", " << linenum++ << ": " << line << "\n" << internal;
 
 		out << endl;
 	}
 
+	/**
+	 * @param level  The block level
+	 */
+	void Comp::purge(int level) {
+		for (auto i = symtbl.begin(); i != symtbl.end(); ) {
+			if (i->second.level() == level) {
+				if (verbose)
+					cout << progName << ": purging "
+						 << i->first << ": "
+						 << SymValue::toString(i->second.kind()) << ", "
+						 << static_cast<int>(i->second.level()) << ", " 
+						 << i->second.value().i
+						 << " from the symbol table\n";
+				i = symtbl.erase(i);
+
+			} else
+				++i;
+		}
+	}
+
 	 /**
-	  *  Local variables have an offset from the *end* of the current stack frame (bp), while parameters
-	  *  have a negative offset from the start of the frame. Offset locals by the size of the activation
-	  *  frame.
+	  * Local variables have an offset from the *end* of the current stack frame (bp), while parameters
+	  * have a negative offset from the *start* of the frame -- offset locals by the size of the
+	  * activation frame.
 	  *
 	  *  @param	level	The current block level
 	  *  @param	val		The variable symbol table entry
@@ -219,11 +250,11 @@ namespace pl0c {
 	 * @param	level	The current block level
 	 */
 	void Comp::unary(int level) {
-		     if (accept(Token::Add))		{	factor(level);	/* ignore + */		}
-		else if (accept(Token::Subtract))	{	factor(level);	emit(OpCode::negi);	}
-		else if (accept(Token::Not))		{	factor(level);	emit(OpCode::noti);	}
-		else if (accept(Token::Complament))	{	factor(level);	emit(OpCode::comp);	}
-		else								factor(level);
+		     if (accept(Token::Add))			{	factor(level);	/* ignore + */		}
+		else if (accept(Token::Subtract))		{	factor(level);	emit(OpCode::negi);	}
+		else if (accept(Token::Not))			{	factor(level);	emit(OpCode::noti);	}
+		else if (accept(Token::Complament))		{	factor(level);	emit(OpCode::comp);	}
+		else									factor(level);
 	}
 
 	/**
@@ -238,7 +269,7 @@ namespace pl0c {
 				 if (accept(Token::Multiply))	{	unary(level);	emit(OpCode::muli);	}
 			else if (accept(Token::Divide))		{	unary(level);	emit(OpCode::divi);	}
 			else if (accept(Token::Mod))		{	unary(level);	emit(OpCode::remi);	}
-			else break;
+			else 								break;
 		}
 	}
 
@@ -250,9 +281,9 @@ namespace pl0c {
 		term(level);
 
 		for (;;) {
-				 if	(accept(Token::Add)) 	{   term(level);	emit(OpCode::addi);  }
+				 if	(accept(Token::Add)) 		{   term(level);	emit(OpCode::addi);  }
 			else if (accept(Token::Subtract)) 	{   term(level);	emit(OpCode::subi);  }
-			else break;
+			else 								break;
 		}
 	}
 
@@ -263,9 +294,9 @@ namespace pl0c {
 	void Comp::shiftExpr(int level) {
 		addExpr(level);
 		for (;;) {
-				 if (accept(Token::ShiftL))	{	addExpr(level);	emit(OpCode::lshift);	}
-			else if (accept(Token::ShiftR))	{	addExpr(level);	emit(OpCode::rshift);	}
-			else break;
+				 if (accept(Token::ShiftL))		{	addExpr(level);	emit(OpCode::lshift);	}
+			else if (accept(Token::ShiftR))		{	addExpr(level);	emit(OpCode::rshift);	}
+			else 								break;
 		}
 	}
 
@@ -278,10 +309,10 @@ namespace pl0c {
 		shiftExpr(level);
 
 		for (;;) {
-				 if (accept(Token::BitOR))	{	shiftExpr(level); emit(OpCode::bor);  }
-			else if (accept(Token::BitAND))	{	shiftExpr(level); emit(OpCode::band); }
-			else if (accept(Token::BitXOR))	{	shiftExpr(level); emit(OpCode::bxor); }
-			else break;
+				 if (accept(Token::BitOR))		{	shiftExpr(level); emit(OpCode::bor);  }
+			else if (accept(Token::BitAND))		{	shiftExpr(level); emit(OpCode::band); }
+			else if (accept(Token::BitXOR))		{	shiftExpr(level); emit(OpCode::bxor); }
+			else 								break;
 		}
 	}
 
@@ -295,11 +326,11 @@ namespace pl0c {
 		for (;;) {
 				 if (accept(Token::LTE)) 		{   expression(level);  emit(OpCode::lte);  }
 			else if (accept(Token::LessThan)) 	{   expression(level);	emit(OpCode::lt);   }
-			else if (accept(Token::GreaterThan))	{	expression(level);	emit(OpCode::gt);   }
+			else if (accept(Token::GreaterThan)) {	expression(level);	emit(OpCode::gt);   }
 			else if (accept(Token::GTE)) 		{	expression(level);	emit(OpCode::gte);  }
 			else if (accept(Token::EQU)) 		{   expression(level);	emit(OpCode::equ);  }
 			else if (accept(Token::NEQU)) 		{	expression(level);	emit(OpCode::neq);  }
-			else break;
+			else 								break;
 		}
 	}
 
@@ -312,9 +343,9 @@ namespace pl0c {
 		relational(level);
 
 		for (;;) {
-				 if (accept(Token::OR)) 	{	relational(level);	emit(OpCode::lor);  }
-			else if (accept(Token::AND)) 	{	relational(level);	emit(OpCode::land);	}
-			else break;
+				 if (accept(Token::OR)) 		{	relational(level);	emit(OpCode::lor);  }
+			else if (accept(Token::AND)) 		{	relational(level);	emit(OpCode::land);	}
+			else 								break;
 		}
 	}
 
@@ -353,7 +384,9 @@ namespace pl0c {
 	}
 
 	/**
-	 *  "call" ident "(" [ expr  { "," expr }] ")"...
+	 * Call a function or procedure...
+	 *
+	 *      ident "(" [ expr  { "," expr }] ")"...
 	 *
 	 * @param	name	The identifier value
 	 * @param	val		The identifiers symbol table entry value
@@ -371,7 +404,7 @@ namespace pl0c {
 
 		expect(Token::CloseParen);
 
-		if (nParams != val.nArgs()) {					// Is the caller passing right # of params?
+		if (nParams != val.nArgs()) {				// Is the caller passing right # of params?
 			ostringstream oss;
 			oss << "passing " << nParams << " parameters where " << val.nArgs() << " where expected";
 			error(oss.str());
@@ -384,7 +417,7 @@ namespace pl0c {
 	}
 
 	/**
-	 * ident "=" expr | ident "(" [ ident { "," ident } ] ")"
+	 *     ident "=" expr | ident "(" [ ident { "," ident } ] ")"
 	 *
 	 * @param	level	The current block level
 	 */
@@ -452,19 +485,19 @@ namespace pl0c {
 
 		if (verbose)
 			cout << progName << ": patching address at " << jmp_pc << " to " << code->size() << "\n";
-		(*code)[jmp_pc].addr = code->size();				// Patch jump on condition false instruction
+		(*code)[jmp_pc].addr = code->size();			// Patch jump on condition false instruction
 
 		if (Else) {
 			statement(level);
 
 			if (verbose)
 				cout << progName << ": patching address at " << else_pc << " to " << code->size() << "\n";
-			(*code)[else_pc].addr = code->size();				// Patch jump on condition false instruction
+			(*code)[else_pc].addr = code->size();		// Patch jump on condition false instruction
 		}
 	 }
 
 	 /**
-	  * [ "repeat" stmt "until" cond ]
+	  * "repeat" statement "until" condition
 	  *
 	  * @param	level 	The current block level
 	  */
@@ -475,6 +508,17 @@ namespace pl0c {
 		 condition(level);
 		 emit(OpCode::jneq, 0, loop_pc);
 	 }
+
+	/** 
+	 * <"begin"> stmt { "," stmt } "end" ; 
+	 *  @param	level		The current block level. 
+	 */
+	void Comp::statementListTail(int level) {
+		do {
+			statement(level);
+		} while (accept(Token::SemiColon));
+		expect(Token::End);
+	}
 
 	/**
 	 * stmt =	[ ident ":=" expr
@@ -492,10 +536,7 @@ namespace pl0c {
 			identStmt(level);
 
 		else if (accept(Token::Begin)) {				// begin ... end
-			do {
-				statement(level);
-			} while (accept(Token::SemiColon));
-			expect(Token::End);
+			statementListTail(level);
 
 		} else if (accept(Token::If)) 					// if condition...
 			ifStmt(level);
@@ -534,16 +575,70 @@ namespace pl0c {
 		return "unknown";
 	}
 
+	/** 
+	 * ":"  "integer" | "real" 
+	 * @return the datum type 
+	 */ 
+	pl0c::Type Comp::typeDecl() {
+		expect(Token::Colon);
+
+		Type type;
+			 if (accept(Token::Integer))	type = Type::Integer; 
+		else if (accept(Token::Real))		type = Type::Real;
+		else {
+			type = Type::Integer;
+			error("expected 'integer' or 'real', got neither");
+		}
+
+		return type;
+	}
+
 	/**
-	 * [ const name = number {, name = number} ; ]
-	 *   name = 		ident ":" "integer" | "real" ;
+	 * block-decl = [ "const" const-decl-blk ";" ]
+	 * const-decl-blk = const-decl-lst { ";" const-decl-lst ;
 	 *
-	 * @note Doesn't emit any code; just stores the named value in the symbol table.
+	 * @note	Doesn't emit any code; just stores the named value in the symbol table.
+	 * @param	level	The current block level. 
+	 */
+	void Comp::constDeclBlock(int level) {
+		// Stops if the ';' if followd by any of hte following tokens
+		static const Token::KindSet stops {
+			Token::VarDecl,
+			Token::ProcDecl, 
+			Token::FuncDecl,
+			Token::Begin
+		};
+
+		if (accept(Token::ConsDecl)) {
+			do {
+				if (oneOf(stops))
+					break;							// No more constants...
+
+				constDeclList(level);
+
+			} while (accept(Token::SemiColon));
+		}
+	}
+
+	/**
+	 * const-decl-lst = const-decl { "," const-decl } ;
+	 * const-decl =  ident "=" number | ident ;
+	 * @param	level	The current block level. 
+	 */
+	void Comp::constDeclList(int level) {
+		do {
+			constDecl(level);
+		} while (accept(Token::Comma));
+	}
+
+	/**
+	 * const-decl-lst = const-decl { "," const-decl } ;
+	 * const-decl =     ident "=" number | ident ;
 	 *
 	 * @param	level	The current block level.
 	 */
 	void Comp::constDecl(int level) {
-		const auto ident = nameDecl(level);
+		const auto ident = nameDecl(level);				// Copy the identifier
 
 		expect(Token::Assign);							// Consume the "="
 		if (accept(Token::IntegerNum, false)) {
@@ -551,7 +646,7 @@ namespace pl0c {
 			next();										// Consume the number
 
 			// Insert ident into the symbol table
-			symtbl.insert({ ident, { SymValue::ConstInt, level, number	} });
+			symtbl.insert({ ident, { SymValue::ConstInt, level, number, Type::Integer	}});
 			if (verbose)
 				cout << progName << ": constDecl " << ident << ": " << level << ", " << number << "\n";
 
@@ -560,7 +655,7 @@ namespace pl0c {
 			next();										// Consume the number
 
 			/// Insert ident into the symbol table
-			symtbl.insert({	ident, { SymValue::ConstReal, level, number	}	});
+			symtbl.insert({	ident, { SymValue::ConstReal, level, number, Type::Real	}});
 			if (verbose)
 				cout << progName << ": constDecl " << ident << ": " << level << ", " << number << "\n";
 
@@ -570,39 +665,102 @@ namespace pl0c {
 		}
 	}
 
-	/**
-	 * Allocate space on the stack for the variable and install it's offset from the block in the symbol
-	 * table.
+	/** 
+	 * A varaiable declaration block; 
 	 *
-	 * var ident { "," ident} ":" type ";"
-	 *
-	 * @param	offset	Stack offset for the next varaible
+	 *     var-decl-blk = "const" var-decl-lst
+	 *     var-decl-lst = var-decl { ";" var-decl }
+	 *     var-decl =	  ident-list : type ;
+	 *     ident-list =   ident { "," ident } ;
+	 *     type =         "integer" | "real" ;
+	 *  
 	 * @param	level	The current block level.
+	 * 
+	 * @return  Number of variables allocated after the activation frame.
+	 */
+	int Comp::varDeclBlock(int level) {
+		int	dx = 0;								// Offsets from the end of activation frame
+		if (accept(Token::VarDecl)) 
+			dx = varDeclList(dx, level, false);
+
+		return dx;
+	}
+
+	/** 
+	 * A semicolon seperated list of variable declarations.
+	 *  
+	 *     var-decl-list = var-decl { ";" var-decl }
+	 *     var-decl =	    ident-list : type ;
+	 *     ident-list =     ident { "," ident } ;
+	 *     type =           "integer" | "real" ;
+	 *  
+	 * Allocate space on the stack for each variable, as a postivie offset from the end of current
+	 * activaction frame. Create a new entry in the symbol table, that notes the offset and data 
+	 * type.
+	 * 
+	 * @param	offset	Starting offset from the end of the activation frame 
+	 * @param	level	The current block level. 
+	 * @param	params	True if processing formal parameters, false if variable declaractions.
+	 *
+	 * @return  Offset of the next variable/parmeter from the current activicaqtion frame. 
+	 */
+	int Comp::varDeclList(int offset, int level, bool params) {
+		// Stops if the ';' if followd by any of hte following tokens
+		static const Token::KindSet stops {
+			Token::ProcDecl, 
+			Token::FuncDecl,
+			Token::Begin, 
+			Token::OpenParen
+		};
+
+		do {
+			if (oneOf(stops))
+				break;								// No more variables...
+
+			offset = varDecl(offset, level, params);
+
+		} while (accept(Token::SemiColon));
+
+		return offset;
+	}
+
+	/** 
+	 * A semicolon list of variable, or formal parameter declractions. Each declaraction starts
+	 * with a comma separated list of identifiers, followed by a colon followed by a type 
+	 * specifier:
+	 *
+	 *     var-decl =	    ident-list : type ;
+	 *     ident-list =     ident { "," ident } ;
+	 *     type =           "integer" | "real" ;
+	 *      
+	 * Allocate space on the stack for each variable, as a positive offset from the *end* of 
+	 * current activaction frame; 0, 1, ..., n-1. Parameters, pushed by the caller, are identified 
+	 * by negative indexes from *before the start* of the frame; -1, -2, ..., -n. Create a new 
+	 * entry in the symbol table for either.
+	 * 
+	 * @param	noffset	Stack offset for the next varaible
+	 * @param	level	The current block level.
+	 * @param	params	True if processing formal parameters, false if variable declaractions.
 	 *
 	 * @return	Stack offset for the next varaible.
 	 */
-	int Comp::varDecl(int offset, int level) {
-		vector<string>	identifiers;					// List of variable identifiers
-		do {
-			identifiers.push_back(nameDecl(level));			// add it to the list...
+	int Comp::varDecl(int noffset, int level, bool params) {
+		vector<string>	identifiers;
+		do {	// Find and append comma separated identifiers to the list...
+			identifiers.push_back(nameDecl(level));
 		} while (accept(Token::Comma));
 
-		expect(Token::Colon);
-		if (!accept(Token::Integer) && !accept(Token::Real))
-			error("excped 'integer' or 'real', got neither");
+		// set the next offset; params have negative offsets in reverse
+		int dx = params ? noffset - identifiers.size() : 0;
 
-		// TBD: record the type to insert into the symbol table below
-
-		expect(Token::SemiColon);
-
+		const Type type = typeDecl();
 		for (const auto& id : identifiers) {
-			symtbl.insert( { id, { SymValue::Variable, level, offset }} );
 			if (verbose)
-				cout << progName << ": varDecl " << id << ": " << level << ", " << offset << "\n";
-			++offset;									// Allocate another local @ level
+				cout << progName << ": var/param " << id << ": " << level << ", " << dx << "\n";
+			symtbl.insert( { id, { SymValue::Variable, level, dx++, type	}	} );
 		}
 
-		return offset;
+		return params ? noffset - identifiers.size() : noffset + identifiers.size();
 	}
 
 	/**
@@ -614,39 +772,23 @@ namespace pl0c {
 	 * @param 	kind	The type of subroutine, e.g., procedure or fuction
 	 * @return	subrountine's symbol table entry
 	 */
-	SymValue& Comp::subroutineDecl(int level, SymValue::Kind kind) {
+	SymValue& Comp::subPrefixDecl(int level, SymValue::Kind kind) {
 		vector<string> 			args;			// formal arguments, if any
 		SymbolTable::iterator	it;				// Will point to the new symbol table entry...
 
-		const auto& ident = nameDecl(level);		// insert the name into the symbol table
+		const auto& ident = nameDecl(level);	// insert the name into the symbol table
 		it = symtbl.insert( { ident, { kind, level, 0 }} );
 		if (verbose)
 			cout << progName << ": subrountine-decl " << ident << ": " << level << ", 0\n";
 
 		// Process the formal auguments, if any...
 		expect(Token::OpenParen);
-		if (accept(Token::Identifier, false)) {
-			int offset = 0;					// Record the arguments...
-			do {
-				args.push_back(ts.current().string_value);
-				--offset;					// -1, -2, ..., -n
-				accept(Token::Identifier);	// Consume the identifier
 
-			} while (accept(Token::Comma));
-
-			/**
-			 * Add the arguments to the symbol table, but with negative offsets from the block/frame, so that
-			 * they have offsets of -n, ..., -2, -1. Note that their activation frame levels must be the same
-			 * as the *following* block!
-			 */
-			for (auto& x : args) {
-				const string& ident = x;
-				symtbl.insert( { ident, { SymValue::Variable, level+1, offset++	}});
-			}
-		}
+		// Note that the activation fram elevel is that of the *following* block!
+		auto nArgs = -varDeclList(0, level+1, true);
 		expect(Token::CloseParen);
 
-		it->second.nArgs(args.size());		// Update subroutine entry with # of arguments
+		it->second.nArgs(nArgs);			// Update subroutine entry with # of arguments
 		return it->second;
 	}
 
@@ -655,26 +797,43 @@ namespace pl0c {
 	 * @param	level	The current block level.
 	 */
 	void Comp::procDecl(int level) {
-		auto& val = subroutineDecl(level, SymValue::Procedure);
+		auto& val = subPrefixDecl(level, SymValue::Procedure);
 		blockDecl(val, level + 1);
 		expect(Token::SemiColon);	// procedure declarations end with a ';'!
 	}
 
 	/**
-	 * "function"  ident "(" [ident {, "ident" }] ")" block ";"
+	 * "function"  ident "(" [ident {, "ident" }] ")"  ":" type  block ";"
 	 * @param	level	The current block level.
 	 */
 	void Comp::funcDecl(int level) {
-		auto& val = subroutineDecl(level, SymValue::Function);
-
-		expect(Token::Colon);
-			 if (accept(Token::Integer))	val.type(Type::Integer);
-		else if (accept(Token::Real))   	val.type(Type::Real);
-		else	 
-			error("expected 'integer' or 'real'");
-
+		auto& val = subPrefixDecl(level, SymValue::Function);
+		val.type(typeDecl());
 		blockDecl(val, level + 1);
-		expect(Token::SemiColon);	// procedure declarations end with a ';'!
+		expect(Token::SemiColon);	// function declarations end with a ';'!
+	}
+
+	/** 
+	 * Zero or more function and/or procedure delclaractions: 
+	 *  
+	 *     { proc-decl | funct-decl } 
+	 *     proc-decl =      "procedure" ident param-decl-lst block-decl ";" ;
+	 *     func-decl =      "function"  ident param-decl-lst ":" type block-decl ";" ;
+	 *     type ; type =    "integer" | "real" ;
+	 *  
+	 * @param level The current block level.
+	 */
+	void Comp::subrountineDecls(int level) {
+		for (;;) {
+			if (accept(Token::ProcDecl))
+				procDecl(level);
+
+			else if (accept(Token::FuncDecl))
+				funcDecl(level);
+
+			else
+				break;
+		}
 	}
 
 	/**
@@ -689,28 +848,14 @@ namespace pl0c {
 	 * @return 	Entry point address 
 	 */
 	Unsigned Comp::blockDecl(SymValue& val, int level) {
-		if (accept(Token::Constant)) {				// [ "const" const-decl-list { ";" const-decl-list } ";" ]
-			do {
-				constDecl(level);
-			} while (accept(Token::Comma));
-			expect(Token::SemiColon);
-		}
+		/* 
+		 * Delcaractions...
+		 */
+	 	constDeclBlock(level);
+		auto dx = varDeclBlock(level);
+		subrountineDecls(level);
 
-		int	dx = 0;									// Variable offset from end of activation frame
-		if (accept(Token::Variable))				// var ident, ... : type ;
-			dx = varDecl(dx, level);
-
-		for (;;) {									// "function..." or "procedure..."?
-			if (accept(Token::Procedure))
-				procDecl(level);
-			else if (accept(Token::Function))
-				funcDecl(level);
-			else
-				break;
-		}
-
-		/*
-		 * Block body
+		/* Block body
 		 *
 		 * Emit the block's prefix, saving and return its address, followed by the postfix. Omit the prefix
 		 * if dx == 0 (the subroutine has zero locals.
@@ -719,30 +864,18 @@ namespace pl0c {
 		const auto addr = dx > 0 ? emit(OpCode::enter, 0, dx) : code->size();
 		val.value(addr);
 
-		statement(level);							// block body proper..
+		if (expect(Token::Begin))					// "begin" statements... "end"
+			statementListTail(level);
 
-		// block post fix...
+		// block postfix... TBD; emit reti or retr for functions!
 
 		assert(val.nArgs() < numeric_limits<int>::max());
 		if (SymValue::Function == val.kind())
-			emit(OpCode::reti, 0, val.nArgs());		//	function...
+			emit(OpCode::reti, 0, val.nArgs());		// function...
 		else
-			emit(OpCode::ret, 0, val.nArgs());     	//	procedure...
+			emit(OpCode::ret, 0, val.nArgs());     	// procedure...
 
-		// Finally, remove symbols only visible in this level
-
-		for (auto i = symtbl.begin(); i != symtbl.end(); ) {
-			if (i->second.level() == level) {
-				if (verbose)
-					cout << progName << ": purging "
-					<< i->first << ": "
-					<< SymValue::toString(i->second.kind()) << ", " << static_cast<int>(i->second.level()) << ", " << i->second.value().i
-					<< " from the symbol table\n";
-				i = symtbl.erase(i);
-
-			} else
-				++i;
-		}
+		purge(level);								// Remove symbols only visible at this level
 
 		return addr;
 	}

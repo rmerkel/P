@@ -11,7 +11,7 @@
 
 const nFacts = 10;
 var result : integer;
-function factorial(n) : integer
+function factorial(n : integer) : integer
 	var p : integer;
 
 	begin
