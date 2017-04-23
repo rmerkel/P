@@ -92,8 +92,8 @@ namespace pl0c {
 	}
 
 	/**
-	 * @param set	Token kind set to test 
-	 * @return true if current() is a member of set. 
+	 * @param set	Token kind set to test
+	 * @return true if current() is a member of set.
 	 */
 	bool Comp::oneOf(Token::KindSet set) {
 		return set.end() != set.find(current());
@@ -163,7 +163,7 @@ namespace pl0c {
 					cout << progName << ": purging "
 						 << i->first << ": "
 						 << SymValue::toString(i->second.kind()) << ", "
-						 << static_cast<int>(i->second.level()) << ", " 
+						 << static_cast<int>(i->second.level()) << ", "
 						 << i->second.value().i
 						 << " from the symbol table\n";
 				i = symtbl.erase(i);
@@ -509,9 +509,9 @@ namespace pl0c {
 		 emit(OpCode::jneq, 0, loop_pc);
 	 }
 
-	/** 
-	 * <"begin"> stmt { "," stmt } "end" ; 
-	 *  @param	level		The current block level. 
+	/**
+	 * <"begin"> stmt { "," stmt } "end" ;
+	 *  @param	level		The current block level.
 	 */
 	void Comp::statementListTail(int level) {
 		do {
@@ -575,15 +575,15 @@ namespace pl0c {
 		return "unknown";
 	}
 
-	/** 
-	 * ":"  "integer" | "real" 
-	 * @return the datum type 
-	 */ 
+	/**
+	 * ":"  "integer" | "real"
+	 * @return the datum type
+	 */
 	pl0c::Type Comp::typeDecl() {
 		expect(Token::Colon);
 
 		Type type;
-			 if (accept(Token::Integer))	type = Type::Integer; 
+			 if (accept(Token::Integer))	type = Type::Integer;
 		else if (accept(Token::Real))		type = Type::Real;
 		else {
 			type = Type::Integer;
@@ -598,13 +598,13 @@ namespace pl0c {
 	 * const-decl-blk = const-decl-lst { ";" const-decl-lst ;
 	 *
 	 * @note	Doesn't emit any code; just stores the named value in the symbol table.
-	 * @param	level	The current block level. 
+	 * @param	level	The current block level.
 	 */
 	void Comp::constDeclBlock(int level) {
 		// Stops if the ';' if followd by any of hte following tokens
 		static const Token::KindSet stops {
 			Token::VarDecl,
-			Token::ProcDecl, 
+			Token::ProcDecl,
 			Token::FuncDecl,
 			Token::Begin
 		};
@@ -623,7 +623,7 @@ namespace pl0c {
 	/**
 	 * const-decl-lst = const-decl { "," const-decl } ;
 	 * const-decl =  ident "=" number | ident ;
-	 * @param	level	The current block level. 
+	 * @param	level	The current block level.
 	 */
 	void Comp::constDeclList(int level) {
 		do {
@@ -665,51 +665,51 @@ namespace pl0c {
 		}
 	}
 
-	/** 
-	 * A varaiable declaration block; 
+	/**
+	 * A varaiable declaration block;
 	 *
 	 *     var-decl-blk = "const" var-decl-lst
 	 *     var-decl-lst = var-decl { ";" var-decl }
 	 *     var-decl =	  ident-list : type ;
 	 *     ident-list =   ident { "," ident } ;
 	 *     type =         "integer" | "real" ;
-	 *  
+	 *
 	 * @param	level	The current block level.
-	 * 
+	 *
 	 * @return  Number of variables allocated after the activation frame.
 	 */
 	int Comp::varDeclBlock(int level) {
 		int	dx = 0;								// Offsets from the end of activation frame
-		if (accept(Token::VarDecl)) 
+		if (accept(Token::VarDecl))
 			dx = varDeclList(dx, level, false);
 
 		return dx;
 	}
 
-	/** 
+	/**
 	 * A semicolon seperated list of variable declarations.
-	 *  
+	 *
 	 *     var-decl-list = var-decl { ";" var-decl }
 	 *     var-decl =	    ident-list : type ;
 	 *     ident-list =     ident { "," ident } ;
 	 *     type =           "integer" | "real" ;
-	 *  
+	 *
 	 * Allocate space on the stack for each variable, as a postivie offset from the end of current
-	 * activaction frame. Create a new entry in the symbol table, that notes the offset and data 
+	 * activaction frame. Create a new entry in the symbol table, that notes the offset and data
 	 * type.
-	 * 
-	 * @param	offset	Starting offset from the end of the activation frame 
-	 * @param	level	The current block level. 
+	 *
+	 * @param	offset	Starting offset from the end of the activation frame
+	 * @param	level	The current block level.
 	 * @param	params	True if processing formal parameters, false if variable declaractions.
 	 *
-	 * @return  Offset of the next variable/parmeter from the current activicaqtion frame. 
+	 * @return  Offset of the next variable/parmeter from the current activicaqtion frame.
 	 */
 	int Comp::varDeclList(int offset, int level, bool params) {
 		// Stops if the ';' if followd by any of hte following tokens
 		static const Token::KindSet stops {
-			Token::ProcDecl, 
+			Token::ProcDecl,
 			Token::FuncDecl,
-			Token::Begin, 
+			Token::Begin,
 			Token::OpenParen
 		};
 
@@ -724,20 +724,20 @@ namespace pl0c {
 		return offset;
 	}
 
-	/** 
+	/**
 	 * A semicolon list of variable, or formal parameter declractions. Each declaraction starts
-	 * with a comma separated list of identifiers, followed by a colon followed by a type 
+	 * with a comma separated list of identifiers, followed by a colon followed by a type
 	 * specifier:
 	 *
 	 *     var-decl =	    ident-list : type ;
 	 *     ident-list =     ident { "," ident } ;
 	 *     type =           "integer" | "real" ;
-	 *      
-	 * Allocate space on the stack for each variable, as a positive offset from the *end* of 
-	 * current activaction frame; 0, 1, ..., n-1. Parameters, pushed by the caller, are identified 
-	 * by negative indexes from *before the start* of the frame; -1, -2, ..., -n. Create a new 
+	 *
+	 * Allocate space on the stack for each variable, as a positive offset from the *end* of
+	 * current activaction frame; 0, 1, ..., n-1. Parameters, pushed by the caller, are identified
+	 * by negative indexes from *before the start* of the frame; -1, -2, ..., -n. Create a new
 	 * entry in the symbol table for either.
-	 * 
+	 *
 	 * @param	noffset	Stack offset for the next varaible
 	 * @param	level	The current block level.
 	 * @param	params	True if processing formal parameters, false if variable declaractions.
@@ -788,7 +788,7 @@ namespace pl0c {
 		auto nArgs = -varDeclList(0, level+1, true);
 		expect(Token::CloseParen);
 
-		it->second.nArgs(nArgs);			// Update subroutine entry with # of arguments
+		it->second.nArgs(nArgs);				// Update subroutine entry with # of arguments
 		return it->second;
 	}
 
@@ -799,7 +799,7 @@ namespace pl0c {
 	void Comp::procDecl(int level) {
 		auto& val = subPrefixDecl(level, SymValue::Procedure);
 		blockDecl(val, level + 1);
-		expect(Token::SemiColon);	// procedure declarations end with a ';'!
+		expect(Token::SemiColon);				// procedure declarations end with a ';'!
 	}
 
 	/**
@@ -813,14 +813,14 @@ namespace pl0c {
 		expect(Token::SemiColon);	// function declarations end with a ';'!
 	}
 
-	/** 
-	 * Zero or more function and/or procedure delclaractions: 
-	 *  
-	 *     { proc-decl | funct-decl } 
+	/**
+	 * Zero or more function and/or procedure delclaractions:
+	 *
+	 *     { proc-decl | funct-decl }
 	 *     proc-decl =      "procedure" ident param-decl-lst block-decl ";" ;
 	 *     func-decl =      "function"  ident param-decl-lst ":" type block-decl ";" ;
 	 *     type ; type =    "integer" | "real" ;
-	 *  
+	 *
 	 * @param level The current block level.
 	 */
 	void Comp::subrountineDecls(int level) {
@@ -844,13 +844,14 @@ namespace pl0c {
 	 *          stmt ;
 	 *
 	 * @param	val		The blocks (procedures) symbol table entry value
-	 * @param	level	The current block level. 
-	 * @return 	Entry point address 
+	 * @param	level	The current block level.
+	 * @return 	Entry point address
 	 */
 	Unsigned Comp::blockDecl(SymValue& val, int level) {
-		/* 
+		/*
 		 * Delcaractions...
 		 */
+
 	 	constDeclBlock(level);
 		auto dx = varDeclBlock(level);
 		subrountineDecls(level);

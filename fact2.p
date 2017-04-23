@@ -1,4 +1,4 @@
-{ Calculate 11 (0..10) factorials
+{ Calculate 11 (0..10) factorials	}
 {	 n		    n!	}
 {  ---  ---------	}
 {	 0		    0	}
