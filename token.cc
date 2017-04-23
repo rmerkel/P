@@ -61,29 +61,29 @@ namespace pl0c {
 			return ct;
 
 		case '!':									// ! or !=?
-			if (!getch(ch))		ct.kind = Token::Not;
+			if (!getch(ch))		ct.kind = Token::NOT;
 			else if ('=' == ch) ct.kind = Token::NEQU;
-			else {	unget();	ct.kind = Token::Not;	}
+			else {	unget();	ct.kind = Token::NOT;	}
 			return ct;
 
 		case '>':									// >, >> or >=?
-			if (!getch(ch))		ct.kind = Token::GreaterThan;
+			if (!getch(ch))		ct.kind = Token::GT;
 			else if ('>' == ch)	ct.kind = Token::ShiftR;
 			else if ('=' == ch)	ct.kind = Token::GTE;
-			else {	unget();	ct.kind = Token::GreaterThan;	}
+			else {	unget();	ct.kind = Token::GT;	}
 			return ct;
 
 		case '<':									// <, << or <=?
-			if (!getch(ch))		ct.kind = Token::LessThan;
+			if (!getch(ch))		ct.kind = Token::LT;
 			else if ('<' == ch)	ct.kind = Token::ShiftL;
 			else if ('=' == ch)	ct.kind = Token::LTE;
-			else {	unget();	ct.kind = Token::LessThan;	}
+			else {	unget();	ct.kind = Token::LT;	}
 			return ct;
 
 		case '|':							// | or ||?
 			if (!getch(ch)) 	ct.kind = Token::BitOR;
 			else if ('|' == ch) ct.kind = Token::OR;
-			else {	unget();	ct.kind = Token::GreaterThan;	}
+			else {	unget();	ct.kind = Token::GT;	}
 			return ct;
 
 		case '&':							// & or &&?
@@ -214,9 +214,9 @@ namespace pl0c {
 		case Kind::AND:			return "&&";			break;
 		case Kind::NEQU:		return "!=";			break;
 
-		case Kind::Not:			return "!";				break;
-		case Kind::LessThan:	return "<";				break;
-		case Kind::GreaterThan:	return ">";				break;
+		case Kind::NOT:			return "!";				break;
+		case Kind::LT:			return "<";				break;
+		case Kind::GT:			return ">";				break;
 
 		case Kind::BitXOR:		return "^";				break;
 		case Kind::BitOR:		return "|";				break;

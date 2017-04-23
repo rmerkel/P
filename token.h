@@ -67,9 +67,9 @@ namespace pl0c {
 
 			// End of non-printing character codes for ASCII and UNICODE (ordinal value 32)
 
-			Not			= '!',				///< Logical not
-			LessThan	= '<',				///< Less than
-			GreaterThan	= '>',				///< Greater then
+			NOT			= '!',				///< Logical not
+			LT			= '<',				///< Less than
+			GT			= '>',				///< Greater then
 
 			BitXOR		= '^',				///< Bit XOR
 			BitOR		= '|',				///< Bit or

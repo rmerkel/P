@@ -32,7 +32,7 @@ single step the program.
 Release
  * git add .
  * git commit -m "vMajor.Minor; description..."
- * git tag -a vMajor.Minor -m "vMajor.Minor; summary"
+ * git tag -a vMajor.Minor -m "summary..."
  * git push --tags origin <branch>
 
 Bugs:
@@ -43,7 +43,7 @@ Bugs:
  * No interactive mode for debugging; just automatic single stepping (verbose ==
    true)
 
-Version
+Versions:
     1.0 - Initial release
     1.1
         * Added Pascal style comments

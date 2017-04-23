@@ -252,7 +252,7 @@ namespace pl0c {
 	void Comp::unary(int level) {
 		     if (accept(Token::Add))			{	factor(level);	/* ignore + */		}
 		else if (accept(Token::Subtract))		{	factor(level);	emit(OpCode::negi);	}
-		else if (accept(Token::Not))			{	factor(level);	emit(OpCode::noti);	}
+		else if (accept(Token::NOT))			{	factor(level);	emit(OpCode::noti);	}
 		else if (accept(Token::Complament))		{	factor(level);	emit(OpCode::comp);	}
 		else									factor(level);
 	}
@@ -325,8 +325,8 @@ namespace pl0c {
 
 		for (;;) {
 				 if (accept(Token::LTE)) 		{   expression(level);  emit(OpCode::lte);  }
-			else if (accept(Token::LessThan)) 	{   expression(level);	emit(OpCode::lt);   }
-			else if (accept(Token::GreaterThan)) {	expression(level);	emit(OpCode::gt);   }
+			else if (accept(Token::LT)) 	{   expression(level);	emit(OpCode::lt);   }
+			else if (accept(Token::GT)) {	expression(level);	emit(OpCode::gt);   }
 			else if (accept(Token::GTE)) 		{	expression(level);	emit(OpCode::gte);  }
 			else if (accept(Token::EQU)) 		{   expression(level);	emit(OpCode::equ);  }
 			else if (accept(Token::NEQU)) 		{	expression(level);	emit(OpCode::neq);  }
