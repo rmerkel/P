@@ -11,18 +11,16 @@
 #include <cassert>
 
 using namespace std;
-using namespace pl0c;
 
 // public static
 
 string SymValue::toString(SymValue::Kind k) {
 	switch(k) {
-	case SymValue::None:		return "None";
-	case SymValue::Variable:	return "Variable";
-	case SymValue::ConstInt:	return "ConsInt";
-	case SymValue::ConstReal:	return "ConstReal";
-	case SymValue::Procedure:	return "Procedure";
-	case SymValue::Function:	return "Function";
+	case SymValue::Kind::None:		return "None";
+	case SymValue::Kind::Variable:	return "Variable";
+	case SymValue::Kind::Constant:	return "ConsInt";
+	case SymValue::Kind::Procedure:	return "Procedure";
+	case SymValue::Kind::Function:	return "Function";
 	default:
 		assert(false);
 	}
@@ -30,21 +28,23 @@ string SymValue::toString(SymValue::Kind k) {
 
 // public
 
-SymValue::SymValue() : k {None}, l {0}, t{Type::Integer}, n{0} {}
+SymValue::SymValue() : k {Kind::None}, l {0}, t{Datum::Kind::Integer}, n{0} {}
 
 /**
  * @param kind	The token kind, e.g., identifier
  * @param level	The token base/frame level, e.g., 0 for "current frame. Default: 0.
  * @param value The token value, e.g., a procedure address. Default: 0
- * @param type  The value type. Default Type::Integer 
+ * @param fType  The value type. Default Type::Integer 
  * @param nArgs	The number of subroutine parameters. Default 0 
  */
 SymValue::SymValue(
 	Kind		kind, 
 	int 		level,
 	Datum 		value,
-	pl0c::Type	type,
-	std::size_t	nArgs) : k{kind}, l{level}, v{value}, t{type}, n{nArgs}
+	Datum::Kind	fType,
+	std::size_t	nArgs)
+
+	: k{kind}, l{level}, v{value}, t{fType}, n{nArgs}
 {
 }
 
@@ -76,8 +76,7 @@ size_t SymValue::nArgs() const						{	return n;			}
  * @param value New function return type 
  * @return My function return type
  */
-Type SymValue::type(Type value)						{	return t = value;	}
+Datum::Kind SymValue::fType(Datum::Kind value)		{	return t = value;	}
 
 /// @return My function return type
-Type SymValue::type() const							{	return t;			}
-
+Datum::Kind SymValue::fType() const					{	return t;			}

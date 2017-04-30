@@ -258,11 +258,11 @@
 			Name="Source Files"
 			Filters="*.c;*.C;*.cc;*.cpp;*.cp;*.cxx;*.c++;*.prg;*.pas;*.dpr;*.asm;*.s;*.bas;*.java;*.cs;*.sc;*.e;*.cob;*.html;*.rc;*.tcl;*.py;*.pl;*.d;*.m;*.mm;*.go;*.groovy;*.gsh"
 			GUID="{FD063192-20FE-4DBA-BB10-A1FC1215099C}">
+			<F N="comp.cc"/>
 			<F N="datum.cc"/>
 			<F N="driver.cc"/>
-			<F N="pl0c.cc"/>
-			<F N="pl0ccomp.cc"/>
-			<F N="pl0cinterp.cc"/>
+			<F N="instr.cc"/>
+			<F N="interp.cc"/>
 			<F N="symbol.cc"/>
 			<F N="token.cc"/>
 		</Folder>
@@ -270,10 +270,10 @@
 			Name="Header Files"
 			Filters="*.h;*.H;*.hh;*.hpp;*.hxx;*.h++;*.inc;*.sh;*.cpy;*.if"
 			GUID="{80E58BB3-E835-4BC1-A967-786A1DC7CEA9}">
+			<F N="comp.h"/>
 			<F N="datum.h"/>
-			<F N="pl0c.h"/>
-			<F N="pl0ccomp.h"/>
-			<F N="pl0cinterp.h"/>
+			<F N="instr.h"/>
+			<F N="interp.h"/>
 			<F N="symbol.h"/>
 			<F N="token.h"/>
 		</Folder>

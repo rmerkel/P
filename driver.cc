@@ -12,19 +12,19 @@
  * "light" syntax and program nesting. The result is a dialect that I call "PL/0C".
  *
  * Like PL/0, PL/0C is a combination compiler and interpreter; it first runs the compiler
- * (pl0c::Comp), and if no errors where encountered, it runs the results in the interpreter
- * (pl0c::Interp). A listing and machine output are written to standard output.
+ * (Comp), and if no errors where encountered, it runs the results in the interpreter
+ * (Interp). A listing and machine output are written to standard output.
  *
  * The compiler started life as a copy of the C example at
  * https://en.wikipedia.org/wiki/Recursive_descent_parser, modified to emit code per Wirth's
- * interpret procedure while using the TokenStream class (pl0c::TokenStream) from *The C++
+ * interpret procedure while using the TokenStream class (TokenStream) from *The C++
  * Programming Language*, 4th Edition, by Stroustrup. Finally modified to support the PL/0C
- * dialect. By default, pl0c::Comp writes a listing to standard output, but the verbose (-v) option
+ * dialect. By default, Comp writes a listing to standard output, but the verbose (-v) option
  * will also log tokens found and code emitted.
  *
  * The machine/interpreter stated life as a C/C++ port of Wirth's machine (procedure interpret),
  * modified to use lest "weird" instruction names, modified to use indirect addressing per HOC, as
- * described in *The UNIX Programming Environment*, by Kernighan and Pike. By default, pl0c::Interp
+ * described in *The UNIX Programming Environment*, by Kernighan and Pike. By default, Interp
  * logs "assigns" on standard output, but the verbose (-v) option will run the program in trace
  * mode; disassembling and dumping the activation frame for each instruction single step the
  * program.
@@ -50,7 +50,7 @@
  *    binary operations.
  *  - Parser now understands, but ignores type names for variables, but not functions.
  *
- * @version 1.3i - Adding types "integer" and real, arrays...
+ * @version 1.3l - Adding types "integer" and real, arrays...
  *  - Function decl return type
  *  - No longer emits calls to every function decl, just to "main".
  *  - Now sets type for const, var and funciton.
@@ -58,13 +58,16 @@
  *  - Pascal like constant and varialble lists
  *  - Subrountine formal now have the same format as variables
  *  - Added support for stop token sets, fahr.p is temporally integer only
+ *  - Cleaned up Datum::Kind and SymbolTab::Kind
+ *  - Adding real instructions... (WIP)
+ *  - Removed pl0c namespace
  *
  * @author Randy Merkel, Slowly but Surly Software.
  * @copyright  (c) 2017 Slowly but Surly Software. All rights reserved.
  */
 
-#include "pl0ccomp.h"
-#include "pl0cinterp.h"
+#include "comp.h"
+#include "interp.h"
 
 #include <iostream>
 #include <vector>
@@ -91,7 +94,7 @@ static void help() {
 
 /// Print the version number as major.minor
 static void printVersion() {
-	cout << progName << ": verson: 1.3i\n";	// makesure to update the verison in mainpage!!
+	cout << progName << ": verson: 1.3l\n";	// makesure to update the verison in mainpage!!
 }
 
 /** Parse the command line arguments...
@@ -157,10 +160,10 @@ static bool parseCommandline(const vector<string>& args) {
 int main(int argc, char* argv[]) {
 	progName = argv[0];
 
-	pl0c::Comp			comp{progName};			// The compiler...
-	pl0c::Interp 		machine;				// The machine...
-	pl0c::InstrVector	code;					// Machine instructions...
-	unsigned 			nErrors = 0;
+	Comp		comp{progName};					// The compiler...
+	Interp 		machine;						// The machine...
+	InstrVector	code;							// Machine instructions...
+	unsigned 	nErrors = 0;
 
 	vector<string> args;						// Parse the command line arguments...
 	for (int argn = 1; argn < argc; ++argn)
@@ -177,9 +180,9 @@ int main(int argc, char* argv[]) {
 				cout << progName << ": loading program '" << inputFile << "', and starting pl/0c...\n";
 		}
 
-		const pl0c::Interp::Result r = machine(code, verbose);
-		if (pl0c::Interp::Result::success != r)
-			cerr << progName << ": runtime error: " << pl0c::Interp::toString(r) << "!\n";
+		const Interp::Result r = machine(code, verbose);
+		if (Interp::Result::success != r)
+			cerr << progName << ": runtime error: " << Interp::toString(r) << "!\n";
 
 		if (verbose) cout << progName << ": Ending pl/0c after " << machine.cycles() << " machine cycles\n";
 	}

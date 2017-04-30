@@ -4,11 +4,11 @@
 # simple.p, 3: begin
     2: enter 2
 # simple.p, 4: 	x = 0;
-    3: pushConst 0
+    3: push.i 0
     4: pushVar 0, 4
     5: assign
 # simple.p, 5: 	y = 1
-    6: pushConst 1
+    6: push.i 1
 # simple.p, 6: end.
     7: pushVar 0, 5
     8: assign

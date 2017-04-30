@@ -8,46 +8,53 @@
 #ifndef	DATUM_H
 #define DATUM_H
 
-#include <cstdint>
+#include <iostream>
 #include <vector>
 
-namespace pl0c {
-	/// A signed integer value or memory offset
-	typedef std::int32_t					Integer;
+#if 0
+typedef int			Integer;				///< Signed integer value or memory offset
+typedef unsigned	Unsigned;				///< Unsigned integer value or address
+typedef double		Real;					///< Floating-point value	
+#endif
 
-	/// An unsigned integer value or memory address
-	typedef std::uint32_t					Unsigned;
+/** A PL0C Data Value
+ *  
+ *  Datums may contain a signed or unsigned integer, or a floating point/real value. Signed
+ *  and unsigned integer values are freely interchangeable, but conversion to from a real is
+ *  undefined.
+ *  
+ *  A discriminator (k), which is initialized by the constructors, is provided, but not
+ *  enforced.
+ */
+struct Datum {
+	typedef int			Integer;			///< Signed integer value or memory offset
+	typedef unsigned	Unsigned;			///< Unsigned integer value or address
+	typedef double		Real;				///< Floating-point value	
 
-	/// A floating point value
-	typedef double							Real;
-
-	/// PL0C data types
-	enum class Type {
-		Integer,							///< Signed integer
-		Real								///< Floating point number
+	/// Datum "kinds"
+	enum class Kind {
+		Integer,							///< Integer
+		Unsigned,							///< Unsigned
+		Real								///< Real
 	};
 
-	/** A PL0C Data Value
-	 *
-	 *  A signed, or unsigned, integer, or a floating point (real) value.
-	 *
-	 *  @note No discrimunator is necessary as the union only contains simple types, and there is no
-	 *  	  requirement for runtime type promotion or demotion.
-	 */
-	union Datum {
-		pl0c::Integer	i;							///< As a signed integer
-		pl0c::Unsigned	u;							///< As a unsigned integer
-		pl0c::Real		r;							///< As a real
+	Datum();								///< Default constructor 
+	Datum(Integer value);					///< Construct a signed integer...
+	Datum(Unsigned value);					///< Construct an unsigned integer...
+	Datum(std::size_t value);				///< Construct an unsigned (size_t)...
+	Datum(Real value);						///< Constuct from a double...
 
-		/// Construct from a signed integer, defaults to zero
-		Datum(pl0c::Integer value = 0);
-		Datum(pl0c::Unsigned value);				///< Construct an unsigned integer
-		Datum(std::size_t value);					///< Construct an unsigned (size_t)
-		Datum(pl0c::Real value);					///< Constuct from a double
+	union {
+		Integer		i;						///< k == Integer
+		Unsigned	u;						///< k == Unsigned
+		Real		r;						///< k == Real
 	};
+	Kind			k;  					///< What Datum type?
+};
 
-	/// A vector of Datums
-	typedef	std::vector<Datum>	DatumVector;
-}
+/// Datum put operator
+std::ostream& operator<<(std::ostream& os, const Datum& d);
+
+typedef	std::vector<Datum>	DatumVector;	///< A vector of Datums
 
 #endif

@@ -11,7 +11,7 @@
 # unknown.p, 3: begin
     2: enter 1
 # unknown.p, 4: 	x # 123;	{	unknown operator "#"!
-    3: pushConst 123
+    3: push.i 123
     4: call 0, 0
 # unknown.p, 5: end .
 # unknown.p, 6: 

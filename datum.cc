@@ -12,23 +12,42 @@
 #include <limits>
 
 using namespace std;
-using namespace pl0c;
+
+/// Constructs a integer with value 0
+Datum::Datum() : i{0}, k{Kind::Integer}						{}
 
 /// @param	value	Signed integer value
-Datum::Datum(pl0c::Integer value)	: i{value}	{}
+Datum::Datum(Integer value) : i{value}, k{Kind::Integer}	{}
 
 /// @param	value	Unsigned integer value
-Datum::Datum(pl0c::Unsigned value)	: u{value}	{}
+Datum::Datum(Unsigned value) : u{value}, k{Kind::Unsigned}	{}
 
 /**
  * @note	Provided for converstion of STL container sizes to Unsigned.
  * @param	value	Unsigned integer value
  */
-Datum::Datum(std::size_t value)	{
+Datum::Datum(std::size_t value) : u{static_cast<Unsigned> (value)}, k{Kind::Unsigned}	{
 	assert(numeric_limits<Unsigned>::max() > value);
-	u = static_cast<Integer> (value);
 }
 
 /// @param	value	Real value
-Datum::Datum(pl0c::Real value)	: r{value}		{}
+Datum::Datum(Real value) : r{value}, k{Kind::Real}			{}
 
+// operators
+
+/** 
+ * Puts Datum value per it's discriminator. 
+ * @param	os	Stream to write d's value to 
+ * @param	d	Datum whose value to write 
+ * @return	os 
+ */
+ostream& operator<<(std::ostream& os, const Datum& d) {
+	switch (d.k) {
+	case Datum::Kind::Integer:	os << d.i;	break;
+	case Datum::Kind::Unsigned:	os << d.u;	break;
+	case Datum::Kind::Real:		os << d.r;	break;
+	default:	assert(false);  os << 0;
+	}
+
+	return os;
+}

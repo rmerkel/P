@@ -15,11 +15,11 @@
 # repeatst.p, 14: begin
     2: enter 2
 # repeatst.p, 15: 	n = 0;
-    3: pushConst 0
+    3: push.i 0
     4: pushVar 0, 4
     5: assign
 # repeatst.p, 16: 	f = 1;
-    6: pushConst 1
+    6: push.i 1
     7: pushVar 0, 5
     8: assign
 # repeatst.p, 17: 	repeat
@@ -27,8 +27,8 @@
 # repeatst.p, 19: 			n = n + 1;
     9: pushVar 0, 4
    10: eval
-   11: pushConst 1
-   12: addi
+   11: push.i 1
+   12: add.i
    13: pushVar 0, 4
    14: assign
 # repeatst.p, 20: 			f = f * n
@@ -37,15 +37,15 @@
 # repeatst.p, 21: 		end
    17: pushVar 0, 4
    18: eval
-   19: muli
+   19: mul.i
    20: pushVar 0, 5
    21: assign
 # repeatst.p, 22: 	until n >= 10
    22: pushVar 0, 4
    23: eval
-   24: pushConst 10
+   24: push.i 10
 # repeatst.p, 23: end.
-   25: gte
+   25: gte.i
    26: jneq 9
    27: ret
 

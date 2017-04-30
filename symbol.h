@@ -23,11 +23,10 @@
 class SymValue {
 public:
 	/// Kinds of symbol table entries
-	enum Kind : char {
+	enum class Kind : char {
 		None,									///< Placeholder for a valid kind...
 		Variable,		  						///< An identifier
-		ConstInt,								///< A constant integer value
-		ConstReal,								///< A constant floating point value
+		Constant,								///< A constant value
 		Procedure,								///< A procedure
 		Function								///< A function
 	};
@@ -37,11 +36,12 @@ public:
 	SymValue();									///< Default constructor
 
 	/// Construct a SymValue from it's components...
-	SymValue(Kind 		kind, 
-			int 		level	= 0, 
-			pl0c::Datum	value	= pl0c::Datum{}, 
-			pl0c::Type	type	= pl0c::Type::Integer,
-			std::size_t nArgs	= 0);
+	SymValue(
+		Kind			kind, 
+		int 			level	= 0, 
+		Datum			value	= Datum{}, 
+		Datum::Kind		fType	= Datum::Kind::Integer,
+		std::size_t		nArgs	= 0);
 
 	/// Descructor
 	virtual ~SymValue()							{}
@@ -50,21 +50,21 @@ public:
 	Kind kind() const;							///< Return my kind
 	int level() const;							///< Return my activation frame level
 
-	pl0c::Datum value(pl0c::Datum value);		///< Set my value
-	pl0c::Datum value() const;					///< Return my value
+	Datum value(Datum value);					///< Set my value
+	Datum value() const;						///< Return my value
 	
-	pl0c::Type type(pl0c::Type value);			///< Set my functoin return type
-	pl0c::Type type() const;					///< Return my function return type
-												///
+	Datum::Kind fType(Datum::Kind value);		///< Set my function return type
+	Datum::Kind fType() const;					///< Return my function return type
+	
 	std::size_t nArgs(std::size_t value);		///< Set my formal parameter count
 	std::size_t nArgs() const;					///< Return my formal parameter count
 
 private:
-	Kind			k;							///< Identifier, ConstInt...
-	int				l;							///< Activation frame level for Variables and subroutines.
-	pl0c::Datum		v;							///< Variable frame offset, Constant value or subroutine address
-	pl0c::Type		t;							///< Datum value type	
-	std::size_t		n;							///< Subrountine formal argument count
+	Kind		k;								///< Identifier, ConstInt...
+	int			l;								///< Activation frame level for Variables and subroutines.
+	Datum		v;								///< Variable frame offset, Constant value or subroutine address
+	Datum::Kind	t;								///< Datum value type	
+	std::size_t	n;								///< Subrountine formal argument count
 };
 
 /// A SymbolTable; a multimap of symbol identifiers to SymValue's

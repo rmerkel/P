@@ -20,29 +20,29 @@
 # fact3.p, 18: 	begin
     2: enter 1
 # fact3.p, 19: 		p = 1;
-    3: pushConst 1
+    3: push.i 1
     4: pushVar 0, 4
     5: assign
 # fact3.p, 20: 		while n > 0 do begin
     6: pushVar 0, -1
     7: eval
-    8: pushConst 0
-    9: gt
+    8: push.i 0
+    9: gt.i
    10: jneq 25
 # fact3.p, 21: 			p = p * n;
    11: pushVar 0, 4
    12: eval
    13: pushVar 0, -1
    14: eval
-   15: muli
+   15: mul.i
    16: pushVar 0, 4
    17: assign
 # fact3.p, 22: 			n = n - 1
    18: pushVar 0, -1
    19: eval
-   20: pushConst 1
+   20: push.i 1
 # fact3.p, 23: 		end;
-   21: subi
+   21: sub.i
    22: pushVar 0, -1
    23: assign
    24: jump 6
@@ -52,14 +52,14 @@
    27: pushVar 0, 3
    28: assign
 # fact3.p, 25: 	end;
-   29: reti
+   29: retf
 # fact3.p, 26: 
 # fact3.p, 27: begin
    30: enter 1
 # fact3.p, 28: 	{ call with wrong number of parameters! }
 # fact3.p, 29:     result = factorial(nFacts, nFacts)
-   31: pushConst 10
-   32: pushConst 10
+   31: push.i 10
+   32: push.i 10
 # fact3.p, 30: end.
    33: call 0, 2
    34: pushVar 0, 4
