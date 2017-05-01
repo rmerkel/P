@@ -26,8 +26,8 @@ void Interp::dump() {
 		cout
 			<< "    "
 			<< setw(5)	<< lastWrite << ": "
-			<< setw(10) << stack[lastWrite].i
-			<< std::endl;
+			<< setw(10) << stack[lastWrite]
+		<< std::endl;
 	lastWrite.invalidate();
 
 	if (!verbose) return;
@@ -35,17 +35,17 @@ void Interp::dump() {
 	// Dump the current  activation frame...
 	assert(sp >= fp);
 	cout    << "fp: " 	<< setw(5) 	<< fp << ": "
-			<< right 	<< setw(10) << stack[fp].u
+			<< right 	<< setw(10) << stack[fp]
 			<< endl;
 
 	for (auto bl = fp+1; bl < sp; ++bl)
 		cout
 			<<	"    "	<< setw(5)	<< bl << ": "
-			<< right << setw(10) 	<< stack[bl].i
+			<< right << setw(10) 	<< stack[bl]
 			<< endl;
 
 	cout    << "sp: " 	<< setw(5) 	<< sp << ": "
-			<< right << setw(10) 	<< stack[sp].i
+			<< right << setw(10) 	<< stack[sp]
 			<< endl;
 
 	disasm(cout, pc, code[pc], "pc");

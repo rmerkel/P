@@ -11,12 +11,6 @@
 #include <iostream>
 #include <vector>
 
-#if 0
-typedef int			Integer;				///< Signed integer value or memory offset
-typedef unsigned	Unsigned;				///< Unsigned integer value or address
-typedef double		Real;					///< Floating-point value	
-#endif
-
 /** A PL0C Data Value
  *  
  *  Datums may contain a signed or unsigned integer, or a floating point/real value. Signed
@@ -38,7 +32,9 @@ struct Datum {
 		Real								///< Real
 	};
 
-	Datum();								///< Default constructor 
+	static std::string toString(Kind k);	///< Return k as a string...
+	
+	Datum();								///< Default constructor...
 	Datum(Integer value);					///< Construct a signed integer...
 	Datum(Unsigned value);					///< Construct an unsigned integer...
 	Datum(std::size_t value);				///< Construct an unsigned (size_t)...

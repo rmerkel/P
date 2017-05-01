@@ -9,73 +9,76 @@
 # fahr.p, 8: 	STEP  =  20;	{	table step size		}
 # fahr.p, 9: 
 # fahr.p, 10: var
-# fahr.p, 11: 	fahr, celsius : integer;
+# fahr.p, 11: 	fahr, celsius : real;
 # fahr.p, 12: 
 # fahr.p, 13: begin
     2: enter 2
 # fahr.p, 14: 	fahr = LOWER;
     3: push.i 0
-    4: pushVar 0, 4
-    5: assign
+    4: itor
+    5: pushVar 0, 4
+    6: assign
 # fahr.p, 15: 	while fahr <= UPPER do begin
-    6: pushVar 0, 4
-    7: eval
-    8: push.i 300
-    9: lte.i
-   10: jneq 28
-# fahr.p, 16: 		celsius = 5 * (fahr-32) / 9;
-   11: push.i 5
-   12: pushVar 0, 4
-   13: eval
-   14: push.i 32
-   15: sub.i
-   16: mul.i
-   17: push.i 9
-   18: div.i
-   19: pushVar 0, 5
-   20: assign
+    7: pushVar 0, 4
+    8: eval
+    9: push.i 300
+   10: itor
+   11: lte.r
+   12: jneq 31
+# fahr.p, 16: 		celsius = 5.0 * (fahr-32.0) / 9.0;
+   13: push.r 5
+   14: pushVar 0, 4
+   15: eval
+   16: push.r 32
+   17: sub.r
+   18: mul.r
+   19: push.r 9
+   20: div.r
+   21: pushVar 0, 5
+   22: assign
 # fahr.p, 17: 		fahr = fahr + STEP;
-   21: pushVar 0, 4
-   22: eval
-   23: push.i 20
-   24: add.i
-   25: pushVar 0, 4
-   26: assign
+   23: pushVar 0, 4
+   24: eval
+   25: push.i 20
+   26: itor
+   27: add.r
+   28: pushVar 0, 4
+   29: assign
 # fahr.p, 18: 	end;
-   27: jump 6
+   30: jump 7
 # fahr.p, 19:  end.
-   28: ret
+   31: ret
 
         8:          0
-        9: -       17
+        9: -  17.7778
         8:         20
-        9: -        6
+        9: -  6.66667
         8:         40
-        9:          4
+        9:    4.44444
         8:         60
-        9:         15
+        9:    15.5556
         8:         80
-        9:         26
+        9:    26.6667
         8:        100
-        9:         37
+        9:    37.7778
         8:        120
-        9:         48
+        9:    48.8889
         8:        140
         9:         60
         8:        160
-        9:         71
+        9:    71.1111
         8:        180
-        9:         82
+        9:    82.2222
         8:        200
-        9:         93
+        9:    93.3333
         8:        220
-        9:        104
+        9:    104.444
         8:        240
-        9:        115
+        9:    115.556
         8:        260
-        9:        126
+        9:    126.667
         8:        280
-        9:        137
+        9:    137.778
         8:        300
-        9:        148
+        9:    148.889
         8:        320

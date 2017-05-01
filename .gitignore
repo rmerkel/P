@@ -22,3 +22,6 @@ pl0c
 *.o
 *.d
 *.lst
+
+# Expected list files are okay
+!test/*.lst

@@ -30,7 +30,8 @@
  * program.
  *
  * @bug
- * - No arrays or strings, just signed integers
+ * - No arrays or strings, just signed integers and reals
+ * - Number of formal parameters for procedure or functions are tracked, but not parameter types
  * - No constant statements, i.e., constants must be initialized with a simple number.
  * - No input/output instructions.
  * - No interactive mode for debugging; just automatic single stepping (verbose == true)
@@ -42,7 +43,6 @@
  *    comment.
  *  - Folded factors into expressions
  *  - Added logical and, orr plus bitwise and, or, xor.
- * @version 1.2 - Added halt instruction
  * @version 1.3
  *	- Interp registers are now all vector<T>size_type
  *  - Added xpl0c.sh to run regression tests
@@ -50,7 +50,7 @@
  *    binary operations.
  *  - Parser now understands, but ignores type names for variables, but not functions.
  *
- * @version 1.3l - Adding types "integer" and real, arrays...
+ * @version 1.3m - Adding types "integer" and real, arrays...
  *  - Function decl return type
  *  - No longer emits calls to every function decl, just to "main".
  *  - Now sets type for const, var and funciton.
@@ -61,6 +61,7 @@
  *  - Cleaned up Datum::Kind and SymbolTab::Kind
  *  - Adding real instructions... (WIP)
  *  - Removed pl0c namespace
+ *	- Fixed interiger to float conversions and assigments
  *
  * @author Randy Merkel, Slowly but Surly Software.
  * @copyright  (c) 2017 Slowly but Surly Software. All rights reserved.
@@ -94,7 +95,7 @@ static void help() {
 
 /// Print the version number as major.minor
 static void printVersion() {
-	cout << progName << ": verson: 1.3l\n";	// makesure to update the verison in mainpage!!
+	cout << progName << ": verson: 1.3m\n";	// makesure to update the verison in mainpage!!
 }
 
 /** Parse the command line arguments...

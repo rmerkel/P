@@ -227,9 +227,9 @@ void Comp::purge(int level) {
 			if (it->second.level() > closest->second.level())
 				closest = it;
 
-		kind = closest->second.value().k;	// Assume it's the symbol's value type
 		switch (closest->second.kind()) {
 		case SymValue::Kind::Constant:
+			kind = closest->second.value().k;	// Assume it's the symbol's value type
 			if (Datum::Kind::Integer == kind)
 				emit(OpCode::pushi, 0, closest->second.value());
 			else
@@ -238,12 +238,13 @@ void Comp::purge(int level) {
 
 		case SymValue::Kind::Variable:
 			varRef(level, closest->second);
+			kind = closest->second.type();
 			emit(OpCode::eval);
 			break;
 
 		case SymValue::Kind::Function:
 			callStmt(closest->first, closest->second, level);
-			kind = closest->second.fType();	// Use the function return type
+			kind = closest->second.type();	// Use the function return type
 			break;
 
 		default:
@@ -254,8 +255,8 @@ void Comp::purge(int level) {
 	return kind;
 }
 
-/**--cached
- * factor = ident | number | "{" expression "}" ;
+/** 
+ *  factor = ident | number | "{" expression "}" ; 
  *
  * @param	level	The current block level.
  * @return	Data type 
@@ -264,7 +265,7 @@ Datum::Kind Comp::factor(int level) {
 	auto kind = Datum::Kind::Integer;	// factor data type
 
 	if (accept(Token::Identifier, false))
-		identifier(level);
+		kind = identifier(level);
 
 	else if (accept(Token::IntegerNum, false)) {
 		emit(OpCode::pushi, 0, ts.current().integer_value);
@@ -373,23 +374,23 @@ Datum::Kind Comp::term(int level) {
  * @return	Data type  
  */
 Datum::Kind Comp::addExpr(int level) {
-	const auto rhs = term(level);
+	const auto lhs = term(level);
 
 	for (;;) {
 		if (accept(Token::Add)) {
-			const auto lhs =  term(level);
+			const auto rhs =  term(level);
 			promote(lhs, rhs);
 
-			if (Datum::Kind::Integer == rhs)
+			if (Datum::Kind::Integer == lhs)
 				emit(OpCode::addi);
 			else
 				emit(OpCode::addr);
 
 		} else if (accept(Token::Subtract)) {
-			const auto lhs = term(level);
+			const auto rhs = term(level);
 			promote(lhs, rhs);
 
-			if (Datum::Kind::Integer == rhs)
+			if (Datum::Kind::Integer == lhs)
 				emit(OpCode::subi);
 			else
 				emit(OpCode::subr);
@@ -398,7 +399,7 @@ Datum::Kind Comp::addExpr(int level) {
 			break;
 	}
 
-	return rhs;
+	return lhs;
 }
 
 /**
@@ -484,7 +485,7 @@ Datum::Kind Comp::relational(int level) {
 			const auto rhs = expression(level);
 			promote(lhs, rhs);
 
-			if (Datum::Kind::Integer == rhs)
+			if (Datum::Kind::Integer == lhs) 
 				emit(OpCode::ltei);
 			else
 				emit(OpCode::lter);
@@ -493,7 +494,7 @@ Datum::Kind Comp::relational(int level) {
 			const auto rhs = expression(level);
 			promote(lhs, rhs);
 
-			if (Datum::Kind::Integer == rhs)
+			if (Datum::Kind::Integer == lhs)
 				emit(OpCode::lti);
 			else
 				emit(OpCode::ltr);
@@ -502,7 +503,7 @@ Datum::Kind Comp::relational(int level) {
 			const auto rhs = expression(level);
 			promote(lhs, rhs);
 
-			if (Datum::Kind::Integer == rhs)
+			if (Datum::Kind::Integer == lhs)
 				emit(OpCode::gti);
 			else
 				emit(OpCode::gtr);
@@ -511,7 +512,7 @@ Datum::Kind Comp::relational(int level) {
 			const auto rhs = expression(level);
 			promote(lhs, rhs);
 
-			if (Datum::Kind::Integer == rhs)
+			if (Datum::Kind::Integer == lhs)
 				emit(OpCode::gtei);
 			else
 				emit(OpCode::gter);
@@ -520,7 +521,7 @@ Datum::Kind Comp::relational(int level) {
 			const auto rhs = expression(level);
 			promote(lhs, rhs);
 
-			if (Datum::Kind::Integer == rhs)
+			if (Datum::Kind::Integer == lhs)
 				emit(OpCode::equi);
 			else
 				emit(OpCode::equr);
@@ -529,7 +530,7 @@ Datum::Kind Comp::relational(int level) {
 			const auto rhs = expression(level);
 			promote(lhs, rhs);
 
-			if (Datum::Kind::Integer == rhs)
+			if (Datum::Kind::Integer == lhs)
 				emit(OpCode::neqi);
 			else
 				emit(OpCode::neqr);
@@ -584,17 +585,17 @@ Datum::Kind Comp::condition(int level) {
  * @param	level	The current block level.
  */
 void Comp::assignStmt(const string& name, const SymValue& val, int level) {
-	const auto lhs = expression(level);
+	const auto rhs = expression(level);
 
 	switch(val.kind()) {
 	case SymValue::Kind::Variable:
-		promote(lhs, val.value().k);
+		promote(val.type(), rhs);
 		varRef(level, val);
 		emit(OpCode::assign);
 		break;
 
 	case SymValue::Kind::Function:		// Save value in the frame's retValue element
-		promote(lhs, val.fType());
+		promote(val.type(), rhs);
 		emit(OpCode::pushVar, 0, FrameRetVal);
 		emit(OpCode::assign);
 		break;
@@ -877,7 +878,7 @@ void Comp::constDecl(int level) {
 		next();										// Consume the number
 
 		// Insert ident into the symbol table
-		symtbl.insert({ ident, { SymValue::Kind::Constant, level, number	}});
+		symtbl.insert({ ident, { level, number	}});
 		if (verbose)
 			cout << progName << ": constDecl " << ident << ": " << level << ", " << number << "\n";
 
@@ -886,7 +887,7 @@ void Comp::constDecl(int level) {
 		next();										// Consume the number
 
 		/// Insert ident into the symbol table
-		symtbl.insert({	ident, { SymValue::Kind::Constant, level, number	}});
+		symtbl.insert({	ident, { level, number	}});
 		if (verbose)
 			cout << progName << ": constDecl " << ident << ": " << level << ", " << number << "\n";
 
@@ -947,7 +948,6 @@ int Comp::varDeclList(int offset, int level, bool params) {
 	do {
 		if (oneOf(stops))
 			break;								// No more variables...
-
 		offset = varDecl(offset, level, params);
 
 	} while (accept(Token::SemiColon));
@@ -988,8 +988,12 @@ int Comp::varDecl(int noffset, int level, bool params) {
 	const Datum::Kind type = typeDecl();
 	for (const auto& id : identifiers) {
 		if (verbose)
-			cout << progName << ": var/param " << id << ": " << level << ", " << dx << "\n";
-		symtbl.insert( { id, { SymValue::Kind::Variable, level, dx++, type	}	} );
+			cout << progName 
+				 << ": var/param " << id << ": " 
+				 << level << ", "
+			     << dx << ", " 
+				 << Datum::toString(type) << "\n";
+		symtbl.insert( { id, { level, dx++, type	}	} );
 	}
 
 	return params ? noffset - identifiers.size() : noffset + identifiers.size();
@@ -1009,7 +1013,7 @@ SymValue& Comp::subPrefixDecl(int level, SymValue::Kind kind) {
 	SymbolTable::iterator	it;				// Will point to the new symbol table entry...
 
 	const auto& ident = nameDecl(level);	// insert the name into the symbol table
-	it = symtbl.insert( { ident, { kind, level, 0 }} );
+	it = symtbl.insert( { ident, { kind, level }} );
 	if (verbose)
 		cout << progName << ": subrountine-decl " << ident << ": " << level << ", 0\n";
 
@@ -1040,7 +1044,7 @@ void Comp::procDecl(int level) {
  */
 void Comp::funcDecl(int level) {
 	auto& val = subPrefixDecl(level, SymValue::Kind::Function);
-	val.fType(typeDecl());
+	val.type(typeDecl());
 	blockDecl(val, level + 1);
 	expect(Token::SemiColon);	// function declarations end with a ';'!
 }
@@ -1139,7 +1143,7 @@ void Comp::run() {
  * @param	pName	The prefix string used by error and verbose/diagnostic messages.
  */
 Comp::Comp(const string& pName) : progName {pName}, nErrors{0}, verbose {false}, ts{cin} {
-	symtbl.insert({"main", { SymValue::Kind::Procedure, 0, 0 }});	// Install the "main" rountine declaraction
+	symtbl.insert({"main", { SymValue::Kind::Procedure, 0 }});	// Install the "main" rountine declaraction
 }
 
 /**

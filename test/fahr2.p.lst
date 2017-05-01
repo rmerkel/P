@@ -1,0 +1,81 @@
+# fahr2.p, 2: { print Fahrenheit-Celsius table	}
+# fahr2.p, 3: {	first version; integers only	}
+# fahr2.p, 4: 
+# fahr2.p, 5: const
+    0: call 0, 2
+    1: halt
+# fahr2.p, 6: 	LOWER =   0.0;	{	lower table limit	}
+# fahr2.p, 7: 	UPPER = 300.0;	{	upper table limit	}
+# fahr2.p, 8: 	STEP  =  20.0;	{	table step size		}
+# fahr2.p, 9: 
+# fahr2.p, 10: var
+# fahr2.p, 11: 	fahr, celsius : real;
+# fahr2.p, 12: 
+# fahr2.p, 13: begin
+    2: enter 2
+# fahr2.p, 14: 	fahr = LOWER;
+    3: push.r 0
+    4: pushVar 0, 4
+    5: assign
+# fahr2.p, 15: 	while fahr <= UPPER do begin
+    6: pushVar 0, 4
+    7: eval
+    8: push.r 300
+    9: lte.r
+   10: jneq 28
+# fahr2.p, 16: 		celsius = 5.0 * (fahr-32.0) / 9.0;
+   11: push.r 5
+   12: pushVar 0, 4
+   13: eval
+   14: push.r 32
+   15: sub.r
+   16: mul.r
+   17: push.r 9
+   18: div.r
+   19: pushVar 0, 5
+   20: assign
+# fahr2.p, 17: 		fahr = fahr + STEP;
+   21: pushVar 0, 4
+   22: eval
+   23: push.r 20
+   24: add.r
+   25: pushVar 0, 4
+   26: assign
+# fahr2.p, 18: 	end;
+   27: jump 6
+# fahr2.p, 19:  end.
+   28: ret
+
+        8:          0
+        9: -  17.7778
+        8:         20
+        9: -  6.66667
+        8:         40
+        9:    4.44444
+        8:         60
+        9:    15.5556
+        8:         80
+        9:    26.6667
+        8:        100
+        9:    37.7778
+        8:        120
+        9:    48.8889
+        8:        140
+        9:         60
+        8:        160
+        9:    71.1111
+        8:        180
+        9:    82.2222
+        8:        200
+        9:    93.3333
+        8:        220
+        9:    104.444
+        8:        240
+        9:    115.556
+        8:        260
+        9:    126.667
+        8:        280
+        9:    137.778
+        8:        300
+        9:    148.889
+        8:        320

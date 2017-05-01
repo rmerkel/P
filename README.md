@@ -36,7 +36,8 @@ Release
  * git push --tags origin branch-name
 
 Bugs:
- * No arrays or strings, just signed integers
+ * No arrays or strings, just signed integers and reals
+ * Number of formal parameters for procedure or functions are tracked, but not parameter types
  * No constant statements, i.e., constants must be initialized with a simple
    number.
  * No input/output instructions.
@@ -57,17 +58,18 @@ Versions:
         * Added xpl0c.sh to run regression tests
         * Added Datum, the stack data type, as a step towards adding types to
           pl0c and for unsigned bit operations.
-    1.3l - internal release; adding types "integer" and "real", arrays.
+    1.3m - internal release; adding types "integer" and "real", arrays.
         * Function decl return types
         * No longer emits calls to every function decl, just to "main".
         * Now sets type for const, var and funciton.
         * block-decl "begin" statement-list "end".
-		* Pascal like constant and varialble lists
-		* Subrountine formal now have the same format as variables
-		* Added support for stop token sets, fahr.p is temporally integer only
-		* Cleaned up Datum::Kind and SymbolTab::Kind
-		* Adding real instructions... (WIP)
-		* Removed pl0c namespace
+        * Pascal like constant and varialble lists
+        * Subrountine formal now have the same format as variables
+        * Added support for stop token sets, fahr.p is temporally integer only
+        * Cleaned up Datum::Kind and SymbolTab::Kind
+        * Adding real instructions... (WIP)
+        * Removed pl0c namespace
+        * @version 1.2 - Added halt instruction
 
 Author
     Randy Merkel, Slowly but Surly Software.

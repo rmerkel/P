@@ -13,6 +13,22 @@
 
 using namespace std;
 
+// public static
+
+/// @param k	Kind whose name to return
+string Datum::toString(Kind k) {
+	switch (k) {
+	case Datum::Kind::Integer:	return "Integer";	break;
+	case Datum::Kind::Unsigned:	return "Unsined";	break;
+	case Datum::Kind::Real:		return "Real";		break;
+	default:
+		assert(false);
+		return "Unknown Datum Kind!";
+	}
+}
+
+// public
+
 /// Constructs a integer with value 0
 Datum::Datum() : i{0}, k{Kind::Integer}						{}
 
