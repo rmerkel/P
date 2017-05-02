@@ -965,7 +965,7 @@ int Comp::varDeclList(int level, bool params) {
 		symtbl.insert( { id.name, SymValue(level, offset++, id.kind)	} );
 	}
 
-	return dx;
+	return params ? dx : offset;
 }
 
 /**

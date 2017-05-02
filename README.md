@@ -31,7 +31,7 @@ single step the program.
 
 Release
  * git add .
- * git commit -m "vMajor.Minor; description..."
+ * git commit -m "description..."
  * git tag -a vMajor.Minor -m "summary..."
  * git push --tags origin branch-name
 
