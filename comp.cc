@@ -878,7 +878,7 @@ void Comp::constDecl(int level) {
 		next();										// Consume the number
 
 		// Insert ident into the symbol table
-		symtbl.insert({ ident, { level, number	}});
+		symtbl.insert(	{ ident, SymValue(level, number)	}	);
 		if (verbose)
 			cout << progName << ": constDecl " << ident << ": " << level << ", " << number << "\n";
 
@@ -887,7 +887,7 @@ void Comp::constDecl(int level) {
 		next();										// Consume the number
 
 		/// Insert ident into the symbol table
-		symtbl.insert({	ident, { level, number	}});
+		symtbl.insert(	{	ident, SymValue(level, number)	}	);
 		if (verbose)
 			cout << progName << ": constDecl " << ident << ": " << level << ", " << number << "\n";
 
@@ -908,14 +908,13 @@ void Comp::constDecl(int level) {
  *
  * @param	level	The current block level.
  *
- * @return  Number of variables allocated after the activation frame.
+ * @return  Number of variables allocated before or after the activation frame.
  */
 int Comp::varDeclBlock(int level) {
-	int	dx = 0;								// Offsets from the end of activation frame
 	if (accept(Token::VarDecl))
-		dx = varDeclList(dx, level, false);
+		return varDeclList(level, false);
 
-	return dx;
+	return 0;
 }
 
 /**
@@ -930,29 +929,43 @@ int Comp::varDeclBlock(int level) {
  * activaction frame. Create a new entry in the symbol table, that notes the offset and data
  * type.
  *
- * @param	offset	Starting offset from the end of the activation frame
  * @param	level	The current block level.
  * @param	params	True if processing formal parameters, false if variable declaractions.
  *
  * @return  Offset of the next variable/parmeter from the current activicaqtion frame.
  */
-int Comp::varDeclList(int offset, int level, bool params) {
+int Comp::varDeclList(int level, bool params) {
 	// Stops if the ';' if followd by any of hte following tokens
 	static const Token::KindSet stops {
 		Token::ProcDecl,
 		Token::FuncDecl,
 		Token::Begin,
-		Token::OpenParen
+		Token::CloseParen
 	};
 
+	NameKindVect	indentifiers;				// vector of name/type pairs.
 	do {
 		if (oneOf(stops))
 			break;								// No more variables...
-		offset = varDecl(offset, level, params);
-
+		varDecl(level, indentifiers);
 	} while (accept(Token::SemiColon));
 
-	return offset;
+	// Set the offset from the activation frame, parameters have negative offsets in reverse
+	const int dx = params ? 0 - indentifiers.size() : 0;
+	int offset = dx;
+
+	for (const auto& id : indentifiers) {
+		if (verbose)
+			cout << progName  
+				 << ": var/param " 	<< id.name << ": " 
+				 << level 			<< ", "
+			     << offset 				<< ", " 
+				 << Datum::toString(id.kind) << "\n";
+
+		symtbl.insert( { id.name, SymValue(level, offset++, id.kind)	} );
+	}
+
+	return dx;
 }
 
 /**
@@ -968,35 +981,22 @@ int Comp::varDeclList(int offset, int level, bool params) {
  * current activaction frame; 0, 1, ..., n-1. Parameters, pushed by the caller, are identified
  * by negative indexes from *before the start* of the frame; -1, -2, ..., -n. Create a new
  * entry in the symbol table for either.
- *
- * @param	noffset	Stack offset for the next varaible
- * @param	level	The current block level.
- * @param	params	True if processing formal parameters, false if variable declaractions.
- *
- * @return	Stack offset for the next varaible.
+ *  
+ * @param			level	The current block level. 
+ * @param[in,out]	idents	Vector of identifer, kind pairs
  */
-int Comp::varDecl(int noffset, int level, bool params) {
-	vector<string>	identifiers;
-	do {	// Find and append comma separated identifiers to the list...
-		identifiers.push_back(nameDecl(level));
+void Comp::varDecl(int level, NameKindVect& idents) {
+	vector<string> indentifiers;
 
+	// Find and append comma separated identifiers to the list...
+	do {
+		indentifiers.push_back(nameDecl(level));
 	} while (accept(Token::Comma));
 
-	// set the next offset; params have negative offsets in reverse
-	int dx = params ? noffset - identifiers.size() : 0;
+	const Datum::Kind kind = typeDecl();
 
-	const Datum::Kind type = typeDecl();
-	for (const auto& id : identifiers) {
-		if (verbose)
-			cout << progName 
-				 << ": var/param " << id << ": " 
-				 << level << ", "
-			     << dx << ", " 
-				 << Datum::toString(type) << "\n";
-		symtbl.insert( { id, { level, dx++, type	}	} );
-	}
-
-	return params ? noffset - identifiers.size() : noffset + identifiers.size();
+	for (auto& id : indentifiers)
+		idents.push_back({ id, kind });
 }
 
 /**
@@ -1009,11 +1009,10 @@ int Comp::varDecl(int noffset, int level, bool params) {
  * @return	subrountine's symbol table entry
  */
 SymValue& Comp::subPrefixDecl(int level, SymValue::Kind kind) {
-	vector<string> 			args;			// formal arguments, if any
 	SymbolTable::iterator	it;				// Will point to the new symbol table entry...
 
 	const auto& ident = nameDecl(level);	// insert the name into the symbol table
-	it = symtbl.insert( { ident, { kind, level }} );
+	it = symtbl.insert( { ident, SymValue(kind, level)	} );
 	if (verbose)
 		cout << progName << ": subrountine-decl " << ident << ": " << level << ", 0\n";
 
@@ -1021,7 +1020,7 @@ SymValue& Comp::subPrefixDecl(int level, SymValue::Kind kind) {
 	expect(Token::OpenParen);
 
 	// Note that the activation fram elevel is that of the *following* block!
-	auto nArgs = -varDeclList(0, level+1, true);
+	auto nArgs = -varDeclList(level+1, true);
 	expect(Token::CloseParen);
 
 	it->second.nArgs(nArgs);				// Update subroutine entry with # of arguments
@@ -1143,7 +1142,7 @@ void Comp::run() {
  * @param	pName	The prefix string used by error and verbose/diagnostic messages.
  */
 Comp::Comp(const string& pName) : progName {pName}, nErrors{0}, verbose {false}, ts{cin} {
-	symtbl.insert({"main", { SymValue::Kind::Procedure, 0 }});	// Install the "main" rountine declaraction
+	symtbl.insert({"main", SymValue(SymValue::Kind::Procedure, 0)});	// Install the "main" rountine declaraction
 }
 
 /**
