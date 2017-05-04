@@ -204,6 +204,8 @@ string Token::toString(Token::Kind k) {
 	case Kind::Integer:		return "integer";		break;
 	case Kind::Real:		return "real";			break;
 
+	case Kind::Round:		return "round";			break;
+
 	case Kind::EOS:			return "EOS";			break;
 
 	case Kind::EQU:			return "==";			break;
@@ -274,7 +276,7 @@ void TokenStream::set_input(std::istream* p) {
 // privite static
 
 TokenStream::KeywordTable	TokenStream::keywords = {
-	{   "const",		Token::ConsDecl	},
+	{   "const",		Token::ConsDecl		},
 	{	"var",			Token::VarDecl		},
 	{	"procedure",	Token::ProcDecl		},
 	{	"function",		Token::FuncDecl		},
@@ -289,5 +291,6 @@ TokenStream::KeywordTable	TokenStream::keywords = {
 	{	"until",		Token::Until		},
 	{	"mod",			Token::Mod			},
 	{	"integer",		Token::Integer		},
-	{	"real",			Token::Real			}
+	{	"real",			Token::Real			},
+	{	"round",		Token::Round		}
 };

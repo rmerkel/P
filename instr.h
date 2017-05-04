@@ -31,15 +31,16 @@ enum Frame {
 
 /// Operation codes; restricted to 256 operations, maximum
 enum class OpCode : unsigned char {
-	itor,								///< Convert TOS to a real
-	rtoi,								///< Convert TOS to a real, by rounding
-	
 	noti, 								///< Unary integer not
 	notr,								///< Unary real not
 	negi,								///< Unary integer negation
 	negr,								///< Unary real negation
 	comp,								///< Unary one's compliment
 
+	rtoi,								///< Unary convert integer to real
+	rtoi2,								///< Unary convert interger (TOS-1) to real
+	itor,								///< Unary round real to integer
+	
 	addi,								///< Interger addition
 	addr,								///< Real addition
 	subi,								///< Interger subtraction

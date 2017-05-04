@@ -257,7 +257,14 @@ void Comp::purge(int level) {
 
 /** 
  *  factor = ident | number | "{" expression "}" ; 
- *
+ *"round" "(" expr ")"					| 
+ * fact = ident                                 |
+ *        ident "(" [ expr { "," expr } ")"   	|
+ *  	  "round" "(" expr ")"					|
+ *        number                                |
+ *        "(" expr ")"
+ *  	  ;
+ * 
  * @param	level	The current block level.
  * @return	Data type 
  */
@@ -267,10 +274,19 @@ Datum::Kind Comp::factor(int level) {
 	if (accept(Token::Identifier, false))
 		kind = identifier(level);
 
-	else if (accept(Token::IntegerNum, false)) {
+	else if (accept(Token::Round))  {	// round(expr) to an integer
+		expect(Token::OpenParen);
+		kind = expression(level);
+		expect(Token::CloseParen);	
+		if (Datum::Kind::Integer != kind) {
+			emit(OpCode::rtoi);
+			kind = Datum::Kind::Integer;
+		}
+		
+	} else if (accept(Token::IntegerNum, false)) {
 		emit(OpCode::pushi, 0, ts.current().integer_value);
 		expect(Token::IntegerNum);
-
+		
 	} else if (accept(Token::RealNum, false)) {
 		kind = Datum::Kind::Real;
 		emit(OpCode::pushr, 0, ts.current().real_value);
@@ -670,7 +686,7 @@ void Comp::identStmt(int level) {
 			assignStmt(closest->first, closest->second, level);
 
 		else if (SymValue::Kind::Function == closest->second.kind())
-			error("callign function with out assignment");
+			error("calling function without assignment");
 
 		else
 			callStmt(closest->first, closest->second, level);
@@ -759,7 +775,7 @@ void Comp::statementListTail(int level) {
  * 		  	| "!" expr
  *          | "begin" stmt {";" stmt } "end"
  *          | "if" cond "then" stmt { "else" stmt }
- *          | "while" cond "do" stmt ] ;
+ *          | "while" cond "do" stmt ] ;identStmt
  *
  * @param	level	The current block level.
  */

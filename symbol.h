@@ -31,7 +31,7 @@ public:
 		Variable,		  						///< A variable location
 		Constant,								///< A constant value
 		Procedure,								///< A procedure entry point
-		Function								///< A function entry point and return value
+		Function,								///< A function entry point and return value
 	};
 
 	static std::string toString(Kind k);		///< Return a kind as a string
@@ -42,7 +42,7 @@ public:
 	/// Construct a Variable location
 	SymValue(int level, Datum::Integer value, Datum::Kind type);
 
-	SymValue(Kind kind, int leve);				///< Construct procedure or funciton
+	SymValue(Kind kind, int level);				///< Construct procedure or funciton
 
 	/// Descructor
 	virtual ~SymValue()							{}

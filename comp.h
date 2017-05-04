@@ -28,30 +28,37 @@
  *
  * @section grammer Grammer (EBNF)
  *
- *     program =		block-decl "." ;
+ *     program =		block-decl "begin" stmt-lst "end" "." ;
  *     block-decl =     [ "const" const-decl-blk ";" ]
  *  					[ "var" var-decl-blk ";" ]
- *  					{ proc-decl | funct-decl }
+ *  					[ sub-decl { ";" sub-decl }
  *  					{ stmt-lst }
  *  					;
+ *     
  *     const-decl-blk = const-decl-lst { ";" const-decl-lst } ;
  *     const-decl-lst = const-decl { "," const-decl } ;
  *     const-decl =     ident "=" number | ident ;
+ *     
+ *     sub-decl = 		( func-decl | proc-decl } ;
+ *     proc-decl =      "procedure" ident param-decl-lst block-decl ";" ;
+ *     func-decl =      "function"  ident param-decl-lst ":" type block-decl ";" ; 
  *     param-decl-lst = "(" [ var-decl-blk ] ")" ;
+ *  
  *     var-decl-blk =	var-decl-lst { ";" var-decl-lst } ;
  *     var-decl-lst =	ident-list : type ;
- *     ident-list =		ident { "," ident }
- *     proc-decl =      "procedure" ident param-decl-lst block-decl ";" ;
- *     func-decl =      "function"  ident param-decl-lst ":" type block-decl ";" ;
  *     type ; type =    "integer" | "real" ;
+ *  
  *     stmt =           [ ident "=" expr 						|
  *						  ident "(" [ expr { "," expr } ")"     |
  *  					  stmt-lst								|
  *  					  "if" cond "then" stmt { "else" stmt } |
  *                        "while" cond "do" stmt 				|
  *  					  "repeat" stmt "until" cond ]
- *                      ;
- *     stme-lst =		"begin" stmt {";" stmt } "end" ;
+ *  					  ;
+ *     tmt-lst =		"begin" stmt {";" stmt } "end" ;
+ *  
+ *     ident-list =		ident { "," ident } ;
+ *                      
  *     cond =           relat { ("||" | &&") relat } ;
  *     relat =          expr { ("==" | "!=" | "<" | "<=" | ">" | ">=") expr } ;
  *     expr =           shift-expr { ("|" | "&" | "^") shift-expr } ;
@@ -59,11 +66,14 @@
  *     add-expr =       term { ("+" | "-") term } ;
  *     term =           unary { ("*" | "/" | "%") unary } ;
  *     unary =          [ ("+"|"-") ] fact ;
+ *  
  *     fact  =          ident                                   |
- *                      ident "(" [ ident { "," ident } ] ")"   |
+ *  					ident "(" [ expr { "," expr } ")"   	|
+ *  					"round" "(" expr ")"					|
  *                      number                                  |
  *                      "(" expr ")"
- *                      ;
+ *  					;
+
  *
  * Key
  * - {}	Repeat zero or more times

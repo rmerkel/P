@@ -51,6 +51,8 @@ struct Token {
 		Integer,						///< "integer"
 		Real,							///< "real
 
+		Round,							///< round real to integer
+
 		EQU,							///< Is equal? (==)
 		LTE,							///< Less than or equal? (<=)
 		GTE,							///< Greater then or equal? (>=)

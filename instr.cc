@@ -19,12 +19,6 @@ using namespace std;
 
 /// A OpCodeInfo table, indexed by OpCode's
 const OpCodeInfo::InfoMap OpCodeInfo::opInfoTbl {
-
-	// Data converstion
-	
-	{ OpCode::itor,		OpCodeInfo{ "itor",		1   		}	},
-	{ OpCode::rtoi,		OpCodeInfo{ "rtoi",		1   		}	},
-
 	// Unary operations
 
 	{ OpCode::noti,		OpCodeInfo{ "not.i",	1			}	},
@@ -32,6 +26,10 @@ const OpCodeInfo::InfoMap OpCodeInfo::opInfoTbl {
 	{ OpCode::negi,		OpCodeInfo{ "neg.i",	1			}	},
 	{ OpCode::negr,		OpCodeInfo{	"neg.r",	1   		}	},
 	{ OpCode::comp,		OpCodeInfo{ "comp.u",	1			}	},
+
+	{ OpCode::rtoi,		OpCodeInfo{ "rtoi",		1			}	},
+	{ OpCode::rtoi2,	OpCodeInfo{ "rtoi2",	1			}	},
+	{ OpCode::itor,		OpCodeInfo{ "itor",		1			}	},
 
 	// Binary operations
 
@@ -122,6 +120,7 @@ Datum::Unsigned disasm(ostream& out, Datum::Unsigned loc, const Instr& instr, co
 		out << label << ": ";
 
 	out << setw(5) << loc << ": " << OpCodeInfo::info(instr.op).name();
+
 	switch(instr.op) {
 	case OpCode::pushi:
 	case OpCode::pushr:
@@ -132,9 +131,6 @@ Datum::Unsigned disasm(ostream& out, Datum::Unsigned loc, const Instr& instr, co
 		break;
 
 	case OpCode::pushVar:
-		out << " "	<< level << ", " << instr.addr;
-		break;
-
 	case OpCode::call:
 		out << " "	<< level << ", " << instr.addr;
 		break;
