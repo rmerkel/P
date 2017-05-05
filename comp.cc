@@ -124,7 +124,7 @@ size_t Comp::emit(const OpCode op, int8_t level, Datum addr) {
 }
 
 /**
- * Convert the top of stack to or from a real as necessary. 
+ * Convert stack operand to a real as necessary. 
  * @param	lhs	The type of the left-hand-side
  * @param	rhs	The type of the right-hand-side 
  */
@@ -132,12 +132,29 @@ void Comp::promote (Datum::Kind lhs, Datum::Kind rhs) {
 	if (lhs == rhs)
 		;				// nothing to do
 
-	else if (Datum::Kind::Real == rhs) {
-		error("Rounding rhs to fit into an integer!");
-		emit(OpCode::rtoi);
+	else if (Datum::Kind::Real == rhs)
+		emit(OpCode::itor2);				// promote lhs (TOS-1) to a real
 
-	} else
-		emit(OpCode::itor);		// promote integer to a real.
+	else
+		emit(OpCode::itor);					// promote rhs to a real
+}
+
+/**
+ * Convert rhs of assign to real if necessary, or emit error would need to be converted to an integer. 
+ * @param	lhs	The type of the left-hand-side
+ * @param	rhs	The type of the right-hand-side 
+ */
+void Comp::assignPromote (Datum::Kind lhs, Datum::Kind rhs) {
+	if (lhs == rhs)
+		;				// nothing to do
+
+	else if (Datum::Kind::Real == rhs) {
+		error("rounding lhs to fit in an integer");
+		emit(OpCode::rtoi);				// promote lhs (TOS-1) to a real
+	}
+
+	else
+		emit(OpCode::itor);					// promote rhs to a real
 }
 
 /**
@@ -605,13 +622,13 @@ void Comp::assignStmt(const string& name, const SymValue& val, int level) {
 
 	switch(val.kind()) {
 	case SymValue::Kind::Variable:
-		promote(val.type(), rhs);
+		assignPromote(val.type(), rhs);
 		varRef(level, val);
 		emit(OpCode::assign);
 		break;
 
 	case SymValue::Kind::Function:		// Save value in the frame's retValue element
-		promote(val.type(), rhs);
+		assignPromote(val.type(), rhs);
 		emit(OpCode::pushVar, 0, FrameRetVal);
 		emit(OpCode::assign);
 		break;

@@ -139,6 +139,9 @@ protected:
 	/// Promote data type if necessary...
 	void promote (Datum::Kind lhs, Datum::Kind rhs);
 
+	/// Promote assigned data type if necessary...
+	void assignPromote (Datum::Kind lhs, Datum::Kind rhs);
+
 	/// Create a listing...
 	void listing(const std::string& name, std::istream& source, std::ostream& out);
 

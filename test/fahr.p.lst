@@ -26,13 +26,13 @@
    11: lte.r
    12: jneq 31
 # fahr.p, 16: 		celsius = 5.0 * (fahr-32.0) / 9.0;
-   13: push.r 5
+   13: push.r 5.000000
    14: pushVar 0, 4
    15: eval
-   16: push.r 32
+   16: push.r 32.000000
    17: sub.r
    18: mul.r
-   19: push.r 9
+   19: push.r 9.000000
    20: div.r
    21: pushVar 0, 5
    22: assign

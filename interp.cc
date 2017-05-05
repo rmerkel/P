@@ -144,15 +144,11 @@ Interp::Result Interp::step() {
 	Datum		rhand;					// righthand side of a binary operation
 
 	switch(ir.op) {
-	case OpCode::rtoi:
+	case OpCode::itor:		stack[sp] = stack[sp].i * 1.0;				break;
+	case OpCode::itor2:		stack[sp-1] = stack[sp-1].i * 1.0;			break;
+	case OpCode::rtoi:	
 		stack[sp] = static_cast<Datum::Integer>(round(stack[sp].r));
 		break;
-
-	case OpCode::rtoi2:		
-		stack[sp-1] = static_cast<Datum::Integer> (round(stack[sp-1].r));
-		break;
-
-	case OpCode::itor:		stack[sp] = stack[sp].i * 1.0;				break;
 
 	case OpCode::noti:		stack[sp] = !stack[sp].i;					break;
 	case OpCode::notr:		stack[sp] = !stack[sp].r;					break;

@@ -27,9 +27,9 @@ const OpCodeInfo::InfoMap OpCodeInfo::opInfoTbl {
 	{ OpCode::negr,		OpCodeInfo{	"neg.r",	1   		}	},
 	{ OpCode::comp,		OpCodeInfo{ "comp.u",	1			}	},
 
-	{ OpCode::rtoi,		OpCodeInfo{ "rtoi",		1			}	},
-	{ OpCode::rtoi2,	OpCodeInfo{ "rtoi2",	1			}	},
 	{ OpCode::itor,		OpCodeInfo{ "itor",		1			}	},
+	{ OpCode::itor2,	OpCodeInfo{ "itor2",	1			}	},
+	{ OpCode::rtoi,		OpCodeInfo{ "rtoi",		1			}	},
 
 	// Binary operations
 
@@ -115,6 +115,8 @@ const OpCodeInfo& OpCodeInfo::info(OpCode op) {
  */
 Datum::Unsigned disasm(ostream& out, Datum::Unsigned loc, const Instr& instr, const string label) {
 	const int level = instr.level;		// so we don't display level as a character
+
+	cout << fixed;							// Use fixed format for floating point values;
 
 	if (label.size())
 		out << label << ": ";

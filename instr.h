@@ -37,10 +37,10 @@ enum class OpCode : unsigned char {
 	negr,								///< Unary real negation
 	comp,								///< Unary one's compliment
 
-	rtoi,								///< Unary convert integer to real
-	rtoi2,								///< Unary convert interger (TOS-1) to real
-	itor,								///< Unary round real to integer
-	
+	itor,								///< Unary convert an interger to real
+	itor2,								///< Unary convert TOS-1 to real
+	rtoi,								///< Unary round real to integer
+
 	addi,								///< Interger addition
 	addr,								///< Real addition
 	subi,								///< Interger subtraction

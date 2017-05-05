@@ -14,30 +14,30 @@
 # fahr2.p, 13: begin
     2: enter 2
 # fahr2.p, 14: 	fahr = LOWER;
-    3: push.r 0
+    3: push.r 0.000000
     4: pushVar 0, 4
     5: assign
 # fahr2.p, 15: 	while fahr <= UPPER do begin
     6: pushVar 0, 4
     7: eval
-    8: push.r 300
+    8: push.r 300.000000
     9: lte.r
    10: jneq 28
 # fahr2.p, 16: 		celsius = 5.0 * (fahr-32.0) / 9.0;
-   11: push.r 5
+   11: push.r 5.000000
    12: pushVar 0, 4
    13: eval
-   14: push.r 32
+   14: push.r 32.000000
    15: sub.r
    16: mul.r
-   17: push.r 9
+   17: push.r 9.000000
    18: div.r
    19: pushVar 0, 5
    20: assign
 # fahr2.p, 17: 		fahr = fahr + STEP;
    21: pushVar 0, 4
    22: eval
-   23: push.r 20
+   23: push.r 20.000000
    24: add.r
    25: pushVar 0, 4
    26: assign
