@@ -30,7 +30,7 @@ string SymValue::toString(SymValue::Kind k) {
 
 // public
 
-SymValue::SymValue() : k {Kind::None}, l {0}, t{Datum::Kind::Integer}, n{0} {}
+SymValue::SymValue() : k {Kind::None}, l {0}, t{Datum::Kind::Integer} {}
 
 /** 
  * Constants have a data value, value and a active frame/block level. 
@@ -38,7 +38,7 @@ SymValue::SymValue() : k {Kind::None}, l {0}, t{Datum::Kind::Integer}, n{0} {}
  * @param value The constant data value.
  */
 SymValue::SymValue(int level, Datum value)
-	: k{SymValue::Kind::Constant}, l{level}, v{value}, t{v.k}, n{0}
+	: k{SymValue::Kind::Constant}, l{level}, v{value}, t{v.k}
 {
 }
 
@@ -50,7 +50,7 @@ SymValue::SymValue(int level, Datum value)
  * @param type  	the variables type, e.g., Datum::Kind::Integer.
  */
 SymValue::SymValue(int level, Datum::Integer offset, Datum::Kind type)
-	: k{SymValue::Kind::Variable}, l{level}, v{offset}, t{type}, n{0}
+	: k{SymValue::Kind::Variable}, l{level}, v{offset}, t{type}
 {
 }
 
@@ -61,7 +61,7 @@ SymValue::SymValue(int level, Datum::Integer offset, Datum::Kind type)
  * @param level	The token base/frame level, e.g., 0 for "current frame.
  */
 SymValue::SymValue(Kind kind, int level)
-	: k{kind}, l{level}, v{0}, t{Datum::Kind::Integer}, n{0}
+	: k{kind}, l{level}, v{0}, t{Datum::Kind::Integer}
 {
 	assert(SymValue::Kind::Procedure == k || SymValue::Kind::Function == k);
 }
@@ -82,15 +82,6 @@ Datum SymValue::value(Datum value) 					{	return v = value;	}
 Datum SymValue::value() const						{	return v;			}
 
 /**
- * @param value New formal parameter count
- * @return	My new formal parameter count
- */
-size_t SymValue::nArgs(std::size_t value)			{	return n = value;   }
-
-/// @return	My formal parameter count
-size_t SymValue::nArgs() const						{	return n;			}
-
-/**
  * @param value New symbol type
  * @return My function return type
  */
@@ -98,4 +89,17 @@ Datum::Kind SymValue::type(Datum::Kind value)		{	return t = value;	}
 
 /// @return My type
 Datum::Kind SymValue::type() const					{	return t;			}
+
+/**
+ * Return subrountine paramer kinds, in order of declaractions
+ * @return Subrountine kinds
+ */
+Datum::KindVec& SymValue::params() 					{   return p;			}
+
+/**
+ * Return subrountine paramer kinds, in order of declaractions
+ * @return Subrountine kinds
+ */
+const Datum::KindVec& SymValue::params() const 		{   return p;			}
+
 

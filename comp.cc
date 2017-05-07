@@ -658,18 +658,24 @@ void Comp::assignStmt(const string& name, const SymValue& val, int level) {
 void Comp::callStmt(const string& name, const SymValue& val, int level) {
 	expect(Token::OpenParen);
 
-	unsigned nParams = 0;						// Count parameters
+	const auto& params = val.params();		// Formal parameter kinds
+	unsigned nParams = 0;					// Count actual parameters
 	if (!accept(Token::CloseParen, false))
-		do {									// [expr {, expr }]
-			expression(level);
+		do {								// collect actual parameters
+			const auto kind = expression(level);
+			if (params.size() > nParams)
+				promote(kind, params[nParams]);
 			++nParams;
+
 		} while (accept (Token::Comma));
 
 	expect(Token::CloseParen);
 
-	if (nParams != val.nArgs()) {				// Is the caller passing right # of params?
+	if (nParams != params.size()) {			// Is the caller passing right # of params?
 		ostringstream oss;
-		oss << "passing " << nParams << " parameters where " << val.nArgs() << " where expected";
+		oss << "passing " << nParams 
+			<< " parameters where " << params.size()
+			<< " where expected";
 		error(oss.str());
 	}
 
@@ -932,7 +938,6 @@ void Comp::constDecl(int level) {
 
 /**
  * A varaiable declaration block;
- *
  *     var-decl-blk = "const" var-decl-lst
  *     var-decl-lst = var-decl { ";" var-decl }
  *     var-decl =	  ident-list : type ;
@@ -944,10 +949,12 @@ void Comp::constDecl(int level) {
  * @return  Number of variables allocated before or after the activation frame.
  */
 int Comp::varDeclBlock(int level) {
-	if (accept(Token::VarDecl))
-		return varDeclList(level, false);
+	NameKindVec	idents;				// vector of name/type pairs.
 
-	return 0;
+	if (accept(Token::VarDecl))
+		varDeclList(level, false, idents);
+
+	return idents.size();
 }
 
 /**
@@ -962,12 +969,13 @@ int Comp::varDeclBlock(int level) {
  * activaction frame. Create a new entry in the symbol table, that notes the offset and data
  * type.
  *
- * @param	level	The current block level.
- * @param	params	True if processing formal parameters, false if variable declaractions.
+ * @param			level	The current block level.
+ * @param			params	True if processing formal parameters, false if variable declaractions. 
+ * @param[in,out]	idents	Vector of identifer, kind pairs 
  *
  * @return  Offset of the next variable/parmeter from the current activicaqtion frame.
  */
-int Comp::varDeclList(int level, bool params) {
+void Comp::varDeclList(int level, bool params, NameKindVec& idents) {
 	// Stops if the ';' if followd by any of hte following tokens
 	static const Token::KindSet stops {
 		Token::ProcDecl,
@@ -976,29 +984,24 @@ int Comp::varDeclList(int level, bool params) {
 		Token::CloseParen
 	};
 
-	NameKindVect	indentifiers;				// vector of name/type pairs.
 	do {
 		if (oneOf(stops))
 			break;								// No more variables...
-		varDecl(level, indentifiers);
+		varDecl(level, idents);
 	} while (accept(Token::SemiColon));
 
 	// Set the offset from the activation frame, parameters have negative offsets in reverse
-	const int dx = params ? 0 - indentifiers.size() : 0;
-	int offset = dx;
-
-	for (const auto& id : indentifiers) {
+	int dx = params ? 0 - idents.size() : 0;
+	for (const auto& id : idents) {
 		if (verbose)
 			cout << progName  
 				 << ": var/param " 	<< id.name << ": " 
 				 << level 			<< ", "
-			     << offset 				<< ", " 
+			     << dx	 			<< ", " 
 				 << Datum::toString(id.kind) << "\n";
 
-		symtbl.insert( { id.name, SymValue(level, offset++, id.kind)	} );
+		symtbl.insert( { id.name, SymValue(level, dx++, id.kind)	} );
 	}
-
-	return params ? dx : offset;
 }
 
 /**
@@ -1018,7 +1021,7 @@ int Comp::varDeclList(int level, bool params) {
  * @param			level	The current block level. 
  * @param[in,out]	idents	Vector of identifer, kind pairs
  */
-void Comp::varDecl(int level, NameKindVect& idents) {
+void Comp::varDecl(int level, NameKindVec& idents) {
 	vector<string> indentifiers;
 
 	// Find and append comma separated identifiers to the list...
@@ -1053,10 +1056,14 @@ SymValue& Comp::subPrefixDecl(int level, SymValue::Kind kind) {
 	expect(Token::OpenParen);
 
 	// Note that the activation fram elevel is that of the *following* block!
-	auto nArgs = -varDeclList(level+1, true);
+
+	NameKindVec	idents;				// vector of name/type pairs.
+	varDeclList(level+1, true, idents);
 	expect(Token::CloseParen);
 
-	it->second.nArgs(nArgs);				// Update subroutine entry with # of arguments
+	for (auto id : idents)
+		it->second.params().push_back(id.kind);
+
 	return it->second;
 }
 
@@ -1138,11 +1145,11 @@ Datum::Unsigned Comp::blockDecl(SymValue& val, int level) {
 
 	// block postfix... TBD; emit reti or retr for functions!
 
-	assert(val.nArgs() < numeric_limits<int>::max());
+	const auto sz = val.params().size();
 	if (SymValue::Kind::Function == val.kind())
-		emit(OpCode::retf, 0, val.nArgs());		// function...
+		emit(OpCode::retf, 0, sz);	// function...
 	else
-		emit(OpCode::ret, 0, val.nArgs());		// procedure...
+		emit(OpCode::ret, 0, sz);	// procedure...
 
 	purge(level);								// Remove symbols only visible at this level
 

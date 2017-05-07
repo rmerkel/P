@@ -112,8 +112,8 @@ protected:
 		NameKind(const std::string n, Datum::Kind k) : name{n}, kind{k} {}
 	};
 
-	/// Vector of NameKind's
-	typedef std::vector<NameKind>	NameKindVect;
+	/// A vector of name kind pairs
+	typedef std::vector<NameKind>	NameKindVec;
 
 	void error(const std::string& msg);		///< Write an error message...
 
@@ -184,9 +184,9 @@ protected:
 	int varDeclBlock(int level);			///< variable-declaration-block production...
 
 	/// variable-declaration-list production...
-	int varDeclList(int level, bool params);
+	void varDeclList(int level, bool params, NameKindVec& idents);
 
-	void varDecl(int level, NameKindVect& idents);		///< ariable-declaration production...
+	void varDecl(int level, NameKindVec& idents);		///< ariable-declaration production...
 
 	/// Subroutine-declaration production...
 	SymValue& subPrefixDecl(int level, SymValue::Kind kind);
