@@ -1,5 +1,4 @@
 { print Fahrenheit-Celsius table	}
-{	first version; integers only	}
 
 const
 	LOWER =   0.0;	{	lower table limit	}
@@ -7,7 +6,7 @@ const
 	STEP  =  20.0;	{	table step size		}
 
 var
-	fahr, celsius : real;
+	fahr, celsius;
 
 begin
 	fahr = LOWER;

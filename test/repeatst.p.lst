@@ -9,17 +9,17 @@
 # repeatst.p, 10: {	 9	  362,880	}
 # repeatst.p, 11: {	10	3,628,800	}
 # repeatst.p, 12: 
-# repeatst.p, 13: var n, f : integer;
+# repeatst.p, 13: var n, f;
     0: call 0, 2
     1: halt
 # repeatst.p, 14: begin
     2: enter 2
 # repeatst.p, 15: 	n = 0;
-    3: push.i 0
+    3: push 0
     4: pushVar 0, 4
     5: assign
 # repeatst.p, 16: 	f = 1;
-    6: push.i 1
+    6: push 1
     7: pushVar 0, 5
     8: assign
 # repeatst.p, 17: 	repeat
@@ -27,8 +27,8 @@
 # repeatst.p, 19: 			n = n + 1;
     9: pushVar 0, 4
    10: eval
-   11: push.i 1
-   12: add.i
+   11: push 1
+   12: add
    13: pushVar 0, 4
    14: assign
 # repeatst.p, 20: 			f = f * n
@@ -37,15 +37,15 @@
 # repeatst.p, 21: 		end
    17: pushVar 0, 4
    18: eval
-   19: mul.i
+   19: mul
    20: pushVar 0, 5
    21: assign
 # repeatst.p, 22: 	until n >= 10
    22: pushVar 0, 4
    23: eval
-   24: push.i 10
+   24: push 10
 # repeatst.p, 23: end.
-   25: gte.i
+   25: gte
    26: jneq 9
    27: ret
 

@@ -1,17 +1,17 @@
 ./pl0c: Unknown token: '#', (0x23) near line 3
 ./pl0c: expected '(' got 'IntegerNum' near line 3
 ./pl0c: expected ')' got ';' near line 3
-./pl0c: passing 1 parameters where 0 where expected near line 3
+./pl0c: passing 1 parameter(s), where 0 was expected near line 3
 ./pl0c: Identifier is not a function or procedure 'x' near line 3
 ./pl0c: expected 'end' got 'bad comment' near line 5
 ./pl0c: expected '.' got 'bad comment' near line 5
-# unknown.p, 2: var x : integer;
+# unknown.p, 2: var x;
     0: call 0, 2
     1: halt
 # unknown.p, 3: begin
     2: enter 1
 # unknown.p, 4: 	x # 123;	{	unknown operator "#"!
-    3: push.i 123
+    3: push 123
     4: call 0, 0
 # unknown.p, 5: end .
 # unknown.p, 6: 

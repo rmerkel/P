@@ -7,14 +7,11 @@
  */
 
 #include "comp.h"
-#include "interp.h"
 
 #include <cassert>
 #include <iomanip>
 #include <iostream>
 #include <fstream>
-#include <limits>
-#include <vector>
 
 using namespace std;
 
@@ -102,19 +99,19 @@ bool Comp::oneOf(Token::KindSet set) {
  * Assembles op, level, addr into a new instruction, and then appends the instruciton on
  * the end of code[], returning it's address/index in code[].
  *
- * Side effect; updates the cross index for the listing.
+ * @note Updates the cross index for the listing as a side-effect
  *
- * @param	op		The pl0 instruction operation code
- * @param	level	The pl0 instruction block level value. Defaults to zero.
- * @param	addr	The pl0 instructions address/value. Defaults to zero.
+ * @param	op		The pl0c instruction operation code
+ * @param	level	The pl0c instruction block level value.
+ * @param	addr	The pl0c instructions address/value.
  *
  * @return The address (code[] index) of the new instruction.
  */
-size_t Comp::emit(const OpCode op, int8_t level, Datum addr) {
+size_t Comp::emit(OpCode op, int8_t level, Datum addr) {
 	const int lvl = static_cast<int>(level);
 	if (verbose)
-		cout << progName << ": emitting " << code->size() << ": "
-				<< OpCodeInfo::info(op).name() << " " << lvl << ", " << addr.i
+		cout	<< progName << ": emitting " << code->size() << ": "
+				<< OpCodeInfo::info(op).name() << " " << lvl << ", " << addr
 				<< "\n";
 
 	code->push_back({op, level, addr});
@@ -123,39 +120,17 @@ size_t Comp::emit(const OpCode op, int8_t level, Datum addr) {
 	return code->size() - 1;				// so it's the address of just emitted instruction
 }
 
+#if 0
 /**
- * Convert stack operand to a real as necessary. 
- * @param	lhs	The type of the left-hand-side
- * @param	rhs	The type of the right-hand-side 
+ * @param	op		The pl0c instruction operation code
+ * @param	level	The pl0c instruction block level value. Defaults to zero.
+ * @param	value	The pl0c instructions address/value. Defaults to zero.
+ * @return The address (code[] index) of the new instruction.
  */
-void Comp::promote (Datum::Kind lhs, Datum::Kind rhs) {
-	if (lhs == rhs)
-		;				// nothing to do
-
-	else if (Datum::Kind::Real == rhs)
-		emit(OpCode::itor2);				// promote lhs (TOS-1) to a real
-
-	else
-		emit(OpCode::itor);					// promote rhs to a real
+size_t Comp::emit(OpCode op, int8_t level, Datum::Integer value) {
+	return emit (op, level, Datum(value));
 }
-
-/**
- * Convert rhs of assign to real if necessary, or emit error would need to be converted to an integer. 
- * @param	lhs	The type of the left-hand-side
- * @param	rhs	The type of the right-hand-side 
- */
-void Comp::assignPromote (Datum::Kind lhs, Datum::Kind rhs) {
-	if (lhs == rhs)
-		;				// nothing to do
-
-	else if (Datum::Kind::Real == rhs) {
-		error("rounding lhs to fit in an integer");
-		emit(OpCode::rtoi);				// promote lhs (TOS-1) to a real
-	}
-
-	else
-		emit(OpCode::itor);					// promote rhs to a real
-}
+#endif
 
 /**
  * Uses the cross index to write a listing on the output stream
@@ -197,7 +172,7 @@ void Comp::purge(int level) {
 					 << i->first << ": "
 					 << SymValue::toString(i->second.kind()) << ", "
 					 << static_cast<int>(i->second.level()) << ", "
-					 << i->second.value().i
+					 << i->second.value()
 					 << " from the symbol table\n";
 			i = symtbl.erase(i);
 
@@ -206,31 +181,27 @@ void Comp::purge(int level) {
 	}
 }
 
- /**
-  * Local variables have an offset from the *end* of the current stack frame (bp), while parameters
-  * have a negative offset from the *start* of the frame -- offset locals by the size of the
-  * activation frame.
-  *
-  *  @param	level	The current block level
-  *  @param	val		The variable symbol table entry
-  *  @return		Data type
-  */
- Datum::Kind Comp::varRef(int level, const SymValue& val) {
-	const auto offset = val.value().i >= 0 ? val.value().i + FrameSize : val.value().i;
-	emit(OpCode::pushVar, level - val.level(), offset);
-	return val.value().k;
- }
+/**
+ * Local variables have an offset from the *end* of the current stack frame (bp), while parameters
+ * have a negative offset from the *start* of the frame -- offset locals by the size of the
+ * activation frame.
+ *
+ *  @param	level	The current block level
+ *  @param	val		The variable symbol table entry
+ */
+void Comp::varRef(int level, const SymValue& val) {
+	const auto offset = val.value().integer() >= 0 ? 
+		val.value().integer() + FrameSize : val.value().integer();
+	emit(OpCode::PUSHVAR, level - val.level(), offset);
+}
 
 /**
  * Push a variable's value, a constant value, or invoke, and push the results, of a function.
  *      ident | ident "(" [ ident { "," ident } ] ")"
  *
  * @param	level	The current block level 
- * @return	Data type 
  */
- Datum::Kind Comp::identifier(int level) {
-	Datum::Kind	kind = Datum::Kind::Integer;	// Identifier type
-
+void Comp::identifier(int level) {
 	const string name = ts.current().string_value;
 	expect(Token::Identifier);					// Consume the identifier
 
@@ -246,30 +217,22 @@ void Comp::purge(int level) {
 
 		switch (closest->second.kind()) {
 		case SymValue::Kind::Constant:
-			kind = closest->second.value().k;	// Assume it's the symbol's value type
-			if (Datum::Kind::Integer == kind)
-				emit(OpCode::pushi, 0, closest->second.value());
-			else
-				emit(OpCode::pushr, 0, closest->second.value());
+			emit(OpCode::PUSH, 0, closest->second.value());
 			break;
 
 		case SymValue::Kind::Variable:
 			varRef(level, closest->second);
-			kind = closest->second.type();
-			emit(OpCode::eval);
+			emit(OpCode::EVAL);
 			break;
 
 		case SymValue::Kind::Function:
 			callStmt(closest->first, closest->second, level);
-			kind = closest->second.type();	// Use the function return type
 			break;
 
 		default:
 			error("Identifier is not a constant, variable or function", name);
 		}
 	}
-
-	return kind;
 }
 
 /** 
@@ -283,34 +246,27 @@ void Comp::purge(int level) {
  *  	  ;
  * 
  * @param	level	The current block level.
- * @return	Data type 
  */
-Datum::Kind Comp::factor(int level) {
-	auto kind = Datum::Kind::Integer;	// factor data type
-
+void Comp::factor(int level) {
 	if (accept(Token::Identifier, false))
-		kind = identifier(level);
+		identifier(level);
 
 	else if (accept(Token::Round))  {	// round(expr) to an integer
 		expect(Token::OpenParen);
-		kind = expression(level);
+		expression(level);
 		expect(Token::CloseParen);	
-		if (Datum::Kind::Integer != kind) {
-			emit(OpCode::rtoi);
-			kind = Datum::Kind::Integer;
-		}
+		emit(OpCode::RTOI);
 		
 	} else if (accept(Token::IntegerNum, false)) {
-		emit(OpCode::pushi, 0, ts.current().integer_value);
+		emit(OpCode::PUSH, 0, ts.current().integer_value);
 		expect(Token::IntegerNum);
 		
 	} else if (accept(Token::RealNum, false)) {
-		kind = Datum::Kind::Real;
-		emit(OpCode::pushr, 0, ts.current().real_value);
+		emit(OpCode::PUSH, 0, ts.current().real_value);
 		expect(Token::RealNum);
 
 	} else if (accept(Token::OpenParen)) {
-		kind = expression(level);
+		expression(level);
 		expect(Token::CloseParen);
 
 	} else {
@@ -318,296 +274,183 @@ Datum::Kind Comp::factor(int level) {
 			Token::toString(current()));
 		next();
 	}
-
-	return kind;
 }
 
 /**
  * urary = [ ("+" | "-" | "!" | "~") ] fact
  * @param	level	The current block level 
- * @return	Data type 
  */
-Datum::Kind Comp::unary(int level) {
-	auto kind = Datum::Kind::Integer;	// factor data type
-
+void Comp::unary(int level) {
 	if (accept(Token::Add)) 
-		kind = factor(level);					/* ignore unary + */	
+		factor(level);					/* ignore unary + */	
 
 	else if (accept(Token::Subtract)) {
-		if (Datum::Kind::Integer == (kind = factor(level)))
-			emit(OpCode::negi);
-		else
-			emit(OpCode::negr);
+		factor(level);
+		emit(OpCode::NEG);
 
 	} else if (accept(Token::NOT)) {
-		if (Datum::Kind::Integer == (kind = factor(level)))
-			emit(OpCode::noti);
-		else
-			emit(OpCode::notr);
+		factor(level);
+		emit(OpCode::NOT);
 
 	} else if (accept(Token::Complament)) {
-		if (Datum::Kind::Integer == (kind = factor(level)))
-			emit(OpCode::comp);
-		else
-			error("unary: complement a Real");
+		factor(level);
+		emit(OpCode::COMP);
 
-	} else									
-		kind = factor(level);
-
-	return kind;
+	} else
+		factor(level);
 }
 
 /**
  * term =  fact { ("*" | "/" | "%") fact } ;
  *
  * @param level	The current block level 
- * @return	Data type  
  */
-Datum::Kind Comp::term(int level) {
-	const auto lhs = unary(level);
+void Comp::term(int level) {
+	unary(level);
 
 	for (;;) {
 		if (accept(Token::Multiply)) {
-			const auto rhs = unary(level);	
-			promote(lhs, rhs);
-
-			if (Datum::Kind::Integer == lhs)
-				emit(OpCode::muli);
-			else
-				emit(OpCode::mulr);
+			unary(level);
+			emit(OpCode::MUL);
 
 		} else if (accept(Token::Divide)) {
-			const auto rhs = unary(level);
-			promote(lhs, rhs);
-
-			if (Datum::Kind::Integer == lhs)
-				emit(OpCode::divi);	
-			else
-				emit(OpCode::divr);
+			unary(level);
+			emit(OpCode::DIV);	
 
 		} else if (accept(Token::Mod)) {
-			const auto rhs = unary(level);
-			promote(lhs, rhs);
-
-			if (Datum::Kind::Integer == lhs)
-				emit(OpCode::remi);
-			else
-				emit(OpCode::remr);
+			unary(level);
+			emit(OpCode::REM);
 
 		} else
 			break;
 	}
-
-	return lhs;
 }
 
 /**
  * additive = term { ("+" | "-") term } ;
  * @param	level	The current block level. 
- * @return	Data type  
  */
-Datum::Kind Comp::addExpr(int level) {
-	const auto lhs = term(level);
+void Comp::addExpr(int level) {
+	term(level);
 
 	for (;;) {
 		if (accept(Token::Add)) {
-			const auto rhs =  term(level);
-			promote(lhs, rhs);
-
-			if (Datum::Kind::Integer == lhs)
-				emit(OpCode::addi);
-			else
-				emit(OpCode::addr);
+			term(level);
+			emit(OpCode::ADD);
 
 		} else if (accept(Token::Subtract)) {
-			const auto rhs = term(level);
-			promote(lhs, rhs);
-
-			if (Datum::Kind::Integer == lhs)
-				emit(OpCode::subi);
-			else
-				emit(OpCode::subr);
+			term(level);
+			emit(OpCode::SUB);
 
 		} else
 			break;
 	}
-
-	return lhs;
 }
 
 /**
  * shift = additive { ("<<" | ">>") additive } ;
  * @param	level	The current block level. 
- * @return	Data type. 
  */
-Datum::Kind Comp::shiftExpr(int level) {
-	const auto lhs = addExpr(level);
+void Comp::shiftExpr(int level) {
+	addExpr(level);
 
 	for (;;) {
 		 if (accept(Token::ShiftL)) {
-			 const auto rhs = addExpr(level);
-
-			 if (Datum::Kind::Integer != lhs || Datum::Kind::Integer != rhs)
-				 error("Shift operator without integer operand(s)");
-			 else 
-				 emit(OpCode::lshift);
+			 addExpr(level);
+			 emit(OpCode::SHFTL);
 
 		 } else if (accept(Token::ShiftR)) {
-			 const auto rhs = addExpr(level);
-
-			 if (Datum::Kind::Integer != lhs || Datum::Kind::Integer != rhs)
-				 error("Shift operator without integer operand(s)");
-			 else 
-				 emit(OpCode::rshift);	
+			 addExpr(level);
+			 emit(OpCode::SHFTR);	
 
 		 } else
 			 break;
 	}
-
-	return lhs;
 }
 
 /**
  * expr = shift { ("|" | "&" | "^") shift } ;
  *
- * @param	level	The current block level. 
- * @return	Data type. 
+ * @param	level	The current block level.  
  */
-Datum::Kind Comp::expression(int level) {
-	const auto lhs = shiftExpr(level);
+void Comp::expression(int level) {
+	shiftExpr(level);
 
 	for (;;) {
 		if (accept(Token::BitOR)) {
-			const auto rhs = shiftExpr(level);
-			if (Datum::Kind::Integer != lhs || Datum::Kind::Integer != rhs)
-				error("binary bit operation without integer operation");
-			else
-				emit(OpCode::bor);
+			shiftExpr(level);
+			emit(OpCode::OR);
 
 		} else if (accept(Token::BitAND)) {
-			const auto rhs = shiftExpr(level);
-			if (Datum::Kind::Integer != lhs || Datum::Kind::Integer != rhs)
-				error("binary bit operation without integer operation");
-			else
-				emit(OpCode::band); 
+			shiftExpr(level);
+			emit(OpCode::AND); 
 
 		} else if (accept(Token::BitXOR)) {
-			const auto rhs = shiftExpr(level);
-			if (Datum::Kind::Integer != lhs || Datum::Kind::Integer != rhs)
-				error("binary bit operation without integer operation");
-			else
-				emit(OpCode::bxor); 
+			shiftExpr(level);
+			emit(OpCode::XOR); 
 
 		} else
 			break;
 	}
-
-	return lhs;
 }
 
 /**
  * relational =  expr { ("="|"!="|"<"|"<="|">"|">=") expr } ;
  * @param level	The current block level 
- * @return	Data type. 
  */
-Datum::Kind Comp::relational(int level) {
-	const auto lhs = expression(level);
+void Comp::relational(int level) {
+	expression(level);
 
 	for (;;) {
 		if (accept(Token::LTE)) {
-			const auto rhs = expression(level);
-			promote(lhs, rhs);
-
-			if (Datum::Kind::Integer == lhs) 
-				emit(OpCode::ltei);
-			else
-				emit(OpCode::lter);
+			expression(level);
+			emit(OpCode::LTE);
 
 		} else if (accept(Token::LT)) {
-			const auto rhs = expression(level);
-			promote(lhs, rhs);
-
-			if (Datum::Kind::Integer == lhs)
-				emit(OpCode::lti);
-			else
-				emit(OpCode::ltr);
+			expression(level);
+			emit(OpCode::LT);
 
 		} else if (accept(Token::GT)) {
-			const auto rhs = expression(level);
-			promote(lhs, rhs);
-
-			if (Datum::Kind::Integer == lhs)
-				emit(OpCode::gti);
-			else
-				emit(OpCode::gtr);
+			expression(level);
+			emit(OpCode::GT);
 			
 		} else if (accept(Token::GTE)) {
-			const auto rhs = expression(level);
-			promote(lhs, rhs);
-
-			if (Datum::Kind::Integer == lhs)
-				emit(OpCode::gtei);
-			else
-				emit(OpCode::gter);
+			expression(level);
+			emit(OpCode::GTE);
 			
 		} else if (accept(Token::EQU)) {
-			const auto rhs = expression(level);
-			promote(lhs, rhs);
-
-			if (Datum::Kind::Integer == lhs)
-				emit(OpCode::equi);
-			else
-				emit(OpCode::equr);
+			expression(level);
+			emit(OpCode::EQU);
 			
 		} else if (accept(Token::NEQU)) {
-			const auto rhs = expression(level);
-			promote(lhs, rhs);
-
-			if (Datum::Kind::Integer == lhs)
-				emit(OpCode::neqi);
-			else
-				emit(OpCode::neqr);
+			expression(level);
+			emit(OpCode::NEQU);
 
 		} else
 			break;
 	}
-
-	return lhs;
 }
 
 /**
  * cond =  relational { (|"||"|"&&") relational } ;
  *
  * @param	level	The current block level. 
- * @return	Data type. 
  */
-Datum::Kind Comp::condition(int level) {
-	const auto lhs = relational(level);
+void Comp::condition(int level) {
+	relational(level);
 
 	for (;;) {
 		if (accept(Token::OR)) {
-			const auto rhs = relational(level);
-			promote(lhs, rhs);
-
-			if (Datum::Kind::Integer == rhs)
-				emit(OpCode::lori);
-			else
-				emit(OpCode::lorr);
+			relational(level);
+			emit(OpCode::LOR);
 
 		} else if (accept(Token::AND)) {
-			const auto rhs = relational(level);
-			promote(lhs, rhs);
-
-			if (Datum::Kind::Integer == rhs)
-				emit(OpCode::landi);
-			else
-				emit(OpCode::landr);
+			relational(level);
+			emit(OpCode::LAND);
 
 		} else
 			break;
 	}
-
-	return lhs;
 }
 
 /**
@@ -618,19 +461,17 @@ Datum::Kind Comp::condition(int level) {
  * @param	level	The current block level.
  */
 void Comp::assignStmt(const string& name, const SymValue& val, int level) {
-	const auto rhs = expression(level);
+	expression(level);
 
 	switch(val.kind()) {
 	case SymValue::Kind::Variable:
-		assignPromote(val.type(), rhs);
 		varRef(level, val);
-		emit(OpCode::assign);
+		emit(OpCode::ASSIGN);
 		break;
 
 	case SymValue::Kind::Function:		// Save value in the frame's retValue element
-		assignPromote(val.type(), rhs);
-		emit(OpCode::pushVar, 0, FrameRetVal);
-		emit(OpCode::assign);
+		emit(OpCode::PUSHVAR, 0, FrameRetVal);
+		emit(OpCode::ASSIGN);
 		break;
 
 	case SymValue::Kind::Constant:
@@ -658,31 +499,28 @@ void Comp::assignStmt(const string& name, const SymValue& val, int level) {
 void Comp::callStmt(const string& name, const SymValue& val, int level) {
 	expect(Token::OpenParen);
 
-	const auto& params = val.params();		// Formal parameter kinds
 	unsigned nParams = 0;					// Count actual parameters
 	if (!accept(Token::CloseParen, false))
 		do {								// collect actual parameters
-			const auto kind = expression(level);
-			if (params.size() > nParams)
-				promote(kind, params[nParams]);
+			expression(level);
 			++nParams;
 
 		} while (accept (Token::Comma));
 
 	expect(Token::CloseParen);
 
-	if (nParams != params.size()) {			// Is the caller passing right # of params?
+	if (nParams != val.nArgs()) {			// Is the caller passing right # of params?
 		ostringstream oss;
 		oss << "passing " << nParams 
-			<< " parameters where " << params.size()
-			<< " where expected";
+			<< " parameter(s), where " << val.nArgs()
+			<< " was expected";
 		error(oss.str());
 	}
 
 	if (SymValue::Kind::Procedure != val.kind() && SymValue::Kind::Function != val.kind())
 		error("Identifier is not a function or procedure", name);
 
-	emit(OpCode::call, level - val.level(), val.value());
+	emit(OpCode::CALL, level - val.level(), val.value());
 }
 
 /**
@@ -716,7 +554,6 @@ void Comp::identStmt(int level) {
 	}
 }
 
-
 /**
  * "while" condition "do" statement...
  *
@@ -727,11 +564,11 @@ void Comp::identStmt(int level) {
 	condition(level);
 
 	// jump if condition is false...
-	const auto jmp_pc = emit(OpCode::jneq, 0, 0);
+	const auto jmp_pc = emit(OpCode::JFAIL, 0, 0);
 	expect(Token::Do);					// consume "do"
 	statement(level);
 
-	emit(OpCode::jump, 0, cond_pc);		// Jump back to condition test...
+	emit(OpCode::JUMP, 0, cond_pc);		// Jump back to condition test...
 
 	if (verbose)
 		cout << progName << ": patching address at " << jmp_pc << " to " << code->size() << "\n";
@@ -745,14 +582,14 @@ void Comp::identStmt(int level) {
 	condition(level);
 
 	// Jump if conditon is false
-	const size_t jmp_pc = emit(OpCode::jneq, 0, 0);
+	const size_t jmp_pc = emit(OpCode::JFAIL, 0, 0);
 	expect(Token::Then);							// Consume "then"
 	statement(level);
 
 	// Jump over else statement, but only if there is an else
 	const bool Else = accept(Token::Else);
 	size_t else_pc = 0;
-	if (Else) else_pc = emit(OpCode::jump, 0, 0);
+	if (Else) else_pc = emit(OpCode::JUMP, 0, 0);
 
 	if (verbose)
 		cout << progName << ": patching address at " << jmp_pc << " to " << code->size() << "\n";
@@ -777,7 +614,7 @@ void Comp::identStmt(int level) {
 	 statement(level);
 	 expect(Token::Until);
 	 condition(level);
-	 emit(OpCode::jneq, 0, loop_pc);
+	 emit(OpCode::JFAIL, 0, loop_pc);
  }
 
 /**
@@ -787,6 +624,7 @@ void Comp::identStmt(int level) {
 void Comp::statementListTail(int level) {
 	do {
 		statement(level);
+
 	} while (accept(Token::SemiColon));
 	expect(Token::End);
 }
@@ -847,24 +685,6 @@ const std::string Comp::nameDecl(int level) {
 }
 
 /**
- * ":"  "integer" | "real"
- * @return the datum type
- */
-Datum::Kind Comp::typeDecl() {
-	expect(Token::Colon);
-
-	Datum::Kind kind;
-		 if (accept(Token::Integer))	kind = Datum::Kind::Integer;
-	else if (accept(Token::Real))		kind = Datum::Kind::Real;
-	else {
-		kind = Datum::Kind::Integer;
-		error("expected 'integer' or 'real', got neither");
-	}
-
-	return kind;
-}
-
-/**
  * block-decl = [ "const" const-decl-blk ";" ]
  * const-decl-blk = const-decl-lst { ";" const-decl-lst ;
  *
@@ -899,6 +719,7 @@ void Comp::constDeclBlock(int level) {
 void Comp::constDeclList(int level) {
 	do {
 		constDecl(level);
+
 	} while (accept(Token::Comma));
 }
 
@@ -917,7 +738,7 @@ void Comp::constDecl(int level) {
 		next();										// Consume the number
 
 		// Insert ident into the symbol table
-		symtbl.insert(	{ ident, SymValue(level, number)	}	);
+		symtbl.insert(	{ ident, SymValue(level, Datum(number))	}	);
 		if (verbose)
 			cout << progName << ": constDecl " << ident << ": " << level << ", " << number << "\n";
 
@@ -926,7 +747,7 @@ void Comp::constDecl(int level) {
 		next();										// Consume the number
 
 		/// Insert ident into the symbol table
-		symtbl.insert(	{	ident, SymValue(level, number)	}	);
+		symtbl.insert(	{	ident, SymValue(level, Datum(number))	}	);
 		if (verbose)
 			cout << progName << ": constDecl " << ident << ": " << level << ", " << number << "\n";
 
@@ -949,7 +770,7 @@ void Comp::constDecl(int level) {
  * @return  Number of variables allocated before or after the activation frame.
  */
 int Comp::varDeclBlock(int level) {
-	NameKindVec	idents;				// vector of name/type pairs.
+	IdentVec idents;
 
 	if (accept(Token::VarDecl))
 		varDeclList(level, false, idents);
@@ -971,11 +792,11 @@ int Comp::varDeclBlock(int level) {
  *
  * @param			level	The current block level.
  * @param			params	True if processing formal parameters, false if variable declaractions. 
- * @param[in,out]	idents	Vector of identifer, kind pairs 
+ * @param[in,out]	idents	Vector of identifers
  *
  * @return  Offset of the next variable/parmeter from the current activicaqtion frame.
  */
-void Comp::varDeclList(int level, bool params, NameKindVec& idents) {
+void Comp::varDeclList(int level, bool params, IdentVec& idents) {
 	// Stops if the ';' if followd by any of hte following tokens
 	static const Token::KindSet stops {
 		Token::ProcDecl,
@@ -987,20 +808,21 @@ void Comp::varDeclList(int level, bool params, NameKindVec& idents) {
 	do {
 		if (oneOf(stops))
 			break;								// No more variables...
+
 		varDecl(level, idents);
+
 	} while (accept(Token::SemiColon));
 
 	// Set the offset from the activation frame, parameters have negative offsets in reverse
 	int dx = params ? 0 - idents.size() : 0;
 	for (const auto& id : idents) {
 		if (verbose)
-			cout << progName  
-				 << ": var/param " 	<< id.name << ": " 
+			cout << progName  		<< ": var/param "
+				 << id				<< ": " 
 				 << level 			<< ", "
-			     << dx	 			<< ", " 
-				 << Datum::toString(id.kind) << "\n";
+			     << dx	 			<< "\n";
 
-		symtbl.insert( { id.name, SymValue(level, dx++, id.kind)	} );
+		symtbl.insert( { id, SymValue(level, dx++)	} );
 	}
 }
 
@@ -1009,9 +831,7 @@ void Comp::varDeclList(int level, bool params, NameKindVec& idents) {
  * with a comma separated list of identifiers, followed by a colon followed by a type
  * specifier:
  *
- *     var-decl =	    ident-list : type ;
- *     ident-list =     ident { "," ident } ;
- *     type =           "integer" | "real" ;
+ *     var-decl =	    iident { "," ident } ;
  *
  * Allocate space on the stack for each variable, as a positive offset from the *end* of
  * current activaction frame; 0, 1, ..., n-1. Parameters, pushed by the caller, are identified
@@ -1019,20 +839,14 @@ void Comp::varDeclList(int level, bool params, NameKindVec& idents) {
  * entry in the symbol table for either.
  *  
  * @param			level	The current block level. 
- * @param[in,out]	idents	Vector of identifer, kind pairs
+ * @param[in,out]	idents	Vector of identifers
  */
-void Comp::varDecl(int level, NameKindVec& idents) {
-	vector<string> indentifiers;
-
+void Comp::varDecl(int level, IdentVec& idents) {
 	// Find and append comma separated identifiers to the list...
 	do {
-		indentifiers.push_back(nameDecl(level));
+		idents.push_back(nameDecl(level));
+
 	} while (accept(Token::Comma));
-
-	const Datum::Kind kind = typeDecl();
-
-	for (auto& id : indentifiers)
-		idents.push_back({ id, kind });
 }
 
 /**
@@ -1052,17 +866,15 @@ SymValue& Comp::subPrefixDecl(int level, SymValue::Kind kind) {
 	if (verbose)
 		cout << progName << ": subrountine-decl " << ident << ": " << level << ", 0\n";
 
-	// Process the formal auguments, if any...
-	expect(Token::OpenParen);
+	expect(Token::OpenParen);				// process formal arguments, if any...
 
-	// Note that the activation fram elevel is that of the *following* block!
+	// Note that the activation frame level is that of the *following* block!
 
-	NameKindVec	idents;				// vector of name/type pairs.
+	IdentVec	idents;						// formal parameter identifiers
 	varDeclList(level+1, true, idents);
 	expect(Token::CloseParen);
 
-	for (auto id : idents)
-		it->second.params().push_back(id.kind);
+	it->second.nArgs(idents.size());		// Set the number of formal parameters
 
 	return it->second;
 }
@@ -1083,7 +895,6 @@ void Comp::procDecl(int level) {
  */
 void Comp::funcDecl(int level) {
 	auto& val = subPrefixDecl(level, SymValue::Kind::Function);
-	val.type(typeDecl());
 	blockDecl(val, level + 1);
 	expect(Token::SemiColon);	// function declarations end with a ';'!
 }
@@ -1137,19 +948,19 @@ Datum::Unsigned Comp::blockDecl(SymValue& val, int level) {
 	 * if dx == 0 (the subroutine has zero locals.
 	 */
 
-	const auto addr = dx > 0 ? emit(OpCode::enter, 0, dx) : code->size();
-	val.value(addr);
+	const auto addr = dx > 0 ? emit(OpCode::ENTER, 0, dx) : code->size();
+	val.value(Datum(addr));
 
 	if (expect(Token::Begin))					// "begin" statements... "end"
 		statementListTail(level);
 
 	// block postfix... TBD; emit reti or retr for functions!
 
-	const auto sz = val.params().size();
+	const auto sz = val.nArgs();
 	if (SymValue::Kind::Function == val.kind())
-		emit(OpCode::retf, 0, sz);	// function...
+		emit(OpCode::RETF, 0, sz);	// function...
 	else
-		emit(OpCode::ret, 0, sz);	// procedure...
+		emit(OpCode::RET, 0, sz);	// procedure...
 
 	purge(level);								// Remove symbols only visible at this level
 
@@ -1162,8 +973,8 @@ void Comp::run() {
 	assert(range.first != range.second);
 
 	// Emit a call to the main procedure, followed by a halt
-	const auto call_pc = emit(OpCode::call, 0, 0);
-	emit(OpCode::halt);
+	const auto call_pc = emit(OpCode::CALL, 0, 0);
+	emit(OpCode::HALT);
 
 	// emit the first block (block 0)
 

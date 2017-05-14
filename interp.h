@@ -9,17 +9,15 @@
 #ifndef	INTERP_H
 #define INTERP_H
 
-#include <cstdint>
 #include <vector>
 
 #include "instr.h"
 
 /** A PL/0C Machine
  *
- * A interperter that started life as a straight C/C++ port of the PL/0 machine described in Algorithms + Data Structures =
- * Programs, 1st Edition, by Wirth, and then modified to provide "C like" instructions.
- *
-
+ * A interperter that started life as a straight C/C++ port of the PL/0 machine
+ * described in "Algorithms + Data Structures = Programs", 1st Edition, by
+ * Wirth, and then modified to provide "C like" instructions.
  */
 class Interp {
 public:
@@ -88,6 +86,9 @@ protected:
 	Datum pop();							///< Pop a Datum from the top of stack...
 	void push(Datum d);						///< Push a Datum onto the stack...
 
+	/// Push a Datum(T) on to the stack
+	template<class T> void push(const T& v)	{	push(Datum(v)); 		}
+
 	/// Call a subroutine...
 	void call(int8_t nlevel, Datum::Unsigned addr);
 	void ret();								///< Return from procedure...
@@ -98,3 +99,4 @@ protected:
 };
 
 #endif
+

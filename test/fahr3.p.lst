@@ -1,50 +1,49 @@
 # fahr3.p, 2: { print Fahrenheit-Celsius table	}
-# fahr3.p, 3: {	first version; integers only	}
-# fahr3.p, 4: 
-# fahr3.p, 5: const
+# fahr3.p, 3: 
+# fahr3.p, 4: const
     0: call 0, 2
     1: halt
-# fahr3.p, 6: 	LOWER =   0.0;	{	lower table limit	}
-# fahr3.p, 7: 	UPPER = 300.0;	{	upper table limit	}
-# fahr3.p, 8: 	STEP  =  20.0;	{	table step size		}
-# fahr3.p, 9: 
-# fahr3.p, 10: var
-# fahr3.p, 11: 	fahr : real ; celsius : integer;
-# fahr3.p, 12: 
-# fahr3.p, 13: begin
+# fahr3.p, 5: 	LOWER =   0.0;	{	lower table limit	}
+# fahr3.p, 6: 	UPPER = 300.0;	{	upper table limit	}
+# fahr3.p, 7: 	STEP  =  20.0;	{	table step size		}
+# fahr3.p, 8: 
+# fahr3.p, 9: var
+# fahr3.p, 10: 	fahr, celsius;
+# fahr3.p, 11: 
+# fahr3.p, 12: begin
     2: enter 2
-# fahr3.p, 14: 	fahr = LOWER;
-    3: push.r 0.000000
+# fahr3.p, 13: 	fahr = LOWER;
+    3: push 0.000000
     4: pushVar 0, 4
     5: assign
-# fahr3.p, 15: 	while fahr <= UPPER do begin
+# fahr3.p, 14: 	while fahr <= UPPER do begin
     6: pushVar 0, 4
     7: eval
-    8: push.r 300.000000
-    9: lte.r
+    8: push 300.000000
+    9: lte
    10: jneq 29
-# fahr3.p, 16: 		celsius = round(5.0 * (fahr-32.0) / 9.0);
-   11: push.r 5.000000
+# fahr3.p, 15: 		celsius = round(5.0 * (fahr-32.0) / 9.0);
+   11: push 5.000000
    12: pushVar 0, 4
    13: eval
-   14: push.r 32.000000
-   15: sub.r
-   16: mul.r
-   17: push.r 9.000000
-   18: div.r
+   14: push 32.000000
+   15: sub
+   16: mul
+   17: push 9.000000
+   18: div
    19: rtoi
    20: pushVar 0, 5
    21: assign
-# fahr3.p, 17: 		fahr = fahr + STEP;
+# fahr3.p, 16: 		fahr = fahr + STEP;
    22: pushVar 0, 4
    23: eval
-   24: push.r 20.000000
-   25: add.r
+   24: push 20.000000
+   25: add
    26: pushVar 0, 4
    27: assign
-# fahr3.p, 18: 	end;
+# fahr3.p, 17: 	end;
    28: jump 6
-# fahr3.p, 19:  end.
+# fahr3.p, 18:  end.
    29: ret
 
         8:   0.000000

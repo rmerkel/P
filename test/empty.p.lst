@@ -1,0 +1,8 @@
+./pl0c: expected 'begin' got 'EOS' near line 2
+./pl0c: expected '.' got 'EOS' near line 2
+# empty.p, 2: 
+# empty.p, 3: 
+    0: call 0, 2
+    1: halt
+    2: ret
+

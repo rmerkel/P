@@ -10,8 +10,8 @@
 {	10	3,628,800	}
 
 const nFacts = 10;
-var p : integer;
-procedure factorial(n : integer) begin
+var p;
+procedure factorial(n) begin
         p = 1;
         while n > 0 do begin
             p = p * n;

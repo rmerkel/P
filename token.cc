@@ -1,8 +1,8 @@
 /**	@file	token.cc
  *
- * TokenStream implementation. Started life as the Token and TokenStream classes from The C++
- * Programming Language, 4th Edition, by Stroustrup, and then modified to work on the integer based
- * PL/0C machine.
+ * TokenStream implementation. Started life as the Token and TokenStream classes
+ * from The C++ Programming Language, 4th Edition, by Stroustrup, and then 
+ * modified to work on the integer based PL/0C machine. 
  *
  * @author Randy Merkel, Slowly but Surly Software.
  * @copyright  (c) 2017 Slowly but Surly Software. All rights reserved.
@@ -294,3 +294,4 @@ TokenStream::KeywordTable	TokenStream::keywords = {
 	{	"real",			Token::Real			},
 	{	"round",		Token::Round		}
 };
+

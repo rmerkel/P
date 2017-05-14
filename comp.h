@@ -27,38 +27,31 @@
  * emit a travlelog (verbose messages).
  *
  * @section grammer Grammer (EBNF)
- *
- *     program =		block-decl "begin" stmt-lst "end" "." ;
- *     block-decl =     [ "const" const-decl-blk ";" ]
- *  					[ "var" var-decl-blk ";" ]
- *  					[ sub-decl { ";" sub-decl }
- *  					{ stmt-lst }
- *  					;
  *     
- *     const-decl-blk = const-decl-lst { ";" const-decl-lst } ;
+ *     program =        block-decl "." ;
+ *     block-decl =     [ "const" const-decl-lst { ";" const-decl-lst ";" ]
+ *                      [ "var" ident-list { ";" ident-lst } ";" ]
+ *                      [ sub-decl { ";" sub-decl } ";" ]
+ *                      stmt-blk 
+ *                      ;
+ *     
  *     const-decl-lst = const-decl { "," const-decl } ;
  *     const-decl =     ident "=" number | ident ;
- *     
- *     sub-decl = 		( func-decl | proc-decl } ;
- *     proc-decl =      "procedure" ident param-decl-lst block-decl ";" ;
- *     func-decl =      "function"  ident param-decl-lst ":" type block-decl ";" ; 
- *     param-decl-lst = "(" [ var-decl-blk ] ")" ;
+ *
+ *     sub-decl =       sub-type ident param-decl-lst block-decl ";" ;
+ *     sub-type =       "procedure" | "function" ;
+ *     param-decl-lst = "(" [ ident-lst ] ")" ;
+ *     ident-lst =        ident { "," ident } ;
  *  
- *     var-decl-blk =	var-decl-lst { ";" var-decl-lst } ;
- *     var-decl-lst =	ident-list : type ;
- *     type ; type =    "integer" | "real" ;
+ *     stmt-blk =       "begin" stmt {";" stmt } "end" ;
+ *     stmt =           [ ident "=" expr                      	|
+ *                        ident "(" [ expr { "," expr } ")"     |
+ *                        stmt-blk                              |
+ *                        "if" cond "then" stmt { "else" stmt } |
+ *                        "while" cond "do" stmt                |
+ *                        "repeat" stmt "until" cond ]
+ *                        ;
  *  
- *     stmt =           [ ident "=" expr 						|
- *						  ident "(" [ expr { "," expr } ")"     |
- *  					  stmt-lst								|
- *  					  "if" cond "then" stmt { "else" stmt } |
- *                        "while" cond "do" stmt 				|
- *  					  "repeat" stmt "until" cond ]
- *  					  ;
- *     tmt-lst =		"begin" stmt {";" stmt } "end" ;
- *  
- *     ident-list =		ident { "," ident } ;
- *                      
  *     cond =           relat { ("||" | &&") relat } ;
  *     relat =          expr { ("==" | "!=" | "<" | "<=" | ">" | ">=") expr } ;
  *     expr =           shift-expr { ("|" | "&" | "^") shift-expr } ;
@@ -66,14 +59,12 @@
  *     add-expr =       term { ("+" | "-") term } ;
  *     term =           unary { ("*" | "/" | "%") unary } ;
  *     unary =          [ ("+"|"-") ] fact ;
- *  
  *     fact  =          ident                                   |
- *  					ident "(" [ expr { "," expr } ")"   	|
- *  					"round" "(" expr ")"					|
+ *                      ident "(" [ expr { "," expr } ")"       |
+ *                      "round" "(" expr ")"                    |
  *                      number                                  |
  *                      "(" expr ")"
- *  					;
-
+ *                      ;
  *
  * Key
  * - {}	Repeat zero or more times
@@ -94,6 +85,7 @@ private:
 	/// A table, indexed by instruction address, yeilding source line numbers
 	typedef std::vector<unsigned> SourceIndex;
 
+
 	std::string			progName;			///< The compilier's name, used in error messages
 	unsigned			nErrors;			///< Total # of compilier errors
 	bool				verbose;			///< Dump debugging information if true
@@ -103,17 +95,8 @@ private:
 	SourceIndex			indextbl;			///< Source cross-index for listings
 
 protected:
-	/// Name, kind pair
-	struct NameKind {
-		std::string		name;				///< Variable/parameter
-		Datum::Kind		kind;				///< It's kind
-
-		/// Construct a name/kind pair
-		NameKind(const std::string n, Datum::Kind k) : name{n}, kind{k} {}
-	};
-
-	/// A vector of name kind pairs
-	typedef std::vector<NameKind>	NameKindVec;
+	///< A vector of identifiers
+	typedef std::vector<std::string>	IdentVec;
 
 	void error(const std::string& msg);		///< Write an error message...
 
@@ -134,13 +117,12 @@ protected:
 	bool oneOf(Token::KindSet set);			///< Is the current token one of the given set?
 
 	/// Emit an instruction...
-	size_t emit(const OpCode op, int8_t level = 0, Datum addr = 0);
+	size_t emit(OpCode op, int8_t level = 0, Datum addr = Datum());
 
-	/// Promote data type if necessary...
-	void promote (Datum::Kind lhs, Datum::Kind rhs);
-
-	/// Promote assigned data type if necessary...
-	void assignPromote (Datum::Kind lhs, Datum::Kind rhs);
+	/// Return emit(op, level, Datum(value)
+	template <class T> size_t emit(OpCode op, int8_t level, const T& value) {
+		return emit(op, level, Datum(value));
+	}
 
 	/// Create a listing...
 	void listing(const std::string& name, std::istream& source, std::ostream& out);
@@ -149,17 +131,17 @@ protected:
 	void purge(int level);
 
 	/// Emit a variable reference, e.g., an absolute address...
-	Datum::Kind varRef(int level, const SymValue& val);
+	void varRef(int level, const SymValue& val);
 
-	Datum::Kind identifier(int level);		///< factor-identifier production...
-	Datum::Kind factor(int level);			///< factor production...
-	Datum::Kind unary(int level);			///< unary-expr production...
-	Datum::Kind term(int level);			///< terminal production...
-	Datum::Kind addExpr(int level);			///< additive-expr production...
-	Datum::Kind shiftExpr(int level);		///< shift production...
-	Datum::Kind expression(int level);		///< expression production...
-	Datum::Kind relational(int level);		///< relational-expr production...
-	Datum::Kind condition(int level);		///< condition production...
+	void identifier(int level);				///< factor-identifier production...
+	void factor(int level);					///< factor production...
+	void unary(int level);					///< unary-expr production...
+	void term(int level);					///< terminal production...
+	void addExpr(int level);				///< additive-expr production...
+	void shiftExpr(int level);				///< shift production...
+	void expression(int level);				///< expression production...
+	void relational(int level);				///< relational-expr production...
+	void condition(int level);				///< condition production...
 
 	/// assignment-statement production...
 	void assignStmt(const std::string& name, const SymValue& val, int level);
@@ -175,7 +157,6 @@ protected:
 	void statementListTail(int level);		///< partial statement-list-production...
 
 	const std::string nameDecl(int level);	///< name (identifier) check...
-	Datum::Kind typeDecl();					///< type decal production...
 
 	void constDeclBlock(int level);			///< const-declaration-block production...
 	void constDeclList(int level);			///< const-declaration-list production...
@@ -184,9 +165,10 @@ protected:
 	int varDeclBlock(int level);			///< variable-declaration-block production...
 
 	/// variable-declaration-list production...
-	void varDeclList(int level, bool params, NameKindVec& idents);
+	void varDeclList(int level, bool params, IdentVec& idents);
 
-	void varDecl(int level, NameKindVec& idents);		///< ariable-declaration production...
+	/// ariable-declaration production...
+	void varDecl(int level, IdentVec& idents);
 
 	/// Subroutine-declaration production...
 	SymValue& subPrefixDecl(int level, SymValue::Kind kind);

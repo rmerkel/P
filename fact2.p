@@ -10,9 +10,9 @@
 {	10	3,628,800	}
 
 const nFacts = 10;
-var result : integer;
-function factorial(n : integer) : integer
-	var p : integer;
+var result;
+function factorial(n)
+	var p;
 
 	begin
 		p = 1;

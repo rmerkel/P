@@ -1,84 +1,80 @@
 # fahr.p, 2: { print Fahrenheit-Celsius table	}
-# fahr.p, 3: {	first version; integers only	}
-# fahr.p, 4: 
-# fahr.p, 5: const
+# fahr.p, 3: 
+# fahr.p, 4: const
     0: call 0, 2
     1: halt
-# fahr.p, 6: 	LOWER =   0;	{	lower table limit	}
-# fahr.p, 7: 	UPPER = 300;	{	upper table limit	}
-# fahr.p, 8: 	STEP  =  20;	{	table step size		}
-# fahr.p, 9: 
-# fahr.p, 10: var
-# fahr.p, 11: 	fahr, celsius : real;
-# fahr.p, 12: 
-# fahr.p, 13: begin
+# fahr.p, 5: 	LOWER =   0;	{	lower table limit	}
+# fahr.p, 6: 	UPPER = 300;	{	upper table limit	}
+# fahr.p, 7: 	STEP  =  20;	{	table step size		}
+# fahr.p, 8: 
+# fahr.p, 9: var
+# fahr.p, 10: 	fahr, celsius;
+# fahr.p, 11: 
+# fahr.p, 12: begin
     2: enter 2
-# fahr.p, 14: 	fahr = LOWER;
-    3: push.i 0
-    4: itor
-    5: pushVar 0, 4
-    6: assign
-# fahr.p, 15: 	while fahr <= UPPER do begin
-    7: pushVar 0, 4
-    8: eval
-    9: push.i 300
-   10: itor
-   11: lte.r
-   12: jneq 31
-# fahr.p, 16: 		celsius = 5.0 * (fahr-32.0) / 9.0;
-   13: push.r 5.000000
-   14: pushVar 0, 4
-   15: eval
-   16: push.r 32.000000
-   17: sub.r
-   18: mul.r
-   19: push.r 9.000000
-   20: div.r
-   21: pushVar 0, 5
-   22: assign
-# fahr.p, 17: 		fahr = fahr + STEP;
-   23: pushVar 0, 4
-   24: eval
-   25: push.i 20
-   26: itor
-   27: add.r
-   28: pushVar 0, 4
-   29: assign
-# fahr.p, 18: 	end;
-   30: jump 7
-# fahr.p, 19:  end.
-   31: ret
+# fahr.p, 13: 	fahr = LOWER;
+    3: push 0
+    4: pushVar 0, 4
+    5: assign
+# fahr.p, 14: 	while fahr <= UPPER do begin
+    6: pushVar 0, 4
+    7: eval
+    8: push 300
+    9: lte
+   10: jneq 28
+# fahr.p, 15: 		celsius = 5.0 * (fahr-32.0) / 9.0;
+   11: push 5.000000
+   12: pushVar 0, 4
+   13: eval
+   14: push 32.000000
+   15: sub
+   16: mul
+   17: push 9.000000
+   18: div
+   19: pushVar 0, 5
+   20: assign
+# fahr.p, 16: 		fahr = fahr + STEP;
+   21: pushVar 0, 4
+   22: eval
+   23: push 20
+   24: add
+   25: pushVar 0, 4
+   26: assign
+# fahr.p, 17: 	end;
+   27: jump 6
+# fahr.p, 18:  end.
+   28: ret
 
-        8:   0.000000
+        8:          0
         9: -17.777778
-        8:  20.000000
+        8:         20
         9: - 6.666667
-        8:  40.000000
+        8:         40
         9:   4.444444
-        8:  60.000000
+        8:         60
         9:  15.555556
-        8:  80.000000
+        8:         80
         9:  26.666667
-        8: 100.000000
+        8:        100
         9:  37.777778
-        8: 120.000000
+        8:        120
         9:  48.888889
-        8: 140.000000
+        8:        140
         9:  60.000000
-        8: 160.000000
+        8:        160
         9:  71.111111
-        8: 180.000000
+        8:        180
         9:  82.222222
-        8: 200.000000
+        8:        200
         9:  93.333333
-        8: 220.000000
+        8:        220
         9: 104.444444
-        8: 240.000000
+        8:        240
         9: 115.555556
-        8: 260.000000
+        8:        260
         9: 126.666667
-        8: 280.000000
+        8:        280
         9: 137.777778
-        8: 300.000000
+        8:        300
         9: 148.888889
-        8: 320.000000
+        8:        320

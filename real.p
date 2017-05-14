@@ -1,5 +1,5 @@
 var
-	f : real; i : integer;
+	f, i;
 
 begin
 	i = 1;

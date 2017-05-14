@@ -1,10 +1,11 @@
 /**	@file	token.h
  *
- *  The PL/0C scanner.
+ * The PL/0C scanner.
  *
- * Started life as the Token and TokenStream classes for the calulator example from The C++
- * Programming Language, 4th Edition, by Stroustrup, modified in an initial port of Wirth's PL/0
- * compilier, and then transformed to use more C/C++ operands yielding the PL/0C scanner.
+ * Started life as the Token and TokenStream classes for the calulator example
+ * from "The C++ Programming Language", 4th Edition, by Stroustrup, modified in
+ * an initial port of Wirth's PL/0 compilier, and then transformed to use more
+ * C/C++ operands yielding the PL/0C scanner.
  *
  * @author Randy Merkel, Slowly but Surly Software.
  * @copyright  (c) 2017 Slowly but Surly Software. All rights reserved.

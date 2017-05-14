@@ -1,26 +1,26 @@
-# testif.p, 2: var x, y, z : integer;
+# testif.p, 2: var x, y, z;
     0: call 0, 2
     1: halt
 # testif.p, 3: begin
     2: enter 3
 # testif.p, 4: 	x = 1;
-    3: push.i 1
+    3: push 1
     4: pushVar 0, 4
     5: assign
 # testif.p, 5: 	y = 2;
-    6: push.i 2
+    6: push 2
     7: pushVar 0, 5
     8: assign
 # testif.p, 6: 	z = 3;
-    9: push.i 3
+    9: push 3
    10: pushVar 0, 6
    11: assign
 # testif.p, 7: 	{ set x to 2	}
 # testif.p, 8: 	if x == 1 then x = y else x = z;
    12: pushVar 0, 4
    13: eval
-   14: push.i 1
-   15: equ.i
+   14: push 1
+   15: equ
    16: jneq 22
    17: pushVar 0, 5
    18: eval
@@ -37,7 +37,7 @@
    27: eval
    28: pushVar 0, 5
    29: eval
-   30: equ.i
+   30: equ
    31: jneq 37
    32: pushVar 0, 6
    33: eval
