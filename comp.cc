@@ -277,91 +277,92 @@ void Comp::factor(int level) {
 }
 
 /**
- * urary = [ ("+" | "-" | "!" | "~") ] fact
+ * urary = [ ("+" | "-" | "!" | "~") ] term 
  * @param	level	The current block level 
  */
 void Comp::unary(int level) {
 	if (accept(Token::Add)) 
-		factor(level);					/* ignore unary + */	
+		term(level);					/* ignore unary + */	
 
 	else if (accept(Token::Subtract)) {
-		factor(level);
+		term(level);
 		emit(OpCode::NEG);
 
 	} else if (accept(Token::NOT)) {
-		factor(level);
+		term(level);
 		emit(OpCode::NOT);
 
 	} else if (accept(Token::Complament)) {
-		factor(level);
+		term(level);
 		emit(OpCode::COMP);
 
 	} else
-		factor(level);
+		term(level);
 }
 
 /**
- * term =  fact { ("*" | "/" | "%") fact } ;
+ * term = fact { multi-oper ) fact } ;
+ * multi-oper = "*" | "/" | "%" | "&" [ "&&";
  *
  * @param level	The current block level 
  */
 void Comp::term(int level) {
-	unary(level);
+	factor(level);
 
 	for (;;) {
 		if (accept(Token::Multiply)) {
-			unary(level);
+			factor(level);
 			emit(OpCode::MUL);
 
 		} else if (accept(Token::Divide)) {
-			unary(level);
+			factor(level);
 			emit(OpCode::DIV);	
 
 		} else if (accept(Token::Mod)) {
-			unary(level);
+			factor(level);
 			emit(OpCode::REM);
 
+		} else if (accept(Token::BitAND)) {
+			factor(level);
+			emit(OpCode::AND);
+
+		} else if (accept(Token::AND)) {
+			factor(level);
+			emit(OpCode::LAND);
+
 		} else
 			break;
 	}
 }
 
 /**
- * additive = term { ("+" | "-") term } ;
+ * simple-expr =	[ "+" | "-" ] term { addr-oper term }; 
+ * addr-oper =		"+" | "-" | "^" | "|" | "||";
  * @param	level	The current block level. 
  */
-void Comp::addExpr(int level) {
-	term(level);
+void Comp::simpleExpr(int level) {
+	unary(level);
 
 	for (;;) {
-		if (accept(Token::Add)) {
-			term(level);
-			emit(OpCode::ADD);
+		 if (accept(Token::Add)) {
+			 unary(level);
+			 emit(OpCode::ADD);
 
 		} else if (accept(Token::Subtract)) {
-			term(level);
-			emit(OpCode::SUB);
+			 unary(level);
+			 emit(OpCode::SUB);
+			 
+		} else if (accept(Token::BitOR)) {
+			unary(level);
+			emit(OpCode::OR);
 
-		} else
-			break;
-	}
-}
+		} else if (accept(Token::BitXOR)) {
+			unary(level);
+			emit(OpCode::XOR);
 
-/**
- * shift = additive { ("<<" | ">>") additive } ;
- * @param	level	The current block level. 
- */
-void Comp::shiftExpr(int level) {
-	addExpr(level);
-
-	for (;;) {
-		 if (accept(Token::ShiftL)) {
-			 addExpr(level);
-			 emit(OpCode::SHFTL);
-
-		 } else if (accept(Token::ShiftR)) {
-			 addExpr(level);
-			 emit(OpCode::SHFTR);	
+		} else if (accept(Token::OR)) {
+			unary(level);
+			emit(OpCode::LOR);
 
 		 } else
 			 break;
@@ -369,84 +370,37 @@ void Comp::shiftExpr(int level) {
 }
 
 /**
- * expr = shift { ("|" | "&" | "^") shift } ;
- *
+ * expr = simple-expr {  relation-op simple-expr };
+ * relation-op = "<"|"<="|"=="|">="|">"|"!=";
  * @param	level	The current block level.  
  */
 void Comp::expression(int level) {
-	shiftExpr(level);
+	simpleExpr(level);
 
 	for (;;) {
-		if (accept(Token::BitOR)) {
-			shiftExpr(level);
-			emit(OpCode::OR);
-
-		} else if (accept(Token::BitAND)) {
-			shiftExpr(level);
-			emit(OpCode::AND); 
-
-		} else if (accept(Token::BitXOR)) {
-			shiftExpr(level);
-			emit(OpCode::XOR); 
-
-		} else
-			break;
-	}
-}
-
-/**
- * relational =  expr { ("="|"!="|"<"|"<="|">"|">=") expr } ;
- * @param level	The current block level 
- */
-void Comp::relational(int level) {
-	expression(level);
-
-	for (;;) {
-		if (accept(Token::LTE)) {
-			expression(level);
-			emit(OpCode::LTE);
-
-		} else if (accept(Token::LT)) {
-			expression(level);
+		if (accept(Token::LT)) {
+			simpleExpr(level);
 			emit(OpCode::LT);
 
-		} else if (accept(Token::GT)) {
-			expression(level);
-			emit(OpCode::GT);
-			
-		} else if (accept(Token::GTE)) {
-			expression(level);
-			emit(OpCode::GTE);
-			
+		} else if (accept(Token::LTE)) {
+			simpleExpr(level);
+			emit(OpCode::LTE);
+
 		} else if (accept(Token::EQU)) {
-			expression(level);
+			simpleExpr(level);
 			emit(OpCode::EQU);
-			
+
+		} else if (accept(Token::GTE)) {
+			simpleExpr(level);
+			emit(OpCode::GTE);
+
+		} else if (accept(Token::GT)) {
+			simpleExpr(level);
+			emit(OpCode::GT);
+
 		} else if (accept(Token::NEQU)) {
 			expression(level);
 			emit(OpCode::NEQU);
-
-		} else
-			break;
-	}
-}
-
-/**
- * cond =  relational { (|"||"|"&&") relational } ;
- *
- * @param	level	The current block level. 
- */
-void Comp::condition(int level) {
-	relational(level);
-
-	for (;;) {
-		if (accept(Token::OR)) {
-			relational(level);
-			emit(OpCode::LOR);
-
-		} else if (accept(Token::AND)) {
-			relational(level);
-			emit(OpCode::LAND);
 
 		} else
 			break;
@@ -555,20 +509,20 @@ void Comp::identStmt(int level) {
 }
 
 /**
- * "while" condition "do" statement...
+ * "while" expression "do" statement...
  *
  * @param	level	The current block level.
  */
  void Comp::whileStmt(int level) {
-	const auto cond_pc = code->size();	// Start of while condition
-	condition(level);
+	const auto cond_pc = code->size();	// Start of while statement
+	expression(level);
 
-	// jump if condition is false...
+	// jump if expression is false...
 	const auto jmp_pc = emit(OpCode::JFAIL, 0, 0);
 	expect(Token::Do);					// consume "do"
 	statement(level);
 
-	emit(OpCode::JUMP, 0, cond_pc);		// Jump back to condition test...
+	emit(OpCode::JUMP, 0, cond_pc);		// Jump back to expression test...
 
 	if (verbose)
 		cout << progName << ": patching address at " << jmp_pc << " to " << code->size() << "\n";
@@ -576,10 +530,10 @@ void Comp::identStmt(int level) {
  }
 
 /**
- *  "if" condition "then" statement1 [ "else" statement2 ]
+ *  "if" expression "then" statement1 [ "else" statement2 ]
  */
  void Comp::ifStmt(int level) {
-	condition(level);
+	expression(level);
 
 	// Jump if conditon is false
 	const size_t jmp_pc = emit(OpCode::JFAIL, 0, 0);
@@ -605,15 +559,15 @@ void Comp::identStmt(int level) {
  }
 
  /**
-  * "repeat" statement "until" condition
+  * "repeat" statement "until" expression
   *
   * @param	level 	The current block level
   */
  void Comp::repeatStmt(int level) {
-	 const size_t loop_pc = code->size();			// jump here until condition fails
+	 const size_t loop_pc = code->size();			// jump here until expression fails
 	 statement(level);
 	 expect(Token::Until);
-	 condition(level);
+	 expression(level);
 	 emit(OpCode::JFAIL, 0, loop_pc);
  }
 
@@ -635,8 +589,9 @@ void Comp::statementListTail(int level) {
  *          | "?" ident
  * 		  	| "!" expr
  *          | "begin" stmt {";" stmt } "end"
- *          | "if" cond "then" stmt { "else" stmt }
- *          | "while" cond "do" stmt ] ;identStmt
+ *          | "if" expr "then" stmt { "else" stmt }
+ *  		| "while" expr "do" stmt ]  
+ *  		| "repeat" expr "until" stmt } ;
  *
  * @param	level	The current block level.
  */
@@ -647,13 +602,13 @@ void Comp::statement(int level) {
 	else if (accept(Token::Begin)) {				// begin ... end
 		statementListTail(level);
 
-	} else if (accept(Token::If)) 					// if condition...
+	} else if (accept(Token::If)) 					// if expression...
 		ifStmt(level);
 
-	else if (accept(Token::While))					// "while" condition...
+	else if (accept(Token::While))					// "while" expression...
 		whileStmt(level);
 
-	else if (accept(Token::Repeat))
+	else if (accept(Token::Repeat))					// "repeat" expresson...
 		repeatStmt(level);
 
 	// else: nothing

@@ -47,25 +47,25 @@
  *     stmt =           [ ident "=" expr                      	|
  *                        ident "(" [ expr { "," expr } ")"     |
  *                        stmt-blk                              |
- *                        "if" cond "then" stmt { "else" stmt } |
- *                        "while" cond "do" stmt                |
- *                        "repeat" stmt "until" cond ]
- *                        ;
- *  
- *     cond =           relat { ("||" | &&") relat } ;
- *     relat =          expr { ("==" | "!=" | "<" | "<=" | ">" | ">=") expr } ;
- *     expr =           shift-expr { ("|" | "&" | "^") shift-expr } ;
- *     shift-expr =     add-expr { ("<<" | ">>") add-expr } ;
- *     add-expr =       term { ("+" | "-") term } ;
- *     term =           unary { ("*" | "/" | "%") unary } ;
- *     unary =          [ ("+"|"-") ] fact ;
- *     fact  =          ident                                   |
+ *                        "if" expr "then" stmt { "else" stmt } |
+ *                        "while" expr "do" stmt                |
+ *  					  "repeat" expr "until" expr ]
+ *     					;
+ *     
+ *     expr =			simple-expr {  relation-op simple-expr };
+ *     relation-op =	"<"|"<="|"=="|"!="|">="|">";
+ *     simple-expr =	[ unary-oper ] term { addr-oper term };
+ *     unary_oper = 	"+" | "-" | "!" | "~"
+ *     addr-oper =		"+" | "-" | "^" | "|" | "||";
+ *     term = 			fact { multi-oper ) fact } ;
+ *     multi-oper =		"*" | "/" | "%" | "&" [ "&&";
+ *     fact  =          number									[
+ *     					ident                                   |
  *                      ident "(" [ expr { "," expr } ")"       |
  *                      "round" "(" expr ")"                    |
- *                      number                                  |
- *                      "(" expr ")"
- *                      ;
- *
+ *  					"(" expr ")"
+ *  					;
+ *      
  * Key
  * - {}	Repeat zero or more times
  * - []	Optional; zero or *one* times
@@ -137,11 +137,8 @@ protected:
 	void factor(int level);					///< factor production...
 	void unary(int level);					///< unary-expr production...
 	void term(int level);					///< terminal production...
-	void addExpr(int level);				///< additive-expr production...
-	void shiftExpr(int level);				///< shift production...
+	void simpleExpr(int level);				///< simple expression production...
 	void expression(int level);				///< expression production...
-	void relational(int level);				///< relational-expr production...
-	void condition(int level);				///< condition production...
 
 	/// assignment-statement production...
 	void assignStmt(const std::string& name, const SymValue& val, int level);

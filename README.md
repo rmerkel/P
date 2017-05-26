@@ -66,6 +66,7 @@ Versions:
 2.0 - Real and integer data types.
 
 3.0 - Made typeless; variables and expressions auto promote as needed.
+3.0a - simplified expression productions
 
 Author
     Randy Merkel, Slowly but Surly Software.
