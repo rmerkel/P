@@ -5,29 +5,29 @@
 # divbyzero.p, 4: begin
     2: enter 3
 # divbyzero.p, 5: 	y = 10;
-    3: push 10
-    4: pushVar 0, 5
+    3: pushVar 0, 5
+    4: push 10
     5: assign
 # divbyzero.p, 6: 	z = 0;
-    6: push 0
-    7: pushVar 0, 6
+    6: pushVar 0, 6
+    7: push 0
     8: assign
 # divbyzero.p, 7: 
 # divbyzero.p, 8: 	x = y / 2;
-    9: pushVar 0, 5
-   10: eval
-   11: push 2
-   12: div
-   13: pushVar 0, 4
+    9: pushVar 0, 4
+   10: pushVar 0, 5
+   11: eval
+   12: push 2
+   13: div
    14: assign
 # divbyzero.p, 9: 	x = y / z	{	opps!	}
-   15: pushVar 0, 5
-   16: eval
+   15: pushVar 0, 4
+   16: pushVar 0, 5
+   17: eval
 # divbyzero.p, 10: end.
-   17: pushVar 0, 6
-   18: eval
-   19: div
-   20: pushVar 0, 4
+   18: pushVar 0, 6
+   19: eval
+   20: div
    21: assign
    22: ret
 #divbyzero.p, 10: 
@@ -35,5 +35,5 @@
         9:         10
        10:          0
         8:          5
-Attempt to divide by zero @ pc (19)!
+Attempt to divide by zero @ pc (20)!
 ./pl0c: runtime error: divideByZero!

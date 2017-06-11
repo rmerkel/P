@@ -9,16 +9,15 @@
 #ifndef	COMP_H
 #define	COMP_H
 
-#include <set>
 #include <string>
 #include <utility>
 
-#include "instr.h"
 #include "datum.h"
+#include "instr.h"
 #include "token.h"
 #include "symbol.h"
 
-/** A PL/0C Compilier
+/** PL/0C Compilier
  *
  * A recursive decent compilier, evolved from
  * https://en.wikipedia.org/wiki/Recursive_descent_parser#C_implementation. Construction binds
@@ -27,45 +26,43 @@
  * emit a travlelog (verbose messages).
  *
  * @section grammer Grammer (EBNF)
- *     
- *     program =        block-decl "." ;
- *     block-decl =     [ "const" const-decl-lst { ";" const-decl-lst ";" ]
- *                      [ "var" ident-list { ";" ident-lst } ";" ]
- *                      [ sub-decl { ";" sub-decl } ";" ]
- *                      stmt-blk 
- *                      ;
- *     
- *     const-decl-lst = const-decl { "," const-decl } ;
- *     const-decl =     ident "=" number | ident ;
- *
- *     sub-decl =       sub-type ident param-decl-lst block-decl ";" ;
- *     sub-type =       "procedure" | "function" ;
- *     param-decl-lst = "(" [ ident-lst ] ")" ;
- *     ident-lst =        ident { "," ident } ;
  *  
- *     stmt-blk =       "begin" stmt {";" stmt } "end" ;
- *     stmt =           [ ident "=" expr                      	|
- *                        ident "(" [ expr { "," expr } ")"     |
- *                        stmt-blk                              |
- *                        "if" expr "then" stmt { "else" stmt } |
- *                        "while" expr "do" stmt                |
- *  					  "repeat" expr "until" expr ]
- *     					;
- *     
- *     expr =			simple-expr {  relation-op simple-expr };
- *     relation-op =	"<"|"<="|"=="|"!="|">="|">";
- *     simple-expr =	[ unary-oper ] term { addr-oper term };
- *     unary_oper = 	"+" | "-" | "!" | "~"
- *     addr-oper =		"+" | "-" | "^" | "|" | "||";
- *     term = 			fact { multi-oper ) fact } ;
- *     multi-oper =		"*" | "/" | "%" | "&" [ "&&";
- *     fact  =          number									[
- *     					ident                                   |
- *                      ident "(" [ expr { "," expr } ")"       |
- *                      "round" "(" expr ")"                    |
- *  					"(" expr ")"
- *  					;
- *      
+ *               fact = number                                              |
+ *                      ident                                               |
+ *                      ident "[" expr "]"                                  | *** future ***
+ *                      ident "(" expr-list ")"                             |
+ *                      "(" expr ")"                                        |
+ *                      "round" "(" expr ")"
+ *                      ;
+ *         multi-oper = "*" | "/" | "%" | "&" [ "&&" | "<<" | ">>" ;
+ *               term = fact { multi-oper ) fact } ;
+ *          addr-oper = "+" | "-" | "^" | "|" | "||" ;
+ *         unary_oper = "+" | "-" | "!" | "~" ;
+ *        simple-expr = [ unary-oper ] term { addr-oper term } ;
+ *            relo-op = "<"|"<="|"=="|"!="|">="|">" ;
+ *               expr = simple-expr {  relo-op simple-expr } ;
+ *           expr-lst = expr { "," expr } ; 
+ *             assign = ident "=" expr ;
+ *               stmt = [ assign                                            |
+ *                        ident "(" [ expr-lst ")"                          |
+ *                        "if" expr "then" stmt { "else" stmt }             |
+ *                        "while" expr "do" stmt                            |
+ *                        "repeat" expr "until" expr                        |
+ *  					  stmt-blk
+ *                      ] ;
+ *           stmt-blk = "begin" stmt {";" stmt } "end" ;
+ *           sub-type = "procedure" | "function" ;
+ *           sub-decl = sub-type ident "(" ident-lst ")" block-decl ";" ;
+ *         ident-decl = ident | ident "[" const-expr "]" ;
+ *          ident-lst = ident-decl { "," ident-decl } ;
+ *         const-expr = number | ident ;
+ *         const-decl = ident "=" const-expr ;
+ *         block-decl = [ "const" const-decl { "," const-decl ";" ]
+ *                      [ "var" ident-lst ";" ]
+ *                      [ sub-decl { ";" sub-decl } ";" ]
+ *                      stmt-blk ;
+ *            program = block-decl "." ;
+ *  
  * Key
  * - {}	Repeat zero or more times
  * - []	Optional; zero or *one* times
@@ -95,9 +92,6 @@ private:
 	SourceIndex			indextbl;			///< Source cross-index for listings
 
 protected:
-	///< A vector of identifiers
-	typedef std::vector<std::string>	IdentVec;
-
 	void error(const std::string& msg);		///< Write an error message...
 
 	/// Write an error message...
@@ -114,12 +108,13 @@ protected:
 	/// Expect the next token to be a k...
 	bool expect(Token::Kind k, bool get = true);
 
-	bool oneOf(Token::KindSet set);			///< Is the current token one of the given set?
-
 	/// Emit an instruction...
 	size_t emit(OpCode op, int8_t level = 0, Datum addr = Datum());
 
-	/// Return emit(op, level, Datum(value)
+	/// Emit a variable or function reference, e.g., an absolute address...
+	void emitVarRef(int level, const SymValue& val);
+
+	/// Return emit(op, level, Datum(value), for different value types...
 	template <class T> size_t emit(OpCode op, int8_t level, const T& value) {
 		return emit(op, level, Datum(value));
 	}
@@ -130,9 +125,10 @@ protected:
 	/// Purge symtbl of entries from a given block level
 	void purge(int level);
 
-	/// Emit a variable reference, e.g., an absolute address...
-	void varRef(int level, const SymValue& val);
+	/// Return the existing entry for an identifier
+	SymbolTable::iterator lookup();
 
+	Datum constIdentifier();				///< constant value...
 	void identifier(int level);				///< factor-identifier production...
 	void factor(int level);					///< factor production...
 	void unary(int level);					///< unary-expr production...
@@ -151,21 +147,16 @@ protected:
 	void repeatStmt(int level);				///< repeat-statement production...
 	void ifStmt(int level);					///< if-statement production...
 	void statement(int level);				///< statement production...
-	void statementListTail(int level);		///< partial statement-list-production...
-
+	void statementList(int level);			///< statement-list production...
 	const std::string nameDecl(int level);	///< name (identifier) check...
 
+	Datum constExpr(int level);				///< const-expresson production
 	void constDeclBlock(int level);			///< const-declaration-block production...
-	void constDeclList(int level);			///< const-declaration-list production...
 	void constDecl(int level);				///< constant-declaration production...
-
 	int varDeclBlock(int level);			///< variable-declaration-block production...
-
-	/// variable-declaration-list production...
-	void varDeclList(int level, bool params, IdentVec& idents);
-
-	/// ariable-declaration production...
-	void varDecl(int level, IdentVec& idents);
+	
+	///< variable-list production...
+	std::pair<unsigned, unsigned> varList(int level, bool params);
 
 	/// Subroutine-declaration production...
 	SymValue& subPrefixDecl(int level, SymValue::Kind kind);
@@ -181,3 +172,4 @@ protected:
 };
 
 #endif
+

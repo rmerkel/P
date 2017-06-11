@@ -1,8 +1,8 @@
 { print Fahrenheit-Celsius table	}
 
 const
-	LOWER =   0;	{	lower table limit	}
-	UPPER = 300;	{	upper table limit	}
+	LOWER =   0,	{	lower table limit	}
+	UPPER = 300,	{	upper table limit	}
 	STEP  =  20;	{	table step size		}
 
 var

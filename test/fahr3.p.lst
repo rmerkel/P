@@ -3,8 +3,8 @@
 # fahr3.p, 4: const
     0: call 0, 2
     1: halt
-# fahr3.p, 5: 	LOWER =   0.0;	{	lower table limit	}
-# fahr3.p, 6: 	UPPER = 300.0;	{	upper table limit	}
+# fahr3.p, 5: 	LOWER =   0.0,	{	lower table limit	}
+# fahr3.p, 6: 	UPPER = 300.0,	{	upper table limit	}
 # fahr3.p, 7: 	STEP  =  20.0;	{	table step size		}
 # fahr3.p, 8: 
 # fahr3.p, 9: var
@@ -13,8 +13,8 @@
 # fahr3.p, 12: begin
     2: enter 2
 # fahr3.p, 13: 	fahr = LOWER;
-    3: push 0.000000
-    4: pushVar 0, 4
+    3: pushVar 0, 4
+    4: push 0.000000
     5: assign
 # fahr3.p, 14: 	while fahr <= UPPER do begin
     6: pushVar 0, 4
@@ -23,23 +23,23 @@
     9: lte
    10: jneq 29
 # fahr3.p, 15: 		celsius = round(5.0 * (fahr-32.0) / 9.0);
-   11: push 5.000000
-   12: pushVar 0, 4
-   13: eval
-   14: push 32.000000
-   15: sub
-   16: mul
-   17: push 9.000000
-   18: div
-   19: rtoi
-   20: pushVar 0, 5
+   11: pushVar 0, 5
+   12: push 5.000000
+   13: pushVar 0, 4
+   14: eval
+   15: push 32.000000
+   16: sub
+   17: mul
+   18: push 9.000000
+   19: div
+   20: rtoi
    21: assign
 # fahr3.p, 16: 		fahr = fahr + STEP;
    22: pushVar 0, 4
-   23: eval
-   24: push 20.000000
-   25: add
-   26: pushVar 0, 4
+   23: pushVar 0, 4
+   24: eval
+   25: push 20.000000
+   26: add
    27: assign
 # fahr3.p, 17: 	end;
    28: jump 6

@@ -62,6 +62,7 @@
  * @version 3.0 - Made typeless; variables and expressions auto promote as
  *  		needed.
  * @version 3.0a - simplified expression productions
+ * @version 3.0b - refactored const, var and subroutine declars
  *  
  * @author Randy Merkel, Slowly but Surly Software.
  * @copyright  (c) 2017 Slowly but Surly Software. All rights reserved.

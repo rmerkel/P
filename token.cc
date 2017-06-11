@@ -105,9 +105,9 @@ Token TokenStream::get() {
 		} while ('}' != ch);
 		return get();							// restart the scan..
 
-	case '%': case '(': case ')': case '*':
-	case '+': case ',': case '-': case '/':
-	case ':': case ';': case '^':
+	case '(': case ')': case '[': case ']':
+	case '+': case '-': case '*': case '/': case '%':
+	case ',': case ':': case ';': case '^':
 		return ct = { static_cast<Token::Kind>(ch) };
 
 	case '.': 									// real number, or just a '.'
@@ -231,6 +231,8 @@ string Token::toString(Token::Kind k) {
 
 	case Kind::OpenParen:	return "(";				break;
 	case Kind::CloseParen:	return ")";				break;
+	case Kind::OpenBrkt:	return "[";				break;
+	case Kind::CloseBrkt:	return "]";				break;
 	case Kind::Comma:		return ",";				break;
 	case Kind::Period:		return ".";				break;
 	case Kind::Colon:		return ":";				break;

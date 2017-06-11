@@ -4,13 +4,13 @@
 # simple.p, 3: begin
     2: enter 2
 # simple.p, 4: 	x = 0;
-    3: push 0
-    4: pushVar 0, 4
+    3: pushVar 0, 4
+    4: push 0
     5: assign
 # simple.p, 5: 	y = 1
-    6: push 1
+    6: pushVar 0, 5
+    7: push 1
 # simple.p, 6: end.
-    7: pushVar 0, 5
     8: assign
     9: ret
 

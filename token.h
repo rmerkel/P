@@ -85,6 +85,8 @@ struct Token {
 
 		OpenParen	= '(',				///< Opening parentheses
 		CloseParen	= ')',				///< Closing parentheses
+		OpenBrkt	= '[',				///< Opening bracket
+		CloseBrkt	= ']',				///< Closing bracket
 		Comma		= ',',				///< Decl separator
 		Period		= '.',				///< Period
 		Colon		= ':',				///< Identifier ':' type

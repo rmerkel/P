@@ -6,25 +6,25 @@
 # real.p, 5: begin
     2: enter 2
 # real.p, 6: 	i = 1;
-    3: push 1
-    4: pushVar 0, 5
+    3: pushVar 0, 5
+    4: push 1
     5: assign
 # real.p, 7: 	i = 2.0;
-    6: push 2.000000
-    7: pushVar 0, 5
+    6: pushVar 0, 5
+    7: push 2.000000
     8: assign
 # real.p, 8: 	f = round(2.5);
-    9: push 2.500000
-   10: rtoi
-   11: pushVar 0, 4
+    9: pushVar 0, 4
+   10: push 2.500000
+   11: rtoi
    12: assign
 # real.p, 9: 	f = 4;
-   13: push 4
-   14: pushVar 0, 4
+   13: pushVar 0, 4
+   14: push 4
    15: assign
 # real.p, 10: 	f = 5.0;
-   16: push 5.000000
-   17: pushVar 0, 4
+   16: pushVar 0, 4
+   17: push 5.000000
    18: assign
 # real.p, 11: end .
    19: ret

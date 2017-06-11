@@ -29,8 +29,8 @@ void Comp::error(const std::string& msg) {
 }
 
 /**
- * Write a diagnostic in the form "msg 'name'", on standard error output, incrementing the error
- * count.
+ * Write a diagnostic in the form "msg 'name'", on standard error output,
+ * incrementing the error count.
  * @param msg The error message
  * @param name Parameter to msg.
  */
@@ -44,23 +44,27 @@ Token Comp::next() {
 
 	if (Token::Unknown == t.kind) {
 		ostringstream oss;
-		oss << "Unknown token: '" << t.string_value << "', (0x" << hex << t.integer_value << ")";
+		oss
+			<< "Unknown token: '" << t.string_value
+			<< "', (0x" << hex << t.integer_value << ")";
 		error(oss.str());
 		return next();
 	}
 
 	if (verbose)
-		cout << progName << ": getting '" << Token::toString(t.kind) << "', " << t.string_value << ", " << t.integer_value << "\n";
+		cout
+			<< progName << ": getting '" << Token::toString(t.kind) << "', "
+			<< t.string_value << ", " << t.integer_value << "\n";
 
 	return t;
 }
 
 /**
- * Returns true, and optionally consumes the current token, if the current tokens "kind" is equal to kind.
+ * Returns true, and optionally consumes the current token, if the current
+ * tokens "kind" is equal to kind.
  *
  * @param	kind	The token Kind to accept.
  * @param	get		Consume the token, if true. Defaults true.
- *
  * @return	true if the current token is a kind.
  */
 bool Comp::accept(Token::Kind kind, bool get) {
@@ -73,30 +77,25 @@ bool Comp::accept(Token::Kind kind, bool get) {
 }
 
 /**
- * Evaluate and return accept(kind, get). Generate an error if accept() returns false.
+ * Evaluate and return accept(kind, get). Generate an error if accept() returns
+ * false.
  *
  * @param	kind	The token Kind to accept.
  * @param	get		Consume the token, if true. Defaults true.
- *
  * @return	true if the current token is a k.
  */
 bool Comp::expect(Token::Kind kind, bool get) {
-	if (accept(kind, get)) return true;
+	if (accept(kind, get))
+		return true;
 
-	error("expected", Token::toString(kind) + "\' got \'" + Token::toString(current()));
+	error("expected", Token::toString(kind) +
+			"\' got \'"						+
+			Token::toString(current()));
 	return false;
 }
 
 /**
- * @param set	Token kind set to test
- * @return true if current() is a member of set.
- */
-bool Comp::oneOf(Token::KindSet set) {
-	return set.end() != set.find(current());
-}
-
-/**
- * Assembles op, level, addr into a new instruction, and then appends the instruciton on
+ * Assembles and instruction from op, level and addr, and appends the result on
  * the end of code[], returning it's address/index in code[].
  *
  * @note Updates the cross index for the listing as a side-effect
@@ -120,17 +119,30 @@ size_t Comp::emit(OpCode op, int8_t level, Datum addr) {
 	return code->size() - 1;				// so it's the address of just emitted instruction
 }
 
-#if 0
-/**
- * @param	op		The pl0c instruction operation code
- * @param	level	The pl0c instruction block level value. Defaults to zero.
- * @param	value	The pl0c instructions address/value. Defaults to zero.
- * @return The address (code[] index) of the new instruction.
+/** 
+ * Emits a variable, parameter or function return value reference (absolute
+ * address).
+ * 
+ * Local variables have an offset from the *end* of the current stack frame
+ * (bp), while parameters have a negative offset from the *start* of the frame
+ * -- offset locals by the size of the activation frame.
+ *
+ *  @param	level	The current block level
+ *  @param	val		The variable symbol table entry
  */
-size_t Comp::emit(OpCode op, int8_t level, Datum::Integer value) {
-	return emit (op, level, Datum(value));
+void Comp::emitVarRef(int level, const SymValue& val) {
+	if (val.kind() == SymValue::Kind::Variable) {
+		const auto offset = val.value().integer() >= 0				?
+								val.value().integer() + FrameSize	:
+								val.value().integer();
+		emit(OpCode::PUSHVAR, level - val.level(), offset);
+
+	} else if (val.kind() == SymValue::Kind::Function) 
+		emit(OpCode::PUSHVAR, 0, FrameRetVal);
+
+	else
+		assert(false);
 }
-#endif
 
 /**
  * Uses the cross index to write a listing on the output stream
@@ -162,7 +174,7 @@ size_t Comp::emit(OpCode op, int8_t level, Datum::Integer value) {
 }
 
 /**
- * @param level  The block level
+ * @param level  The block level to purge
  */
 void Comp::purge(int level) {
 	for (auto i = symtbl.begin(); i != symtbl.end(); ) {
@@ -182,56 +194,94 @@ void Comp::purge(int level) {
 }
 
 /**
- * Local variables have an offset from the *end* of the current stack frame (bp), while parameters
- * have a negative offset from the *start* of the frame -- offset locals by the size of the
- * activation frame.
+ * Expects that that the next token is a identifer, which it consumes. Returns
+ * a iterator positioned at the correspending symbol table entry, or end().
  *
- *  @param	level	The current block level
- *  @param	val		The variable symbol table entry
- */
-void Comp::varRef(int level, const SymValue& val) {
-	const auto offset = val.value().integer() >= 0 ? 
-		val.value().integer() + FrameSize : val.value().integer();
-	emit(OpCode::PUSHVAR, level - val.level(), offset);
-}
-
-/**
- * Push a variable's value, a constant value, or invoke, and push the results, of a function.
- *      ident | ident "(" [ ident { "," ident } ] ")"
+ * There maybe multiple identifiers in the symbol table, but with differnt
+ * block levels. Assuming that the symbol table is purged on block exit, the
+ * closest identifer is that with the highest block level.
  *
- * @param	level	The current block level 
+ * @return  Symbol table iterator, or symtbl.end();
  */
-void Comp::identifier(int level) {
+SymbolTable::iterator Comp::lookup() {
 	const string name = ts.current().string_value;
 	expect(Token::Identifier);					// Consume the identifier
 
-	auto range = symtbl.equal_range(name);
-	if (range.first == range.second)
+	auto range = symtbl.equal_range(name);		// Lookup name in the symbol table
+	if (range.first == range.second) {
 		error("Undefined identifier", name);
+		return range.first;						// Not found, name is undefined... return end().
 
-	else {
+	} else {									// Find the closest, that is, the highest level
 		auto closest = range.first;
 		for (auto it = range.first; it != range.second; ++it)
 			if (it->second.level() > closest->second.level())
 				closest = it;
 
-		switch (closest->second.kind()) {
+		return closest;
+	}
+}
+
+/**
+ * Push a variable's value, a constant value, or invoke, and push the results,
+ * of a function.
+ *      ident | ident "(" [ ident { "," ident } ] ")" | ident "[" expr "]"
+ *
+ * @param	level	The current block level 
+ */
+void Comp::identifier(int level) {
+	auto it = lookup();
+
+	if (symtbl.end() != it) {
+		switch (it->second.kind()) {
 		case SymValue::Kind::Constant:
-			emit(OpCode::PUSH, 0, closest->second.value());
+			emit(OpCode::PUSH, 0, it->second.value());
 			break;
 
 		case SymValue::Kind::Variable:
-			varRef(level, closest->second);
+			emitVarRef(level, it->second);
+
+			if (accept(Token::OpenBrkt)) {		// name[expr]...
+				expression(level);
+				expect(Token::CloseBrkt);
+				emit(OpCode::ADD);				// index into name[]...
+			}
 			emit(OpCode::EVAL);
 			break;
 
 		case SymValue::Kind::Function:
-			callStmt(closest->first, closest->second, level);
+			callStmt(it->first, it->second, level);
 			break;
 
 		default:
-			error("Identifier is not a constant, variable or function", name);
+			error("Identifier is not a constant, variable or function", it->first);
 		}
+	}
+}
+
+/**
+ * @return	The constant value 
+ */
+Datum Comp::constIdentifier() {
+	auto it = lookup();
+	if (symtbl.end() == it) 
+		return Datum(0);
+
+	switch (it->second.kind()) {
+	case SymValue::Kind::Constant:
+		return it->second.value();
+
+	case SymValue::Kind::Variable:
+		error("Expected constant, but identifier is a variable", it->first);
+		return Datum(0);
+
+	case SymValue::Kind::Function:
+		error("Expected constant, but identifier is a function", it->first);
+		return Datum(0);
+
+	default:
+		error("Identifier is not a constant, variable or function", it->first);
+		return Datum(0);
 	}
 }
 
@@ -270,8 +320,7 @@ void Comp::factor(int level) {
 		expect(Token::CloseParen);
 
 	} else {
-		error("factor: syntax error; expected ident | num | { expr }, but got:",
-			Token::toString(current()));
+		error("expected a factor, but got:", Token::toString(current()));
 		next();
 	}
 }
@@ -364,7 +413,7 @@ void Comp::simpleExpr(int level) {
 			unary(level);
 			emit(OpCode::LOR);
 
-		 } else
+		} else
 			 break;
 	}
 }
@@ -419,12 +468,7 @@ void Comp::assignStmt(const string& name, const SymValue& val, int level) {
 
 	switch(val.kind()) {
 	case SymValue::Kind::Variable:
-		varRef(level, val);
-		emit(OpCode::ASSIGN);
-		break;
-
-	case SymValue::Kind::Function:		// Save value in the frame's retValue element
-		emit(OpCode::PUSHVAR, 0, FrameRetVal);
+	case SymValue::Kind::Function:
 		emit(OpCode::ASSIGN);
 		break;
 
@@ -477,43 +521,56 @@ void Comp::callStmt(const string& name, const SymValue& val, int level) {
 	emit(OpCode::CALL, level - val.level(), val.value());
 }
 
-/**
- *     ident "=" expr | ident "(" [ ident { "," ident } ] ")"
- *
- * @param	level	The current block level
+/** 
+ *     ident | ident "=" expr | expr "(" ident-list ")"
+ *  
+ * @note	Identifier has been accepted, but not consumed.
+ * @param	level	The current block level 
  */
 void Comp::identStmt(int level) {
-	// Save the identifier string before consuming it
-	const string name = ts.current().string_value;
-	expect(Token::Identifier);
+	auto it = lookup();
+	if (symtbl.end() != it) {				// proc (expr-list)...
+		switch(it->second.kind()) {
+		case SymValue::Kind::Variable:		// ident | ident[expr] = expr
+			if (accept(Token::OpenBrkt)) {	// ident[expr] = expr
+				emitVarRef(level, it->second);
+				expression(level);
+				emit(OpCode::ADD);
+				expect(Token::CloseBrkt);
 
-	auto range = symtbl.equal_range(name);		// look it up....
-	if (range.first == range.second)
-		error("undefined variable", name);
+			} else							// ident "=" expression
+				emitVarRef(level, it->second);
 
-	else {
-		auto closest = range.first;				// Find the "closest" entry
-		for (auto it = range.first; it != range.second; ++it)
-			if (it->second.level() > closest->second.level())
-				closest = it;
+			expect(Token::Assign);
+			assignStmt(it->first, it->second, level);
+			break;
 
-		if (accept(Token::Assign))			// ident "=" expression
-			assignStmt(closest->first, closest->second, level);
+		case SymValue::Kind::Function:			// func = returnExpr
+			emitVarRef(level, it->second);
+			expect(Token::Assign);
+			assignStmt(it->first, it->second, level);
+			break;
 
-		else if (SymValue::Kind::Function == closest->second.kind())
-			error("calling function without assignment");
+		case SymValue::Kind::Constant:
+			error("Can't assign to a constant", it->first);
+			break;
 
-		else
-			callStmt(closest->first, closest->second, level);
+		case SymValue::Kind::Procedure:			// proc(expr-list)
+			callStmt(it->first, it->second, level);
+			break;
+
+		default:
+			assert(false);
+		}
 	}
 }
 
 /**
  * "while" expression "do" statement...
- *
+ * @name	"while" has been accepted.
  * @param	level	The current block level.
  */
- void Comp::whileStmt(int level) {
+void Comp::whileStmt(int level) {
 	const auto cond_pc = code->size();	// Start of while statement
 	expression(level);
 
@@ -530,9 +587,11 @@ void Comp::identStmt(int level) {
  }
 
 /**
- *  "if" expression "then" statement1 [ "else" statement2 ]
+ *    "if" expression "then" statement1 [ "else" statement2 ]
+ * @param	level	The current block level.
+ * @return	true if an if statemnt was accepted
  */
- void Comp::ifStmt(int level) {
+void Comp::ifStmt(int level) {
 	expression(level);
 
 	// Jump if conditon is false
@@ -541,15 +600,15 @@ void Comp::identStmt(int level) {
 	statement(level);
 
 	// Jump over else statement, but only if there is an else
-	const bool Else = accept(Token::Else);
+	const bool doElse = accept(Token::Else);
 	size_t else_pc = 0;
-	if (Else) else_pc = emit(OpCode::JUMP, 0, 0);
+	if (doElse) else_pc = emit(OpCode::JUMP, 0, 0);
 
 	if (verbose)
 		cout << progName << ": patching address at " << jmp_pc << " to " << code->size() << "\n";
 	(*code)[jmp_pc].addr = code->size();
 
-	if (Else) {
+	if (doElse) {
 		statement(level);
 
 		if (verbose)
@@ -559,11 +618,11 @@ void Comp::identStmt(int level) {
  }
 
  /**
-  * "repeat" statement "until" expression
-  *
-  * @param	level 	The current block level
+  * "repeat" statement "until" expression...
+  * @note	"repeat" has been accepted.
+  * @param	level 	The current block level 
   */
- void Comp::repeatStmt(int level) {
+void Comp::repeatStmt(int level) {
 	 const size_t loop_pc = code->size();			// jump here until expression fails
 	 statement(level);
 	 expect(Token::Until);
@@ -572,46 +631,49 @@ void Comp::identStmt(int level) {
  }
 
 /**
- * <"begin"> stmt { "," stmt } "end" ;
- *  @param	level		The current block level.
- */
-void Comp::statementListTail(int level) {
-	do {
-		statement(level);
-
-	} while (accept(Token::SemiColon));
-	expect(Token::End);
-}
-
-/**
- * stmt =	[ ident ":=" expr
- * 		  	| "call" ident
- *          | "?" ident
- * 		  	| "!" expr
+ * stmt =	[ ident ":=" expr   					|
+ * 			  ident "(" expr-lst ")"
  *          | "begin" stmt {";" stmt } "end"
  *          | "if" expr "then" stmt { "else" stmt }
- *  		| "while" expr "do" stmt ]  
- *  		| "repeat" expr "until" stmt } ;
+ *  		| "while" expr "do" stmt
+ *  		| "repeat" expr "until" stmt
+ *  		| "for" assign ("to" | "downto") expr "do" stmt*
+ *  		] ;
+ *
+ * * for statment is a possible future feature...
  *
  * @param	level	The current block level.
  */
 void Comp::statement(int level) {
-	if (accept(Token::Identifier, false)) 			// assignment or proc call
-		identStmt(level);
+	if (accept(Token::Identifier, false))
+		identStmt(level);					// assignment, or procedure call
 
-	else if (accept(Token::Begin)) {				// begin ... end
-		statementListTail(level);
+	else if (accept(Token::If))
+		ifStmt(level);						// "if" expression...
 
-	} else if (accept(Token::If)) 					// if expression...
-		ifStmt(level);
+	else if (accept(Token::While))
+		whileStmt(level);					// "while" expression...
 
-	else if (accept(Token::While))					// "while" expression...
-		whileStmt(level);
+	else if (accept(Token::Repeat))
+		repeatStmt(level);					// "repeate" expressoin...
 
-	else if (accept(Token::Repeat))					// "repeat" expresson...
-		repeatStmt(level);
+	else if (accept(Token::Begin))
+		statementList(level);				// begin .. end
 
-	// else: nothing
+	// otherwise... the empty statement.
+}
+
+/**
+ *     "begin" stmt { "," stmt } "end" ;
+ * @note "begin" has been accepted
+ *  
+ *  @param	level		The current block level.
+ */
+void Comp::statementList(int level) {
+	do {
+		statement(level);
+	} while (accept(Token::SemiColon));
+	expect(Token::End);
 }
 
 /**
@@ -640,168 +702,140 @@ const std::string Comp::nameDecl(int level) {
 }
 
 /**
- * block-decl = [ "const" const-decl-blk ";" ]
- * const-decl-blk = const-decl-lst { ";" const-decl-lst ;
+ * const-expr = number | ident ;
+ * @param	level	The current block level.
+ */
+Datum Comp::constExpr(int level) {
+	Datum value;
+
+	if (accept(Token::IntegerNum, false)) {
+		value = ts.current().integer_value;
+		if (verbose)
+			cout << progName << ": constExpr " << level << ", " << value << "\n";
+		next();
+
+	} else if (accept(Token::RealNum, false)) {
+		value = ts.current().real_value;
+		if (verbose)
+			cout << progName << ": constExpr " << level << ", " << value << "\n";
+		next();
+
+	} else if (accept(Token::Identifier, false)) {
+		value =  constIdentifier();
+		if (verbose)
+			cout << progName << ": constExpr " << level << ", " << value << "\n";
+
+	} else {
+		error("expected an numeric literal or a constant, got neither", ts.current().string_value);
+		next();
+	}
+
+	return value;
+}
+
+/**
+ * const-expr = number | ident ;
+ * const-decl = ident "=" const-expr ;
+ * const-decl-lst = const-decl { "," const-decl } ;
+ *
+ * @param	level	The current block level.
+ */
+void Comp::constDecl(int level) {
+	const auto ident = nameDecl(level);				// Get the identifier...
+	expect(Token::Assign);							// Consume the "="
+
+	const auto value = constExpr(level);
+	// Insert ident into the symbol table
+	symtbl.insert(	{ ident, SymValue(level, value)	}	);
+	if (verbose)
+		cout << progName << ": constDecl " << ident << ": " << level << ", " << value << "\n";
+}
+
+/**
+ * [ "const" const-decl { "," const-decl } ";" ] ;
  *
  * @note	Doesn't emit any code; just stores the named value in the symbol table.
  * @param	level	The current block level.
  */
 void Comp::constDeclBlock(int level) {
-	// Stops if the ';' if followd by any of hte following tokens
-	static const Token::KindSet stops {
-		Token::VarDecl,
-		Token::ProcDecl,
-		Token::FuncDecl,
-		Token::Begin
-	};
-
 	if (accept(Token::ConsDecl)) {
 		do {
-			if (oneOf(stops))
-				break;							// No more constants...
+			constDecl(level);
 
-			constDeclList(level);
+		} while (accept(Token::Comma));
 
-		} while (accept(Token::SemiColon));
+		expect(Token::SemiColon);
 	}
 }
 
 /**
- * const-decl-lst = const-decl { "," const-decl } ;
- * const-decl =  ident "=" number | ident ;
- * @param	level	The current block level.
- */
-void Comp::constDeclList(int level) {
-	do {
-		constDecl(level);
-
-	} while (accept(Token::Comma));
-}
-
-/**
- * const-decl-lst = const-decl { "," const-decl } ;
- * const-decl =     ident "=" number | ident ;
- *
- * @param	level	The current block level.
- */
-void Comp::constDecl(int level) {
-	const auto ident = nameDecl(level);				// Copy the identifier
-
-	expect(Token::Assign);							// Consume the "="
-	if (accept(Token::IntegerNum, false)) {
-		const auto number = ts.current().integer_value;
-		next();										// Consume the number
-
-		// Insert ident into the symbol table
-		symtbl.insert(	{ ident, SymValue(level, Datum(number))	}	);
-		if (verbose)
-			cout << progName << ": constDecl " << ident << ": " << level << ", " << number << "\n";
-
-	} else if (accept(Token::RealNum, false)) {
-		const auto number = ts.current().real_value;
-		next();										// Consume the number
-
-		/// Insert ident into the symbol table
-		symtbl.insert(	{	ident, SymValue(level, Datum(number))	}	);
-		if (verbose)
-			cout << progName << ": constDecl " << ident << ": " << level << ", " << number << "\n";
-
-	} else {
-		error("expected an interger or real literal, got neither", ts.current().string_value);
-		next();
-	}
-}
-
-/**
- * A varaiable declaration block;
- *     var-decl-blk = "const" var-decl-lst
- *     var-decl-lst = var-decl { ";" var-decl }
- *     var-decl =	  ident-list : type ;
- *     ident-list =   ident { "," ident } ;
- *     type =         "integer" | "real" ;
- *
- * @param	level	The current block level.
+ * ident-decl = ident | ident "[" const-expr "]" ;
+ * [ "var" ident-decl { "," ident-decl } ";" ]
  *
  * @return  Number of variables allocated before or after the activation frame.
  */
 int Comp::varDeclBlock(int level) {
-	IdentVec idents;
+	if (accept(Token::VarDecl)) {
+		const auto nVars = varList(level, false);
+		expect(Token::SemiColon);
+		return nVars.second;
+	}
 
-	if (accept(Token::VarDecl))
-		varDeclList(level, false, idents);
-
-	return idents.size();
+	return 0;
 }
 
 /**
- * A semicolon seperated list of variable declarations.
+ * A semicolon seperated list of identifers, either variable or formal parameters;
  *
- *     var-decl-list = var-decl { ";" var-decl }
- *     var-decl =	    ident-list : type ;
- *     ident-list =     ident { "," ident } ;
- *     type =           "integer" | "real" ;
+ *     ident-decl = ident | ident "[" const-expr "]" ;
+ *     ident-decl { "," ident-decl }
  *
- * Allocate space on the stack for each variable, as a postivie offset from the end of current
- * activaction frame. Create a new entry in the symbol table, that notes the offset and data
- * type.
+ * For varaibles (params == false), allocates space on the stack for each variable as an offset
+ * from the end of the curent activation frame (level). For parameters, increments a negative
+ * offset from the start of the activation frame. Both; create a new entry in the symbol table
+ * for each.
  *
  * @param			level	The current block level.
- * @param			params	True if processing formal parameters, false if variable declaractions. 
- * @param[in,out]	idents	Vector of identifers
+ * @param			params	True if processing formal parameters, false for variable declaractions. 
  *
- * @return  Offset of the next variable/parmeter from the current activicaqtion frame.
+ * @return	Count of identifiers, total size of identifiers, in Datums, as a pair
  */
-void Comp::varDeclList(int level, bool params, IdentVec& idents) {
-	// Stops if the ';' if followd by any of hte following tokens
-	static const Token::KindSet stops {
-		Token::ProcDecl,
-		Token::FuncDecl,
-		Token::Begin,
-		Token::CloseParen
-	};
+pair<unsigned, unsigned> Comp::varList(int level, bool params) {
+	vector<pair<string, unsigned> > idents;	// identifier name, size (Datums) pairs
+	unsigned count = 0;						// # of Datums in idents...
 
-	do {
-		if (oneOf(stops))
-			break;								// No more variables...
+	do {									// Collect the names into idents...
+		const string name = nameDecl(level);
+		unsigned nDim = 1;
 
-		varDecl(level, idents);
+		if (accept(Token::OpenBrkt)) {		// name[expr]...
+			nDim = constExpr(level).uinteger();
+			expect(Token::CloseBrkt);
+		}
 
-	} while (accept(Token::SemiColon));
-
-	// Set the offset from the activation frame, parameters have negative offsets in reverse
-	int dx = params ? 0 - idents.size() : 0;
-	for (const auto& id : idents) {
-		if (verbose)
-			cout << progName  		<< ": var/param "
-				 << id				<< ": " 
-				 << level 			<< ", "
-			     << dx	 			<< "\n";
-
-		symtbl.insert( { id, SymValue(level, dx++)	} );
-	}
-}
-
-/**
- * A semicolon list of variable, or formal parameter declractions. Each declaraction starts
- * with a comma separated list of identifiers, followed by a colon followed by a type
- * specifier:
- *
- *     var-decl =	    iident { "," ident } ;
- *
- * Allocate space on the stack for each variable, as a positive offset from the *end* of
- * current activaction frame; 0, 1, ..., n-1. Parameters, pushed by the caller, are identified
- * by negative indexes from *before the start* of the frame; -1, -2, ..., -n. Create a new
- * entry in the symbol table for either.
- *  
- * @param			level	The current block level. 
- * @param[in,out]	idents	Vector of identifers
- */
-void Comp::varDecl(int level, IdentVec& idents) {
-	// Find and append comma separated identifiers to the list...
-	do {
-		idents.push_back(nameDecl(level));
+		count += nDim;
+		idents.push_back(make_pair(name, nDim));
 
 	} while (accept(Token::Comma));
+
+
+	// Set the offset from the activation frame, parameters have negative offsets in reverse
+	int dx = params ? 0 - count : 0;
+
+	// Insert the names into the symbol table, tracking/allocating their actual size...
+	const string vp = params ? "param" : "var";
+	for (const auto& id : idents) {
+		if (verbose)
+			cout << progName	<< ": " << vp << " "
+				 << id.first	<< ": " 
+				 << level 		<< ", "
+			     << dx	 		<< "\n";
+
+		symtbl.insert( { id.first, SymValue(level, dx) } );
+		dx += id.second;
+	}
+
+	return make_pair(idents.size(), count);
 }
 
 /**
@@ -825,11 +859,10 @@ SymValue& Comp::subPrefixDecl(int level, SymValue::Kind kind) {
 
 	// Note that the activation frame level is that of the *following* block!
 
-	IdentVec	idents;						// formal parameter identifiers
-	varDeclList(level+1, true, idents);
+	const auto nParams = varList(level+1, true);
 	expect(Token::CloseParen);
 
-	it->second.nArgs(idents.size());		// Set the number of formal parameters
+	it->second.nArgs(nParams.first);		// Set the number of formal parameters
 
 	return it->second;
 }
@@ -889,9 +922,7 @@ void Comp::subrountineDecls(int level) {
  * @return 	Entry point address
  */
 Datum::Unsigned Comp::blockDecl(SymValue& val, int level) {
-	/*
-	 * Delcaractions...
-	 */
+	// Delcaractions...
 
 	constDeclBlock(level);
 	auto dx = varDeclBlock(level);
@@ -906,8 +937,8 @@ Datum::Unsigned Comp::blockDecl(SymValue& val, int level) {
 	const auto addr = dx > 0 ? emit(OpCode::ENTER, 0, dx) : code->size();
 	val.value(Datum(addr));
 
-	if (expect(Token::Begin))					// "begin" statements... "end"
-		statementListTail(level);
+	if (expect(Token::Begin))
+		statementList(level);
 
 	// block postfix... TBD; emit reti or retr for functions!
 
@@ -945,10 +976,12 @@ void Comp::run() {
 
 /**
  * Construct a new compilier with the token stream initially bound to std::cin.
- * @param	pName	The prefix string used by error and verbose/diagnostic messages.
+ * @param	pName	The prefix string used by error and verbose/diagnostic
+ *					messages.
  */
 Comp::Comp(const string& pName) : progName {pName}, nErrors{0}, verbose {false}, ts{cin} {
-	symtbl.insert({"main", SymValue(SymValue::Kind::Procedure, 0)});	// Install the "main" rountine declaraction
+	// Install the "main" rountine declaraction...
+	symtbl.insert({"main", SymValue(SymValue::Kind::Procedure, 0)});
 }
 
 /**

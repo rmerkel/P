@@ -1,0 +1,63 @@
+# whiletst.p, 2: const max = 10;
+    0: call 0, 2
+    1: halt
+# whiletst.p, 3: var i, sum;
+# whiletst.p, 4: begin
+    2: enter 2
+# whiletst.p, 5: 	sum = 0;
+    3: pushVar 0, 5
+    4: push 0
+    5: assign
+# whiletst.p, 6: 	i = 0;
+    6: pushVar 0, 4
+    7: push 0
+    8: assign
+# whiletst.p, 7: 	while i < max do begin
+    9: pushVar 0, 4
+   10: eval
+   11: push 10
+   12: lt
+   13: jneq 28
+# whiletst.p, 8: 		sum = sum + i;
+   14: pushVar 0, 5
+   15: pushVar 0, 5
+   16: eval
+   17: pushVar 0, 4
+   18: eval
+   19: add
+   20: assign
+# whiletst.p, 9: 		i = i + 1
+   21: pushVar 0, 4
+   22: pushVar 0, 4
+   23: eval
+   24: push 1
+# whiletst.p, 10: 	end
+   25: add
+   26: assign
+# whiletst.p, 11: end .
+   27: jump 9
+   28: ret
+#whiletst.p, 11: 		
+
+        9:          0
+        8:          0
+        9:          0
+        8:          1
+        9:          1
+        8:          2
+        9:          3
+        8:          3
+        9:          6
+        8:          4
+        9:         10
+        8:          5
+        9:         15
+        8:          6
+        9:         21
+        8:          7
+        9:         28
+        8:          8
+        9:         36
+        8:          9
+        9:         45
+        8:         10

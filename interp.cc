@@ -151,7 +151,8 @@ Interp::Result Interp::step() {
 	case OpCode::SUB:		rhand = pop(); push(pop() - rhand); 	break;
 	case OpCode::MUL:		rhand = pop(); push(pop() * rhand);		break;
 	case OpCode::DIV:
-		if (Datum(0) != (rhand = pop())) push(pop() / rhand);
+		if (Datum(0) != (rhand = pop()))
+			push(pop() / rhand);
 
 		else {
 			cerr << "Attempt to divide by zero @ pc (" << prevPc << ")!\n";
@@ -160,7 +161,8 @@ Interp::Result Interp::step() {
 		break;
 
 	case OpCode::REM:
-		if (Datum(0) != (rhand = pop())) push(pop() % rhand);
+		if (Datum(0) != (rhand = pop()))
+			push(pop() % rhand);
 
 		else {
 			cerr << "attempt to divide by zero @ pc (" << prevPc << ")!\n";
@@ -191,10 +193,11 @@ Interp::Result Interp::step() {
 		push(stack[ea.uinteger()]);	
 	}	break;
 
-	case OpCode::ASSIGN:
-		lastWrite = pop().uinteger();	// Save the effective address for dump()...
-		stack[lastWrite] = pop();
-		break;
+	case OpCode::ASSIGN: {
+		const auto value = pop();
+		lastWrite = pop().uinteger();
+		stack[lastWrite] = value;
+	}   break;
 
 	case OpCode::CALL:  	call(ir.level, ir.addr.uinteger());		break;
 	case OpCode::RET:   	ret();  								break;
@@ -205,7 +208,7 @@ Interp::Result Interp::step() {
 		break;
 
 	case OpCode::JUMP:  	pc = ir.addr.uinteger();				break;
-	case OpCode::JFAIL: 	
+	case OpCode::JFAIL:
 		if (pop() == Datum(0)) 
 			pc = ir.addr.uinteger();			
 		break;
