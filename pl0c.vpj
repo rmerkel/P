@@ -302,30 +302,19 @@
 			Filters=""
 			GUID="{74623FBD-74C2-48DA-9586-F190FFB3C274}">
 			<F N="comment.p"/>
-			<F N="comment.p.expected"/>
 			<F N="divbyzero.p"/>
-			<F N="divbyzero.p.expected"/>
 			<F N="fact.p"/>
-			<F N="fact.p.expected"/>
 			<F N="fact2.p"/>
-			<F N="fact2.p.expected"/>
 			<F N="fact3.p"/>
-			<F N="fact3.p.expected"/>
 			<F N="fahr.p"/>
+			<F N="fahr2.p"/>
 			<F N="min.p"/>
-			<F N="min.p.expected"/>
 			<F N="precedence.p"/>
-			<F N="precedence.p.expected"/>
 			<F N="repeatst.p"/>
-			<F N="repeatst.p.expected"/>
 			<F N="simple.p"/>
-			<F N="simple.p.expected"/>
 			<F N="test.p"/>
-			<F N="test.p.expected"/>
 			<F N="testif.p"/>
-			<F N="testif.p.expected"/>
 			<F N="unknown.p"/>
-			<F N="unknown.p.expected"/>
 			<F N="xpl0c.sh"/>
 		</Folder>
 	</Files>

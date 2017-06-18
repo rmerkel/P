@@ -28,52 +28,47 @@
  *
  * @section grammer Grammer (EBNF)
  *
- *     program =		block-decl "begin" stmt-lst "end" "." ;
- *     block-decl =     [ "const" const-decl-blk ";" ]
- *  					[ "var" var-decl-blk ";" ]
- *  					[ sub-decl { ";" sub-decl }
- *  					{ stmt-lst }
- *  					;
- *     
- *     const-decl-blk = const-decl-lst { ";" const-decl-lst } ;
- *     const-decl-lst = const-decl { "," const-decl } ;
- *     const-decl =     ident "=" number | ident ;
- *     
- *     sub-decl = 		( func-decl | proc-decl } ;
- *     proc-decl =      "procedure" ident param-decl-lst block-decl ";" ;
- *     func-decl =      "function"  ident param-decl-lst ":" type block-decl ";" ; 
- *     param-decl-lst = "(" [ var-decl-blk ] ")" ;
- *  
- *     var-decl-blk =	var-decl-lst { ";" var-decl-lst } ;
- *     var-decl-lst =	ident-list : type ;
- *     type ; type =    "integer" | "real" ;
- *  
- *     stmt =           [ ident "=" expr 						|
- *						  ident "(" [ expr { "," expr } ")"     |
- *  					  stmt-lst								|
- *  					  "if" cond "then" stmt { "else" stmt } |
- *                        "while" cond "do" stmt 				|
- *  					  "repeat" stmt "until" cond ]
- *  					  ;
- *     tmt-lst =		"begin" stmt {";" stmt } "end" ;
- *  
- *     ident-list =		ident { "," ident } ;
- *                      
- *     cond =           relat { ("||" | &&") relat } ;
- *     relat =          expr { ("==" | "!=" | "<" | "<=" | ">" | ">=") expr } ;
- *     expr =           shift-expr { ("|" | "&" | "^") shift-expr } ;
- *     shift-expr =     add-expr { ("<<" | ">>") add-expr } ;
- *     add-expr =       term { ("+" | "-") term } ;
- *     term =           unary { ("*" | "/" | "%") unary } ;
- *     unary =          [ ("+"|"-") ] fact ;
- *  
- *     fact  =          ident                                   |
- *  					ident "(" [ expr { "," expr } ")"   	|
- *  					"round" "(" expr ")"					|
- *                      number                                  |
- *                      "(" expr ")"
- *  					;
-
+ *               program: block-decl 'begin' stmt-lst 'end' '.' ;
+ *            block-decl: [ const-decl-blk ';' ]
+ *                        [ var-decl-blk ';' ]
+ *                        [ sub-decl { ';' sub-decl }
+ *                        { stmt-blk }
+ *                        ;
+ *        const-decl-blk: 'const' const-decl-lst { ';' const-decl-lst } ;
+ *        const-decl-lst: const-decl { "," const-decl } ;
+ *            const-decl: ident "=" const-expr ;
+ *          var-decl-blk: 'var' var-decl-lst ;
+ *              sub-decl: func-decl | proc-decl ;
+ *             proc-decl: 'procedure' ident param-decl-lst block-decl ';' ;
+ *             func-decl: 'function'  ident param-decl-lst ':' type block-decl ';' ; 
+ *        param-decl-lst: '(' [ var-decl-lst ] ')' ;
+ *          var-decl-lst: var-decl-type-lst { ';' var-decl-type-lst } ;
+ *     var-decl-type-lst: ident-lst : type ;
+ *             ident-lst: ident { ',' ident } ;
+ *                  type: 'integer' | 'real' ;
+ *              stmt-blk: 'begin' stmt-lst 'end' ;
+ *              stmt-lst: 'begin' stmt {';' stmt } 'end' ;
+ *                  stmt: [ ident '=' expr                         |
+ *                          'if' cond 'then' stmt { 'else' stmt }  |
+ *                          'while' cond 'do' stmt                 |
+ *                          'repeat' stmt 'until' cond             |
+ *                          stmt-blk ]
+ *                       ;
+ *            const-expr: number | ident ;
+ *              expr-lst: expr { ',' expr } ;
+ *                  expr: simple-expr { relo-op simple-expr } ;
+ *               relo-op: '<' | '<=' | '==' | '>=' | '>' | '!=' ;
+ *           simple-expr: [unary-op ] term { add-op term } ;
+ *              unary-op: '+' | '-' | '!' | '~' ;
+ *                add-op: '+' | '-' | '^' | '|' | '||' ;
+ *                  term: fact { multi-op fact } ;
+ *              multi-op: '*' | '/' | '%' | '&' | '&&' | '<<' | '>>' ;
+ *                  fact: ident                                    |
+ *                        ident '(' [ expr-lst ] ')'               |
+ *                        'round' '(' expr ')'                     |
+ *                        number                                   |
+ *                        '(' expr ')'
+ *                        ;
  *
  * Key
  * - {}	Repeat zero or more times
@@ -137,7 +132,7 @@ protected:
 	size_t emit(const OpCode op, int8_t level = 0, Datum addr = 0);
 
 	/// Promote data type if necessary...
-	void promote (Datum::Kind lhs, Datum::Kind rhs);
+	Datum::Kind promote (Datum::Kind lhs, Datum::Kind rhs);
 
 	/// Promote assigned data type if necessary...
 	void assignPromote (Datum::Kind lhs, Datum::Kind rhs);
@@ -149,17 +144,15 @@ protected:
 	void purge(int level);
 
 	/// Emit a variable reference, e.g., an absolute address...
-	Datum::Kind varRef(int level, const SymValue& val);
+	Datum::Kind emitVarRef(int level, const SymValue& val);
 
+	SymbolTable::iterator identRef();		///< identifier sub-production...
 	Datum::Kind identifier(int level);		///< factor-identifier production...
 	Datum::Kind factor(int level);			///< factor production...
-	Datum::Kind unary(int level);			///< unary-expr production...
 	Datum::Kind term(int level);			///< terminal production...
-	Datum::Kind addExpr(int level);			///< additive-expr production...
-	Datum::Kind shiftExpr(int level);		///< shift production...
+	Datum::Kind unary(int level);			///< unary-expr sub-production...
+	Datum::Kind simpleExpr(int level);		///< simple-expr production...
 	Datum::Kind expression(int level);		///< expression production...
-	Datum::Kind relational(int level);		///< relational-expr production...
-	Datum::Kind condition(int level);		///< condition production...
 
 	/// assignment-statement production...
 	void assignStmt(const std::string& name, const SymValue& val, int level);
@@ -172,9 +165,9 @@ protected:
 	void repeatStmt(int level);				///< repeat-statement production...
 	void ifStmt(int level);					///< if-statement production...
 	void statement(int level);				///< statement production...
-	void statementListTail(int level);		///< partial statement-list-production...
+	void statementList(int level);			///< statement-list-production...
 
-	const std::string nameDecl(int level);	///< name (identifier) check...
+	std::string nameDecl(int level);		///< name (identifier) check...
 	Datum::Kind typeDecl();					///< type decal production...
 
 	void constDeclBlock(int level);			///< const-declaration-block production...

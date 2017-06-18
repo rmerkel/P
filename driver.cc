@@ -51,6 +51,10 @@
  *  - Parser now understands, but ignores type names for variables, but not functions.
  *
  * @version 2.0 - Real and integer data types. 
+ * @version 2.0a
+ *	- Combined integer/unsigned/real instructions into single instructions.
+ *	- Converted Datum to a class from a struct
+ *	- Modified the compilier per the simplified expression grammer.
  *  
  * @author Randy Merkel, Slowly but Surly Software.
  * @copyright  (c) 2017 Slowly but Surly Software. All rights reserved.
@@ -84,7 +88,7 @@ static void help() {
 
 /// Print the version number as major.minor
 static void printVersion() {
-	cout << progName << ": verson: 2.0\n";	// makesure to update the verison in mainpage!!
+	cout << progName << ": verson: 2.0a\n";	// makesure to update the verison in mainpage!!
 }
 
 /** Parse the command line arguments...
@@ -179,3 +183,4 @@ int main(int argc, char* argv[]) {
 
 	return nErrors;
 }
+

@@ -18,7 +18,7 @@
 
 /** Activation Frame layout
  *
- * Word offsets from the start of a activaction frame, as created by OpCode::call
+ * Word offsets from the start of a activaction frame, as created by OpCode::Call
  */
 enum Frame {
 	FrameBase		= 0,				///< Offset to the Activation Frame base (base(n))
@@ -31,66 +31,50 @@ enum Frame {
 
 /// Operation codes; restricted to 256 operations, maximum
 enum class OpCode : unsigned char {
-	noti, 								///< Unary integer not
-	notr,								///< Unary real not
-	negi,								///< Unary integer negation
-	negr,								///< Unary real negation
-	comp,								///< Unary one's compliment
+	Not, 								///< Unary boolean not
+	Neg,								///< Unary negation
+	Comp,								///< Unary one's compliment
 
-	itor,								///< Unary convert an interger to real
-	itor2,								///< Unary convert TOS-1 to real
-	rtoi,								///< Unary round real to integer
+	ITOR,								///< Unary convert an interger to real
+	ITOR2,								///< Unary convert TOS-1 to real
+	RTOI,								///< Unary round real to integer
 
-	addi,								///< Interger addition
-	addr,								///< Real addition
-	subi,								///< Interger subtraction
-	subr,								///< Real addition
-	muli,								///< Interger multiplication
-	mulr,								///< Real multiplicaton
-	divi,								///< Interger division
-	divr,								///< Real division
-	remi,								///< Integer remainder
-	remr,								///< Real remander
+	Add,								///< Addition
+	Sub,								///< Subtraction
+	Mul,								///< Multiplication
+	Div,								///< Division
+	Rem,								///< Remainder
 
-	bor,								///< Bitwise inclusive or
-	band,								///< Bitwise and
-	bxor,								///< Bitwise eXclusive or
+	BOR,								///< Bitwise inclusive or
+	BAND,								///< Bitwise and
+	BXOR,								///< Bitwise eXclusive or
 
-	lshift,								///< Left shift
-	rshift,								///< Right shift
+	LShift,								///< Left shift
+	RShift,								///< Right shift
 
-	lti,								///< Integer less than
-	ltr,								///< Real less than
-	ltei,								///< Integer less then or equal
-	lter,								///< Real less then or equal
-	equi,								///< Integer equality
-	equr,								///< Real equality
-	gtei,								///< Integer greater than or equal
-	gter,								///< Real greater than or equal
-	gti,								///< Integer greater than
-	gtr,								///< Real greater than
-	neqi,								///< Integer inequality
-	neqr,								///< Real inequality
+	LT,									///< Less than
+	LTE,								///< Less then or equal
+	EQU,								///< Is equal to
+	GTE,								///< Greater than or equal
+	GT,									///< Greater than
+	NEQU,								///< Does not equal
 
-	lori,								///< Integer logical or
-	lorr,								///< Real logical or
-	landi,								///< Integer logical and
-	landr,								///< Real logical and
+	LOR,								///< Logical or
+	LAND,								///< Integer logical and
 	
-	pushi,								///< Push a constant integer value
-	pushr,								///< Push a constant real value
-	pushVar,							///< Push variable address (base(level) + addr)
-	eval,								///< Evaluate variable TOS = address, replace with value
-	assign,								///< Assign; TOS = variable address, TOS-1 = value
+	Push,								///< Push a constant integer value
+	PushVar,							///< Push variable address (base(level) + addr)
+	Eval,								///< Evaluate variable TOS = address, replace with value
+	Assign,								///< Assign; TOS = variable address, TOS-1 = value
 
-	call,								///< Call a procedure, pushing a new acrivation Frame
-	enter,								///< Allocate locals on the stack
-	ret,								///< Return from procedure; unlink Frame
-	retf,								///< Return from function; push result
-	jump,								///< Jump to a location
-	jneq,								///< Condition = pop(); Jump if condition == false (0)
+	Call,								///< Call a procedure, pushing a new acrivation Frame
+	Enter,								///< Allocate locals on the stack
+	Ret,								///< Return from procedure; unlink Frame
+	Retf,								///< Return from function; push result
+	Jump,								///< Jump to a location
+	JNEQ,								///< Condition = pop(); Jump if condition == false (0)
 
-	halt = 255							///< Halt the machine
+	Halt = 255							///< Halt the machine
 };
 
 /** OpCode Information
@@ -130,7 +114,7 @@ struct Instr {
 	OpCode			op;					///< Operation code
 
 	/// Default constructor; results in pushConst 0, 0...
-	Instr() : level{0}, op{OpCode::halt}
+	Instr() : level{0}, op{OpCode::Halt}
 		{}
 
 	/// Construct an instruction from it's components...

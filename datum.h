@@ -13,26 +13,28 @@
 
 /** A PL0C Data Value
  *  
- *  Datums may contain a signed or unsigned integer, or a floating point/real value. Signed
- *  and unsigned integer values are freely interchangeable, but conversion to from a real is
- *  undefined.
+ * Datums contain a signed or unsigned integer, or a floating point/real value.
+ * Signed and unsigned integer values are freely interchangeable, but
+ * conversion from a real, say calling real() on a Integer, is undefined.
  *  
- *  A discriminator (k), which is initialized by the constructors, is provided, but not
- *  enforced.
+ * A discriminator (kind()), which is initialized by the constructors, is
+ * provided, but only partially enforced by some operators, via assert(), i.e.,
+ * bitwise operators on Real values is undefined.
  */
-struct Datum {
-	typedef int			Integer;			///< Signed integer value or memory offset
-	typedef unsigned	Unsigned;			///< Unsigned integer value or address
+class Datum {
+public:
+	typedef int			Integer;			///< Signed integer or memory offset
+	typedef unsigned	Unsigned;			///< Unsigned value or memory address
 	typedef double		Real;				///< Floating-point value	
 
 	/// Datum "kinds"
 	enum class Kind {
-		Integer,							///< Integer
-		Unsigned,							///< Unsigned
+		Integer,							///< Signed integer
+		Unsigned,							///< Unsigned integer
 		Real								///< Real
 	};
 
-	typedef std::vector<Kind>	KindVec;	///< Vector of Kind's
+	typedef std::vector<Kind>	KindVec;	///< Vector of Datum Kind's
 
 	static std::string toString(Kind k);	///< Return k as a string...
 
@@ -42,6 +44,23 @@ struct Datum {
 	Datum(std::size_t value);				///< Construct an unsigned (size_t)...
 	Datum(Real value);						///< Constuct from a double...
 
+	Datum operator!() const;				///< Unary boolean negation...
+	Datum operator-() const;				///< Unary negation...
+	Datum operator~() const;				///< Unary bitwise not...
+
+	/// Return my kind...
+	Kind kind() const						{	return k;	};
+
+	/// Return my integer value...
+	Integer integer() const					{	return i;	};
+
+	/// Return my unsigned value...
+	Unsigned uinteger() const				{	return u;	};
+
+	/// Retrun my real value...
+	Real real() const						{	return r;	};
+
+private:
 	union {
 		Integer		i;						///< k == Integer
 		Unsigned	u;						///< k == Unsigned
@@ -50,9 +69,30 @@ struct Datum {
 	Kind			k;  					///< What Datum type?
 };
 
-/// Datum put operator
+typedef	std::vector<Datum>	DatumVector;	///< A vector of Datums
+
 std::ostream& operator<<(std::ostream& os, const Datum& d);
 
-typedef	std::vector<Datum>	DatumVector;	///< A vector of Datums
+Datum operator+	(const Datum& lhs,	const Datum& rhs);
+Datum operator-	(const Datum& lhs,	const Datum& rhs);
+Datum operator*	(const Datum& lhs,	const Datum& rhs);
+Datum operator/	(const Datum& lhs,	const Datum& rhs);
+Datum operator%	(const Datum& lhs,	const Datum& rhs);
+
+Datum operator&	(const Datum& lhs,	const Datum& rhs);
+Datum operator|	(const Datum& lhs,	const Datum& rhs);
+Datum operator^	(const Datum& lhs,	const Datum& rhs);
+Datum operator<<(const Datum& lhs,	const Datum& rhs);
+Datum operator>>(const Datum& lhs,	const Datum& rhs);
+
+Datum operator<	(const Datum& lhs,	const Datum& rhs);
+Datum operator<=(const Datum& lhs,	const Datum& rhs);
+Datum operator==(const Datum& lhs,	const Datum& rhs);
+Datum operator>=(const Datum& lhs,	const Datum& rhs);
+Datum operator>	(const Datum& lhs,	const Datum& rhs);
+Datum operator!=(const Datum& lhs,	const Datum& rhs);
+
+Datum operator&&(const Datum& lsh, const Datum& rhs);
+Datum operator||(const Datum& lsh, const Datum& rhs);
 
 #endif

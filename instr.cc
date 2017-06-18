@@ -21,71 +21,55 @@ using namespace std;
 const OpCodeInfo::InfoMap OpCodeInfo::opInfoTbl {
 	// Unary operations
 
-	{ OpCode::noti,		OpCodeInfo{ "not.i",	1			}	},
-	{ OpCode::notr,		OpCodeInfo{	"not.r",	1			}	},
-	{ OpCode::negi,		OpCodeInfo{ "neg.i",	1			}	},
-	{ OpCode::negr,		OpCodeInfo{	"neg.r",	1   		}	},
-	{ OpCode::comp,		OpCodeInfo{ "comp.u",	1			}	},
+	{ OpCode::Not,		OpCodeInfo{ "not",		1			}	},
+	{ OpCode::Neg,		OpCodeInfo{ "neg",		1			}	},
+	{ OpCode::Comp,		OpCodeInfo{ "comp",		1			}	},
 
-	{ OpCode::itor,		OpCodeInfo{ "itor",		1			}	},
-	{ OpCode::itor2,	OpCodeInfo{ "itor2",	1			}	},
-	{ OpCode::rtoi,		OpCodeInfo{ "rtoi",		1			}	},
+	{ OpCode::ITOR,		OpCodeInfo{ "itor",		1			}	},
+	{ OpCode::ITOR2,	OpCodeInfo{ "itor2",	1			}	},
+	{ OpCode::RTOI,		OpCodeInfo{ "rtoi",		1			}	},
 
 	// Binary operations
 
-	{ OpCode::addi,		OpCodeInfo{ "add.i",	2   		}	},
-	{ OpCode::addr,		OpCodeInfo{ "add.r",	2   		}	},
-	{ OpCode::subi,		OpCodeInfo{ "sub.i",	2			}	},
-	{ OpCode::subr,		OpCodeInfo{ "sub.r",	2   		}	},
-	{ OpCode::muli,		OpCodeInfo{ "mul.i",	2			}	},
-	{ OpCode::mulr,		OpCodeInfo{ "mul.r",	2   		}	},
-	{ OpCode::divi,		OpCodeInfo{ "div.i",	2			}	},
-	{ OpCode::divr,		OpCodeInfo{ "div.r",	2   		}	},
-	{ OpCode::remi,		OpCodeInfo{ "remi",		2			}	},
-	{ OpCode::remr,		OpCodeInfo{ "remr",		2   		}	},
+	{ OpCode::Add,		OpCodeInfo{ "add",		2   		}	},
+	{ OpCode::Sub,		OpCodeInfo{ "sub",		2			}	},
+	{ OpCode::Mul,		OpCodeInfo{ "mul",		2			}	},
+	{ OpCode::Div,		OpCodeInfo{ "div",		2			}	},
+	{ OpCode::Rem,		OpCodeInfo{ "rem",		2			}	},
 
-	{ OpCode::bor,		OpCodeInfo{ "bor",		2			}	},
-	{ OpCode::band,		OpCodeInfo{ "band",		2			}	},
-	{ OpCode::bxor,		OpCodeInfo{ "bxor",		2			}	},
-	{ OpCode::lshift,	OpCodeInfo{ "lshift",	2			}	},
-	{ OpCode::rshift,	OpCodeInfo{ "rshift",	2			}	},
+	{ OpCode::BOR,		OpCodeInfo{ "bor",		2			}	},
+	{ OpCode::BAND,		OpCodeInfo{ "band",		2			}	},
+	{ OpCode::BXOR,		OpCodeInfo{ "bxor",		2			}	},
+	{ OpCode::LShift,	OpCodeInfo{ "lshift",	2			}	},
+	{ OpCode::RShift,	OpCodeInfo{ "rshift",	2			}	},
 
-	{ OpCode::lti,		OpCodeInfo{ "lt.i",		2			}	},
-	{ OpCode::ltr,		OpCodeInfo{ "lt.r",		2			}	},
-	{ OpCode::ltei,		OpCodeInfo{ "lte.i",	2			}	},
-	{ OpCode::lter,		OpCodeInfo{ "lte.r",	2			}	},
-	{ OpCode::equi,		OpCodeInfo{ "equ.i",	2			}	},
-	{ OpCode::equr,		OpCodeInfo{ "equ.r",	2			}	},
-	{ OpCode::gtei,		OpCodeInfo{ "gte.i",	2			}	},
-	{ OpCode::gter,		OpCodeInfo{ "gte.r",	2			}	},
-	{ OpCode::gti,		OpCodeInfo{ "gt.i",		2			}	},
-	{ OpCode::gtr,		OpCodeInfo{ "gt.r",		2			}	},
-	{ OpCode::neqi,		OpCodeInfo{ "neq.i",	2			}	},
-	{ OpCode::neqr,		OpCodeInfo{ "neq.r",	2			}	},
+	{ OpCode::LT,		OpCodeInfo{ "lt",		2			}	},
+	{ OpCode::LTE,		OpCodeInfo{ "lte",		2			}	},
+	{ OpCode::EQU,		OpCodeInfo{ "equ",		2			}	},
+	{ OpCode::GTE,		OpCodeInfo{ "gte",		2			}	},
+	{ OpCode::GT,		OpCodeInfo{ "gt",		2			}	},
+	{ OpCode::NEQU,		OpCodeInfo{ "neq",		2			}	},
 
-	{ OpCode::lori,		OpCodeInfo{ "lor.i",	2			}	},
-	{ OpCode::lorr,		OpCodeInfo{ "lor.r",	2			}	},
-	{ OpCode::landi,	OpCodeInfo{ "land.i",	2			}	},
-	{ OpCode::landr,	OpCodeInfo{ "land.r",	2			}	},
+	{ OpCode::LOR,		OpCodeInfo{ "lor",		2			}	},
+	{ OpCode::LAND,		OpCodeInfo{ "land",		2			}	},
 
 	// Push/pop
 
-	{ OpCode::pushi,	OpCodeInfo{ "push.i",	1			}	},
-	{ OpCode::pushr,	OpCodeInfo{ "push.r",	1   		}	},
-	{ OpCode::pushVar,	OpCodeInfo{ "pushVar",	1			}	},
-	{ OpCode::eval,		OpCodeInfo{ "eval",		2			}	},
-	{ OpCode::assign,	OpCodeInfo{ "assign",	2			}	},
+	{ OpCode::Push,		OpCodeInfo{ "push",		1			}	},
+	{ OpCode::PushVar,	OpCodeInfo{ "pushvar",	1			}	},
+	{ OpCode::Eval,		OpCodeInfo{ "eval",		2			}	},
+	{ OpCode::Assign,	OpCodeInfo{ "assign",	2			}	},
 
 	// Call/return/jump...
 
-	{ OpCode::call,		OpCodeInfo{ "call",		0			}	},
-	{ OpCode::enter,	OpCodeInfo{ "enter",	0			}	},	// Size isn't staticly know
-	{ OpCode::ret,		OpCodeInfo{ "ret",		FrameSize	}	},
-	{ OpCode::retf,		OpCodeInfo{ "retf",		FrameSize	}	}, 	// Pops frame, push return value
-	{ OpCode::jump,		OpCodeInfo{ "jump",		0			}	},
-	{ OpCode::jneq,		OpCodeInfo{ "jneq",		0			}	},
+	{ OpCode::Call,		OpCodeInfo{ "call",		0			}	},
+	{ OpCode::Enter,	OpCodeInfo{ "enter",	0			}	},	// Size isn't staticly know
+	{ OpCode::Ret,		OpCodeInfo{ "ret",		FrameSize	}	},
+	{ OpCode::Retf,		OpCodeInfo{ "retf",		FrameSize	}	}, 	// Pops frame, push return value
+	{ OpCode::Jump,		OpCodeInfo{ "jump",		0			}	},
+	{ OpCode::JNEQ,		OpCodeInfo{ "jneq",		0			}	},
 
-	{ OpCode::halt,		OpCodeInfo{ "halt",		0			}   }
+	{ OpCode::Halt,		OpCodeInfo{ "halt",		0			}   }
 };
 
 // public static
@@ -124,16 +108,15 @@ Datum::Unsigned disasm(ostream& out, Datum::Unsigned loc, const Instr& instr, co
 	out << setw(5) << loc << ": " << OpCodeInfo::info(instr.op).name();
 
 	switch(instr.op) {
-	case OpCode::pushi:
-	case OpCode::pushr:
-	case OpCode::enter:
-	case OpCode::jump:
-	case OpCode::jneq:
+	case OpCode::Push:
+	case OpCode::Enter:
+	case OpCode::Jump:
+	case OpCode::JNEQ:
 		out << " " << instr.addr;
 		break;
 
-	case OpCode::pushVar:
-	case OpCode::call:
+	case OpCode::PushVar:
+	case OpCode::Call:
 		out << " "	<< level << ", " << instr.addr;
 		break;
 

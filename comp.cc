@@ -47,13 +47,18 @@ Token Comp::next() {
 
 	if (Token::Unknown == t.kind) {
 		ostringstream oss;
-		oss << "Unknown token: '" << t.string_value << "', (0x" << hex << t.integer_value << ")";
+		oss
+			<< "Unknown token: '" << t.string_value
+			<< "', (0x" << hex << t.integer_value << ")";
 		error(oss.str());
 		return next();
 	}
 
 	if (verbose)
-		cout << progName << ": getting '" << Token::toString(t.kind) << "', " << t.string_value << ", " << t.integer_value << "\n";
+		cout
+			<< progName << ": getting '"
+			<< Token::toString(t.kind) << "', "
+			<< t.string_value << ", " << t.integer_value << "\n";
 
 	return t;
 }
@@ -113,9 +118,10 @@ bool Comp::oneOf(Token::KindSet set) {
 size_t Comp::emit(const OpCode op, int8_t level, Datum addr) {
 	const int lvl = static_cast<int>(level);
 	if (verbose)
-		cout << progName << ": emitting " << code->size() << ": "
-				<< OpCodeInfo::info(op).name() << " " << lvl << ", " << addr.i
-				<< "\n";
+		cout
+			<< progName << ": emitting " << code->size() << ": "
+			<< OpCodeInfo::info(op).name() << " " << lvl << ", "
+			<< addr.integer() << "\n";
 
 	code->push_back({op, level, addr});
 	indextbl.push_back(ts.lineNum);			// update the cross index
@@ -127,20 +133,24 @@ size_t Comp::emit(const OpCode op, int8_t level, Datum addr) {
  * Convert stack operand to a real as necessary. 
  * @param	lhs	The type of the left-hand-side
  * @param	rhs	The type of the right-hand-side 
+ * @return  The promoted to Datum kind
  */
-void Comp::promote (Datum::Kind lhs, Datum::Kind rhs) {
+Datum::Kind Comp::promote (Datum::Kind lhs, Datum::Kind rhs) {
 	if (lhs == rhs)
-		;				// nothing to do
+		return lhs;							// nothing to do
 
 	else if (Datum::Kind::Real == rhs)
-		emit(OpCode::itor2);				// promote lhs (TOS-1) to a real
+		emit(OpCode::ITOR2);				// promote lhs (TOS-1) to a real
 
 	else
-		emit(OpCode::itor);					// promote rhs to a real
+		emit(OpCode::ITOR);					// promote rhs to a real
+
+	return Datum::Kind::Real;
 }
 
 /**
- * Convert rhs of assign to real if necessary, or emit error would need to be converted to an integer. 
+ * Convert rhs of assign to real if necessary, or emit error would need to be
+ * converted to an integer. 
  * @param	lhs	The type of the left-hand-side
  * @param	rhs	The type of the right-hand-side 
  */
@@ -150,11 +160,11 @@ void Comp::assignPromote (Datum::Kind lhs, Datum::Kind rhs) {
 
 	else if (Datum::Kind::Real == rhs) {
 		error("rounding lhs to fit in an integer");
-		emit(OpCode::rtoi);				// promote lhs (TOS-1) to a real
+		emit(OpCode::RTOI);				// promote lhs (TOS-1) to a real
 	}
 
 	else
-		emit(OpCode::itor);					// promote rhs to a real
+		emit(OpCode::ITOR);					// promote rhs to a real
 }
 
 /**
@@ -197,7 +207,7 @@ void Comp::purge(int level) {
 					 << i->first << ": "
 					 << SymValue::toString(i->second.kind()) << ", "
 					 << static_cast<int>(i->second.level()) << ", "
-					 << i->second.value().i
+					 << i->second.value().integer()
 					 << " from the symbol table\n";
 			i = symtbl.erase(i);
 
@@ -207,22 +217,43 @@ void Comp::purge(int level) {
 }
 
  /**
-  * Local variables have an offset from the *end* of the current stack frame (bp), while parameters
-  * have a negative offset from the *start* of the frame -- offset locals by the size of the
-  * activation frame.
+  * Local variables have an offset from the *end* of the current stack frame
+  * (bp), while parameters have a negative offset from the *start* of the frame
+  *  -- offset locals by the size of the activation frame.
   *
   *  @param	level	The current block level
   *  @param	val		The variable symbol table entry
   *  @return		Data type
   */
- Datum::Kind Comp::varRef(int level, const SymValue& val) {
-	const auto offset = val.value().i >= 0 ? val.value().i + FrameSize : val.value().i;
-	emit(OpCode::pushVar, level - val.level(), offset);
-	return val.value().k;
+ Datum::Kind Comp::emitVarRef(int level, const SymValue& val) {
+	const auto offset = val.value().integer() >= 0 ? val.value().integer() + FrameSize : val.value().integer();
+	emit(OpCode::PushVar, level - val.level(), offset);
+	return val.value().kind();
  }
 
+/// Consume, and return the closest identifer in the token stream...
+SymbolTable::iterator Comp::identRef() {
+	const string id = ts.current().string_value;	// Copy and, then 
+	next();											// Consme the identifier...
+
+	auto range = symtbl.equal_range(id);			// Should have already been defined...
+	if (range.first == range.second) {
+		error("Undefined identifier", id);
+		return symtbl.end();
+
+	} else {										// Find the closest...
+		auto closest = range.first;
+		for (auto it = closest; it != range.second; ++it)
+			if (it->second.level() > closest->second.level())
+				closest = it;
+
+		return closest;
+	}
+}
+
 /**
- * Push a variable's value, a constant value, or invoke, and push the results, of a function.
+ * Push a variable's value, a constant value, or invoke, and push the results,
+ * of a function.
  *      ident | ident "(" [ ident { "," ident } ] ")"
  *
  * @param	level	The current block level 
@@ -231,41 +262,27 @@ void Comp::purge(int level) {
  Datum::Kind Comp::identifier(int level) {
 	Datum::Kind	kind = Datum::Kind::Integer;	// Identifier type
 
-	const string name = ts.current().string_value;
-	expect(Token::Identifier);					// Consume the identifier
-
-	auto range = symtbl.equal_range(name);
-	if (range.first == range.second)
-		error("Undefined identifier", name);
-
-	else {
-		auto closest = range.first;
-		for (auto it = range.first; it != range.second; ++it)
-			if (it->second.level() > closest->second.level())
-				closest = it;
-
-		switch (closest->second.kind()) {
+	auto it = identRef();
+	if (it != symtbl.end()) {
+		switch (it->second.kind()) {
 		case SymValue::Kind::Constant:
-			kind = closest->second.value().k;	// Assume it's the symbol's value type
-			if (Datum::Kind::Integer == kind)
-				emit(OpCode::pushi, 0, closest->second.value());
-			else
-				emit(OpCode::pushr, 0, closest->second.value());
+			kind = it->second.value().kind();	// Assume it's the symbol's value type
+			emit(OpCode::Push, 0, it->second.value());
 			break;
 
 		case SymValue::Kind::Variable:
-			varRef(level, closest->second);
-			kind = closest->second.type();
-			emit(OpCode::eval);
+			kind = it->second.type();			// Use the variable's type
+			emitVarRef(level, it->second);
+			emit(OpCode::Eval);
 			break;
 
 		case SymValue::Kind::Function:
-			callStmt(closest->first, closest->second, level);
-			kind = closest->second.type();	// Use the function return type
+			kind = it->second.type();		// Use the function return type
+			callStmt(it->first, it->second, level);
 			break;
 
 		default:
-			error("Identifier is not a constant, variable or function", name);
+			error("Identifier is not a constant, variable or function", it->first);
 		}
 	}
 
@@ -273,14 +290,11 @@ void Comp::purge(int level) {
 }
 
 /** 
- *  factor = ident | number | "{" expression "}" ; 
- *"round" "(" expr ")"					| 
- * fact = ident                                 |
- *        ident "(" [ expr { "," expr } ")"   	|
- *  	  "round" "(" expr ")"					|
- *        number                                |
- *        "(" expr ")"
- *  	  ;
+ * ident                                |
+ * "round" "(" expr ")"					|
+ * ident "(" [ expr { "," expr } ")"	|
+ * number                              
+ * "(" expr ")"
  * 
  * @param	level	The current block level.
  * @return	Data type 
@@ -296,17 +310,17 @@ Datum::Kind Comp::factor(int level) {
 		kind = expression(level);
 		expect(Token::CloseParen);	
 		if (Datum::Kind::Integer != kind) {
-			emit(OpCode::rtoi);
+			emit(OpCode::RTOI);
 			kind = Datum::Kind::Integer;
 		}
 		
 	} else if (accept(Token::IntegerNum, false)) {
-		emit(OpCode::pushi, 0, ts.current().integer_value);
+		emit(OpCode::Push, 0, ts.current().integer_value);
 		expect(Token::IntegerNum);
 		
 	} else if (accept(Token::RealNum, false)) {
 		kind = Datum::Kind::Real;
-		emit(OpCode::pushr, 0, ts.current().real_value);
+		emit(OpCode::Push, 0, ts.current().real_value);
 		expect(Token::RealNum);
 
 	} else if (accept(Token::OpenParen)) {
@@ -323,76 +337,64 @@ Datum::Kind Comp::factor(int level) {
 }
 
 /**
- * urary = [ ("+" | "-" | "!" | "~") ] fact
- * @param	level	The current block level 
- * @return	Data type 
- */
-Datum::Kind Comp::unary(int level) {
-	auto kind = Datum::Kind::Integer;	// factor data type
-
-	if (accept(Token::Add)) 
-		kind = factor(level);					/* ignore unary + */	
-
-	else if (accept(Token::Subtract)) {
-		if (Datum::Kind::Integer == (kind = factor(level)))
-			emit(OpCode::negi);
-		else
-			emit(OpCode::negr);
-
-	} else if (accept(Token::NOT)) {
-		if (Datum::Kind::Integer == (kind = factor(level)))
-			emit(OpCode::noti);
-		else
-			emit(OpCode::notr);
-
-	} else if (accept(Token::Complament)) {
-		if (Datum::Kind::Integer == (kind = factor(level)))
-			emit(OpCode::comp);
-		else
-			error("unary: complement a Real");
-
-	} else									
-		kind = factor(level);
-
-	return kind;
-}
-
-/**
- * term =  fact { ("*" | "/" | "%") fact } ;
+ * fact { ("*"|"/"|"%"|"&"|"&&"|"<<"|">>") fact } ;
  *
  * @param level	The current block level 
  * @return	Data type  
  */
 Datum::Kind Comp::term(int level) {
-	const auto lhs = unary(level);
+	const auto lhs = factor(level);
 
 	for (;;) {
 		if (accept(Token::Multiply)) {
-			const auto rhs = unary(level);	
+			const auto rhs = factor(level);	
 			promote(lhs, rhs);
-
-			if (Datum::Kind::Integer == lhs)
-				emit(OpCode::muli);
-			else
-				emit(OpCode::mulr);
-
+			emit(OpCode::Mul);
+			
 		} else if (accept(Token::Divide)) {
-			const auto rhs = unary(level);
+			const auto rhs = factor(level);
 			promote(lhs, rhs);
-
-			if (Datum::Kind::Integer == lhs)
-				emit(OpCode::divi);	
-			else
-				emit(OpCode::divr);
-
+			emit(OpCode::Div);	
+			
 		} else if (accept(Token::Mod)) {
-			const auto rhs = unary(level);
+			const auto rhs = factor(level);
 			promote(lhs, rhs);
+			emit(OpCode::Rem);
 
-			if (Datum::Kind::Integer == lhs)
-				emit(OpCode::remi);
+		} else if (accept(Token::BitAND)) {
+			auto rhs = factor(level);
+			rhs = promote(lhs, rhs);
+			if (Datum::Kind::Real == lhs || Datum::Kind::Real == rhs)
+				error("binary bit operation with real operand(s)");
 			else
-				emit(OpCode::remr);
+				emit(OpCode::BAND); 
+
+		} else if (accept(Token::AND)) {
+			const auto rhs = factor(level);
+			promote(lhs, rhs);
+			emit(OpCode::LAND);
+
+
+		 } else if (accept(Token::ShiftL)) {
+			 const auto rhs = factor(level);
+			 if (Datum::Kind::Real == lhs || Datum::Kind::Real == rhs)
+				 error("Shift operator with real operand(s)");
+			 else 
+				 emit(OpCode::LShift);
+
+		 } else if (accept(Token::ShiftR)) {
+			 const auto rhs = factor(level);
+			 if (Datum::Kind::Real == lhs || Datum::Kind::Real == rhs)
+				 error("Shift operator with real operand(s)");
+			 else 
+				 emit(OpCode::RShift);	
+
+		 } else if (accept(Token::ShiftL)) {
+			 const auto rhs = factor(level);
+			 if (Datum::Kind::Real == lhs || Datum::Kind::Real == rhs)
+				 error("Shift operator with real operand(s)");
+			 else 
+				 emit(OpCode::LShift);	
 
 		} else
 			break;
@@ -402,101 +404,65 @@ Datum::Kind Comp::term(int level) {
 }
 
 /**
- * additive = term { ("+" | "-") term } ;
+ * [ ("+" | "-" | "!" | "~") ] fact
+ * @param	level	The current block level 
+ * @return	Data type 
+ */
+Datum::Kind Comp::unary(int level) {
+	auto kind = Datum::Kind::Integer;		// Default factor data type
+
+	if (accept(Token::Add)) 
+		kind = term(level);					// ignore unary + 
+
+	else if (accept(Token::Subtract)) {
+		kind = term(level);
+		emit(OpCode::Neg);
+
+	} else if (accept(Token::NOT)) {
+		kind = term(level);
+		emit(OpCode::Not);
+
+	} else if (accept(Token::Complament)) {
+		kind = term(level);
+		if (Datum::Kind::Integer == kind)
+			emit(OpCode::Comp);
+		else
+			error("unary: complement a Real");
+
+	} else									
+		kind = term(level);
+
+	return kind;
+}
+
+/**
+ * term { ("+" | "-" | "!" | "~") term } ;
  * @param	level	The current block level. 
  * @return	Data type  
  */
-Datum::Kind Comp::addExpr(int level) {
-	const auto lhs = term(level);
+Datum::Kind Comp::simpleExpr(int level) {
+	const auto lhs = unary(level);
 
 	for (;;) {
 		if (accept(Token::Add)) {
-			const auto rhs =  term(level);
+			const auto rhs =  unary(level);
 			promote(lhs, rhs);
-
-			if (Datum::Kind::Integer == lhs)
-				emit(OpCode::addi);
-			else
-				emit(OpCode::addr);
+			emit(OpCode::Add);
 
 		} else if (accept(Token::Subtract)) {
-			const auto rhs = term(level);
+			const auto rhs = unary(level);
 			promote(lhs, rhs);
+			emit(OpCode::Sub);
 
-			if (Datum::Kind::Integer == lhs)
-				emit(OpCode::subi);
-			else
-				emit(OpCode::subr);
+		} else if (accept(Token::BitOR)) {
+			const auto rhs = unary(level);
+			promote(lhs, rhs);
+			emit(OpCode::BOR);
 
-		} else
-			break;
-	}
-
-	return lhs;
-}
-
-/**
- * shift = additive { ("<<" | ">>") additive } ;
- * @param	level	The current block level. 
- * @return	Data type. 
- */
-Datum::Kind Comp::shiftExpr(int level) {
-	const auto lhs = addExpr(level);
-
-	for (;;) {
-		 if (accept(Token::ShiftL)) {
-			 const auto rhs = addExpr(level);
-
-			 if (Datum::Kind::Integer != lhs || Datum::Kind::Integer != rhs)
-				 error("Shift operator without integer operand(s)");
-			 else 
-				 emit(OpCode::lshift);
-
-		 } else if (accept(Token::ShiftR)) {
-			 const auto rhs = addExpr(level);
-
-			 if (Datum::Kind::Integer != lhs || Datum::Kind::Integer != rhs)
-				 error("Shift operator without integer operand(s)");
-			 else 
-				 emit(OpCode::rshift);	
-
-		 } else
-			 break;
-	}
-
-	return lhs;
-}
-
-/**
- * expr = shift { ("|" | "&" | "^") shift } ;
- *
- * @param	level	The current block level. 
- * @return	Data type. 
- */
-Datum::Kind Comp::expression(int level) {
-	const auto lhs = shiftExpr(level);
-
-	for (;;) {
-		if (accept(Token::BitOR)) {
-			const auto rhs = shiftExpr(level);
-			if (Datum::Kind::Integer != lhs || Datum::Kind::Integer != rhs)
-				error("binary bit operation without integer operation");
-			else
-				emit(OpCode::bor);
-
-		} else if (accept(Token::BitAND)) {
-			const auto rhs = shiftExpr(level);
-			if (Datum::Kind::Integer != lhs || Datum::Kind::Integer != rhs)
-				error("binary bit operation without integer operation");
-			else
-				emit(OpCode::band); 
-
-		} else if (accept(Token::BitXOR)) {
-			const auto rhs = shiftExpr(level);
-			if (Datum::Kind::Integer != lhs || Datum::Kind::Integer != rhs)
-				error("binary bit operation without integer operation");
-			else
-				emit(OpCode::bxor); 
+		} else if (accept(Token::OR)) {
+			const auto rhs = unary(level);
+			promote(lhs, rhs);
+			emit(OpCode::LOR);
 
 		} else
 			break;
@@ -506,102 +472,43 @@ Datum::Kind Comp::expression(int level) {
 }
 
 /**
- * relational =  expr { ("="|"!="|"<"|"<="|">"|">=") expr } ;
+ * simpleExpr { ("<"|"<="|"=="|">="|">"|"!=") simpleExpr } ;
  * @param level	The current block level 
  * @return	Data type. 
  */
-Datum::Kind Comp::relational(int level) {
-	const auto lhs = expression(level);
+Datum::Kind Comp::expression(int level) {
+	const auto lhs = simpleExpr(level);
 
 	for (;;) {
 		if (accept(Token::LTE)) {
-			const auto rhs = expression(level);
+			const auto rhs = simpleExpr(level);
 			promote(lhs, rhs);
-
-			if (Datum::Kind::Integer == lhs) 
-				emit(OpCode::ltei);
-			else
-				emit(OpCode::lter);
+			emit(OpCode::LTE);
 
 		} else if (accept(Token::LT)) {
-			const auto rhs = expression(level);
+			const auto rhs = simpleExpr(level);
 			promote(lhs, rhs);
-
-			if (Datum::Kind::Integer == lhs)
-				emit(OpCode::lti);
-			else
-				emit(OpCode::ltr);
+			emit(OpCode::LT);
 
 		} else if (accept(Token::GT)) {
-			const auto rhs = expression(level);
+			const auto rhs = simpleExpr(level);
 			promote(lhs, rhs);
-
-			if (Datum::Kind::Integer == lhs)
-				emit(OpCode::gti);
-			else
-				emit(OpCode::gtr);
+			emit(OpCode::GT);
 			
 		} else if (accept(Token::GTE)) {
-			const auto rhs = expression(level);
+			const auto rhs = simpleExpr(level);
 			promote(lhs, rhs);
-
-			if (Datum::Kind::Integer == lhs)
-				emit(OpCode::gtei);
-			else
-				emit(OpCode::gter);
+			emit(OpCode::GTE);
 			
 		} else if (accept(Token::EQU)) {
-			const auto rhs = expression(level);
+			const auto rhs = simpleExpr(level);
 			promote(lhs, rhs);
+			emit(OpCode::EQU);
 
-			if (Datum::Kind::Integer == lhs)
-				emit(OpCode::equi);
-			else
-				emit(OpCode::equr);
-			
 		} else if (accept(Token::NEQU)) {
-			const auto rhs = expression(level);
+			const auto rhs = simpleExpr(level);
 			promote(lhs, rhs);
-
-			if (Datum::Kind::Integer == lhs)
-				emit(OpCode::neqi);
-			else
-				emit(OpCode::neqr);
-
-		} else
-			break;
-	}
-
-	return lhs;
-}
-
-/**
- * cond =  relational { (|"||"|"&&") relational } ;
- *
- * @param	level	The current block level. 
- * @return	Data type. 
- */
-Datum::Kind Comp::condition(int level) {
-	const auto lhs = relational(level);
-
-	for (;;) {
-		if (accept(Token::OR)) {
-			const auto rhs = relational(level);
-			promote(lhs, rhs);
-
-			if (Datum::Kind::Integer == rhs)
-				emit(OpCode::lori);
-			else
-				emit(OpCode::lorr);
-
-		} else if (accept(Token::AND)) {
-			const auto rhs = relational(level);
-			promote(lhs, rhs);
-
-			if (Datum::Kind::Integer == rhs)
-				emit(OpCode::landi);
-			else
-				emit(OpCode::landr);
+			emit(OpCode::NEQU);
 
 		} else
 			break;
@@ -623,14 +530,14 @@ void Comp::assignStmt(const string& name, const SymValue& val, int level) {
 	switch(val.kind()) {
 	case SymValue::Kind::Variable:
 		assignPromote(val.type(), rhs);
-		varRef(level, val);
-		emit(OpCode::assign);
+		emitVarRef(level, val);
+		emit(OpCode::Assign);
 		break;
 
 	case SymValue::Kind::Function:		// Save value in the frame's retValue element
 		assignPromote(val.type(), rhs);
-		emit(OpCode::pushVar, 0, FrameRetVal);
-		emit(OpCode::assign);
+		emit(OpCode::PushVar, 0, FrameRetVal);
+		emit(OpCode::Assign);
 		break;
 
 	case SymValue::Kind::Constant:
@@ -682,7 +589,7 @@ void Comp::callStmt(const string& name, const SymValue& val, int level) {
 	if (SymValue::Kind::Procedure != val.kind() && SymValue::Kind::Function != val.kind())
 		error("Identifier is not a function or procedure", name);
 
-	emit(OpCode::call, level - val.level(), val.value());
+	emit(OpCode::Call, level - val.level(), val.value());
 }
 
 /**
@@ -691,47 +598,34 @@ void Comp::callStmt(const string& name, const SymValue& val, int level) {
  * @param	level	The current block level
  */
 void Comp::identStmt(int level) {
-	// Save the identifier string before consuming it
-	const string name = ts.current().string_value;
-	expect(Token::Identifier);
+	auto it = identRef();
 
-	auto range = symtbl.equal_range(name);		// look it up....
-	if (range.first == range.second)
-		error("undefined variable", name);
+	if (accept(Token::Assign))			// ident "=" expression
+		assignStmt(it->first, it->second, level);
 
-	else {
-		auto closest = range.first;				// Find the "closest" entry
-		for (auto it = range.first; it != range.second; ++it)
-			if (it->second.level() > closest->second.level())
-				closest = it;
+	else if (SymValue::Kind::Function == it->second.kind())
+		error("calling function without assignment", it->first);
 
-		if (accept(Token::Assign))			// ident "=" expression
-			assignStmt(closest->first, closest->second, level);
-
-		else if (SymValue::Kind::Function == closest->second.kind())
-			error("calling function without assignment");
-
-		else
-			callStmt(closest->first, closest->second, level);
-	}
+	else
+		callStmt(it->first, it->second, level);
 }
 
 
 /**
- * "while" condition "do" statement...
+ * "while" expr "do" statement...
  *
  * @param	level	The current block level.
  */
  void Comp::whileStmt(int level) {
-	const auto cond_pc = code->size();	// Start of while condition
-	condition(level);
+	const auto cond_pc = code->size();	// Start of while expr
+	expression(level);
 
-	// jump if condition is false...
-	const auto jmp_pc = emit(OpCode::jneq, 0, 0);
+	// jump if expr is false...
+	const auto jmp_pc = emit(OpCode::JNEQ, 0, 0);
 	expect(Token::Do);					// consume "do"
 	statement(level);
 
-	emit(OpCode::jump, 0, cond_pc);		// Jump back to condition test...
+	emit(OpCode::Jump, 0, cond_pc);		// Jump back to expr test...
 
 	if (verbose)
 		cout << progName << ": patching address at " << jmp_pc << " to " << code->size() << "\n";
@@ -739,20 +633,20 @@ void Comp::identStmt(int level) {
  }
 
 /**
- *  "if" condition "then" statement1 [ "else" statement2 ]
+ *  "if" expr "then" statement1 [ "else" statement2 ]
  */
  void Comp::ifStmt(int level) {
-	condition(level);
+	expression(level);
 
 	// Jump if conditon is false
-	const size_t jmp_pc = emit(OpCode::jneq, 0, 0);
+	const size_t jmp_pc = emit(OpCode::JNEQ, 0, 0);
 	expect(Token::Then);							// Consume "then"
 	statement(level);
 
 	// Jump over else statement, but only if there is an else
 	const bool Else = accept(Token::Else);
 	size_t else_pc = 0;
-	if (Else) else_pc = emit(OpCode::jump, 0, 0);
+	if (Else) else_pc = emit(OpCode::Jump, 0, 0);
 
 	if (verbose)
 		cout << progName << ": patching address at " << jmp_pc << " to " << code->size() << "\n";
@@ -768,38 +662,29 @@ void Comp::identStmt(int level) {
  }
 
  /**
-  * "repeat" statement "until" condition
+  * "repeat" statement "until" expr
   *
   * @param	level 	The current block level
   */
  void Comp::repeatStmt(int level) {
-	 const size_t loop_pc = code->size();			// jump here until condition fails
+	 const size_t loop_pc = code->size();			// jump here until expr fails
 	 statement(level);
 	 expect(Token::Until);
-	 condition(level);
-	 emit(OpCode::jneq, 0, loop_pc);
+	 expression(level);
+	 emit(OpCode::JNEQ, 0, loop_pc);
  }
 
 /**
- * <"begin"> stmt { "," stmt } "end" ;
- *  @param	level		The current block level.
+ *  stmt { ";" stmt }
+ * @param	level		The current block level.
  */
-void Comp::statementListTail(int level) {
+void Comp::statementList(int level) {
 	do {
 		statement(level);
 	} while (accept(Token::SemiColon));
-	expect(Token::End);
 }
 
 /**
- * stmt =	[ ident ":=" expr
- * 		  	| "call" ident
- *          | "?" ident
- * 		  	| "!" expr
- *          | "begin" stmt {";" stmt } "end"
- *          | "if" cond "then" stmt { "else" stmt }
- *          | "while" cond "do" stmt ] ;identStmt
- *
  * @param	level	The current block level.
  */
 void Comp::statement(int level) {
@@ -807,15 +692,16 @@ void Comp::statement(int level) {
 		identStmt(level);
 
 	else if (accept(Token::Begin)) {				// begin ... end
-		statementListTail(level);
+		statementList(level);
+		expect(Token::End);
 
-	} else if (accept(Token::If)) 					// if condition...
+	} else if (accept(Token::If)) 					// if expr...
 		ifStmt(level);
 
-	else if (accept(Token::While))					// "while" condition...
+	else if (accept(Token::While))					// "while" expr...
 		whileStmt(level);
 
-	else if (accept(Token::Repeat))
+	else if (accept(Token::Repeat))					// "repeat" until...
 		repeatStmt(level);
 
 	// else: nothing
@@ -828,7 +714,7 @@ void Comp::statement(int level) {
  * @return 	the next identifer in the token stream, "unknown" if the next token wasn't an
  *  		identifier.
  */
-const std::string Comp::nameDecl(int level) {
+std::string Comp::nameDecl(int level) {
 	const string id = ts.current().string_value;			// Copy the identifer
 
 	if (expect(Token::Identifier)) {						// Consume the identifier
@@ -913,7 +799,7 @@ void Comp::constDecl(int level) {
 
 	expect(Token::Assign);							// Consume the "="
 	if (accept(Token::IntegerNum, false)) {
-		const auto number = ts.current().integer_value;
+		const Datum number(ts.current().integer_value);
 		next();										// Consume the number
 
 		// Insert ident into the symbol table
@@ -922,13 +808,39 @@ void Comp::constDecl(int level) {
 			cout << progName << ": constDecl " << ident << ": " << level << ", " << number << "\n";
 
 	} else if (accept(Token::RealNum, false)) {
-		const auto number = ts.current().real_value;
+		const Datum number(ts.current().real_value);
 		next();										// Consume the number
 
 		/// Insert ident into the symbol table
 		symtbl.insert(	{	ident, SymValue(level, number)	}	);
 		if (verbose)
 			cout << progName << ": constDecl " << ident << ": " << level << ", " << number << "\n";
+
+	} else if (accept(Token::Identifier, false)) {
+		auto it = identRef();
+		if (it != symtbl.end()) {
+			switch (it->second.kind()) {
+			case SymValue::Kind::Constant: 			// Insert ident into the symbol table
+				symtbl.insert(	{	ident, SymValue(level, it->second.value())	}	);
+				if (verbose)
+					cout
+						<< progName << ": constDecl "
+						<< ident << ": " << level << ", "
+						<< it->second.value() << "\n";
+				break;
+
+			case SymValue::Kind::Variable:
+				error("identifier is not a constant", it->first);
+				break;
+
+			case SymValue::Kind::Function:
+				error("Function is not a constant expression", it->first);
+				break;
+
+			default:
+				error("Identifier is not a constant, variable or function", it->first);
+			}
+		}
 
 	} else {
 		error("expected an interger or real literal, got neither", ts.current().string_value);
@@ -1123,11 +1035,7 @@ void Comp::subrountineDecls(int level) {
  * @return 	Entry point address
  */
 Datum::Unsigned Comp::blockDecl(SymValue& val, int level) {
-	/*
-	 * Delcaractions...
-	 */
-
-	constDeclBlock(level);
+	constDeclBlock(level);						// declaractions...
 	auto dx = varDeclBlock(level);
 	subrountineDecls(level);
 
@@ -1137,19 +1045,21 @@ Datum::Unsigned Comp::blockDecl(SymValue& val, int level) {
 	 * if dx == 0 (the subroutine has zero locals.
 	 */
 
-	const auto addr = dx > 0 ? emit(OpCode::enter, 0, dx) : code->size();
+	const auto addr = dx > 0 ? emit(OpCode::Enter, 0, dx) : code->size();
 	val.value(addr);
 
-	if (expect(Token::Begin))					// "begin" statements... "end"
-		statementListTail(level);
+	if (expect(Token::Begin)) {					// "begin" statements... "end"
+		statementList(level);
+		expect(Token::End);
+	}
 
 	// block postfix... TBD; emit reti or retr for functions!
 
 	const auto sz = val.params().size();
 	if (SymValue::Kind::Function == val.kind())
-		emit(OpCode::retf, 0, sz);	// function...
+		emit(OpCode::Retf, 0, sz);	// function...
 	else
-		emit(OpCode::ret, 0, sz);	// procedure...
+		emit(OpCode::Ret, 0, sz);	// procedure...
 
 	purge(level);								// Remove symbols only visible at this level
 
@@ -1162,8 +1072,8 @@ void Comp::run() {
 	assert(range.first != range.second);
 
 	// Emit a call to the main procedure, followed by a halt
-	const auto call_pc = emit(OpCode::call, 0, 0);
-	emit(OpCode::halt);
+	const auto call_pc = emit(OpCode::Call, 0, 0);
+	emit(OpCode::Halt);
 
 	// emit the first block (block 0)
 

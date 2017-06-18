@@ -1,5 +1,5 @@
 { print Fahrenheit-Celsius table	}
-{	first version; integers only	}
+{	third version; integers & reals	}
 
 const
 	LOWER =   0.0;	{	lower table limit	}

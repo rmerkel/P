@@ -14,35 +14,35 @@
 # fahr.p, 13: begin
     2: enter 2
 # fahr.p, 14: 	fahr = LOWER;
-    3: push.i 0
+    3: push 0
     4: itor
-    5: pushVar 0, 4
+    5: pushvar 0, 4
     6: assign
 # fahr.p, 15: 	while fahr <= UPPER do begin
-    7: pushVar 0, 4
+    7: pushvar 0, 4
     8: eval
-    9: push.i 300
+    9: push 300
    10: itor
-   11: lte.r
+   11: lte
    12: jneq 31
 # fahr.p, 16: 		celsius = 5.0 * (fahr-32.0) / 9.0;
-   13: push.r 5.000000
-   14: pushVar 0, 4
+   13: push 5.000000
+   14: pushvar 0, 4
    15: eval
-   16: push.r 32.000000
-   17: sub.r
-   18: mul.r
-   19: push.r 9.000000
-   20: div.r
-   21: pushVar 0, 5
+   16: push 32.000000
+   17: sub
+   18: mul
+   19: push 9.000000
+   20: div
+   21: pushvar 0, 5
    22: assign
 # fahr.p, 17: 		fahr = fahr + STEP;
-   23: pushVar 0, 4
+   23: pushvar 0, 4
    24: eval
-   25: push.i 20
+   25: push 20
    26: itor
-   27: add.r
-   28: pushVar 0, 4
+   27: add
+   28: pushvar 0, 4
    29: assign
 # fahr.p, 18: 	end;
    30: jump 7

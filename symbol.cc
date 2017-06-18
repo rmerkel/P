@@ -38,7 +38,7 @@ SymValue::SymValue() : k {Kind::None}, l {0}, t{Datum::Kind::Integer} {}
  * @param value The constant data value.
  */
 SymValue::SymValue(int level, Datum value)
-	: k{SymValue::Kind::Constant}, l{level}, v{value}, t{v.k}
+	: k{SymValue::Kind::Constant}, l{level}, v{value}, t{v.kind()}
 {
 }
 
@@ -101,5 +101,4 @@ Datum::KindVec& SymValue::params() 					{   return p;			}
  * @return Subrountine kinds
  */
 const Datum::KindVec& SymValue::params() const 		{   return p;			}
-
 

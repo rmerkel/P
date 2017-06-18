@@ -5,29 +5,29 @@
 # divbyzero.p, 4: begin
     2: enter 3
 # divbyzero.p, 5: 	y = 10;
-    3: push.i 10
-    4: pushVar 0, 5
+    3: push 10
+    4: pushvar 0, 5
     5: assign
 # divbyzero.p, 6: 	z = 0;
-    6: push.i 0
-    7: pushVar 0, 6
+    6: push 0
+    7: pushvar 0, 6
     8: assign
 # divbyzero.p, 7: 
 # divbyzero.p, 8: 	x = y / 2;
-    9: pushVar 0, 5
+    9: pushvar 0, 5
    10: eval
-   11: push.i 2
-   12: div.i
-   13: pushVar 0, 4
+   11: push 2
+   12: div
+   13: pushvar 0, 4
    14: assign
 # divbyzero.p, 9: 	x = y / z	{	opps!	}
-   15: pushVar 0, 5
+   15: pushvar 0, 5
    16: eval
 # divbyzero.p, 10: end.
-   17: pushVar 0, 6
+   17: pushvar 0, 6
    18: eval
-   19: div.i
-   20: pushVar 0, 4
+   19: div
+   20: pushvar 0, 4
    21: assign
    22: ret
 #divbyzero.p, 10: 

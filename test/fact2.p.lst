@@ -19,36 +19,36 @@
 # fact2.p, 18: 	begin
     2: enter 1
 # fact2.p, 19: 		p = 1;
-    3: push.i 1
-    4: pushVar 0, 4
+    3: push 1
+    4: pushvar 0, 4
     5: assign
 # fact2.p, 20: 		while n > 0 do begin
-    6: pushVar 0, -1
+    6: pushvar 0, -1
     7: eval
-    8: push.i 0
-    9: gt.i
+    8: push 0
+    9: gt
    10: jneq 25
 # fact2.p, 21: 			p = p * n;
-   11: pushVar 0, 4
+   11: pushvar 0, 4
    12: eval
-   13: pushVar 0, -1
+   13: pushvar 0, -1
    14: eval
-   15: mul.i
-   16: pushVar 0, 4
+   15: mul
+   16: pushvar 0, 4
    17: assign
 # fact2.p, 22: 			n = n - 1
-   18: pushVar 0, -1
+   18: pushvar 0, -1
    19: eval
-   20: push.i 1
+   20: push 1
 # fact2.p, 23: 		end;
-   21: sub.i
-   22: pushVar 0, -1
+   21: sub
+   22: pushvar 0, -1
    23: assign
    24: jump 6
 # fact2.p, 24: 		factorial = p;
-   25: pushVar 0, 4
+   25: pushvar 0, 4
    26: eval
-   27: pushVar 0, 3
+   27: pushvar 0, 3
    28: assign
 # fact2.p, 25: 	end;
    29: retf
@@ -57,10 +57,10 @@
    30: enter 1
 # fact2.p, 28: 	{ The result is the 10th factorial; 3,628,000	}
 # fact2.p, 29:     result = factorial(nFacts)
-   31: push.i 10
+   31: push 10
 # fact2.p, 30: end.
    32: call 0, 2
-   33: pushVar 0, 4
+   33: pushvar 0, 4
    34: assign
    35: ret
 

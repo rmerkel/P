@@ -21,7 +21,6 @@ using namespace std;
 
 /// Dump the current machine state
 void Interp::dump() {
-
 	cout << fixed;							// Use fixed format for floating point values;
 
 	// Dump the last write
@@ -65,7 +64,7 @@ void Interp::dump() {
 Datum::Unsigned Interp::base(Datum::Unsigned lvl) {
 	auto b = fp;
 	for (; lvl > 0; --lvl)
-		b = stack[b].u;
+		b = stack[b].uinteger();
 
 	return b;
 }
@@ -116,9 +115,9 @@ void Interp::call(int8_t nlevel, Datum::Unsigned addr) {
  */
 void Interp::ret() {
 	sp = fp - 1; 					// "pop" the activaction frame
-	pc = stack[fp + FrameRetAddr].u;
-	fp = stack[fp + FrameOldFp].u;
-	sp -= ir.addr.u;				// Pop parameters, if any...
+	pc = stack[fp + FrameRetAddr].uinteger();
+	fp = stack[fp + FrameOldFp].uinteger();
+	sp -= ir.addr.uinteger();		// Pop parameters, if any...
 }
 
 /// Unlink the stack frame, set the return address, and then push the function result
@@ -141,30 +140,33 @@ Interp::Result Interp::step() {
 		return Result::stackUnderflow;
 	}
 
-	Datum		rhand;					// righthand side of a binary operation
+	Datum	rhand;						// right-hand side of a binary operation
 
 	switch(ir.op) {
-	case OpCode::itor:		stack[sp] = stack[sp].i * 1.0;				break;
-	case OpCode::itor2:		stack[sp-1] = stack[sp-1].i * 1.0;			break;
-	case OpCode::rtoi:	
-		stack[sp] = static_cast<Datum::Integer>(round(stack[sp].r));
+	case OpCode::ITOR:
+		stack[sp] = stack[sp].integer() * 1.0;
 		break;
 
-	case OpCode::noti:		stack[sp] = !stack[sp].i;					break;
-	case OpCode::notr:		stack[sp] = !stack[sp].r;					break;
-	case OpCode::negi:		stack[sp] = -stack[sp].i;					break;
-	case OpCode::negr:		stack[sp] = -stack[sp].r;					break;
-	case OpCode::comp:		stack[sp] = ~stack[sp].u; 					break;
-	case OpCode::addi:   	rhand = pop(); push(pop().i + rhand.i); 	break;
-	case OpCode::addr:		rhand = pop(); push(pop().r + rhand.r);		break;
-	case OpCode::subi:		rhand = pop(); push(pop().i - rhand.i); 	break;
-	case OpCode::subr:		rhand = pop(); push(pop().r - rhand.r);		break;
-	case OpCode::muli:		rhand = pop(); push(pop().i * rhand.i);		break;
-	case OpCode::mulr:		rhand = pop(); push(pop().r * rhand.r);		break;
+	case OpCode::ITOR2:
+		stack[sp-1] = stack[sp-1].integer() * 1.0;
+		break;
 
-	case OpCode::divi:
-		if (0 != (rhand = pop()).i)	
-			push(pop().i / rhand.i);
+	case OpCode::RTOI:	
+		stack[sp] = static_cast<Datum::Integer>(round(stack[sp].real()));
+		break;
+
+	case OpCode::Not:		stack[sp] = !stack[sp];					break;
+	case OpCode::Neg:		stack[sp] = -stack[sp];					break;
+	case OpCode::Comp:		stack[sp] = ~stack[sp]; 				break;
+
+	case OpCode::Add:		rhand = pop(); push(pop() + rhand);		break;
+	case OpCode::Sub:		rhand = pop(); push(pop() - rhand); 	break;
+	case OpCode::Mul:		rhand = pop(); push(pop() * rhand);		break;
+	
+	case OpCode::Div:
+		rhand = pop();
+		if ((rhand.kind() == Datum::Kind::Real && rhand.real() != 0) || rhand.integer() != 0)
+			push(pop() / rhand);
 
 		else {
 			cerr << "Attempt to divide by zero @ pc (" << prevPc << ")!\n";
@@ -172,19 +174,10 @@ Interp::Result Interp::step() {
 		}
 		break;
 
-	case OpCode::divr:
-		if (0.0 != (rhand = pop()).r)
-			push(pop().r / rhand.r);
-
-		else {
-			cerr << "Attempt to divide by zero @ pc (" << prevPc << ")!\n";
-			return Result::divideByZero;
-		}
-		break;
-
-	case OpCode::remi:
-		if (0 != (rhand = pop()).i)
-			push(pop().i % rhand.i);
+	case OpCode::Rem:
+		rhand = pop();
+		if ((rhand.kind() == Datum::Kind::Real && rhand.real() != 0) || rhand.real() != 0)
+			push(pop() % rhand);
 
 		else {
 			cerr << "attempt to divide by zero @ pc (" << prevPc << ")!\n";
@@ -192,53 +185,51 @@ Interp::Result Interp::step() {
 		}
 		break;
 
-	case OpCode::remr:
-		if (0.0 != (rhand = pop()).r)	
-			push(fmod(pop().r, rhand.r));
+	case OpCode::BOR:	 	rhand = pop(); push(pop()  | rhand);	break;
+	case OpCode::BAND:   	rhand = pop(); push(pop()  & rhand); 	break;
+	case OpCode::BXOR:   	rhand = pop(); push(pop()  ^ rhand); 	break;
+	case OpCode::LShift: 	rhand = pop(); push(pop() << rhand); 	break;
+	case OpCode::RShift:	rhand = pop(); push(pop() >> rhand); 	break;
+	case OpCode::LT:		rhand = pop(); push(pop()  < rhand); 	break;
+	case OpCode::LTE:   	rhand = pop(); push(pop() <= rhand); 	break;
+	case OpCode::EQU:   	rhand = pop(); push(pop() == rhand); 	break;
+	case OpCode::GTE:   	rhand = pop(); push(pop() >= rhand); 	break;
+	case OpCode::GT:		rhand = pop(); push(pop()  > rhand); 	break;
+	case OpCode::NEQU:   	rhand = pop(); push(pop() != rhand); 	break;
+	case OpCode::LOR:   	rhand = pop(); push(pop() || rhand); 	break;
+	case OpCode::LAND:  	rhand = pop(); push(pop() && rhand); 	break;
+	case OpCode::Push: 		push(ir.addr);							break;
 
-		else {
-			cerr << "attempt to divide by zero @ pc (" << prevPc << ")!\n";
-			return Result::divideByZero;
-		}
+	case OpCode::PushVar:
+		push(base(ir.level) + ir.addr.integer());
 		break;
 
-	case OpCode::bor:	 	rhand = pop(); push(pop().u  | rhand.u);	break;
-	case OpCode::band:   	rhand = pop(); push(pop().u  & rhand.u); 	break;
-	case OpCode::bxor:   	rhand = pop(); push(pop().u  ^ rhand.u); 	break;
-	case OpCode::lshift: 	rhand = pop(); push(pop().u << rhand.u); 	break;
-	case OpCode::rshift:	rhand = pop(); push(pop().u >> rhand.u); 	break;
-	case OpCode::ltei:   	rhand = pop(); push(pop().i <= rhand.i); 	break;
-	case OpCode::lter:   	rhand = pop(); push(pop().r <= rhand.r); 	break;
-	case OpCode::lti:		rhand = pop(); push(pop().i  < rhand.i); 	break;
-	case OpCode::ltr:		rhand = pop(); push(pop().r  < rhand.r); 	break;
-	case OpCode::equi:   	rhand = pop(); push(pop().i == rhand.i); 	break;
-	case OpCode::equr:   	rhand = pop(); push(pop().r == rhand.r); 	break;
-	case OpCode::gti:		rhand = pop(); push(pop().i  > rhand.i); 	break;
-	case OpCode::gtr:		rhand = pop(); push(pop().r  > rhand.r); 	break;
-	case OpCode::gtei:   	rhand = pop(); push(pop().i >= rhand.i); 	break;
-	case OpCode::gter:   	rhand = pop(); push(pop().r >= rhand.r); 	break;
-	case OpCode::neqi:   	rhand = pop(); push(pop().i != rhand.i); 	break;
-	case OpCode::neqr:   	rhand = pop(); push(pop().r != rhand.r); 	break;
-	case OpCode::lori:   	rhand = pop(); push(pop().i || rhand.i); 	break;
-	case OpCode::lorr:		rhand = pop(); push(pop().r || rhand.r);	break;
-	case OpCode::landi:  	rhand = pop(); push(pop().i && rhand.i); 	break;
-	case OpCode::landr:		rhand = pop(); push(pop().r && rhand.r);	break;
-	case OpCode::pushi: 	push(ir.addr.i);							break;
-	case OpCode::pushr:		push(ir.addr.r);							break;
-	case OpCode::pushVar:	push(base(ir.level) + ir.addr.i);			break;
-	case OpCode::eval:	{   auto ea = pop(); push(stack[ea.u]);	}		break;
-	case OpCode::assign:
-		lastWrite = pop().u;	// Save the effective address for dump()...
+	case OpCode::Eval: {	auto ea = pop(); push(stack[ea.uinteger()]);	}
+		break;
+
+	case OpCode::Assign:
+		lastWrite = pop().uinteger();	// Save the effective address for dump()...
 		stack[lastWrite] = pop();
 		break;
 
-	case OpCode::call: 		call(ir.level, ir.addr.u);					break;
-	case OpCode::ret:   	ret();  									break;
-	case OpCode::retf: 		retf();										break;
-	case OpCode::enter: 	mkStackSpace(ir.addr.u); sp+=ir.addr.u;		break;
-	case OpCode::jump:		pc = ir.addr.u;								break;
-	case OpCode::jneq:		if (pop().i == 0) pc = ir.addr.u;			break;
-	case OpCode::halt:		return Result::halted;						break;
+	case OpCode::Call: 		call(ir.level, ir.addr.uinteger());		break;
+	case OpCode::Ret:   	ret();  								break;
+	case OpCode::Retf: 		retf();									break;
+
+	case OpCode::Enter:
+		mkStackSpace(ir.addr.uinteger());
+			sp+=ir.addr.uinteger();
+			break;
+
+	case OpCode::Jump:		pc = ir.addr.uinteger();				break;
+
+	case OpCode::JNEQ:
+		if (pop().integer() == 0)
+			pc = ir.addr.uinteger();
+		break;
+
+	case OpCode::Halt:		return Result::halted;					break;
+
 	default:
 		cerr 	<< "Unknown op code: " << OpCodeInfo::info(ir.op).name()
 				<< " found at pc (" << prevPc << ")!\n" << endl;

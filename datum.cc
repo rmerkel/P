@@ -46,24 +46,325 @@ Datum::Datum(std::size_t value) : u{static_cast<Unsigned> (value)}, k{Kind::Unsi
 	assert(numeric_limits<Unsigned>::max() > value);
 }
 
-/// @param	value	Real value
 Datum::Datum(Real value) : r{value}, k{Kind::Real}			{}
+
+Datum Datum::operator!() const {
+	switch(kind()) {
+	case Datum::Kind::Integer:	return Datum(!i);
+	case Datum::Kind::Unsigned:	return Datum(!u);
+	case Datum::Kind::Real:		return Datum(!r);
+	default:	assert(false);	return Datum(0);
+	}
+}
+
+Datum Datum::operator-() const {
+	switch(kind()) {
+	case Datum::Kind::Integer:	return Datum(-i);
+	case Datum::Kind::Unsigned:	return Datum(-u);
+	case Datum::Kind::Real:		return Datum(-r);
+	default:	assert(false);	return Datum(0);
+	}
+}
+
+/// @invariant undefined if kind() == Real
+Datum Datum::operator~() const {
+	switch(kind()) {
+	case Datum::Kind::Integer:	return Datum(~i);
+	case Datum::Kind::Unsigned:	return Datum(~u);
+	case Datum::Kind::Real:
+		assert(false);
+		return Datum(0);
+
+	default:
+		assert(false);
+		return Datum(0);
+	}
+}
 
 // operators
 
-/** 
- * Puts Datum value per it's discriminator. 
+/** @brief Datum stream put operator
+ * Puts Datum value on os per it's discriminator. 
  * @param	os	Stream to write d's value to 
  * @param	d	Datum whose value to write 
  * @return	os 
  */
 ostream& operator<<(std::ostream& os, const Datum& d) {
-	switch (d.k) {
-	case Datum::Kind::Integer:	os << d.i;	break;
-	case Datum::Kind::Unsigned:	os << d.u;	break;
-	case Datum::Kind::Real:		os << d.r;	break;
+	switch (d.kind()) {
+	case Datum::Kind::Integer:	os << d.integer();	break;
+	case Datum::Kind::Unsigned:	os << d.uinteger();	break;
+	case Datum::Kind::Real:		os << d.real();	break;
 	default:	assert(false);  os << 0;
 	}
 
 	return os;
 }
+
+/**
+ * @invariant	undefined if l.kind() != r.kind()
+ * @return l + r
+ */
+Datum operator+(const Datum& lhs, const Datum& rhs) {
+	if (lhs.kind() != rhs.kind()) {
+		assert(false);
+		return Datum(0);
+	}
+
+	switch(lhs.kind()) {
+	case Datum::Kind::Integer:	return Datum(lhs.integer()	+ rhs.integer());
+	case Datum::Kind::Unsigned:	return Datum(lhs.uinteger()	+ rhs.uinteger());
+	case Datum::Kind::Real:		return Datum(lhs.real()		+ rhs.real());
+	default:
+		assert(false);
+		return Datum(0);
+	}
+}
+
+/**
+ * @invariant	undefined if lhs.kind() != rhs.kind()
+ * @return lhs - rhs
+ */
+Datum operator-(const Datum& lhs, const Datum& rhs) {
+	if (lhs.kind() != rhs.kind()) {
+		assert(false);
+		return Datum(0);
+	}
+
+	switch(lhs.kind()) {
+	case Datum::Kind::Integer:	return Datum(lhs.integer()	- rhs.integer());
+	case Datum::Kind::Unsigned:	return Datum(lhs.uinteger()	- rhs.uinteger());
+	case Datum::Kind::Real:		return Datum(lhs.real()		- rhs.real());
+	default:
+		assert(false);
+		return Datum(0);
+	}
+}
+
+/**
+ * @invariant	undefined if lhs.kind() != rhs.kind()
+ * @return lhs * rhs
+ */
+Datum operator*(const Datum& lhs, const Datum& rhs) {
+	if (lhs.kind() != rhs.kind()) {
+		assert(false);
+		return Datum(0);
+	}
+
+	switch(lhs.kind()) {
+	case Datum::Kind::Integer:	return Datum(lhs.integer()	* rhs.integer());
+	case Datum::Kind::Unsigned:	return Datum(lhs.uinteger()	* rhs.uinteger());
+	case Datum::Kind::Real:		return Datum(lhs.real()		* rhs.real());
+	default:
+		assert(false);
+		return Datum(0);
+	}
+}
+
+/**
+ * @invariant	undefined if lhs.kind() != rhs.kind()
+ * @return lhs / rhs
+ */
+Datum operator/(const Datum& lhs, const Datum& rhs) {
+	if (lhs.kind() != rhs.kind()) {
+		assert(false);
+		return Datum(0);
+	}
+
+	switch(lhs.kind()) {
+	case Datum::Kind::Integer:
+		return rhs.integer() != 0 ? Datum(lhs.integer()	/ rhs.integer()) : Datum(0);
+		break;
+
+	case Datum::Kind::Unsigned:
+		return rhs.uinteger() != 0 ? Datum(lhs.uinteger() / rhs.uinteger()) : Datum(0);
+		break;
+
+	case Datum::Kind::Real:
+		return rhs.real() != 0 ? Datum(lhs.real() / rhs.real()) : Datum(0);
+		break;
+
+	default:	assert(false);	return Datum(0);
+	}
+}
+
+/**
+ * @invariant	undefined if lhs.kind() != rhs.kind()
+ * @return lhs % rhs
+ */
+Datum operator%(const Datum& lhs, const Datum& rhs) {
+	if (lhs.kind() != rhs.kind()) {
+		assert(false);
+		return Datum(0);
+	}
+
+	switch(lhs.kind()) {
+	case Datum::Kind::Integer:
+		return rhs.integer() != 0 ? Datum(lhs.integer() % rhs.integer()) : Datum(0);
+		break;
+
+	case Datum::Kind::Unsigned:
+		return rhs.uinteger() != 0 ? Datum(lhs.uinteger() % rhs.uinteger()) : Datum(0);
+		break;
+
+	case Datum::Kind::Real: 
+		assert(false);
+		return Datum(0);
+
+	default:	assert(false);	return Datum(0);
+	}
+}
+
+/**
+ * @invariant	undefined if lhs.kind() != rhs.kind() != Datum::Kind::Unsigned
+ * @return lhs & rhs
+ */
+Datum operator&(const Datum& lhs, const Datum& rhs) {
+	if (lhs.kind() != rhs.kind() || lhs.kind() != Datum::Kind::Unsigned)
+		assert(false);
+	return Datum(lhs.uinteger() & rhs.uinteger());
+}
+
+/**
+ * @invariant	undefined if lhs.kind() != rhs.kind() != Datum::Kind::Unsigned
+ * @return lhs | rhs
+ */
+Datum operator|(const Datum& lhs, const Datum& rhs) {
+	if (lhs.kind() != rhs.kind())
+		assert(false);
+	return Datum(lhs.uinteger() | rhs.uinteger());
+}
+
+/**
+ * @invariant	undefined if lhs.kind() != rhs.kind() != Datum::Kind::Unsigned
+ * @return lhs ^ rhs
+ */
+Datum operator^(const Datum& lhs, const Datum& rhs) {
+	if (lhs.kind() != rhs.kind())
+		assert(false);
+	return Datum(lhs.uinteger() ^ rhs.uinteger());
+}
+
+/**
+ * @invariant	undefined if lhs.kind() != rhs.kind() != Datum::Kind::Unsigned
+ * @return lhs << rhs
+ */
+Datum operator<<(const Datum& lhs, const Datum& rhs) {
+	if (lhs.kind() != rhs.kind())
+		assert(false);
+	return Datum(lhs.uinteger() << rhs.uinteger());
+}
+
+/**
+ * @invariant	undefined if lhs.kind() != rhs.kind() != Datum::Kind::Unsigned
+ * @return lhs << rhs
+ */
+Datum operator>>(const Datum& lhs, const Datum& rhs) {
+	if (lhs.kind() != rhs.kind())
+		assert(false);
+	return Datum(lhs.uinteger() >> rhs.uinteger());
+}
+
+/**
+ * @invariant	undefined if lhs.kind() != rhs.kind()
+ * @return lhs < rhs
+ */
+Datum operator<(const Datum& lhs, const Datum& rhs) {
+	switch(lhs.kind()) {
+	case Datum::Kind::Integer:	return Datum(lhs.integer()	< rhs.integer());
+	case Datum::Kind::Unsigned:	return Datum(lhs.uinteger()	< rhs.uinteger());
+	case Datum::Kind::Real:		return Datum(lhs.real()		< rhs.real());
+	default:	assert(false);	return Datum(0);
+	}
+}
+
+/**
+ * @invariant	undefined if lhs.kind() != rhs.kind()
+ * @return lhs <= rhs
+ */
+Datum operator<=(const Datum& lhs, const Datum& rhs) {
+	switch(lhs.kind()) {
+	case Datum::Kind::Integer:	return Datum(lhs.integer()	<= rhs.integer());
+	case Datum::Kind::Unsigned:	return Datum(lhs.uinteger() <= rhs.uinteger());
+	case Datum::Kind::Real:		return Datum(lhs.real()		<= rhs.real());
+	default:	assert(false);	return Datum(0);
+	}
+}
+
+/**
+ * @invariant	undefined if lhs.kind() != rhs.kind()
+ * @return lhs == rhs
+ */
+Datum operator==(const Datum& lhs, const Datum& rhs) {
+	switch(lhs.kind()) {
+	case Datum::Kind::Integer:	return Datum(lhs.integer()	== rhs.integer());
+	case Datum::Kind::Unsigned:	return Datum(lhs.uinteger() == rhs.uinteger());
+	case Datum::Kind::Real:		return Datum(lhs.real()		== rhs.real());
+	default:	assert(false);	return Datum(0);
+	}
+}
+
+/**
+ * @invariant	undefined if lhs.kind() != rhs.kind()
+ * @return lhs >= rhs
+ */
+Datum operator>=(const Datum& lhs, const Datum& rhs) {
+	switch(lhs.kind()) {
+	case Datum::Kind::Integer:	return Datum(lhs.integer()	>= rhs.integer());
+	case Datum::Kind::Unsigned:	return Datum(lhs.uinteger() >= rhs.uinteger());
+	case Datum::Kind::Real:		return Datum(lhs.real() 	>= rhs.real());
+	default:	assert(false);	return Datum(0);
+	}
+}
+
+/**
+ * @invariant	undefined if lhs.kind() != rhs.kind()
+ * @return lhs > rhs
+ */
+Datum operator>(const Datum& lhs, const Datum& rhs) {
+	switch(lhs.kind()) {
+	case Datum::Kind::Integer:	return Datum(lhs.integer()	> rhs.integer());
+	case Datum::Kind::Unsigned:	return Datum(lhs.uinteger() > rhs.uinteger());
+	case Datum::Kind::Real:		return Datum(lhs.real()		> rhs.real());
+	default:	assert(false);	return Datum(0);
+	}
+}
+
+/**
+ * @invariant	undefined if lhs.kind() != rhs.kind()
+ * @return lhs != rhs
+ */
+Datum operator!=(const Datum& lhs, const Datum& rhs) {
+	switch(lhs.kind()) {
+	case Datum::Kind::Integer:	return Datum(lhs.integer()	!= rhs.integer());
+	case Datum::Kind::Unsigned:	return Datum(lhs.uinteger() != rhs.uinteger());
+	case Datum::Kind::Real:		return Datum(lhs.real() 	!= rhs.real());
+	default:	assert(false);	return Datum(0);
+	}
+}
+
+/**
+ * @invariant	undefined if lhs.kind() != rhs.kind()
+ * @return lhs && rhs
+ */
+Datum operator&&(const Datum& lhs, const Datum& rhs) {
+	switch(lhs.kind()) {
+	case Datum::Kind::Integer:	return Datum(lhs.integer()	&& rhs.integer());
+	case Datum::Kind::Unsigned:	return Datum(lhs.uinteger() && rhs.uinteger());
+	case Datum::Kind::Real:		return Datum(lhs.real() 	&& rhs.real());
+	default:	assert(false);	return Datum(0);
+	}
+}
+
+/**
+ * @invariant	undefined if lhs.kind() != rhs.kind()
+ * @return lhs || rhs
+ */
+Datum operator||(const Datum& lhs, const Datum& rhs) {
+	switch(lhs.kind()) {
+	case Datum::Kind::Integer:	return Datum(lhs.integer()	|| rhs.integer());
+	case Datum::Kind::Unsigned:	return Datum(lhs.uinteger() || rhs.uinteger());
+	case Datum::Kind::Real:		return Datum(lhs.real()		|| rhs.real());
+	default:	assert(false);	return Datum(0);
+	}
+}
+

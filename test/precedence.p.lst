@@ -4,26 +4,26 @@
 # precedence.p, 3: begin
     2: enter 1
 # precedence.p, 4: 	x = 1 + 2 * 3 - 4;	{	s/b 3	}
-    3: push.i 1
-    4: push.i 2
-    5: push.i 3
-    6: mul.i
-    7: add.i
-    8: push.i 4
-    9: sub.i
-   10: pushVar 0, 4
+    3: push 1
+    4: push 2
+    5: push 3
+    6: mul
+    7: add
+    8: push 4
+    9: sub
+   10: pushvar 0, 4
    11: assign
 # precedence.p, 5: 	x = -1 + 2 * 3 - 4	{	s/b 1	}
-   12: push.i 1
-   13: neg.i
-   14: push.i 2
-   15: push.i 3
-   16: mul.i
-   17: add.i
-   18: push.i 4
+   12: push 1
+   13: neg
+   14: push 2
+   15: push 3
+   16: mul
+   17: add
+   18: push 4
 # precedence.p, 6: end .
-   19: sub.i
-   20: pushVar 0, 4
+   19: sub
+   20: pushvar 0, 4
    21: assign
    22: ret
 
