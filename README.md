@@ -56,10 +56,10 @@ Versions:
         * Added Datum, the stack data type, as a step towards adding types to
           pl0c and for unsigned bit operations.
     2.0 - Real and integer data types.
-	2.0a
-		* Combined integer/unsigned/real instructions into single instructions.
-		* Converted Datum to a class from a struct
-		* Modified the compilier per the simplified expression grammer.
+    2.0a
+        * Combined integer/unsigned/real instructions into single instructions.
+        * Converted Datum to a class from a struct
+        * Modified the compilier per the simplified expression grammer.
 
 Author
     Randy Merkel, Slowly but Surly Software.
