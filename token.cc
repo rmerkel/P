@@ -183,6 +183,7 @@ string Token::toString(Token::Kind k) {
 
 	case Kind::ConsDecl:	return "const";			break;
 	case Kind::VarDecl:		return "var";			break;
+	case Kind::ProgDecl:	return "program";		break;
 	case Kind::ProcDecl:	return "procedure";		break;
 	case Kind::FuncDecl:	return "function";		break;
 	case Kind::Begin:		return "begin";			break;
@@ -272,6 +273,7 @@ void TokenStream::set_input(std::istream* p) {
 TokenStream::KeywordTable	TokenStream::keywords = {
 	{   "const",		Token::ConsDecl		},
 	{	"var",			Token::VarDecl		},
+	{	"program",		Token::ProgDecl		},
 	{	"procedure",	Token::ProcDecl		},
 	{	"function",		Token::FuncDecl		},
 	{	"begin",		Token::Begin		},

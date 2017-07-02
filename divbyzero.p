@@ -1,3 +1,4 @@
+program divbyzero ;
 var x, y, z : integer;
 
 begin

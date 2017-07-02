@@ -1,6 +1,7 @@
 { print Fahrenheit-Celsius table	}
 {	third version; integers & reals	}
 
+program fahr3
 const
 	LOWER :=   0.0;	{	lower table limit	}
 	UPPER := 300.0;	{	upper table limit	}

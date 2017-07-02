@@ -1,29 +1,30 @@
 # fahr2.p, 2: { print Fahrenheit-Celsius table	}
 # fahr2.p, 3: {	first version; integers only	}
 # fahr2.p, 4: 
-# fahr2.p, 5: const
+# fahr2.p, 5: program fact2 ;
+# fahr2.p, 6: const
     0: call 0, 2
     1: halt
-# fahr2.p, 6: 	LOWER :=   0.0;	{	lower table limit	}
-# fahr2.p, 7: 	UPPER := 300.0;	{	upper table limit	}
-# fahr2.p, 8: 	STEP  :=  20.0;	{	table step size		}
-# fahr2.p, 9: 
-# fahr2.p, 10: var
-# fahr2.p, 11: 	fahr, celsius : real;
-# fahr2.p, 12: 
-# fahr2.p, 13: begin
+# fahr2.p, 7: 	LOWER :=   0.0;	{	lower table limit	}
+# fahr2.p, 8: 	UPPER := 300.0;	{	upper table limit	}
+# fahr2.p, 9: 	STEP  :=  20.0;	{	table step size		}
+# fahr2.p, 10: 
+# fahr2.p, 11: var
+# fahr2.p, 12: 	fahr, celsius : real;
+# fahr2.p, 13: 
+# fahr2.p, 14: begin
     2: enter 2
-# fahr2.p, 14: 	fahr := LOWER;
+# fahr2.p, 15: 	fahr := LOWER;
     3: push 0.000000
     4: pushvar 0, 4
     5: assign
-# fahr2.p, 15: 	while fahr <= UPPER do begin
+# fahr2.p, 16: 	while fahr <= UPPER do begin
     6: pushvar 0, 4
     7: eval
     8: push 300.000000
     9: lte
    10: jneq 28
-# fahr2.p, 16: 		celsius := 5.0 * (fahr-32.0) / 9.0;
+# fahr2.p, 17: 		celsius := 5.0 * (fahr-32.0) / 9.0;
    11: push 5.000000
    12: pushvar 0, 4
    13: eval
@@ -34,16 +35,16 @@
    18: div
    19: pushvar 0, 5
    20: assign
-# fahr2.p, 17: 		fahr := fahr + STEP;
+# fahr2.p, 18: 		fahr := fahr + STEP;
    21: pushvar 0, 4
    22: eval
    23: push 20.000000
    24: add
    25: pushvar 0, 4
    26: assign
-# fahr2.p, 18: 	end;
+# fahr2.p, 19: 	end;
    27: jump 6
-# fahr2.p, 19:  end.
+# fahr2.p, 20:  end.
    28: ret
 
         8:   0.000000

@@ -1,36 +1,37 @@
-# divbyzero.p, 2: var x, y, z : integer;
+# divbyzero.p, 2: program divbyzero ;
+# divbyzero.p, 3: var x, y, z : integer;
     0: call 0, 2
     1: halt
-# divbyzero.p, 3: 
-# divbyzero.p, 4: begin
+# divbyzero.p, 4: 
+# divbyzero.p, 5: begin
     2: enter 3
-# divbyzero.p, 5: 	y := 10;
+# divbyzero.p, 6: 	y := 10;
     3: push 10
     4: pushvar 0, 5
     5: assign
-# divbyzero.p, 6: 	z := 0;
+# divbyzero.p, 7: 	z := 0;
     6: push 0
     7: pushvar 0, 6
     8: assign
-# divbyzero.p, 7: 
-# divbyzero.p, 8: 	x := y / 2;
+# divbyzero.p, 8: 
+# divbyzero.p, 9: 	x := y / 2;
     9: pushvar 0, 5
    10: eval
    11: push 2
    12: div
    13: pushvar 0, 4
    14: assign
-# divbyzero.p, 9: 	x := y / z	{	opps!	}
+# divbyzero.p, 10: 	x := y / z	{	opps!	}
    15: pushvar 0, 5
    16: eval
-# divbyzero.p, 10: end.
+# divbyzero.p, 11: end.
    17: pushvar 0, 6
    18: eval
    19: div
    20: pushvar 0, 4
    21: assign
    22: ret
-#divbyzero.p, 10: 
+#divbyzero.p, 11: 
 
         9:         10
        10:          0

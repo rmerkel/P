@@ -1,9 +1,10 @@
-# precedence.p, 2: var x : integer;
+# precedence.p, 2: program precedence ;
+# precedence.p, 3: var x : integer;
     0: call 0, 2
     1: halt
-# precedence.p, 3: begin
+# precedence.p, 4: begin
     2: enter 1
-# precedence.p, 4: 	x := 1 + 2 * 3 - 4;	{	s/b 3	}
+# precedence.p, 5: 	x := 1 + 2 * 3 - 4;	{	s/b 3	}
     3: push 1
     4: push 2
     5: push 3
@@ -13,7 +14,7 @@
     9: sub
    10: pushvar 0, 4
    11: assign
-# precedence.p, 5: 	x := -1 + 2 * 3 - 4	{	s/b 1	}
+# precedence.p, 6: 	x := -1 + 2 * 3 - 4	{	s/b 1	}
    12: push 1
    13: neg
    14: push 2
@@ -21,7 +22,7 @@
    16: mul
    17: add
    18: push 4
-# precedence.p, 6: end .
+# precedence.p, 7: end .
    19: sub
    20: pushvar 0, 4
    21: assign

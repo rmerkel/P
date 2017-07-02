@@ -1,3 +1,4 @@
+program real ;
 var
 	f : real; i : integer;
 

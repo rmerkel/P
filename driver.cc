@@ -34,6 +34,7 @@
  * - No interactive mode for debugging; just automatic single stepping (verbose == true)
  *
  * @version 0.1 - Initial fork from pl0c, using pascal <>, =, etc...
+ * @version 0.2 - Program declaraction
  *  
  * @author Randy Merkel, Slowly but Surly Software.
  * @copyright  (c) 2017 Slowly but Surly Software. All rights reserved.
@@ -67,7 +68,7 @@ static void help() {
 
 /// Print the version number as major.minor
 static void printVersion() {
-	cout << progName << ": verson: 0.1\n";	// makesure to update the verison in mainpage!!
+	cout << progName << ": verson: 0.2\n";	// makesure to update the verison in mainpage!!
 }
 
 /** Parse the command line arguments...

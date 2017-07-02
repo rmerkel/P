@@ -949,7 +949,7 @@ SymValue& Comp::subPrefixDecl(int level, SymValue::Kind kind) {
 	const auto& ident = nameDecl(level);	// insert the name into the symbol table
 	it = symtbl.insert( { ident, SymValue(kind, level)	} );
 	if (verbose)
-		cout << progName << ": subrountine-decl " << ident << ": " << level << ", 0\n";
+		cout << progName << ": subPrefixDecl " << ident << ": " << level << ", 0\n";
 
 	// Process the formal auguments, if any...
 	if (accept(Token::OpenParen)) {
@@ -1056,21 +1056,23 @@ Datum::Unsigned Comp::blockDecl(SymValue& val, int level) {
 }
 
 void Comp::run() {
+	const int level = 0;						// Start at block level 0
 	next();										// Fetch the 1st token
-	auto range = symtbl.equal_range("main");
-	assert(range.first != range.second);
+
+	expect(Token::ProgDecl);					// Program heading...
+	auto& val = subPrefixDecl(level, SymValue::Kind::Procedure);
+	expect(Token::SemiColon);
 
 	// Emit a call to the main procedure, followed by a halt
-	const auto call_pc = emit(OpCode::Call, 0, 0);
+	const auto call_pc = emit(OpCode::Call, level, 0);
 	emit(OpCode::Halt);
 
-	// emit the first block (block 0)
-
-	const auto addr = blockDecl(range.first->second, 0);
+	const auto addr = blockDecl(val, level);	// emit the first block 
 	if (verbose)
-		cout << progName << ": patching call to main at " << call_pc << " to " << addr  << "\n";
+		cout << progName << ": patching call to program at " << call_pc << " to " << addr  << "\n";
 
 	(*code)[call_pc].addr = addr;
+
 	expect(Token::Period);
 }
 

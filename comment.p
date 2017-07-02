@@ -1,4 +1,5 @@
 { "main" starts here... }
+program comment ;
 const nFacts := 10;
 var n, f : integer;	{ var z; parser doesn't see 'z' }
 begin

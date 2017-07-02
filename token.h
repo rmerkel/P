@@ -36,6 +36,7 @@ struct Token {
 		RealNum,						///< Real literal number (real_value)
 		ConsDecl,						///< "const" constant declaration
 		VarDecl,						///< "var" variable (mutable) declaration
+		ProgDecl,						///< "program" declaraction
 		ProcDecl,						///< "procedure" declaraction
 		FuncDecl,						///< "function" declaration
 		Begin,							///< "begin" ... "end"

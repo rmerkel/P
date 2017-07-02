@@ -1,6 +1,7 @@
 { print Fahrenheit-Celsius table	}
 {	first version; integers only	}
 
+program fahr ;
 const
 	LOWER :=   0;	{	lower table limit	}
 	UPPER := 300;	{	upper table limit	}

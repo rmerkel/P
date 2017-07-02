@@ -40,6 +40,7 @@ Bugs:
 
 Versions:
     0.1 - Initial fork form pl0c, modified to use =, <> etc.
+    0.2 - Program declaraction
 
 Author
     Randy Merkel, Slowly but Surly Software.

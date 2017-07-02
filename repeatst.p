@@ -9,6 +9,7 @@
 {	 9	  362,880	}
 {	10	3,628,800	}
 
+program repeatst ;
 var n, f : integer;
 begin
 	n := 0;

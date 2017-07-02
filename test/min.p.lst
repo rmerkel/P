@@ -1,5 +1,6 @@
 # min.p, 2: {	minimum Pascal program	}
-# min.p, 3: begin end.
+# min.p, 3: program minimum ;
+# min.p, 4: begin end.
     0: call 0, 2
     1: halt
     2: ret

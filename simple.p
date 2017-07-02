@@ -1,3 +1,4 @@
+program simple ;
 var x, y : integer;
 begin
 	x := 0;
