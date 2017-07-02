@@ -4,16 +4,16 @@
 # fahr.p, 5: const
     0: call 0, 2
     1: halt
-# fahr.p, 6: 	LOWER =   0;	{	lower table limit	}
-# fahr.p, 7: 	UPPER = 300;	{	upper table limit	}
-# fahr.p, 8: 	STEP  =  20;	{	table step size		}
+# fahr.p, 6: 	LOWER :=   0;	{	lower table limit	}
+# fahr.p, 7: 	UPPER := 300;	{	upper table limit	}
+# fahr.p, 8: 	STEP  :=  20;	{	table step size		}
 # fahr.p, 9: 
 # fahr.p, 10: var
 # fahr.p, 11: 	fahr, celsius : real;
 # fahr.p, 12: 
 # fahr.p, 13: begin
     2: enter 2
-# fahr.p, 14: 	fahr = LOWER;
+# fahr.p, 14: 	fahr := LOWER;
     3: push 0
     4: itor
     5: pushvar 0, 4
@@ -25,7 +25,7 @@
    10: itor
    11: lte
    12: jneq 31
-# fahr.p, 16: 		celsius = 5.0 * (fahr-32.0) / 9.0;
+# fahr.p, 16: 		celsius := 5.0 * (fahr-32.0) / 9.0;
    13: push 5.000000
    14: pushvar 0, 4
    15: eval
@@ -36,7 +36,7 @@
    20: div
    21: pushvar 0, 5
    22: assign
-# fahr.p, 17: 		fahr = fahr + STEP;
+# fahr.p, 17: 		fahr := fahr + STEP;
    23: pushvar 0, 4
    24: eval
    25: push 20

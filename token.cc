@@ -53,18 +53,6 @@ Token TokenStream::get() {
 	} while (isspace(ch));
 
 	switch (ch) {
-	case '=':									// = or ==?
-		if (!getch(ch))		ct.kind = Token::Assign;
-		else if ('=' == ch) ct.kind = Token::EQU;
-		else {	unget();	ct.kind = Token::Assign;	}
-		return ct;
-
-	case '!':									// ! or !=?
-		if (!getch(ch))		ct.kind = Token::NOT;
-		else if ('=' == ch) ct.kind = Token::NEQU;
-		else {	unget();	ct.kind = Token::NOT;	}
-		return ct;
-
 	case '>':									// >, >> or >=?
 		if (!getch(ch))		ct.kind = Token::GT;
 		else if ('>' == ch)	ct.kind = Token::ShiftR;
@@ -79,16 +67,22 @@ Token TokenStream::get() {
 		else {	unget();	ct.kind = Token::LT;	}
 		return ct;
 
-	case '|':							// | or ||?
+	case '|':									// | or ||?
 		if (!getch(ch)) 	ct.kind = Token::BitOR;
 		else if ('|' == ch) ct.kind = Token::OR;
-		else {	unget();	ct.kind = Token::GT;	}
+		else {	unget();	ct.kind = Token::BitOR;	}
 		return ct;
 
-	case '&':							// & or &&?
+	case '&':									// & or &&?
 		if (!getch(ch)) 	ct.kind = Token::BitAND;
 		else if ('&' == ch) ct.kind = Token::AND;
 		else {	unget();	ct.kind = Token::BitAND;  }
+		return ct;
+
+	case ':':									// : or :=?
+		if (!getch(ch))		ct.kind = Token::Colon;
+		else if ('=' == ch)	ct.kind = Token::Assign;
+		else { unget();		ct.kind = Token::Colon;	}
 		return ct;
 
 	case '{':									// comment; { ... }
@@ -105,9 +99,9 @@ Token TokenStream::get() {
 		} while ('}' != ch);
 		return get();							// restart the scan..
 
-	case '%': case '(': case ')': case '*':
-	case '+': case ',': case '-': case '/':
-	case ':': case ';': case '^':
+	case '%': case '(': case ')': case '*': case '+':
+	case ',': case '-': case '/': case ';': case '^':
+	case '=': case '!':
 		return ct = { static_cast<Token::Kind>(ch) };
 
 	case '.': 									// real number, or just a '.'
@@ -208,12 +202,12 @@ string Token::toString(Token::Kind k) {
 
 	case Kind::EOS:			return "EOS";			break;
 
-	case Kind::EQU:			return "==";			break;
+	case Kind::EQU:			return "=";				break;
 	case Kind::LTE:			return "<=";			break;
 	case Kind::GTE:			return ">=";			break;
 	case Kind::OR:			return "||";			break;
 	case Kind::AND:			return "&&";			break;
-	case Kind::NEQU:		return "!=";			break;
+	case Kind::NEQU:		return "<>";			break;
 
 	case Kind::NOT:			return "!";				break;
 	case Kind::LT:			return "<";				break;
@@ -235,7 +229,7 @@ string Token::toString(Token::Kind k) {
 	case Kind::Period:		return ".";				break;
 	case Kind::Colon:		return ":";				break;
 	case Kind::SemiColon:	return ";";				break;
-	case Kind::Assign:		return "=";				break;
+	case Kind::Assign:		return ":=";			break;
 
 	default: {
 			ostringstream oss;

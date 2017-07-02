@@ -53,12 +53,13 @@ struct Token {
 
 		Round,							///< round real to integer
 
-		EQU,							///< Is equal? (==)
+		Assign,							///< Assignment (:=)
+
 		LTE,							///< Less than or equal? (<=)
 		GTE,							///< Greater then or equal? (>=)
 		OR,								///< Or? (||)
 		AND,							///< And? (&&)
-		NEQU,							///< Not equal? (!=)
+		NEQU,							///< Not equal? (<>)
 
 		ShiftL,							///< Left shift "<<"
 		ShiftR,							///< Right shift ">>"Number
@@ -66,6 +67,8 @@ struct Token {
 		EOS,							///< End of stream
 
 		// End of non-printing character codes for ASCII and UNICODE (ordinal value 32)
+
+		EQU			= '=',				///< Is equal? (=)
 
 		NOT			= '!',				///< Logical not
 		LT			= '<',				///< Less than
@@ -88,7 +91,6 @@ struct Token {
 		Period		= '.',				///< Period
 		Colon		= ':',				///< Identifier ':' type
 		SemiColon	= ';',				///< Statement separator
-		Assign		= '='				///< Assignment
 	};
 
 	/// A set of Token kinds

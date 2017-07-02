@@ -1,15 +1,15 @@
 # comment.p, 2: { "main" starts here... }
-# comment.p, 3: const nFacts = 10;
+# comment.p, 3: const nFacts := 10;
     0: call 0, 2
     1: halt
 # comment.p, 4: var n, f : integer;	{ var z; parser doesn't see 'z' }
 # comment.p, 5: begin
     2: enter 2
-# comment.p, 6:    n = 0;
+# comment.p, 6:    n := 0;
     3: push 0
     4: pushvar 0, 4
     5: assign
-# comment.p, 7:    f = 1;
+# comment.p, 7:    f := 1;
     6: push 1
     7: pushvar 0, 5
     8: assign
@@ -21,14 +21,14 @@
    11: push 10
    12: lt
    13: jneq 28
-# comment.p, 11:       n = n + 1;
+# comment.p, 11:       n := n + 1;
    14: pushvar 0, 4
    15: eval
    16: push 1
    17: add
    18: pushvar 0, 4
    19: assign
-# comment.p, 12:       f = f * n
+# comment.p, 12:       f := f * n
    20: pushvar 0, 5
    21: eval
 # comment.p, 13:    end

@@ -9,12 +9,12 @@
 # fact.p, 10: {	 9	  362,880	}
 # fact.p, 11: {	10	3,628,800	}
 # fact.p, 12: 
-# fact.p, 13: const nFacts = 10;
+# fact.p, 13: const nFacts := 10;
     0: call 0, 25
     1: halt
 # fact.p, 14: var p : integer;
-# fact.p, 15: procedure factorial(n : integer) begin
-# fact.p, 16:         p = 1;
+# fact.p, 15: procedure factorial(n : integer) ; begin
+# fact.p, 16:         p := 1;
     2: push 1
     3: pushvar 1, 4
     4: assign
@@ -24,7 +24,7 @@
     7: push 0
     8: gt
     9: jneq 24
-# fact.p, 18:             p = p * n;
+# fact.p, 18:             p := p * n;
    10: pushvar 1, 4
    11: eval
    12: pushvar 0, -1
@@ -32,7 +32,7 @@
    14: mul
    15: pushvar 1, 4
    16: assign
-# fact.p, 19:             n = n - 1
+# fact.p, 19:             n := n - 1
    17: pushvar 0, -1
    18: eval
    19: push 1

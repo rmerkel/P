@@ -1,4 +1,4 @@
-# min.p, 2: {	minimum pl0c program	}
+# min.p, 2: {	minimum Pascal program	}
 # min.p, 3: begin end.
     0: call 0, 2
     1: halt

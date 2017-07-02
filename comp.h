@@ -29,23 +29,23 @@
  * @section grammer Grammer (EBNF)
  *
  *               program: block-decl 'begin' stmt-lst 'end' '.' ;
- *            block-decl: [ const-decl-blk ';' ]
+ *            block-decl: [ const-decl-lst ';' ]
  *                        [ var-decl-blk ';' ]
- *                        [ sub-decl { ';' sub-decl }
+ *                        [ sub-decl { ';' sub-decl-lst }
  *                        { stmt-blk }
  *                        ;
- *        const-decl-blk: 'const' const-decl-lst { ';' const-decl-lst } ;
- *        const-decl-lst: const-decl { "," const-decl } ;
+ *        const-decl-lst: 'const' const-decl { ';' const-decl } ';' ;
  *            const-decl: ident "=" const-expr ;
  *          var-decl-blk: 'var' var-decl-lst ;
- *              sub-decl: func-decl | proc-decl ;
- *             proc-decl: 'procedure' ident param-decl-lst block-decl ';' ;
- *             func-decl: 'function'  ident param-decl-lst ':' type block-decl ';' ; 
- *        param-decl-lst: '(' [ var-decl-lst ] ')' ;
- *          var-decl-lst: var-decl-type-lst { ';' var-decl-type-lst } ;
- *     var-decl-type-lst: ident-lst : type ;
+ *          var-decl-lst: var-decl { ';' var-decl } ';' ;
+ *              var-decl: ident-lst : type ;
  *             ident-lst: ident { ',' ident } ;
  *                  type: 'integer' | 'real' ;
+ *          sub-decl-lst: func-decl | proc-decl ;
+ *             proc-decl: 'procedure' ident param-lst ';' block-decl ';' ;
+ *             func-decl: 'function'  ident param-lst ':' type ';' block-decl ';' ; 
+ *             param-lst: [ '(' var-decl-lst ')' ] ;
+
  *              stmt-blk: 'begin' stmt-lst 'end' ;
  *              stmt-lst: 'begin' stmt {';' stmt } 'end' ;
  *                  stmt: [ ident '=' expr                         |
@@ -54,7 +54,7 @@
  *                          'repeat' stmt 'until' cond             |
  *                          stmt-blk ]
  *                       ;
- *            const-expr: number | ident ;
+ *            const-expr: [ '+' | '-' ] number | ident ;
  *              expr-lst: expr { ',' expr } ;
  *                  expr: simple-expr { relo-op simple-expr } ;
  *               relo-op: '<' | '<=' | '==' | '>=' | '>' | '!=' ;
@@ -154,6 +154,8 @@ protected:
 	Datum::Kind simpleExpr(int level);		///< simple-expr production...
 	Datum::Kind expression(int level);		///< expression production...
 
+	Datum constExpr();						///< const-expr production...
+
 	/// assignment-statement production...
 	void assignStmt(const std::string& name, const SymValue& val, int level);
 
@@ -170,7 +172,6 @@ protected:
 	std::string nameDecl(int level);		///< name (identifier) check...
 	Datum::Kind typeDecl();					///< type decal production...
 
-	void constDeclBlock(int level);			///< const-declaration-block production...
 	void constDeclList(int level);			///< const-declaration-list production...
 	void constDecl(int level);				///< constant-declaration production...
 
@@ -186,7 +187,7 @@ protected:
 
 	void procDecl(int level);				///< procedure-declaration production...
 	void funcDecl(int level);				///< function-declaration production...
-	void subrountineDecls(int level);		///< function/procedue declaraction productions...
+	void subDeclList(int level);			///< function/procedue declaraction productions...
 
 	/// block-declaration production...
 	Datum::Unsigned blockDecl(SymValue& val, int level);

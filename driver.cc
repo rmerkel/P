@@ -1,26 +1,24 @@
 /** @file driver.cc
  *
- * The driver routine for the PL/0C Programming Language compiler/interpreter.
+ * The driver routine for the Pascal Programming Language compiler/interpreter.
  *
- * @mainpage PL/0C Programming Language
+ * @mainpage Pascal Programming Language
  *
  * Yet another small, interpreted, computer language... just for the fun of it!
  *
  * A compiler/interpreter, inspired by the original PL/0 language and machine described in
- * *Algorithms + Data Structures = Programs*, 1st Edition, by Wirth. Modified to use C/C++
- * operators, e.g., check for equality with "==" and assigned with "=", but otherwise using Pascal
- * "light" syntax and program nesting. The result is a dialect that I call "PL/0C".
+ * *Algorithms + Data Structures = Programs*, 1st Edition, by Wirth.
  *
- * Like PL/0, PL/0C is a combination compiler and interpreter; it first runs the compiler
+ * Like PL/0, p'as' is a combination compiler and interpreter; it first runs the compiler
  * (Comp), and if no errors where encountered, it runs the results in the interpreter
  * (Interp). A listing and machine output are written to standard output.
  *
  * The compiler started life as a copy of the C example at
  * https://en.wikipedia.org/wiki/Recursive_descent_parser, modified to emit code per Wirth's
  * interpret procedure while using the TokenStream class (TokenStream) from *The C++
- * Programming Language*, 4th Edition, by Stroustrup. Finally modified to support the PL/0C
- * dialect. By default, Comp writes a listing to standard output, but the verbose (-v) option
- * will also log tokens found and code emitted.
+ * Programming Language*, 4th Edition, by Stroustrup. Finally, modified, step by step to 
+ * support Pascal proper. By default, Comp writes a listing to standard output, but the
+ *  verbose (-v) option will also log tokens found and code emitted.
  *
  * The machine/interpreter stated life as a C/C++ port of Wirth's machine (procedure interpret),
  * modified to use lest "weird" instruction names, modified to use indirect addressing per HOC, as
@@ -30,31 +28,12 @@
  * program.
  *
  * @bug
+ * - More pl0c than Pascal at this point
  * - No arrays or strings, just signed integers and reals
- * - Number of formal parameters for procedure or functions are tracked, but not parameter types
- * - No constant statements, i.e., constants must be initialized with a simple number.
  * - No input/output instructions.
  * - No interactive mode for debugging; just automatic single stepping (verbose == true)
  *
- * @version 1.0 - Initial release
- * @version 1.1
- *  - Added Pascal style comments
- *  - TokenString now returns unknown for an unknow token, or badComment for an unterminted
- *    comment.
- *  - Folded factors into expressions
- *  - Added logical and, orr plus bitwise and, or, xor.
- * @version 1.3
- *	- Interp registers are now all vector<T>size_type
- *  - Added xpl0c.sh to run regression tests
- *  - Added Datum, the stack data type, as a step towards adding types to pl0c, and for unsigned
- *    binary operations.
- *  - Parser now understands, but ignores type names for variables, but not functions.
- *
- * @version 2.0 - Real and integer data types. 
- * @version 2.0a
- *	- Combined integer/unsigned/real instructions into single instructions.
- *	- Converted Datum to a class from a struct
- *	- Modified the compilier per the simplified expression grammer.
+ * @version 0.1 - Initial fork from pl0c, using pascal <>, =, etc...
  *  
  * @author Randy Merkel, Slowly but Surly Software.
  * @copyright  (c) 2017 Slowly but Surly Software. All rights reserved.
@@ -88,7 +67,7 @@ static void help() {
 
 /// Print the version number as major.minor
 static void printVersion() {
-	cout << progName << ": verson: 2.0a\n";	// makesure to update the verison in mainpage!!
+	cout << progName << ": verson: 0.1\n";	// makesure to update the verison in mainpage!!
 }
 
 /** Parse the command line arguments...

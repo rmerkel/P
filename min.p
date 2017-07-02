@@ -1,2 +1,2 @@
-{	minimum pl0c program	}
+{	minimum Pascal program	}
 begin end.

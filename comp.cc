@@ -518,6 +518,55 @@ Datum::Kind Comp::expression(int level) {
 }
 
 /**
+ * [ '+' | '-' ] number | (const) identifer
+ */
+Datum Comp::constExpr() {
+	Datum value(0);
+	int sign = 1;
+
+	if (accept(Token::Add))
+		;											// ignore unary + 
+	else if (accept(Token::Subtract))
+		sign = -1;
+
+	if (accept(Token::IntegerNum, false)) {
+		value = sign * ts.current().integer_value;
+		next();										// Consume the number
+
+	} else if (accept(Token::RealNum, false)) {
+		value = sign * ts.current().real_value;
+		next();										// Consume the number
+
+	} else if (accept(Token::Identifier, false)) {
+		auto it = identRef();
+		if (it != symtbl.end()) {
+			switch (it->second.kind()) {
+			case SymValue::Kind::Constant: 			// Return const ident value
+				value = sign * it->second.value();
+				break;
+
+			case SymValue::Kind::Variable:
+				error("identifier is not a constant", it->first);
+				break;
+
+			case SymValue::Kind::Function:
+				error("Function is not a constant expression", it->first);
+				break;
+
+			default:
+				error("Identifier is not a constant, variable or function", it->first);
+			}
+		}
+
+	} else {
+		error("expected an interger or real literal, got neither", ts.current().string_value);
+		next();
+	}
+
+	return value;
+}
+
+/**
  * ident "=" expression
  *
  * @param	name	The identifier value
@@ -751,13 +800,12 @@ Datum::Kind Comp::typeDecl() {
 }
 
 /**
- * block-decl = [ "const" const-decl-blk ";" ]
- * const-decl-blk = const-decl-lst { ";" const-decl-lst ;
+ * const-decl-lst: 'const' const-decl { ';' const-decl } ;
  *
  * @note	Doesn't emit any code; just stores the named value in the symbol table.
  * @param	level	The current block level.
  */
-void Comp::constDeclBlock(int level) {
+void Comp::constDeclList(int level) {
 	// Stops if the ';' if followd by any of hte following tokens
 	static const Token::KindSet stops {
 		Token::VarDecl,
@@ -771,93 +819,32 @@ void Comp::constDeclBlock(int level) {
 			if (oneOf(stops))
 				break;							// No more constants...
 
-			constDeclList(level);
+			constDecl(level);
 
 		} while (accept(Token::SemiColon));
 	}
 }
 
 /**
- * const-decl-lst = const-decl { "," const-decl } ;
- * const-decl =  ident "=" number | ident ;
- * @param	level	The current block level.
- */
-void Comp::constDeclList(int level) {
-	do {
-		constDecl(level);
-	} while (accept(Token::Comma));
-}
-
-/**
- * const-decl-lst = const-decl { "," const-decl } ;
- * const-decl =     ident "=" number | ident ;
+ * const-decl: ident "=" const-expr ;
  *
  * @param	level	The current block level.
  */
 void Comp::constDecl(int level) {
 	const auto ident = nameDecl(level);				// Copy the identifier
-
 	expect(Token::Assign);							// Consume the "="
-	if (accept(Token::IntegerNum, false)) {
-		const Datum number(ts.current().integer_value);
-		next();										// Consume the number
+	const auto value = constExpr();					// Get the constant value
 
-		// Insert ident into the symbol table
-		symtbl.insert(	{ ident, SymValue(level, number)	}	);
-		if (verbose)
-			cout << progName << ": constDecl " << ident << ": " << level << ", " << number << "\n";
+	// Insert ident into the symbol table
 
-	} else if (accept(Token::RealNum, false)) {
-		const Datum number(ts.current().real_value);
-		next();										// Consume the number
-
-		/// Insert ident into the symbol table
-		symtbl.insert(	{	ident, SymValue(level, number)	}	);
-		if (verbose)
-			cout << progName << ": constDecl " << ident << ": " << level << ", " << number << "\n";
-
-	} else if (accept(Token::Identifier, false)) {
-		auto it = identRef();
-		if (it != symtbl.end()) {
-			switch (it->second.kind()) {
-			case SymValue::Kind::Constant: 			// Insert ident into the symbol table
-				symtbl.insert(	{	ident, SymValue(level, it->second.value())	}	);
-				if (verbose)
-					cout
-						<< progName << ": constDecl "
-						<< ident << ": " << level << ", "
-						<< it->second.value() << "\n";
-				break;
-
-			case SymValue::Kind::Variable:
-				error("identifier is not a constant", it->first);
-				break;
-
-			case SymValue::Kind::Function:
-				error("Function is not a constant expression", it->first);
-				break;
-
-			default:
-				error("Identifier is not a constant, variable or function", it->first);
-			}
-		}
-
-	} else {
-		error("expected an interger or real literal, got neither", ts.current().string_value);
-		next();
-	}
+	symtbl.insert(	{ ident, SymValue(level, value)	}	);
+	if (verbose)
+		cout << progName << ": constDecl " << ident << ": " << level << ", " << value << "\n";
 }
 
 /**
- * A varaiable declaration block;
- *     var-decl-blk = "const" var-decl-lst
- *     var-decl-lst = var-decl { ";" var-decl }
- *     var-decl =	  ident-list : type ;
- *     ident-list =   ident { "," ident } ;
- *     type =         "integer" | "real" ;
- *
+ * "const" var-decl-lst ';'
  * @param	level	The current block level.
- *
  * @return  Number of variables allocated before or after the activation frame.
  */
 int Comp::varDeclBlock(int level) {
@@ -870,12 +857,7 @@ int Comp::varDeclBlock(int level) {
 }
 
 /**
- * A semicolon seperated list of variable declarations.
- *
- *     var-decl-list = var-decl { ";" var-decl }
- *     var-decl =	    ident-list : type ;
- *     ident-list =     ident { "," ident } ;
- *     type =           "integer" | "real" ;
+ * var-decl { ';' var-decl }
  *
  * Allocate space on the stack for each variable, as a postivie offset from the end of current
  * activaction frame. Create a new entry in the symbol table, that notes the offset and data
@@ -899,7 +881,9 @@ void Comp::varDeclList(int level, bool params, NameKindVec& idents) {
 	do {
 		if (oneOf(stops))
 			break;								// No more variables...
+
 		varDecl(level, idents);
+
 	} while (accept(Token::SemiColon));
 
 	// Set the offset from the activation frame, parameters have negative offsets in reverse
@@ -917,6 +901,8 @@ void Comp::varDeclList(int level, bool params, NameKindVec& idents) {
 }
 
 /**
+ * ident-list : type ;
+ *
  * A semicolon list of variable, or formal parameter declractions. Each declaraction starts
  * with a comma separated list of identifiers, followed by a colon followed by a type
  * specifier:
@@ -939,6 +925,7 @@ void Comp::varDecl(int level, NameKindVec& idents) {
 	// Find and append comma separated identifiers to the list...
 	do {
 		indentifiers.push_back(nameDecl(level));
+
 	} while (accept(Token::Comma));
 
 	const Datum::Kind kind = typeDecl();
@@ -965,16 +952,16 @@ SymValue& Comp::subPrefixDecl(int level, SymValue::Kind kind) {
 		cout << progName << ": subrountine-decl " << ident << ": " << level << ", 0\n";
 
 	// Process the formal auguments, if any...
-	expect(Token::OpenParen);
+	if (accept(Token::OpenParen)) {
+		// Note that the activation fram elevel is that of the *following* block!
 
-	// Note that the activation fram elevel is that of the *following* block!
+		NameKindVec	idents;					// vector of name/type pairs.
+		varDeclList(level+1, true, idents);
+		expect(Token::CloseParen);
 
-	NameKindVec	idents;				// vector of name/type pairs.
-	varDeclList(level+1, true, idents);
-	expect(Token::CloseParen);
-
-	for (auto id : idents)
-		it->second.params().push_back(id.kind);
+		for (auto id : idents)
+			it->second.params().push_back(id.kind);
+	}
 
 	return it->second;
 }
@@ -985,6 +972,7 @@ SymValue& Comp::subPrefixDecl(int level, SymValue::Kind kind) {
  */
 void Comp::procDecl(int level) {
 	auto& val = subPrefixDecl(level, SymValue::Kind::Procedure);
+	expect(Token::SemiColon);
 	blockDecl(val, level + 1);
 	expect(Token::SemiColon);				// procedure declarations end with a ';'!
 }
@@ -996,6 +984,7 @@ void Comp::procDecl(int level) {
 void Comp::funcDecl(int level) {
 	auto& val = subPrefixDecl(level, SymValue::Kind::Function);
 	val.type(typeDecl());
+	expect(Token::SemiColon);
 	blockDecl(val, level + 1);
 	expect(Token::SemiColon);	// function declarations end with a ';'!
 }
@@ -1010,7 +999,7 @@ void Comp::funcDecl(int level) {
  *
  * @param level The current block level.
  */
-void Comp::subrountineDecls(int level) {
+void Comp::subDeclList(int level) {
 	for (;;) {
 		if (accept(Token::ProcDecl))
 			procDecl(level);
@@ -1035,9 +1024,9 @@ void Comp::subrountineDecls(int level) {
  * @return 	Entry point address
  */
 Datum::Unsigned Comp::blockDecl(SymValue& val, int level) {
-	constDeclBlock(level);						// declaractions...
+	constDeclList(level);						// declaractions...
 	auto dx = varDeclBlock(level);
-	subrountineDecls(level);
+	subDeclList(level);
 
 	/* Block body
 	 *

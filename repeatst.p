@@ -11,12 +11,12 @@
 
 var n, f : integer;
 begin
-	n = 0;
-	f = 1;
+	n := 0;
+	f := 1;
 	repeat
 		begin
-			n = n + 1;
-			f = f * n
+			n := n + 1;
+			f := f * n
 		end
 	until n >= 10
 end.

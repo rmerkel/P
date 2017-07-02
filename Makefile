@@ -30,7 +30,7 @@ SRCS	= datum.cc driver.cc instr.cc comp.cc interp.cc symbol.cc token.cc
 ALLSRCS	= $(SRCS) $(wildcard *.h)
 OBJS	= $(SRCS:.cc=.o)
 DEPS	= $(SRCS:.cc=.d)
-EXE		= pl0c
+EXE		= pas
 
 TESTS 	= $(wildcard *p)
 LSTINGS = $(TESTS:.p=.p.lst)
@@ -44,7 +44,7 @@ LSTINGS = $(TESTS:.p=.p.lst)
 all:	$(EXE) docs
 
 ################################################################################
-# pl0com
+# pas
 ################################################################################
 
 $(EXE): $(OBJS)
@@ -94,7 +94,7 @@ help:
 	@echo "    cleanll - to delete all targets and intermediates."
 	@echo "    docs    - to generate documentation."
 	@echo "    help    - prints this message."
-	@echo "    pl0c    - to build the compiler."
+	@echo "    pas     - to build the compiler."
 	@echo "    pr      - prepare source for printing"
 	@echo "    test    - to bring calc upto date and run tests."
 	@echo ""
@@ -111,5 +111,5 @@ pr:
 ################################################################################
 
 test: all
-	./xpl0c.sh
+	./xpas.sh
 

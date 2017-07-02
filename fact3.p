@@ -9,21 +9,21 @@
 {	 9	  362,880	}
 {	10	3,628,800	}
 
-const nFacts = 10;
+const nFacts := 10;
 var result : integer;
-function factorial(n : integer) : integer
+function factorial(n : integer) : integer ;
 	var p : integer;
 
 	begin
-		p = 1;
+		p := 1;
 		while n > 0 do begin
-			p = p * n;
-			n = n - 1
+			p := p * n;
+			n := n - 1
 		end;
-		factorial = p;
+		factorial := p;
 	end;
 
 begin
 	{ call with wrong number of parameters! }
-    result = factorial(nFacts, nFacts)
+    result := factorial(nFacts, nFacts)
 end.

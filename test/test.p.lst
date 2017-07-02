@@ -8,17 +8,17 @@
 # test.p, 9: {	...				}
 # test.p, 10: {	 9	  362,880	}
 # test.p, 11: {	10	3,628,800	}
-# test.p, 12: const nFacts = 10;
+# test.p, 12: const nFacts := 10;
     0: call 0, 2
     1: halt
 # test.p, 13: var n, f : integer;	
 # test.p, 14: begin
     2: enter 2
-# test.p, 15:    n = 0;
+# test.p, 15:    n := 0;
     3: push 0
     4: pushvar 0, 4
     5: assign
-# test.p, 16:    f = 1;
+# test.p, 16:    f := 1;
     6: push 1
     7: pushvar 0, 5
     8: assign
@@ -28,14 +28,14 @@
    11: push 10
    12: lt
    13: jneq 28
-# test.p, 18:       n = n + 1;
+# test.p, 18:       n := n + 1;
    14: pushvar 0, 4
    15: eval
    16: push 1
    17: add
    18: pushvar 0, 4
    19: assign
-# test.p, 19:       f = f * n
+# test.p, 19:       f := f * n
    20: pushvar 0, 5
    21: eval
 # test.p, 20:    end

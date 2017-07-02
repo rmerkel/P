@@ -1,10 +1,10 @@
-./pl0c: Unknown token: '#', (0x23) near line 3
-./pl0c: expected '(' got 'IntegerNum' near line 3
-./pl0c: expected ')' got ';' near line 3
-./pl0c: passing 1 parameters where 0 where expected near line 3
-./pl0c: Identifier is not a function or procedure 'x' near line 3
-./pl0c: expected 'end' got 'bad comment' near line 5
-./pl0c: expected '.' got 'bad comment' near line 5
+./pas: Unknown token: '#', (0x23) near line 3
+./pas: expected '(' got 'IntegerNum' near line 3
+./pas: expected ')' got ';' near line 3
+./pas: passing 1 parameters where 0 where expected near line 3
+./pas: Identifier is not a function or procedure 'x' near line 3
+./pas: expected 'end' got 'bad comment' near line 5
+./pas: expected '.' got 'bad comment' near line 5
 # unknown.p, 2: var x : integer;
     0: call 0, 2
     1: halt
