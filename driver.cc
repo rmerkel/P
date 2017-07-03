@@ -7,9 +7,10 @@
  * Yet another small, interpreted, computer language... just for the fun of it!
  *
  * A compiler/interpreter, inspired by the original PL/0 language and machine described in
- * *Algorithms + Data Structures = Programs*, 1st Edition, by Wirth.
+ * Algorithms + Data Structures = Programs*, 1st Edition, by Wirth.  Currently, the
+ * compilier supports a dialect between PL/0 and Pascal.
  *
- * Like PL/0, p'as' is a combination compiler and interpreter; it first runs the compiler
+ * Like PL/0, 'pas' is a combination compiler and interpreter; it first runs the compiler
  * (Comp), and if no errors where encountered, it runs the results in the interpreter
  * (Interp). A listing and machine output are written to standard output.
  *
@@ -35,6 +36,7 @@
  *
  * @version 0.1 - Initial fork from pl0c, using pascal <>, =, etc...
  * @version 0.2 - Program declaraction
+ * @version 0.3 - Removed the C/C++ bit and shift operations
  *  
  * @author Randy Merkel, Slowly but Surly Software.
  * @copyright  (c) 2017 Slowly but Surly Software. All rights reserved.
@@ -68,7 +70,7 @@ static void help() {
 
 /// Print the version number as major.minor
 static void printVersion() {
-	cout << progName << ": verson: 0.2\n";	// makesure to update the verison in mainpage!!
+	cout << progName << ": verson: 0.3\n";	// makesure to update the verison in mainpage!!
 }
 
 /** Parse the command line arguments...

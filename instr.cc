@@ -21,9 +21,7 @@ using namespace std;
 const OpCodeInfo::InfoMap OpCodeInfo::opInfoTbl {
 	// Unary operations
 
-	{ OpCode::Not,		OpCodeInfo{ "not",		1			}	},
 	{ OpCode::Neg,		OpCodeInfo{ "neg",		1			}	},
-	{ OpCode::Comp,		OpCodeInfo{ "comp",		1			}	},
 
 	{ OpCode::ITOR,		OpCodeInfo{ "itor",		1			}	},
 	{ OpCode::ITOR2,	OpCodeInfo{ "itor2",	1			}	},
@@ -36,12 +34,6 @@ const OpCodeInfo::InfoMap OpCodeInfo::opInfoTbl {
 	{ OpCode::Mul,		OpCodeInfo{ "mul",		2			}	},
 	{ OpCode::Div,		OpCodeInfo{ "div",		2			}	},
 	{ OpCode::Rem,		OpCodeInfo{ "rem",		2			}	},
-
-	{ OpCode::BOR,		OpCodeInfo{ "bor",		2			}	},
-	{ OpCode::BAND,		OpCodeInfo{ "band",		2			}	},
-	{ OpCode::BXOR,		OpCodeInfo{ "bxor",		2			}	},
-	{ OpCode::LShift,	OpCodeInfo{ "lshift",	2			}	},
-	{ OpCode::RShift,	OpCodeInfo{ "rshift",	2			}	},
 
 	{ OpCode::LT,		OpCodeInfo{ "lt",		2			}	},
 	{ OpCode::LTE,		OpCodeInfo{ "lte",		2			}	},

@@ -58,33 +58,27 @@ struct Token {
 
 		LTE,							///< Less than or equal? (<=)
 		GTE,							///< Greater then or equal? (>=)
-		OR,								///< Or? (||)
-		AND,							///< And? (&&)
+		OR,								///< Or? 
+		AND,							///< And?
 		NEQU,							///< Not equal? (<>)
 
 		ShiftL,							///< Left shift "<<"
 		ShiftR,							///< Right shift ">>"Number
 
+		Mod,							///< Modulus (remainder)
 		EOS,							///< End of stream
 
 		// End of non-printing character codes for ASCII and UNICODE (ordinal value 32)
 
 		EQU			= '=',				///< Is equal? (=)
 
-		NOT			= '!',				///< Logical not
 		LT			= '<',				///< Less than
 		GT			= '>',				///< Greater then
-
-		BitXOR		= '^',				///< Bit XOR
-		BitOR		= '|',				///< Bit or
-		BitAND		= '&',				///< Bit and
-		Complament	= '~',				///< 1's complament
 
 		Add			= '+',				///< Addition
 		Subtract	= '-',				///< Subtraction
 		Multiply	= '*',				///< Multiplication
 		Divide 		= '/',				///< Division
-		Mod			= '%',				///< Modulus (remainder)
 
 		OpenParen	= '(',				///< Opening parentheses
 		CloseParen	= ')',				///< Closing parentheses

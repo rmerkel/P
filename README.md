@@ -4,6 +4,7 @@ Yet another small, interpreted, computer language... just for the fun of it!
 
 A compiler/interpreter, inspired by the original PL/0 language and machine
 described in Algorithms + Data Structures = Programs, 1st Edition, by Wirth.
+Currently, the compilier supports a dialect between PL/0 and Pascal.
 
 Like PL/0, pas is a combination compiler and interpreter; it first runs the
 compiler (Comp), and if no errors where encountered, it runs the results in
@@ -41,6 +42,7 @@ Bugs:
 Versions:
     0.1 - Initial fork form pl0c, modified to use =, <> etc.
     0.2 - Program declaraction
+    0.3 - Removed the C/C++ bit and shift operations
 
 Author
     Randy Merkel, Slowly but Surly Software.

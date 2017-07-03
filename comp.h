@@ -45,7 +45,6 @@
  *             proc-decl: 'procedure' ident param-lst ';' block-decl ';' ;
  *             func-decl: 'function'  ident param-lst ':' type ';' block-decl ';' ; 
  *             param-lst: [ '(' var-decl-lst ')' ] ;
-
  *              stmt-blk: 'begin' stmt-lst 'end' ;
  *              stmt-lst: 'begin' stmt {';' stmt } 'end' ;
  *                  stmt: [ ident '=' expr                         |
@@ -57,10 +56,11 @@
  *            const-expr: [ '+' | '-' ] number | ident ;
  *              expr-lst: expr { ',' expr } ;
  *                  expr: simple-expr { relo-op simple-expr } ;
- *               relo-op: '<' | '<=' | '==' | '>=' | '>' | '!=' ;
+ *               relo-op: '<' | '<=' | '=' | '>=' | '>' | '<>' ;
  *           simple-expr: [unary-op ] term { add-op term } ;
- *              unary-op: '+' | '-' | '!' | '~' ;
+ *              unary-op: '+' | '-' | '~' ;
  *                add-op: '+' | '-' | '^' | '|' | '||' ;
+
  *                  term: fact { multi-op fact } ;
  *              multi-op: '*' | '/' | '%' | '&' | '&&' | '<<' | '>>' ;
  *                  fact: ident                                    |

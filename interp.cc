@@ -155,9 +155,7 @@ Interp::Result Interp::step() {
 		stack[sp] = static_cast<Datum::Integer>(round(stack[sp].real()));
 		break;
 
-	case OpCode::Not:		stack[sp] = !stack[sp];					break;
 	case OpCode::Neg:		stack[sp] = -stack[sp];					break;
-	case OpCode::Comp:		stack[sp] = ~stack[sp]; 				break;
 
 	case OpCode::Add:		rhand = pop(); push(pop() + rhand);		break;
 	case OpCode::Sub:		rhand = pop(); push(pop() - rhand); 	break;
@@ -185,11 +183,6 @@ Interp::Result Interp::step() {
 		}
 		break;
 
-	case OpCode::BOR:	 	rhand = pop(); push(pop()  | rhand);	break;
-	case OpCode::BAND:   	rhand = pop(); push(pop()  & rhand); 	break;
-	case OpCode::BXOR:   	rhand = pop(); push(pop()  ^ rhand); 	break;
-	case OpCode::LShift: 	rhand = pop(); push(pop() << rhand); 	break;
-	case OpCode::RShift:	rhand = pop(); push(pop() >> rhand); 	break;
 	case OpCode::LT:		rhand = pop(); push(pop()  < rhand); 	break;
 	case OpCode::LTE:   	rhand = pop(); push(pop() <= rhand); 	break;
 	case OpCode::EQU:   	rhand = pop(); push(pop() == rhand); 	break;

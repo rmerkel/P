@@ -31,9 +31,7 @@ enum Frame {
 
 /// Operation codes; restricted to 256 operations, maximum
 enum class OpCode : unsigned char {
-	Not, 								///< Unary boolean not
 	Neg,								///< Unary negation
-	Comp,								///< Unary one's compliment
 
 	ITOR,								///< Unary convert an interger to real
 	ITOR2,								///< Unary convert TOS-1 to real
@@ -44,13 +42,6 @@ enum class OpCode : unsigned char {
 	Mul,								///< Multiplication
 	Div,								///< Division
 	Rem,								///< Remainder
-
-	BOR,								///< Bitwise inclusive or
-	BAND,								///< Bitwise and
-	BXOR,								///< Bitwise eXclusive or
-
-	LShift,								///< Left shift
-	RShift,								///< Right shift
 
 	LT,									///< Less than
 	LTE,								///< Less then or equal

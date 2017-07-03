@@ -361,40 +361,10 @@ Datum::Kind Comp::term(int level) {
 			promote(lhs, rhs);
 			emit(OpCode::Rem);
 
-		} else if (accept(Token::BitAND)) {
-			auto rhs = factor(level);
-			rhs = promote(lhs, rhs);
-			if (Datum::Kind::Real == lhs || Datum::Kind::Real == rhs)
-				error("binary bit operation with real operand(s)");
-			else
-				emit(OpCode::BAND); 
-
 		} else if (accept(Token::AND)) {
 			const auto rhs = factor(level);
 			promote(lhs, rhs);
 			emit(OpCode::LAND);
-
-
-		 } else if (accept(Token::ShiftL)) {
-			 const auto rhs = factor(level);
-			 if (Datum::Kind::Real == lhs || Datum::Kind::Real == rhs)
-				 error("Shift operator with real operand(s)");
-			 else 
-				 emit(OpCode::LShift);
-
-		 } else if (accept(Token::ShiftR)) {
-			 const auto rhs = factor(level);
-			 if (Datum::Kind::Real == lhs || Datum::Kind::Real == rhs)
-				 error("Shift operator with real operand(s)");
-			 else 
-				 emit(OpCode::RShift);	
-
-		 } else if (accept(Token::ShiftL)) {
-			 const auto rhs = factor(level);
-			 if (Datum::Kind::Real == lhs || Datum::Kind::Real == rhs)
-				 error("Shift operator with real operand(s)");
-			 else 
-				 emit(OpCode::LShift);	
 
 		} else
 			break;
@@ -404,7 +374,7 @@ Datum::Kind Comp::term(int level) {
 }
 
 /**
- * [ ("+" | "-" | "!" | "~") ] fact
+ * [ ("+" | "-" ] term
  * @param	level	The current block level 
  * @return	Data type 
  */
@@ -417,17 +387,6 @@ Datum::Kind Comp::unary(int level) {
 	else if (accept(Token::Subtract)) {
 		kind = term(level);
 		emit(OpCode::Neg);
-
-	} else if (accept(Token::NOT)) {
-		kind = term(level);
-		emit(OpCode::Not);
-
-	} else if (accept(Token::Complament)) {
-		kind = term(level);
-		if (Datum::Kind::Integer == kind)
-			emit(OpCode::Comp);
-		else
-			error("unary: complement a Real");
 
 	} else									
 		kind = term(level);
@@ -453,11 +412,6 @@ Datum::Kind Comp::simpleExpr(int level) {
 			const auto rhs = unary(level);
 			promote(lhs, rhs);
 			emit(OpCode::Sub);
-
-		} else if (accept(Token::BitOR)) {
-			const auto rhs = unary(level);
-			promote(lhs, rhs);
-			emit(OpCode::BOR);
 
 		} else if (accept(Token::OR)) {
 			const auto rhs = unary(level);

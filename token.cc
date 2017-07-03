@@ -67,18 +67,6 @@ Token TokenStream::get() {
 		else {	unget();	ct.kind = Token::LT;	}
 		return ct;
 
-	case '|':									// | or ||?
-		if (!getch(ch)) 	ct.kind = Token::BitOR;
-		else if ('|' == ch) ct.kind = Token::OR;
-		else {	unget();	ct.kind = Token::BitOR;	}
-		return ct;
-
-	case '&':									// & or &&?
-		if (!getch(ch)) 	ct.kind = Token::BitAND;
-		else if ('&' == ch) ct.kind = Token::AND;
-		else {	unget();	ct.kind = Token::BitAND;  }
-		return ct;
-
 	case ':':									// : or :=?
 		if (!getch(ch))		ct.kind = Token::Colon;
 		else if ('=' == ch)	ct.kind = Token::Assign;
@@ -101,7 +89,7 @@ Token TokenStream::get() {
 
 	case '%': case '(': case ')': case '*': case '+':
 	case ',': case '-': case '/': case ';': case '^':
-	case '=': case '!':
+	case '=':
 		return ct = { static_cast<Token::Kind>(ch) };
 
 	case '.': 									// real number, or just a '.'
@@ -206,23 +194,17 @@ string Token::toString(Token::Kind k) {
 	case Kind::EQU:			return "=";				break;
 	case Kind::LTE:			return "<=";			break;
 	case Kind::GTE:			return ">=";			break;
-	case Kind::OR:			return "||";			break;
-	case Kind::AND:			return "&&";			break;
+	case Kind::OR:			return "or";			break;
+	case Kind::AND:			return "and";			break;
 	case Kind::NEQU:		return "<>";			break;
 
-	case Kind::NOT:			return "!";				break;
 	case Kind::LT:			return "<";				break;
 	case Kind::GT:			return ">";				break;
-
-	case Kind::BitXOR:		return "^";				break;
-	case Kind::BitOR:		return "|";				break;
-	case Kind::BitAND:		return "&";				break;
 
 	case Kind::Add:			return "+";				break;
 	case Kind::Subtract:	return "-";				break;
 	case Kind::Multiply:	return "*";				break;
 	case Kind::Divide:		return "/";				break;
-	case Kind::Mod:			return "%";				break;
 
 	case Kind::OpenParen:	return "(";				break;
 	case Kind::CloseParen:	return ")";				break;
@@ -271,22 +253,24 @@ void TokenStream::set_input(std::istream* p) {
 // privite static
 
 TokenStream::KeywordTable	TokenStream::keywords = {
+	{	"and",			Token::AND			},
+	{	"begin",		Token::Begin		},
 	{   "const",		Token::ConsDecl		},
-	{	"var",			Token::VarDecl		},
+	{	"do",			Token::Do			},
+	{	"else",			Token::Else			},
+	{	"end",			Token::End			},
+	{	"function",		Token::FuncDecl		},
+	{	"if",			Token::If			},
+	{	"integer",		Token::Integer		},
+	{	"mod",			Token::Mod			},
+	{	"or",			Token::OR			},
 	{	"program",		Token::ProgDecl		},
 	{	"procedure",	Token::ProcDecl		},
-	{	"function",		Token::FuncDecl		},
-	{	"begin",		Token::Begin		},
-	{	"end",			Token::End			},
-	{	"if",			Token::If			},
-	{	"then",			Token::Then			},
-	{	"else",			Token::Else			},
-	{	"while",		Token::While		},
-	{	"do",			Token::Do			},
-	{	"repeat",		Token::Repeat		},
-	{	"until",		Token::Until		},
-	{	"mod",			Token::Mod			},
-	{	"integer",		Token::Integer		},
 	{	"real",			Token::Real			},
-	{	"round",		Token::Round		}
+	{	"repeat",		Token::Repeat		},
+	{	"round",		Token::Round		},
+	{	"then",			Token::Then			},
+	{	"until",		Token::Until		},
+	{	"var",			Token::VarDecl		},
+	{	"while",		Token::While		}
 };
