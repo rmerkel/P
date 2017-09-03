@@ -1,6 +1,6 @@
 /** @file instr.h
  *
- * PL/0C machine operation codes, machine instruction format, activation frame format, and
+ * Pascal-Lite machine operation codes, machine instruction format, activation frame format, and
  * associated utilities used by both the compiler (Comp) and the interpreter (Interp).
  *
  * @author Randy Merkel, Slowly but Surly Software.
@@ -88,6 +88,8 @@ public:
 	OpCodeInfo(const std::string& name, unsigned nelements)
 		: _name{name}, _nElements{nelements} {}
 
+	virtual ~OpCodeInfo() {}			///< Destructor
+
 	/// Return the OpCode name string
 	const std::string name() const		{	return _name;   	}
 
@@ -117,6 +119,6 @@ struct Instr {
 typedef std::vector<Instr>					InstrVector;
 
 /// Disassemble an instruction...
-Datum::Unsigned disasm(std::ostream& out, Datum::Unsigned loc, const Instr& instr, const std::string label = "");
+Unsigned disasm(std::ostream& out, Unsigned loc, const Instr& instr, const std::string label = "");
 
 #endif

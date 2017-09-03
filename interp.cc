@@ -1,6 +1,6 @@
 /** @file interp.cc
  *
- * PL/0 interpreter in C++
+ * Pascal-Lite interpreter in C++
  *
  * @author Randy Merkel, Slowly but Surly Software.
  * @copyright  (c) 2017 Slowly but Surly Software. All rights reserved.
@@ -61,7 +61,7 @@ void Interp::dump() {
  * @param lvl Number of levels down
  * @return The base, lvl's down the stack
  */
-Datum::Unsigned Interp::base(Datum::Unsigned lvl) {
+Unsigned Interp::base(Unsigned lvl) {
 	auto b = fp;
 	for (; lvl > 0; --lvl)
 		b = stack[b].uinteger();
@@ -74,7 +74,7 @@ Datum::Unsigned Interp::base(Datum::Unsigned lvl) {
  * @param	n	Maximum number of entries pushed down on the stack, if necessary, to make
  *  		    sufficient room for sp+n entries.
  */
-void Interp::mkStackSpace(Datum::Unsigned n) {
+void Interp::mkStackSpace(Unsigned n) {
 	while (stack.size() <= static_cast<unsigned> (sp + n))
 		stack.push_back(-1);
 }
@@ -92,7 +92,7 @@ void Interp::push(Datum d) {
  * @param 	nlevel	Set the subroutines frame base nlevel's down
  * @param 	addr 	The address of the subroutine.
  */
-void Interp::call(int8_t nlevel, Datum::Unsigned addr) {
+void Interp::call(int8_t nlevel, Unsigned addr) {
 	mkStackSpace(FrameSize);
 
 	const auto oldFp = fp;			// Save a copy before we modify it
@@ -152,7 +152,7 @@ Interp::Result Interp::step() {
 		break;
 
 	case OpCode::RTOI:	
-		stack[sp] = static_cast<Datum::Integer>(round(stack[sp].real()));
+		stack[sp] = static_cast<Integer>(round(stack[sp].real()));
 		break;
 
 	case OpCode::Neg:		stack[sp] = -stack[sp];					break;

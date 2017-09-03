@@ -2,7 +2,7 @@
  *
  * TokenStream implementation. Started life as the Token and TokenStream classes from The C++
  * Programming Language, 4th Edition, by Stroustrup, and then modified to work on the integer based
- * PL/0C machine.
+ * Pascal-Lite machine.
  *
  * @author Randy Merkel, Slowly but Surly Software.
  * @copyright  (c) 2017 Slowly but Surly Software. All rights reserved.
@@ -166,6 +166,7 @@ string Token::toString(Token::Kind k) {
 	case Kind::BadComment:	return "bad comment";	break;
 
 	case Kind::Identifier:	return "identifier";	break;
+
 	case Kind::IntegerNum:	return "IntegerNum";	break;
 	case Kind::RealNum:		return "RealNum";		break;
 
@@ -184,8 +185,15 @@ string Token::toString(Token::Kind k) {
 	case Kind::Repeat:		return "repeat";		break;
 	case Kind::Until:		return "until";			break;
 
+#if 1
+	case Kind::Type:		return "type";			break;
+#else
 	case Kind::Integer:		return "integer";		break;
 	case Kind::Real:		return "real";			break;
+#endif	
+
+	case Kind::Array:		return "array";			break;
+	case Kind::Of:			return "of";			break;
 
 	case Kind::Round:		return "round";			break;
 
@@ -194,9 +202,9 @@ string Token::toString(Token::Kind k) {
 	case Kind::EQU:			return "=";				break;
 	case Kind::LTE:			return "<=";			break;
 	case Kind::GTE:			return ">=";			break;
-	case Kind::OR:			return "or";			break;
-	case Kind::AND:			return "and";			break;
-	case Kind::NEQU:		return "<>";			break;
+	case Kind::Or:			return "or";			break;
+	case Kind::And:			return "and";			break;
+	case Kind::NEQ:			return "<>";			break;
 
 	case Kind::LT:			return "<";				break;
 	case Kind::GT:			return ">";				break;
@@ -208,6 +216,8 @@ string Token::toString(Token::Kind k) {
 
 	case Kind::OpenParen:	return "(";				break;
 	case Kind::CloseParen:	return ")";				break;
+	case Kind::OpenBrkt:	return "[";				break;
+	case Kind::CloseBrkt:	return "]";				break;
 	case Kind::Comma:		return ",";				break;
 	case Kind::Period:		return ".";				break;
 	case Kind::Colon:		return ":";				break;
@@ -253,20 +263,32 @@ void TokenStream::set_input(std::istream* p) {
 // privite static
 
 TokenStream::KeywordTable	TokenStream::keywords = {
-	{	"and",			Token::AND			},
+	{	"and",			Token::And			},
+	{	"array",		Token::Array		},
 	{	"begin",		Token::Begin		},
+	{	"type",			Token::TypeDecl		},
 	{   "const",		Token::ConsDecl		},
 	{	"do",			Token::Do			},
 	{	"else",			Token::Else			},
 	{	"end",			Token::End			},
 	{	"function",		Token::FuncDecl		},
 	{	"if",			Token::If			},
+
+#if 1
+	{	"integer",		Token::Type 		},
+#else
 	{	"integer",		Token::Integer		},
+#endif
 	{	"mod",			Token::Mod			},
-	{	"or",			Token::OR			},
+	{	"of",			Token::Of			},
+	{	"or",			Token::Or			},
 	{	"program",		Token::ProgDecl		},
 	{	"procedure",	Token::ProcDecl		},
+#if 1
+	{	"real",			Token::Type			},
+#else
 	{	"real",			Token::Real			},
+#endif
 	{	"repeat",		Token::Repeat		},
 	{	"round",		Token::Round		},
 	{	"then",			Token::Then			},
@@ -274,3 +296,4 @@ TokenStream::KeywordTable	TokenStream::keywords = {
 	{	"var",			Token::VarDecl		},
 	{	"while",		Token::While		}
 };
+

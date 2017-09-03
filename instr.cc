@@ -1,6 +1,6 @@
 /** @file instr.cc
  *
- * PL/0C Opcodes and instruction format
+ * Pascal-Lite Opcodes and instruction format
  *
  * @author Randy Merkel, Slowly but Surly Software.
  * @copyright  (c) 2017 Slowly but Surly Software. All rights reserved.
@@ -89,7 +89,7 @@ const OpCodeInfo& OpCodeInfo::info(OpCode op) {
  * @param	label	Display label
  * @return 	loc+1
  */
-Datum::Unsigned disasm(ostream& out, Datum::Unsigned loc, const Instr& instr, const string label) {
+Unsigned disasm(ostream& out, Unsigned loc, const Instr& instr, const string label) {
 	const int level = instr.level;		// so we don't display level as a character
 
 	cout << fixed;							// Use fixed format for floating point values;

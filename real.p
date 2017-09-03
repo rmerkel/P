@@ -1,4 +1,4 @@
-program real ;
+program testReal ;
 var
 	f : real; i : integer;
 

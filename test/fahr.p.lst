@@ -11,9 +11,9 @@
 # fahr.p, 6: const
     0: call 0, 2
     1: halt
-# fahr.p, 7: 	LOWER :=   0;	{	lower table limit	}
-# fahr.p, 8: 	UPPER := 300;	{	upper table limit	}
-# fahr.p, 9: 	STEP  :=  20;	{	table step size		}
+# fahr.p, 7: 	LOWER =   0;	{	lower table limit	}
+# fahr.p, 8: 	UPPER = 300;	{	upper table limit	}
+# fahr.p, 9: 	STEP  =  20;	{	table step size		}
 # fahr.p, 10: 
 # fahr.p, 11: var
 # fahr.p, 12: 	fahr, celsius : real;

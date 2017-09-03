@@ -1,27 +1,32 @@
-/**	@file	symbol.cc
+/********************************************************************************************//**
+ * @file	symbol.cc
  *
- * The PL/0C Symbol table implementation
+ * The Pascal-Lite Symbol table implementation
  *
  * @author Randy Merkel, Slowly but Surly Software.
  * @copyright  (c) 2017 Slowly but Surly Software. All rights reserved.
- */
-
-#include "symbol.h"
+ ************************************************************************************************/
 
 #include <cassert>
+
+#include "symbol.h"
 
 using namespace std;
 
 // public static
 
-/// @param	k	Symbol table Kind show name we return
-string SymValue::toString(SymValue::Kind k) {
-	switch(k) {
+/********************************************************************************************//**
+ * @param	kind	Symbol table Kind
+ * @return	kind's name
+ ************************************************************************************************/
+string SymValue::toString(SymValue::Kind kind) {
+	switch(kind) {
 	case SymValue::Kind::None:		return "None";
 	case SymValue::Kind::Variable:	return "Variable";
 	case SymValue::Kind::Constant:	return "ConsInt";
 	case SymValue::Kind::Procedure:	return "Procedure";
 	case SymValue::Kind::Function:	return "Function";
+	case SymValue::Kind::Type:		return "Type";
 	default:
 		assert(false);
 		return "Unknown SymValue Kind!";
@@ -30,75 +35,101 @@ string SymValue::toString(SymValue::Kind k) {
 
 // public
 
-SymValue::SymValue() : k {Kind::None}, l {0}, t{Datum::Kind::Integer} {}
+/********************************************************************************************//**
+ * @note kind() == None, i.e., a place holder for a real symbol
+ ************************************************************************************************/
+SymValue::SymValue() : _kind{Kind::None}, _level{0} {}
 
-/** 
- * Constants have a data value, value and a active frame/block level. 
- * @param level	The base/frame level, e.g., 0 for "current frame.
+/********************************************************************************************//**
+ * Constants have a integer value, data type (descriptor), and an active frame/block level. 
+ *
+ * @param level	The base/frame level, e.g., 0 for the current frame.
  * @param value The constant data value.
- */
-SymValue::SymValue(int level, Datum value)
-	: k{SymValue::Kind::Constant}, l{level}, v{value}, t{v.kind()}
+ * @param type	Type descriptor. Assumed to be for "integer"
+ ************************************************************************************************/
+SymValue::SymValue(int level, Datum value, TDescPtr type)
+	: _kind{SymValue::Kind::Constant}, _level{level}, _value{value}, _type(type)
 {
 }
 
-/** 
- * Variables don't have a data value, but do have a data type, location as a 
- * offset from a activaation frame/block, n levels down 
+/********************************************************************************************//**
+ * Variables have a type, location, as an offset from a block/frame, n levels down.
+ *
  * @param level		The base/frame level, e.g., 0 for "current frame..
  * @param offset	The variables location as a ofset from the activation frame
- * @param type  	the variables type, e.g., Datum::Kind::Integer.
- */
-SymValue::SymValue(int level, Datum::Integer offset, Datum::Kind type)
-	: k{SymValue::Kind::Variable}, l{level}, v{offset}, t{type}
+ * @param type  	the variables type descriptor
+ ************************************************************************************************/
+SymValue::SymValue(int level, Integer offset, TDescPtr type)
+	: _kind{SymValue::Kind::Variable}, _level{level}, _value{offset}, _type{type}
 {
 }
 
-/** 
- * Constructs a partially defined function or procedure. The offset and 
- * (Function) return type has to be set later. 
- * @param kind	The token kind, e.g., identifier
+/********************************************************************************************//**
+ * Constructs a partially defined Function or Procedure. The entry point address and return type,
+ * Function only, has to be set later. 
+ *
+ * @invariant kind must be equal to Procedure or Function
+ *
+ * @param kind	The token kind, Procedure or Function.
  * @param level	The token base/frame level, e.g., 0 for "current frame.
- */
-SymValue::SymValue(Kind kind, int level)
-	: k{kind}, l{level}, v{0}, t{Datum::Kind::Integer}
+ ************************************************************************************************/
+SymValue::SymValue(Kind kind, int level) : _kind{kind}, _level{level}, _value{0}
 {
-	assert(SymValue::Kind::Procedure == k || SymValue::Kind::Function == k);
+	assert(SymValue::Kind::Procedure == _kind || SymValue::Kind::Function == _kind);
 }
 
-/// @return my Kind
-SymValue::Kind SymValue::kind() const				{	return k;   		}
 
-/// @return my current activation frame lavel
-int SymValue::level() const							{	return l;   		}
+/********************************************************************************************//**
+ * Types have a block/frame level, and of course, a type descriptor.
+ ************************************************************************************************/
+SymValue::SymValue(int level, TDescPtr type)
+	: _kind{Kind::Type}, _level{level}, _value{0}, _type{type}
+{
+}
 
-/**
+/********************************************************************************************//**
+ * @return my Kind
+ ************************************************************************************************/
+SymValue::Kind SymValue::kind() const				{	return _kind;  			}
+
+/********************************************************************************************//**
+ * @return my current activation frame lavel
+ ************************************************************************************************/
+int SymValue::level() const							{	return _level; 			}
+
+/********************************************************************************************//**
  * @param value	New value
  * @return My new value.
- */
-Datum SymValue::value(Datum value) 					{	return v = value;	}
+ ************************************************************************************************/
+Datum SymValue::value(Datum value) 					{	return _value = value;	}
 
-/// @return my value
-Datum SymValue::value() const						{	return v;			}
+/********************************************************************************************//**
+ * @return my value
+ ************************************************************************************************/
+Datum SymValue::value() const						{	return _value;			}
 
-/**
- * @param value New symbol type
+/********************************************************************************************//**
+ * @param type	New symbol type
  * @return My function return type
- */
-Datum::Kind SymValue::type(Datum::Kind value)		{	return t = value;	}
+ ************************************************************************************************/
+ConstTDescPtr SymValue::type(TDescPtr type)			{	return _type = type;	}
 
-/// @return My type
-Datum::Kind SymValue::type() const					{	return t;			}
+/********************************************************************************************//**
+ * @return My type
+ ************************************************************************************************/
+ConstTDescPtr SymValue::type() const				{	return _type;			}
 
-/**
- * Return subrountine paramer kinds, in order of declaractions
+/********************************************************************************************//**
+ * Return subrountine paramer kinds, in order of declaractions.
+ *
  * @return Subrountine kinds
- */
-Datum::KindVec& SymValue::params() 					{   return p;			}
+ ************************************************************************************************/
+TDescPtrVec& SymValue::params() 					{   return _params;			}
 
-/**
+/********************************************************************************************//**
  * Return subrountine paramer kinds, in order of declaractions
+ *
  * @return Subrountine kinds
- */
-const Datum::KindVec& SymValue::params() const 		{   return p;			}
+ ************************************************************************************************/
+const TDescPtrVec& SymValue::params() const 		{   return _params;			}
 

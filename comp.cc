@@ -1,10 +1,11 @@
-/** @file comp.cc
+/********************************************************************************************//**
+ * @file comp.cc
  *
- * PL0C Compiler implementation
+ * Pascal-Lite Compiler implementation
  *
  * @author Randy Merkel, Slowly but Surly Software.
  * @copyright  (c) 2017 Slowly but Surly Software. All rights reserved.
- */
+ ************************************************************************************************/
 
 #include "comp.h"
 #include "interp.h"
@@ -18,30 +19,54 @@
 
 using namespace std;
 
-// class PL0CComp
+/************************************************************************************************
+ * class PL0CComp
+ *
+ * private static :
+ ************************************************************************************************/
 
-// protected:
+// built-in types
 
-/**
+/// Type descriptor for integers
+ConstTDescPtr	Comp::intDesc = TDesc::newTDesc(
+	TDesc::Kind::Integer,
+	1,
+	SubRange(numeric_limits<Integer>::min(), numeric_limits<Integer>::max()),
+	"",
+	FieldVec());
+
+/// Type descriptor for reals
+ConstTDescPtr Comp::realDesc = TDesc::newTDesc(
+	TDesc::Kind::Real,
+	1,
+	SubRange(numeric_limits<Real>::min(), numeric_limits<Real>::max()),
+	"",
+	FieldVec());
+
+// private:
+
+/********************************************************************************************//**
  * Write a diagnostic on standard error output, incrementing the error count.
  * @param msg The error message
- */
+ ************************************************************************************************/
 void Comp::error(const std::string& msg) {
 	cerr << progName << ": " << msg << " near line " << ts.lineNum << endl;
 	++nErrors;
 }
 
-/**
+/********************************************************************************************//**
  * Write a diagnostic in the form "msg 'name'", on standard error output, incrementing the error
  * count.
  * @param msg The error message
  * @param name Parameter to msg.
- */
+ ************************************************************************************************/
 void Comp::error(const std::string& msg, const std::string& name) {
 	error (msg + " \'" + name + "\'");
 }
 
-/// @return The next token from the token stream
+/********************************************************************************************//**
+ * @return The next token from the token stream
+ ************************************************************************************************/
 Token Comp::next() {
 	const Token t = ts.get();
 
@@ -63,14 +88,14 @@ Token Comp::next() {
 	return t;
 }
 
-/**
+/********************************************************************************************//**
  * Returns true, and optionally consumes the current token, if the current tokens "kind" is equal to kind.
  *
  * @param	kind	The token Kind to accept.
  * @param	get		Consume the token, if true. Defaults true.
  *
  * @return	true if the current token is a kind.
- */
+ ************************************************************************************************/
 bool Comp::accept(Token::Kind kind, bool get) {
 	if (current() == kind) {
 		if (get) next();			// consume the token
@@ -80,14 +105,14 @@ bool Comp::accept(Token::Kind kind, bool get) {
 	return false;
 }
 
-/**
+/********************************************************************************************//**
  * Evaluate and return accept(kind, get). Generate an error if accept() returns false.
  *
  * @param	kind	The token Kind to accept.
  * @param	get		Consume the token, if true. Defaults true.
  *
  * @return	true if the current token is a k.
- */
+ ************************************************************************************************/
 bool Comp::expect(Token::Kind kind, bool get) {
 	if (accept(kind, get)) return true;
 
@@ -95,15 +120,15 @@ bool Comp::expect(Token::Kind kind, bool get) {
 	return false;
 }
 
-/**
+/********************************************************************************************//**
  * @param set	Token kind set to test
  * @return true if current() is a member of set.
- */
+ ************************************************************************************************/
 bool Comp::oneOf(Token::KindSet set) {
 	return set.end() != set.find(current());
 }
 
-/**
+/********************************************************************************************//**
  * Assembles op, level, addr into a new instruction, and then appends the instruciton on
  * the end of code[], returning it's address/index in code[].
  *
@@ -114,7 +139,7 @@ bool Comp::oneOf(Token::KindSet set) {
  * @param	addr	The pl0 instructions address/value. Defaults to zero.
  *
  * @return The address (code[] index) of the new instruction.
- */
+ ************************************************************************************************/
 size_t Comp::emit(const OpCode op, int8_t level, Datum addr) {
 	const int lvl = static_cast<int>(level);
 	if (verbose)
@@ -129,109 +154,110 @@ size_t Comp::emit(const OpCode op, int8_t level, Datum addr) {
 	return code->size() - 1;				// so it's the address of just emitted instruction
 }
 
-/**
+/********************************************************************************************//**
  * Convert stack operand to a real as necessary. 
  * @param	lhs	The type of the left-hand-side
  * @param	rhs	The type of the right-hand-side 
  * @return  The promoted to Datum kind
- */
-Datum::Kind Comp::promote (Datum::Kind lhs, Datum::Kind rhs) {
-	if (lhs == rhs)
+ ************************************************************************************************/
+ConstTDescPtr Comp::promote (ConstTDescPtr lhs, ConstTDescPtr rhs) {
+	if (lhs->kind() == rhs->kind())
 		return lhs;							// nothing to do
 
-	else if (Datum::Kind::Real == rhs)
+	else if (rhs->kind() == TDesc::Real)
 		emit(OpCode::ITOR2);				// promote lhs (TOS-1) to a real
 
 	else
 		emit(OpCode::ITOR);					// promote rhs to a real
 
-	return Datum::Kind::Real;
+	return realDesc;
 }
 
-/**
+/********************************************************************************************//**
  * Convert rhs of assign to real if necessary, or emit error would need to be
  * converted to an integer. 
  * @param	lhs	The type of the left-hand-side
  * @param	rhs	The type of the right-hand-side 
- */
-void Comp::assignPromote (Datum::Kind lhs, Datum::Kind rhs) {
-	if (lhs == rhs)
+ ************************************************************************************************/
+void Comp::assignPromote (ConstTDescPtr lhs, ConstTDescPtr rhs) {
+	if (lhs->kind() == rhs->kind())
 		;				// nothing to do
 
-	else if (Datum::Kind::Real == rhs) {
-		error("rounding lhs to fit in an integer");
-		emit(OpCode::RTOI);				// promote lhs (TOS-1) to a real
-	}
-
-	else
-		emit(OpCode::ITOR);					// promote rhs to a real
-}
-
-/**
- * Uses the cross index to write a listing on the output stream
- *
- * @param name		Name of the source file
- * @param source 	The source file stream
- * @param out		The listing file stream
- */
- void Comp::listing(const string& name, istream& source, ostream& out) {
-	string 			line;   				// Current source line
-	unsigned 		linenum = 1;			// source line number
-	Datum::Unsigned	addr = 0;				// code address (index)
-
-	while (addr < indextbl.size()) {
-		while (linenum <= indextbl[addr]) {	// Print lines that lead up to code[addr]...
-			getline(source, line);	++linenum;
-			cout << "# " << name << ", " << linenum << ": " << line << "\n" << internal;
-		}
-
-		disasm(out, addr, (*code)[addr]);	// Disasmble resulting instructions...
-		while (linenum-1 == indextbl[++addr])
-			disasm(out, addr, (*code)[addr]);
-	}
-
-	while (getline(source, line))			// Any lines following '.' ...
-		cout << "#" << name << ", " << linenum++ << ": " << line << "\n" << internal;
-
-	out << endl;
-}
-
-/**
- * @param level  The block level
- */
-void Comp::purge(int level) {
-	for (auto i = symtbl.begin(); i != symtbl.end(); ) {
-		if (i->second.level() == level) {
-			if (verbose)
-				cout << progName << ": purging "
-					 << i->first << ": "
-					 << SymValue::toString(i->second.kind()) << ", "
-					 << static_cast<int>(i->second.level()) << ", "
-					 << i->second.value().integer()
-					 << " from the symbol table\n";
-			i = symtbl.erase(i);
+		else if (rhs->kind() == TDesc::Real) {
+			error("rounding lhs to fit in an integer");
+			emit(OpCode::RTOI);					// promote rhs to a integer
 
 		} else
-			++i;
+			emit(OpCode::ITOR);                 // promote rhs to a real
 	}
-}
 
- /**
-  * Local variables have an offset from the *end* of the current stack frame
-  * (bp), while parameters have a negative offset from the *start* of the frame
-  *  -- offset locals by the size of the activation frame.
-  *
-  *  @param	level	The current block level
-  *  @param	val		The variable symbol table entry
-  *  @return		Data type
-  */
- Datum::Kind Comp::emitVarRef(int level, const SymValue& val) {
+	/********************************************************************************************//**
+	 * Uses the cross index to write a listing on the output stream
+	 *
+	 * @param name		Name of the source file
+	 * @param source 	The source file stream
+	 * @param out		The listing file stream
+	 ************************************************************************************************/
+	 void Comp::listing(const string& name, istream& source, ostream& out) {
+		string 		line;   				// Current source line
+		unsigned 	linenum = 1;			// source line number
+		Unsigned	addr = 0;				// code address (index)
+
+		while (addr < indextbl.size()) {
+			while (linenum <= indextbl[addr]) {	// Print lines that lead up to code[addr]...
+				getline(source, line);	++linenum;
+				cout << "# " << name << ", " << linenum << ": " << line << "\n" << internal;
+			}
+
+			disasm(out, addr, (*code)[addr]);	// Disasmble resulting instructions...
+			while (linenum-1 == indextbl[++addr])
+				disasm(out, addr, (*code)[addr]);
+		}
+
+		while (getline(source, line))			// Any lines following '.' ...
+			cout << "#" << name << ", " << linenum++ << ": " << line << "\n" << internal;
+
+		out << endl;
+	}
+
+	/********************************************************************************************//**
+	 * @param level  The block level
+	 ************************************************************************************************/
+	void Comp::purge(int level) {
+		for (auto i = symtbl.begin(); i != symtbl.end(); ) {
+			if (i->second.level() == level) {
+				if (verbose)
+					cout << progName << ": purging "
+						 << i->first << ": "
+						 << SymValue::toString(i->second.kind()) << ", "
+						 << static_cast<int>(i->second.level()) << ", "
+						 << i->second.value().integer()
+						 << " from the symbol table\n";
+				i = symtbl.erase(i);
+
+			} else
+				++i;
+		}
+	}
+
+	/********************************************************************************************//**
+	 * Local variables have an offset from the *end* of the current stack frame
+	 * (bp), while parameters have a negative offset from the *start* of the frame
+	 *  -- offset locals by the size of the activation frame.
+	 *
+	 *  @param	level	The current block level
+	 *  @param	val		The variable symbol table entry
+	 *  @return			Data type
+	 ************************************************************************************************/
+	ConstTDescPtr Comp::emitVarRef(int level, const SymValue& val) {
 	const auto offset = val.value().integer() >= 0 ? val.value().integer() + FrameSize : val.value().integer();
 	emit(OpCode::PushVar, level - val.level(), offset);
-	return val.value().kind();
+	return val.type();
  }
 
-/// Consume, and return the closest identifer in the token stream...
+/********************************************************************************************//**
+ * Consume, and return the 'closest' (highest block level) identifer in the token stream...
+ ************************************************************************************************/
 SymbolTable::iterator Comp::identRef() {
 	const string id = ts.current().string_value;	// Copy and, then 
 	next();											// Consme the identifier...
@@ -251,33 +277,34 @@ SymbolTable::iterator Comp::identRef() {
 	}
 }
 
-/**
- * Push a variable's value, a constant value, or invoke, and push the results,
+/********************************************************************************************//**
+ * Push a variable's value, a constant value, or invoke a function, and push the results,
  * of a function.
- *      ident | ident "(" [ ident { "," ident } ] ")"
+ *
+ * ident | ident [ ( expr-lst ) ]
  *
  * @param	level	The current block level 
  * @return	Data type 
- */
- Datum::Kind Comp::identifier(int level) {
-	Datum::Kind	kind = Datum::Kind::Integer;	// Identifier type
+ ************************************************************************************************/
+ConstTDescPtr Comp::identifier(int level) {
+	auto type = intDesc;					// Identifiers type
 
 	auto it = identRef();
 	if (it != symtbl.end()) {
 		switch (it->second.kind()) {
 		case SymValue::Kind::Constant:
-			kind = it->second.value().kind();	// Assume it's the symbol's value type
+			type = it->second.type();
 			emit(OpCode::Push, 0, it->second.value());
 			break;
 
 		case SymValue::Kind::Variable:
-			kind = it->second.type();			// Use the variable's type
+			type = it->second.type();
 			emitVarRef(level, it->second);
 			emit(OpCode::Eval);
 			break;
 
 		case SymValue::Kind::Function:
-			kind = it->second.type();		// Use the function return type
+			type = it->second.type();		// Use the function return type
 			callStmt(it->first, it->second, level);
 			break;
 
@@ -286,32 +313,33 @@ SymbolTable::iterator Comp::identRef() {
 		}
 	}
 
-	return kind;
+	return type;
 }
 
-/** 
+/********************************************************************************************//**
  * ident                                |
- * "round" "(" expr ")"					|
- * ident "(" [ expr { "," expr } ")"	|
- * number                              
- * "(" expr ")"
+ * round ( expr )						|
+ * ident [ ( expr-lst ) ]				|
+ * number                               |
+ * ( expr )
  * 
  * @param	level	The current block level.
  * @return	Data type 
- */
-Datum::Kind Comp::factor(int level) {
-	auto kind = Datum::Kind::Integer;	// factor data type
+ ************************************************************************************************/
+ConstTDescPtr Comp::factor(int level) {
+	auto type = intDesc;				// Factor data type
 
 	if (accept(Token::Identifier, false))
-		kind = identifier(level);
+		type = identifier(level);
 
 	else if (accept(Token::Round))  {	// round(expr) to an integer
 		expect(Token::OpenParen);
-		kind = expression(level);
+		type = expression(level);
 		expect(Token::CloseParen);	
-		if (Datum::Kind::Integer != kind) {
+
+		if (type->kind() == TDesc::Real) {
 			emit(OpCode::RTOI);
-			kind = Datum::Kind::Integer;
+			type = intDesc;
 		}
 		
 	} else if (accept(Token::IntegerNum, false)) {
@@ -319,12 +347,12 @@ Datum::Kind Comp::factor(int level) {
 		expect(Token::IntegerNum);
 		
 	} else if (accept(Token::RealNum, false)) {
-		kind = Datum::Kind::Real;
+		type = realDesc;
 		emit(OpCode::Push, 0, ts.current().real_value);
 		expect(Token::RealNum);
 
 	} else if (accept(Token::OpenParen)) {
-		kind = expression(level);
+		type = expression(level);
 		expect(Token::CloseParen);
 
 	} else {
@@ -333,37 +361,33 @@ Datum::Kind Comp::factor(int level) {
 		next();
 	}
 
-	return kind;
+	return type;
 }
 
-/**
- * fact { ("*"|"/"|"%"|"&"|"&&"|"<<"|">>") fact } ;
+/********************************************************************************************//**
+ * fact { ( * | / | mod | and ) fact } ;
  *
  * @param level	The current block level 
  * @return	Data type  
- */
-Datum::Kind Comp::term(int level) {
+ ************************************************************************************************/
+ConstTDescPtr Comp::term(int level) {
 	const auto lhs = factor(level);
 
 	for (;;) {
 		if (accept(Token::Multiply)) {
-			const auto rhs = factor(level);	
-			promote(lhs, rhs);
+			promote(lhs, factor(level));
 			emit(OpCode::Mul);
 			
 		} else if (accept(Token::Divide)) {
-			const auto rhs = factor(level);
-			promote(lhs, rhs);
+			promote(lhs, factor(level));
 			emit(OpCode::Div);	
 			
 		} else if (accept(Token::Mod)) {
-			const auto rhs = factor(level);
-			promote(lhs, rhs);
+			promote(lhs, factor(level));
 			emit(OpCode::Rem);
 
-		} else if (accept(Token::AND)) {
-			const auto rhs = factor(level);
-			promote(lhs, rhs);
+		} else if (accept(Token::And)) {
+			promote(lhs, factor(level));
 			emit(OpCode::LAND);
 
 		} else
@@ -373,49 +397,50 @@ Datum::Kind Comp::term(int level) {
 	return lhs;
 }
 
+/********************************************************************************************//**
+ ************************************************************************************************/
 /**
- * [ ("+" | "-" ] term
+ * [ ( + | - ] term
+ *
  * @param	level	The current block level 
  * @return	Data type 
  */
-Datum::Kind Comp::unary(int level) {
-	auto kind = Datum::Kind::Integer;		// Default factor data type
+ConstTDescPtr Comp::unary(int level) {
+	auto type = intDesc;					// Default factor data type
 
 	if (accept(Token::Add)) 
-		kind = term(level);					// ignore unary + 
+		type = term(level);					// ignore unary + 
 
 	else if (accept(Token::Subtract)) {
-		kind = term(level);
+		type = term(level);
 		emit(OpCode::Neg);
 
 	} else									
-		kind = term(level);
+		type = term(level);
 
-	return kind;
+	return type;
 }
 
-/**
- * term { ("+" | "-" | "!" | "~") term } ;
+/********************************************************************************************//**
+ * term { (+ | - | or ) term } ;
+ *
  * @param	level	The current block level. 
  * @return	Data type  
- */
-Datum::Kind Comp::simpleExpr(int level) {
-	const auto lhs = unary(level);
+ ************************************************************************************************/
+ConstTDescPtr Comp::simpleExpr(int level) {
+	auto lhs = unary(level);
 
 	for (;;) {
 		if (accept(Token::Add)) {
-			const auto rhs =  unary(level);
-			promote(lhs, rhs);
+			promote(lhs, unary(level));
 			emit(OpCode::Add);
 
 		} else if (accept(Token::Subtract)) {
-			const auto rhs = unary(level);
-			promote(lhs, rhs);
+			promote(lhs, unary(level));
 			emit(OpCode::Sub);
 
-		} else if (accept(Token::OR)) {
-			const auto rhs = unary(level);
-			promote(lhs, rhs);
+		} else if (accept(Token::Or)) {
+			promote(lhs, unary(level));
 			emit(OpCode::LOR);
 
 		} else
@@ -425,43 +450,38 @@ Datum::Kind Comp::simpleExpr(int level) {
 	return lhs;
 }
 
-/**
- * simpleExpr { ("<"|"<="|"=="|">="|">"|"!=") simpleExpr } ;
+/********************************************************************************************//**
+ * simpleExpr { (< | <= | = | >= | > | <> ) simpleExpr } ;
+ *
  * @param level	The current block level 
  * @return	Data type. 
- */
-Datum::Kind Comp::expression(int level) {
-	const auto lhs = simpleExpr(level);
+ ************************************************************************************************/
+ConstTDescPtr Comp::expression(int level) {
+	auto lhs = simpleExpr(level);
 
 	for (;;) {
 		if (accept(Token::LTE)) {
-			const auto rhs = simpleExpr(level);
-			promote(lhs, rhs);
+			promote(lhs, simpleExpr(level));
 			emit(OpCode::LTE);
 
 		} else if (accept(Token::LT)) {
-			const auto rhs = simpleExpr(level);
-			promote(lhs, rhs);
+			promote(lhs, simpleExpr(level));
 			emit(OpCode::LT);
 
 		} else if (accept(Token::GT)) {
-			const auto rhs = simpleExpr(level);
-			promote(lhs, rhs);
+			promote(lhs, simpleExpr(level));
 			emit(OpCode::GT);
 			
 		} else if (accept(Token::GTE)) {
-			const auto rhs = simpleExpr(level);
-			promote(lhs, rhs);
+			promote(lhs, simpleExpr(level));
 			emit(OpCode::GTE);
 			
 		} else if (accept(Token::EQU)) {
-			const auto rhs = simpleExpr(level);
-			promote(lhs, rhs);
+			promote(lhs, simpleExpr(level));
 			emit(OpCode::EQU);
 
-		} else if (accept(Token::NEQU)) {
-			const auto rhs = simpleExpr(level);
-			promote(lhs, rhs);
+		} else if (accept(Token::NEQ)) {
+			promote(lhs, simpleExpr(level));
 			emit(OpCode::NEQU);
 
 		} else
@@ -471,9 +491,11 @@ Datum::Kind Comp::expression(int level) {
 	return lhs;
 }
 
-/**
- * [ '+' | '-' ] number | (const) identifer
- */
+/********************************************************************************************//**
+ * [ + | - ] number | (const) identifer
+ *
+ * @return A constant value
+ ************************************************************************************************/
 Datum Comp::constExpr() {
 	Datum value(0);
 	int sign = 1;
@@ -494,39 +516,27 @@ Datum Comp::constExpr() {
 	} else if (accept(Token::Identifier, false)) {
 		auto it = identRef();
 		if (it != symtbl.end()) {
-			switch (it->second.kind()) {
-			case SymValue::Kind::Constant: 			// Return const ident value
+			if (it->second.kind() == SymValue::Kind::Constant)
 				value = sign * it->second.value();
-				break;
-
-			case SymValue::Kind::Variable:
-				error("identifier is not a constant", it->first);
-				break;
-
-			case SymValue::Kind::Function:
-				error("Function is not a constant expression", it->first);
-				break;
-
-			default:
+			else
 				error("Identifier is not a constant, variable or function", it->first);
-			}
 		}
 
 	} else {
 		error("expected an interger or real literal, got neither", ts.current().string_value);
-		next();
+		next();										// Consume the errent token
 	}
 
 	return value;
 }
 
-/**
- * ident "=" expression
+/********************************************************************************************//**
+ * ident = expression
  *
  * @param	name	The identifier value
  * @param	val		The identifiers symbol table entry value
  * @param	level	The current block level.
- */
+ ************************************************************************************************/
 void Comp::assignStmt(const string& name, const SymValue& val, int level) {
 	const auto rhs = expression(level);
 
@@ -556,15 +566,15 @@ void Comp::assignStmt(const string& name, const SymValue& val, int level) {
 	}
 }
 
-/**
+/********************************************************************************************//**
  * Call a function or procedure...
  *
- *      ident "(" [ expr  { "," expr }] ")"...
+ * ident [ ( expr-list ) ]...
  *
  * @param	name	The identifier value
  * @param	val		The identifiers symbol table entry value
  * @param	level	The current block level 
- */
+ ************************************************************************************************/
 void Comp::callStmt(const string& name, const SymValue& val, int level) {
 	expect(Token::OpenParen);
 
@@ -595,11 +605,11 @@ void Comp::callStmt(const string& name, const SymValue& val, int level) {
 	emit(OpCode::Call, level - val.level(), val.value());
 }
 
-/**
- *     ident "=" expr | ident "(" [ ident { "," ident } ] ")"
+/********************************************************************************************//**
+ * indentifier = expression | indentifier [ ( indentifier { , indentifier } ) ]
  *
  * @param	level	The current block level
- */
+ ************************************************************************************************/
 void Comp::identStmt(int level) {
 	auto it = identRef();
 
@@ -614,11 +624,11 @@ void Comp::identStmt(int level) {
 }
 
 
-/**
- * "while" expr "do" statement...
+/********************************************************************************************//**
+ * while expr do statement...
  *
  * @param	level	The current block level.
- */
+ ************************************************************************************************/
  void Comp::whileStmt(int level) {
 	const auto cond_pc = code->size();	// Start of while expr
 	expression(level);
@@ -635,9 +645,11 @@ void Comp::identStmt(int level) {
 	(*code)[jmp_pc].addr = code->size(); 
  }
 
-/**
- *  "if" expr "then" statement1 [ "else" statement2 ]
- */
+/********************************************************************************************//**
+ * if expr then statement [ else statement ]
+ *
+ * @param	level 	The current block level
+ ************************************************************************************************/
  void Comp::ifStmt(int level) {
 	expression(level);
 
@@ -664,11 +676,11 @@ void Comp::identStmt(int level) {
 	}
  }
 
- /**
-  * "repeat" statement "until" expr
-  *
-  * @param	level 	The current block level
-  */
+/********************************************************************************************//**
+ * repeat statement until expr
+ *
+ * @param	level 	The current block level
+ ************************************************************************************************/
  void Comp::repeatStmt(int level) {
 	 const size_t loop_pc = code->size();			// jump here until expr fails
 	 statement(level);
@@ -677,19 +689,26 @@ void Comp::identStmt(int level) {
 	 emit(OpCode::JNEQ, 0, loop_pc);
  }
 
-/**
- *  stmt { ";" stmt }
+/********************************************************************************************//**
+ * stmt { ; stmt }
+ *
  * @param	level		The current block level.
- */
+ ************************************************************************************************/
 void Comp::statementList(int level) {
 	do {
 		statement(level);
 	} while (accept(Token::SemiColon));
 }
 
-/**
+/********************************************************************************************//**
+ * [ ident = expr						|
+ *   if expr then stmt { else stmt }	|
+ *   while expr do stmt					|
+ *   repeat stmt until expr				|
+ *   stmt-block ]
+ *
  * @param	level	The current block level.
- */
+ ************************************************************************************************/
 void Comp::statement(int level) {
 	if (accept(Token::Identifier, false)) 			// assignment or proc call
 		identStmt(level);
@@ -710,14 +729,15 @@ void Comp::statement(int level) {
 	// else: nothing
 }
 
-/**
- * Scans and returns the next token in the stream which is expected to be an identifier. Checks to
- * see, and reports, if the identifier has already been delcared in this scope (level).
+/********************************************************************************************//**
+ * Scans and returns the next token in the stream which is expected to be an identifier. Checks
+ * to see, and reports, if the identifier has already been delcared in this scope (level).
+ *
  * @param 	level	The current block level.
  * @return 	the next identifer in the token stream, "unknown" if the next token wasn't an
  *  		identifier.
- */
-std::string Comp::nameDecl(int level) {
+ ************************************************************************************************/
+const std::string Comp::nameDecl(int level) {
 	const string id = ts.current().string_value;			// Copy the identifer
 
 	if (expect(Token::Identifier)) {						// Consume the identifier
@@ -735,33 +755,16 @@ std::string Comp::nameDecl(int level) {
 	return "unknown";
 }
 
-/**
- * ":"  "integer" | "real"
- * @return the datum type
- */
-Datum::Kind Comp::typeDecl() {
-	expect(Token::Colon);
-
-	Datum::Kind kind;
-		 if (accept(Token::Integer))	kind = Datum::Kind::Integer;
-	else if (accept(Token::Real))		kind = Datum::Kind::Real;
-	else {
-		kind = Datum::Kind::Integer;
-		error("expected 'integer' or 'real', got neither");
-	}
-
-	return kind;
-}
-
-/**
- * const-decl-lst: 'const' const-decl { ';' const-decl } ;
+/********************************************************************************************//**
+ * const const-decl { ; const-decl } ;
  *
  * @note	Doesn't emit any code; just stores the named value in the symbol table.
  * @param	level	The current block level.
- */
+ ************************************************************************************************/
 void Comp::constDeclList(int level) {
 	// Stops if the ';' if followd by any of hte following tokens
 	static const Token::KindSet stops {
+		Token::TypeDecl,
 		Token::VarDecl,
 		Token::ProcDecl,
 		Token::FuncDecl,
@@ -772,21 +775,31 @@ void Comp::constDeclList(int level) {
 		do {
 			if (oneOf(stops))
 				break;							// No more constants...
-
 			constDecl(level);
 
 		} while (accept(Token::SemiColon));
 	}
 }
 
-/**
- * const-decl: ident "=" const-expr ;
- *
+/********************************************************************************************//**
+ * ident = type
  * @param	level	The current block level.
- */
-void Comp::constDecl(int level) {
+ ************************************************************************************************/
+void Comp::typeDecl(int level) {
 	const auto ident = nameDecl(level);				// Copy the identifier
-	expect(Token::Assign);							// Consume the "="
+	expect(Token::EQU);								// Consume the "="
+
+#if 0	// TBD...
+	if (accept(Token::Integer))
+		kind = Datum::Kind::Integer;
+	else if (accept(Token::Real))
+		kind = Datum::Kind::Real;
+	else {
+	}
+
+
+	xxxxxxxxxxxxxxxx
+
 	const auto value = constExpr();					// Get the constant value
 
 	// Insert ident into the symbol table
@@ -794,23 +807,71 @@ void Comp::constDecl(int level) {
 	symtbl.insert(	{ ident, SymValue(level, value)	}	);
 	if (verbose)
 		cout << progName << ": constDecl " << ident << ": " << level << ", " << value << "\n";
+#endif
 }
 
-/**
- * "const" var-decl-lst ';'
+/********************************************************************************************//**
+ * type type-decl { ; type-decl } ;
+ *
+ * @note	Doesn't emit any code; just stores the new type in the symbol table.
+ * @param	level	The current block level.
+ ************************************************************************************************/
+void Comp::typeDeclList(int level) {
+	// Stops if the ';' if followd by any of hte following tokens
+	static const Token::KindSet stops {
+		Token::VarDecl,
+		Token::ProcDecl,
+		Token::FuncDecl,
+		Token::Begin
+	};
+
+	if (accept(Token::TypeDecl)) {
+		do {
+			if (oneOf(stops))
+				break;							// No more constants...
+			typeDecl(level);
+
+		} while (accept(Token::SemiColon));
+	}
+}
+
+/********************************************************************************************//**
+ * ident = const-expr ;
+ *
+ * @param	level	The current block level.
+ ************************************************************************************************/
+void Comp::constDecl(int level) {
+	auto ident = nameDecl(level);				// Copy the identifier
+	expect(Token::EQU);							// Consume the "="
+	auto value = constExpr();					// Get the constant value
+
+	ConstTDescPtr type = value.kind() == Datum::Kind::Integer ? intDesc : realDesc;
+
+	symtbl.insert(	{ ident, SymValue(level, value, type) }	);
+	if (verbose)
+		cout << progName << ": constDecl " << ident << ": " << level << ", " << value << "\n";
+}
+
+/********************************************************************************************//**
+ * const" var-decl-lst ;
+ *
  * @param	level	The current block level.
  * @return  Number of variables allocated before or after the activation frame.
- */
+ ************************************************************************************************/
 int Comp::varDeclBlock(int level) {
-	NameKindVec	idents;				// vector of name/type pairs.
+	NameKindVec	idents;							// vector of name/type pairs.
 
 	if (accept(Token::VarDecl))
 		varDeclList(level, false, idents);
 
-	return idents.size();
+	int sum = 0;								// Add up the size of every variable in the block
+	for (const auto& id : idents)
+		sum += id.type->size();
+
+	return sum;
 }
 
-/**
+/********************************************************************************************//**
  * var-decl { ';' var-decl }
  *
  * Allocate space on the stack for each variable, as a postivie offset from the end of current
@@ -822,7 +883,7 @@ int Comp::varDeclBlock(int level) {
  * @param[in,out]	idents	Vector of identifer, kind pairs 
  *
  * @return  Offset of the next variable/parmeter from the current activicaqtion frame.
- */
+ ************************************************************************************************/
 void Comp::varDeclList(int level, bool params, NameKindVec& idents) {
 	// Stops if the ';' if followd by any of hte following tokens
 	static const Token::KindSet stops {
@@ -835,9 +896,7 @@ void Comp::varDeclList(int level, bool params, NameKindVec& idents) {
 	do {
 		if (oneOf(stops))
 			break;								// No more variables...
-
 		varDecl(level, idents);
-
 	} while (accept(Token::SemiColon));
 
 	// Set the offset from the activation frame, parameters have negative offsets in reverse
@@ -848,22 +907,19 @@ void Comp::varDeclList(int level, bool params, NameKindVec& idents) {
 				 << ": var/param " 	<< id.name << ": " 
 				 << level 			<< ", "
 			     << dx	 			<< ", " 
-				 << Datum::toString(id.kind) << "\n";
+				 << TDesc::toString(id.type->kind()) << "\n";
 
-		symtbl.insert( { id.name, SymValue(level, dx++, id.kind)	} );
+		symtbl.insert( { id.name, SymValue(level, dx++, id.type)	} );
 	}
 }
 
-/**
- * ident-list : type ;
- *
+/********************************************************************************************//**
  * A semicolon list of variable, or formal parameter declractions. Each declaraction starts
  * with a comma separated list of identifiers, followed by a colon followed by a type
  * specifier:
  *
  *     var-decl =	    ident-list : type ;
  *     ident-list =     ident { "," ident } ;
- *     type =           "integer" | "real" ;
  *
  * Allocate space on the stack for each variable, as a positive offset from the *end* of
  * current activaction frame; 0, 1, ..., n-1. Parameters, pushed by the caller, are identified
@@ -872,35 +928,59 @@ void Comp::varDeclList(int level, bool params, NameKindVec& idents) {
  *  
  * @param			level	The current block level. 
  * @param[in,out]	idents	Vector of identifer, kind pairs
- */
+ ************************************************************************************************/
 void Comp::varDecl(int level, NameKindVec& idents) {
-	vector<string> indentifiers;
+	vector<string> identifiers;
 
 	// Find and append comma separated identifiers to the list...
 	do {
-		indentifiers.push_back(nameDecl(level));
-
+		identifiers.push_back(nameDecl(level));
 	} while (accept(Token::Comma));
 
-	const Datum::Kind kind = typeDecl();
-
-	for (auto& id : indentifiers)
-		idents.push_back({ id, kind });
+	expect(Token::Colon);
+	const auto desc = type();
+	for (auto& id : identifiers)
+		idents.push_back({ id, desc });
 }
 
-/**
+/********************************************************************************************//**
+ * ":"  "integer" | "real"
+ * @return the type description
+ ************************************************************************************************/
+ConstTDescPtr Comp::type() {
+	auto type = intDesc;
+	const string id = ts.current().string_value;	// Copy the type-identifer
+	expect(Token::Type);
+
+	auto range = symtbl.equal_range(id);			// Should have already been defined...
+	if (range.first == range.second)
+		error("Undefined type identifier", id);
+
+	else {											// Find the closest...
+		auto closest = range.first;
+		for (auto it = closest; it != range.second; ++it)
+			if (it->second.level() > closest->second.level())
+				closest = it;
+
+		type = closest->second.type();
+	}
+
+	return type;
+}
+
+/********************************************************************************************//**
  * Process the common subroutine delcaration for procedures and functions:
  *
- * ident "(" [ name { "," name } ] ")" ...
+ * ident [ ( var-decl-lst ) ] ) ...
  *
  * @param	level	The current block level.
  * @param 	kind	The type of subroutine, e.g., procedure or fuction
  * @return	subrountine's symbol table entry
- */
+ ************************************************************************************************/
 SymValue& Comp::subPrefixDecl(int level, SymValue::Kind kind) {
 	SymbolTable::iterator	it;				// Will point to the new symbol table entry...
 
-	const auto& ident = nameDecl(level);	// insert the name into the symbol table
+	auto ident = nameDecl(level);			// insert the name into the symbol table
 	it = symtbl.insert( { ident, SymValue(kind, level)	} );
 	if (verbose)
 		cout << progName << ": subPrefixDecl " << ident << ": " << level << ", 0\n";
@@ -914,16 +994,17 @@ SymValue& Comp::subPrefixDecl(int level, SymValue::Kind kind) {
 		expect(Token::CloseParen);
 
 		for (auto id : idents)
-			it->second.params().push_back(id.kind);
+			it->second.params().push_back(id.type);
 	}
 
 	return it->second;
 }
 
-/**
- * "procedure" ident "(" [ident {, "ident" }] ")" block ";
+/********************************************************************************************//**
+ * procedure ident [ ( var-decl-lst ) ] ; block ;
+ *
  * @param	level	The current block level.
- */
+ ************************************************************************************************/
 void Comp::procDecl(int level) {
 	auto& val = subPrefixDecl(level, SymValue::Kind::Procedure);
 	expect(Token::SemiColon);
@@ -931,19 +1012,23 @@ void Comp::procDecl(int level) {
 	expect(Token::SemiColon);				// procedure declarations end with a ';'!
 }
 
-/**
- * "function"  ident "(" [ident {, "ident" }] ")"  ":" type  block ";"
+/********************************************************************************************//**
+ * function ident [ ( var-decl-lst ) ] : type  block-decl ;
+ *
  * @param	level	The current block level.
- */
+ ************************************************************************************************/
 void Comp::funcDecl(int level) {
 	auto& val = subPrefixDecl(level, SymValue::Kind::Function);
-	val.type(typeDecl());
+	expect(Token::Colon);
+	val.type(type());
 	expect(Token::SemiColon);
 	blockDecl(val, level + 1);
 	expect(Token::SemiColon);	// function declarations end with a ';'!
 }
 
-/**
+/********************************************************************************************//**
+ * proc-decl | func-decl
+ *
  * Zero or more function and/or procedure delclaractions:
  *
  *     { proc-decl | funct-decl }
@@ -952,7 +1037,7 @@ void Comp::funcDecl(int level) {
  *     type ; type =    "integer" | "real" ;
  *
  * @param level The current block level.
- */
+ ************************************************************************************************/
 void Comp::subDeclList(int level) {
 	for (;;) {
 		if (accept(Token::ProcDecl))
@@ -966,19 +1051,19 @@ void Comp::subDeclList(int level) {
 	}
 }
 
-/**
- * block = 	[ const ident = number {, ident = number} ";"]
- *         	[ var ident {, ident} ";" ]
- *         	{ procedure ident "(" [ ident { "," ident } ] ")" block ";"
- *         	 | function ident "(" [ ident { "," ident } ] ")" block ";" }
- *          stmt ;
+/********************************************************************************************//**
+ * [ const-decl-lst ]
+ * [ var-decl-blk   ]
+ * [ sub-decl-lst   ]
+ * [ stmt-block     }
  *
  * @param	val		The blocks (procedures) symbol table entry value
  * @param	level	The current block level.
  * @return 	Entry point address
- */
-Datum::Unsigned Comp::blockDecl(SymValue& val, int level) {
+ ************************************************************************************************/
+Unsigned Comp::blockDecl(SymValue& val, int level) {
 	constDeclList(level);						// declaractions...
+	typeDeclList(level);
 	auto dx = varDeclBlock(level);
 	subDeclList(level);
 
@@ -1009,6 +1094,8 @@ Datum::Unsigned Comp::blockDecl(SymValue& val, int level) {
 	return addr;
 }
 
+/********************************************************************************************//**
+ ************************************************************************************************/
 void Comp::run() {
 	const int level = 0;						// Start at block level 0
 	next();										// Fetch the 1st token
@@ -1030,22 +1117,26 @@ void Comp::run() {
 	expect(Token::Period);
 }
 
-// public:
+/************************************************************************************************
+ * public:
+ ************************************************************************************************/
 
-/**
+/********************************************************************************************//**
  * Construct a new compilier with the token stream initially bound to std::cin.
  * @param	pName	The prefix string used by error and verbose/diagnostic messages.
- */
+ ************************************************************************************************/
 Comp::Comp(const string& pName) : progName {pName}, nErrors{0}, verbose {false}, ts{cin} {
-	symtbl.insert({"main", SymValue(SymValue::Kind::Procedure, 0)});	// Install the "main" rountine declaraction
+	// insert builtin types into the symbol table
+	symtbl.insert(	{"integer", SymValue(0, intDesc)	} );
+	symtbl.insert(	{"real",	SymValue(0, realDesc)	} );
 }
 
-/**
+/********************************************************************************************//**
  * @param	inFile	The source file name, where "-" means the standard input stream
  * @param	prog	The generated machine code is appended here
  * @param	verb	Output verbose messages if true
  * @return	The number of errors encountered
- */
+ ************************************************************************************************/
 unsigned Comp::operator()(const string& inFile, InstrVector& prog, bool verb) {
 	code = &prog;
 	verbose = verb;
@@ -1076,3 +1167,4 @@ unsigned Comp::operator()(const string& inFile, InstrVector& prog, bool verb) {
 
 	return nErrors;
 }
+

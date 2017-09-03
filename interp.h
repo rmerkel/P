@@ -1,10 +1,11 @@
-/** @file interp.h
+/********************************************************************************************//**
+ * @file interp.h
  *
  * The PL/0C interpreter.
  *
  * @author Randy Merkel, Slowly but Surly Software.
  * @copyright  (c) 2017 Slowly but Surly Software. All rights reserved.
- */
+ ********************************************************************************************//**/
 
 #ifndef	INTERP_H
 #define INTERP_H
@@ -14,13 +15,12 @@
 
 #include "instr.h"
 
-/** A PL/0C Machine
+/********************************************************************************************//**
+ * A PL/0C Machine
  *
- * A interperter that started life as a straight C/C++ port of the PL/0 machine described in Algorithms + Data Structures =
- * Programs, 1st Edition, by Wirth, and then modified to provide "C like" instructions.
- *
-
- */
+ * A interperter that started life as a straight C/C++ port of the PL/0 machine described in
+ * Algorithms + Data Structures = Programs, 1st Edition, by Wirth.
+ ********************************************************************************************//**/
 class Interp {
 public:
 	/// Interpeter results
@@ -68,9 +68,9 @@ private:
 
 	InstrVector		code;					///< Code segment, indexed by pc
 	DatumVector		stack;					///< Data segment (stack), indexed by fp and sp
-	Datum::Unsigned	pc;						///< Program counter register; index of *next* instruction in code[]
-	Datum::Unsigned	fp;						///< Frame pointer register; index of the current mark block/frame in stack[]
-	Datum::Unsigned	sp;						///< Top of stack register (stack[sp])
+	Unsigned		pc;						///< Program counter register; index of *next* instruction in code[]
+	Unsigned		fp;						///< Frame pointer register; index of the current mark block/frame in stack[]
+	Unsigned		sp;						///< Top of stack register (stack[sp])
 	Instr			ir;						///< *Current* instruction register (code[pc-1])
 
 	EAddr			lastWrite;				///< Last write effective address (to stack[]), if valid
@@ -81,15 +81,15 @@ private:
 
 protected:
 	///< Find the activation base 'lvl' levels up the stack...
-	Datum::Unsigned base(Datum::Unsigned lvl);
+	Unsigned base(Unsigned lvl);
 
-	void mkStackSpace(Datum::Unsigned n);	///< Make room for more stack entries...
+	void mkStackSpace(Unsigned n);	///< Make room for more stack entries...
 
 	Datum pop();							///< Pop a Datum from the top of stack...
 	void push(Datum d);						///< Push a Datum onto the stack...
 
 	/// Call a subroutine...
-	void call(int8_t nlevel, Datum::Unsigned addr);
+	void call(int8_t nlevel, Unsigned addr);
 	void ret();								///< Return from procedure...
 	void retf();							///< Return from a function...
 

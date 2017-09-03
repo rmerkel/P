@@ -10,7 +10,7 @@
 # fact.p, 11: {	10	3,628,800	}
 # fact.p, 12: 
 # fact.p, 13: program fact ;
-# fact.p, 14: const nFacts := 10;
+# fact.p, 14: const nFacts = 10;
     0: call 0, 25
     1: halt
 # fact.p, 15: var p : integer;

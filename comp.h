@@ -1,10 +1,11 @@
-/** @file comp.h
+/********************************************************************************************//**
+ * @file comp.h
  *
- * The PL/0C compiler.
+ * The Pascal-Lite compilier.
  *
  * @author Randy Merkel, Slowly but Surly Software.
  * @copyright  (c) 2017 Slowly but Surly Software. All rights reserved.
- */
+ ************************************************************************************************/
 
 #ifndef	COMP_H
 #define	COMP_H
@@ -15,68 +16,18 @@
 
 #include "instr.h"
 #include "datum.h"
-#include "token.h"
 #include "symbol.h"
+#include "token.h"
 
-/** A PL/0C Compilier
+/********************************************************************************************//**
+ * A Pascal-Lite Compilier
  *
  * A recursive decent compilier, evolved from
  * https://en.wikipedia.org/wiki/Recursive_descent_parser#C_implementation. Construction binds
  * a program name with the instance, used in error messages. The compilier is run via the call
  * operator which specifies the input stream, the location of the emitted code, and weather to
  * emit a travlelog (verbose messages).
- *
- * @section grammer Grammer (EBNF)
- *
- *               program: block-decl 'begin' stmt-lst 'end' '.' ;
- *            block-decl: [ const-decl-lst ';' ]
- *                        [ var-decl-blk ';' ]
- *                        [ sub-decl { ';' sub-decl-lst }
- *                        { stmt-blk }
- *                        ;
- *        const-decl-lst: 'const' const-decl { ';' const-decl } ';' ;
- *            const-decl: ident "=" const-expr ;
- *          var-decl-blk: 'var' var-decl-lst ;
- *          var-decl-lst: var-decl { ';' var-decl } ';' ;
- *              var-decl: ident-lst : type ;
- *             ident-lst: ident { ',' ident } ;
- *                  type: 'integer' | 'real' ;
- *          sub-decl-lst: func-decl | proc-decl ;
- *             proc-decl: 'procedure' ident param-lst ';' block-decl ';' ;
- *             func-decl: 'function'  ident param-lst ':' type ';' block-decl ';' ; 
- *             param-lst: [ '(' var-decl-lst ')' ] ;
- *              stmt-blk: 'begin' stmt-lst 'end' ;
- *              stmt-lst: 'begin' stmt {';' stmt } 'end' ;
- *                  stmt: [ ident '=' expr                         |
- *                          'if' cond 'then' stmt { 'else' stmt }  |
- *                          'while' cond 'do' stmt                 |
- *                          'repeat' stmt 'until' cond             |
- *                          stmt-blk ]
- *                       ;
- *            const-expr: [ '+' | '-' ] number | ident ;
- *              expr-lst: expr { ',' expr } ;
- *                  expr: simple-expr { relo-op simple-expr } ;
- *               relo-op: '<' | '<=' | '=' | '>=' | '>' | '<>' ;
- *           simple-expr: [unary-op ] term { add-op term } ;
- *              unary-op: '+' | '-' | '~' ;
- *                add-op: '+' | '-' | '^' | '|' | '||' ;
-
- *                  term: fact { multi-op fact } ;
- *              multi-op: '*' | '/' | '%' | '&' | '&&' | '<<' | '>>' ;
- *                  fact: ident                                    |
- *                        ident '(' [ expr-lst ] ')'               |
- *                        'round' '(' expr ')'                     |
- *                        number                                   |
- *                        '(' expr ')'
- *                        ;
- *
- * Key
- * - {}	Repeat zero or more times
- * - []	Optional; zero or *one* times
- * - () Grouping
- * - |  One of ...
- * - ;  End of production
- */
+ ************************************************************************************************/
 class Comp {
 public:
 	Comp(const std::string& pName);			///< Constructor; use pName for error messages
@@ -97,14 +48,17 @@ private:
 	InstrVector*		code;				///< Emitted code
 	SourceIndex			indextbl;			///< Source cross-index for listings
 
-protected:
+	// built-in types
+	static	ConstTDescPtr	intDesc;		///< integer type descriptor
+	static	ConstTDescPtr	realDesc;		///< Real type descriptor
+
 	/// Name, kind pair
 	struct NameKind {
 		std::string		name;				///< Variable/parameter
-		Datum::Kind		kind;				///< It's kind
+		TDescPtr		type;				///< it's type descriptor
 
 		/// Construct a name/kind pair
-		NameKind(const std::string n, Datum::Kind k) : name{n}, kind{k} {}
+		NameKind(const std::string n, TDescPtr p) : name{n}, type{p} {}
 	};
 
 	/// A vector of name kind pairs
@@ -132,10 +86,10 @@ protected:
 	size_t emit(const OpCode op, int8_t level = 0, Datum addr = 0);
 
 	/// Promote data type if necessary...
-	Datum::Kind promote (Datum::Kind lhs, Datum::Kind rhs);
+	ConstTDescPtr promote (ConstTDescPtr lhs, ConstTDescPtr rhs);
 
 	/// Promote assigned data type if necessary...
-	void assignPromote (Datum::Kind lhs, Datum::Kind rhs);
+	void assignPromote (ConstTDescPtr lhs, ConstTDescPtr rhs);
 
 	/// Create a listing...
 	void listing(const std::string& name, std::istream& source, std::ostream& out);
@@ -144,22 +98,22 @@ protected:
 	void purge(int level);
 
 	/// Emit a variable reference, e.g., an absolute address...
-	Datum::Kind emitVarRef(int level, const SymValue& val);
+	ConstTDescPtr emitVarRef(int level, const SymValue& val);
 
 	SymbolTable::iterator identRef();		///< identifier sub-production...
-	Datum::Kind identifier(int level);		///< factor-identifier production...
-	Datum::Kind factor(int level);			///< factor production...
-	Datum::Kind term(int level);			///< terminal production...
-	Datum::Kind unary(int level);			///< unary-expr sub-production...
-	Datum::Kind simpleExpr(int level);		///< simple-expr production...
-	Datum::Kind expression(int level);		///< expression production...
+	ConstTDescPtr identifier(int level);	///< factor-identifier production...
+	ConstTDescPtr factor(int level);		///< factor production...
+	ConstTDescPtr term(int level);			///< terminal production...
+	ConstTDescPtr unary(int level);			///< unary-expr sub-production...
+	ConstTDescPtr simpleExpr(int level);	///< simple-expr production...
+	ConstTDescPtr expression(int level);	///< expression production...
 
 	Datum constExpr();						///< const-expr production...
 
-	/// assignment-statement production...
+											/// assignment-statement production...
 	void assignStmt(const std::string& name, const SymValue& val, int level);
 
-	/// call-statement production...
+											/// call-statement production...
 	void callStmt(const std::string& name, const SymValue& val, int level);
 
 	void identStmt(int level);				///< identifier-statement production...
@@ -168,29 +122,26 @@ protected:
 	void ifStmt(int level);					///< if-statement production...
 	void statement(int level);				///< statement production...
 	void statementList(int level);			///< statement-list-production...
-
-	std::string nameDecl(int level);		///< name (identifier) check...
-	Datum::Kind typeDecl();					///< type decal production...
-
+	const std::string nameDecl(int level);	///< name (identifier) check...
 	void constDeclList(int level);			///< const-declaration-list production...
 	void constDecl(int level);				///< constant-declaration production...
 
+	void typeDecl(int level);				///< type-declaracton production...
+	void typeDeclList(int level);			///< type-declaraction-list production...
+
 	int varDeclBlock(int level);			///< variable-declaration-block production...
-
-	/// variable-declaration-list production...
+											/// variable-declaration-list production...
 	void varDeclList(int level, bool params, NameKindVec& idents);
-
-	void varDecl(int level, NameKindVec& idents);		///< ariable-declaration production...
-
-	/// Subroutine-declaration production...
+											/// variable-declaration production...
+	void varDecl(int level, NameKindVec& idents);
+	ConstTDescPtr type();					///< type production...
+											/// Subroutine-declaration production...
 	SymValue& subPrefixDecl(int level, SymValue::Kind kind);
-
 	void procDecl(int level);				///< procedure-declaration production...
 	void funcDecl(int level);				///< function-declaration production...
 	void subDeclList(int level);			///< function/procedue declaraction productions...
-
-	/// block-declaration production...
-	Datum::Unsigned blockDecl(SymValue& val, int level);
+											/// block-declaration production...
+	Unsigned blockDecl(SymValue& val, int level);
 
 	void run();								///< runs the compilier...
 };

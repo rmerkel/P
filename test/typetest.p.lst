@@ -1,0 +1,29 @@
+# typetest.p, 2: { print Fahrenheit-Celsius table	}
+# typetest.p, 3: {	third version; integers & reals	}
+# typetest.p, 4: 
+# typetest.p, 5: program fahr3 ;
+# typetest.p, 6: {	type int = integer;	}
+# typetest.p, 7: 
+# typetest.p, 8: var
+    0: call 0, 2
+    1: halt
+# typetest.p, 9: 	i : integer;
+# typetest.p, 10: 
+# typetest.p, 11: begin
+    2: enter 1
+# typetest.p, 12: 	i := 0;
+    3: push 0
+    4: pushvar 0, 4
+    5: assign
+# typetest.p, 13: 	i := i + 1
+    6: pushvar 0, 4
+    7: eval
+    8: push 1
+# typetest.p, 14:  end.
+    9: add
+   10: pushvar 0, 4
+   11: assign
+   12: ret
+
+        8:          0
+        8:          1

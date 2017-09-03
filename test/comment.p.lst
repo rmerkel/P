@@ -1,6 +1,6 @@
 # comment.p, 2: { "main" starts here... }
 # comment.p, 3: program comment ;
-# comment.p, 4: const nFacts := 10;
+# comment.p, 4: const nFacts = 10;
     0: call 0, 2
     1: halt
 # comment.p, 5: var n, f : integer;	{ var z; parser doesn't see 'z' }

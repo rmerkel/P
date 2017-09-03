@@ -1,10 +1,11 @@
-/**	@file	symbol.h
+/********************************************************************************************//**
+ * @file	symbol.h
  *
- * The P/L0C Symbol table
+ * The Pascal-Lite Symbol table
  *
  * @author Randy Merkel, Slowly but Surly Software.
  * @copyright  (c) 2017 Slowly but Surly Software. All rights reserved.
- */
+ ************************************************************************************************/
 
 #ifndef SYMBOL_H
 #define SYMBOL_H
@@ -14,59 +15,77 @@
 #include <sstream>
 
 #include "datum.h"
+#include "type.h"
 
-/** A Symbol table entry
+/********************************************************************************************//**
+ * A Symbol table entry
  *
- * Each entry describes one of the following objects:
- * - Constant Datum value, type and block level, setting it's scope.
- * - Variable location, as offset from a block/frame, n levels down, and its Datum type.
- * - Procedure entry point, it's activation block/frame level, and vector of formal parameter kinds 
- * - Same as procedure, but with the additon of a return Datum type
- */
+ * Describes a varaible, constant value, procedure or function or an entry in the type system.
+ * Every entry has a block/activation frame level, setting the objects scope in the program. In
+ * addition:
+ * - A Varaible is a location, as an offset from the block/frame, n levels down, and a type.
+ * - A Constant is just a Datum value and its type
+ * - Subroutines, Functions and Procedures, have an absolute entry point address and a vector of
+ *   formal parameter types. In addition, Funcitons have a return type while Procedures are 
+ *   untyped.
+ * - A Type is a type descriptor in the type system.
+ ************************************************************************************************/
 class SymValue {
 public:
 	/// Kinds of symbol table entries
 	enum class Kind : char {
 		None,									///< Placeholder for a valid kind...
-		Variable,		  						///< A variable location
-		Constant,								///< A constant value
+		Variable,		  						///< A variable location and type
+		Constant,								///< A constant value and type
 		Procedure,								///< A procedure entry point
-		Function,								///< A function entry point and return value
+		Function,								///< A function entry point and return type
+		Type									///< Entry in the type system
 	};
 
-	static std::string toString(Kind k);		///< Return a kind as a string
+	static std::string toString(Kind kind);		///< Return a kind as a string
 
 	typedef std::vector<Kind> KindVec;			///< Vector of Kinds
 	
 	SymValue();									///< Default constructor; undefined entry
-	SymValue(int level, Datum value);			///< Construct a constant value
+
+	/// Construct a constant value
+	SymValue(int level, Datum value, TDescPtr type);
 
 	/// Construct a Variable location
-	SymValue(int level, Datum::Integer value, Datum::Kind type);
+	SymValue(int level, Integer offset, TDescPtr type);
 
-	SymValue(Kind kind, int level);				///< Construct procedure or funciton
+	SymValue(Kind kind, int level);				///< Partially construct Procedure or Function
+
+	SymValue(int level, TDescPtr type);			///< Construct Type
 
 	/// Descructor
 	virtual ~SymValue()							{}
 
 	Kind kind() const;							///< Return my kind
+
 	int level() const;							///< Return my activation frame level
-	Datum value(Datum value);					///< Set my value
+
+	Datum value(Datum value);					///< Set, and return, my value
 	Datum value() const;						///< Return my value
-	Datum::Kind type(Datum::Kind value);		///< Set my function return type
-	Datum::Kind type() const;					///< Return my function return type
-	Datum::KindVec& params();					///< Subrountine parameter kinds
-	const Datum::KindVec& params() const;		///< Subrountine parameter kinds
+
+	TDescPtrVec& params();						///< Return my subrountine parameter kinds
+	const TDescPtrVec& params() const;			///< Return my subrountine parameter kinds
+
+	ConstTDescPtr type(TDescPtr type);			///< Set and return my type
+	ConstTDescPtr type() const;					///< Return my type
+
 
 private:
-	Kind			k;							///< None, Variable, Procedure or Function
-	int				l;							///< Activation frame level for Variables and subroutines.
-	Datum			v;							///< Variable frame offset, Constant value or subroutine address
-	Datum::Kind		t;							///< Datum value type	
-	Datum::KindVec	p;							///< Subrouuntine parameter kinds
+	Kind			_kind;						///< None, Variable, Procedure, Function or Type
+	int				_level;						///< Block level (scope) for all types
+	Datum			_value;						///< Variable frame offset, Constant value or subroutine address
+	TDescPtr		_type;						///< Type, n/a for Procedures
+	TDescPtrVec		_params;					///< Subroutine parameter kinds
 };
 
-/// A SymbolTable; a multimap of symbol identifiers to SymValue's
+/********************************************************************************************//**
+ * A SymbolTable; a multimap of symbol identifiers to SymValue's
+ ************************************************************************************************/
 typedef std::multimap<std::string, SymValue> SymbolTable;
 
 #endif

@@ -10,9 +10,9 @@
 		Type="gnuc"
 		DebugCallbackName="gdb"
 		Version="1"
-		OutputFile="%bdpl0c"
+		OutputFile="%bdpas"
 		CompilerConfigName="Latest Version"
-		ObjectDir="/home/rmerkel/pl0c/">
+		ObjectDir="/home/rmerkel/pascal/">
 		<Menu>
 			<Target
 				Name="Compile"
@@ -134,9 +134,9 @@
 		Type="gnuc"
 		DebugCallbackName="gdb"
 		Version="1"
-		OutputFile="%bdpl0c"
+		OutputFile="%bdpas"
 		CompilerConfigName="Latest Version"
-		ObjectDir="/home/rmerkel/pl0c/">
+		ObjectDir="/home/rmerkel/pascal/">
 		<Menu>
 			<Target
 				Name="Compile"
@@ -294,7 +294,7 @@
 			<F
 				N="Makefile"
 				Type="Makefile"/>
-			<F N="pl0c.vpwistu"/>
+			<F N="pascal.vpwistu"/>
 			<F N="README.md"/>
 		</Folder>
 		<Folder
@@ -315,7 +315,7 @@
 			<F N="test.p"/>
 			<F N="testif.p"/>
 			<F N="unknown.p"/>
-			<F N="xpl0c.sh"/>
+			<F N="xpas.sh"/>
 		</Folder>
 	</Files>
 </Project>

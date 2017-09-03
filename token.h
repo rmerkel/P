@@ -1,6 +1,6 @@
 /**	@file	token.h
  *
- *  The PL/0C scanner.
+ *  The Pascal-Lite scanner.
  *
  * Started life as the Token and TokenStream classes for the calulator example from The C++
  * Programming Language, 4th Edition, by Stroustrup, modified in an initial port of Wirth's PL/0
@@ -34,6 +34,7 @@ struct Token {
 		Identifier,	  		  			///< An identifier (string_value)
 		IntegerNum,						///< Integer literal number (integer_value)
 		RealNum,						///< Real literal number (real_value)
+		TypeDecl,						///< "type" declaraction
 		ConsDecl,						///< "const" constant declaration
 		VarDecl,						///< "var" variable (mutable) declaration
 		ProgDecl,						///< "program" declaraction
@@ -49,8 +50,14 @@ struct Token {
 		Repeat,							///< "repeat" ... "until"
 		Until,							///< "until"
 
+#if 1
+		Type,							///< "type"
+#else
 		Integer,						///< "integer"
 		Real,							///< "real
+#endif
+		Array,							///< "array"
+		Of,								///< "of"
 
 		Round,							///< round real to integer
 
@@ -58,9 +65,9 @@ struct Token {
 
 		LTE,							///< Less than or equal? (<=)
 		GTE,							///< Greater then or equal? (>=)
-		OR,								///< Or? 
-		AND,							///< And?
-		NEQU,							///< Not equal? (<>)
+		Or,								///< Or? 
+		And,							///< And?
+		NEQ,                           ///< Not equal? (<>)
 
 		ShiftL,							///< Left shift "<<"
 		ShiftR,							///< Right shift ">>"Number
@@ -82,6 +89,8 @@ struct Token {
 
 		OpenParen	= '(',				///< Opening parentheses
 		CloseParen	= ')',				///< Closing parentheses
+		OpenBrkt	= '[',				///< Opening bracket
+		CloseBrkt	= ']',				///< Closing bracket
 		Comma		= ',',				///< Decl separator
 		Period		= '.',				///< Period
 		Colon		= ':',				///< Identifier ':' type
@@ -95,8 +104,8 @@ struct Token {
 
 	Kind			kind;				///< Token type
 	std::string		string_value;		///< kind == Identifier
-	Datum::Integer	integer_value;      ///< Kind == IntegerNum
-	Datum::Real		real_value;			///< Kind == RealNum
+	Integer			integer_value;      ///< Kind == IntegerNum
+	Real			real_value;			///< Kind == RealNum
 
 	/// Construct a token of type k, stirng value "", number value 0.
 	Token(Kind k) : kind{k}, integer_value{0} {}

@@ -1,8 +1,8 @@
 /** @file driver.cc
  *
- * The driver routine for the Pascal Programming Language compiler/interpreter.
+ * The driver routine for the Pascal-Lite Programming Language compiler/interpreter.
  *
- * @mainpage Pascal Programming Language
+ * @mainpage Pascal-Lite Programming Language
  *
  * Yet another small, interpreted, computer language... just for the fun of it!
  *

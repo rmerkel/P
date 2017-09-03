@@ -1,7 +1,7 @@
 ################################################################################
 # @file makefile
 #
-# @brief makefile for PL0C (p/l 0 complier/interperter)
+# @brief makefile for Pascal-Lite complier & interperter
 ################################################################################
 
 ################################################################################
@@ -26,7 +26,7 @@ endif
 # Project files
 ################################################################################
 
-SRCS	= datum.cc driver.cc instr.cc comp.cc interp.cc symbol.cc token.cc
+SRCS	= datum.cc driver.cc instr.cc comp.cc interp.cc symbol.cc token.cc type.cc
 ALLSRCS	= $(SRCS) $(wildcard *.h)
 OBJS	= $(SRCS:.cc=.o)
 DEPS	= $(SRCS:.cc=.d)

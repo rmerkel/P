@@ -10,7 +10,7 @@
 {	10	3,628,800	}
 
 program fact ;
-const nFacts := 10;
+const nFacts = 10;
 var p : integer;
 procedure factorial(n : integer) ; begin
         p := 1;
