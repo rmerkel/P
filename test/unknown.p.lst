@@ -5,16 +5,16 @@
 ./pas: Identifier is not a function or procedure 'x' near line 4
 ./pas: expected 'end' got 'bad comment' near line 6
 ./pas: expected '.' got 'bad comment' near line 6
-# unknown.p, 2: program unknown ;
-# unknown.p, 3: var x : integer;
+# test/unknown.p, 2: program unknown ;
+# test/unknown.p, 3: var x : integer;
     0: call 0, 2
     1: halt
-# unknown.p, 4: begin
+# test/unknown.p, 4: begin
     2: enter 1
-# unknown.p, 5: 	x # 123;	{	unknown operator "#"!
+# test/unknown.p, 5: 	x # 123;	{	unknown operator "#"!
     3: push 123
     4: call 0, 0
-# unknown.p, 6: end .
-# unknown.p, 7: 
+# test/unknown.p, 6: end .
+# test/unknown.p, 7: 
     5: ret
 

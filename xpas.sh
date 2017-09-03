@@ -1,9 +1,10 @@
 #!/bin/bash
-for i in $( ls *.p ); do
-	./pas $i &> $i.lst
-	cmp $i.lst test/$i.lst
+for i in $( ls test/*.p ); do
+	s=$(basename $i)
+	./pas $i &> $s.lst
+	cmp $s.lst $i.lst
 	if [ "$?" != "0" ]; then
-		diff $i.lst test/$i.lst
+		diff $s.lst $i.lst
 		exit
 	fi
 done

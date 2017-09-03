@@ -32,8 +32,7 @@ OBJS	= $(SRCS:.cc=.o)
 DEPS	= $(SRCS:.cc=.d)
 EXE		= pas
 
-TESTS 	= $(wildcard *p)
-LSTINGS = $(TESTS:.p=.p.lst)
+LSTINGS = $(wildcard *p.lst)
 
 .PHONY:	all clean cleanall docs help pr test
 
