@@ -49,13 +49,10 @@ struct Token {
 		Do,								///< "do"
 		Repeat,							///< "repeat" ... "until"
 		Until,							///< "until"
+		Ellipsis,						///< ".."
 
-#if 1
-		Type,							///< "type"
-#else
-		Integer,						///< "integer"
-		Real,							///< "real
-#endif
+		IntegerType,					///< "integer"
+		RealType,						///< "real"
 		Array,							///< "array"
 		Of,								///< "of"
 
@@ -67,7 +64,7 @@ struct Token {
 		GTE,							///< Greater then or equal? (>=)
 		Or,								///< Or? 
 		And,							///< And?
-		NEQ,                           ///< Not equal? (<>)
+		NEQ,                           	///< Not equal? (<>)
 
 		ShiftL,							///< Left shift "<<"
 		ShiftR,							///< Right shift ">>"Number

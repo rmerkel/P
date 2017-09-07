@@ -51,7 +51,7 @@
    39: pushvar 0, 4
    40: assign
    41: ret
-#test/testif.p, 12: 
+# test/testif.p, 12: 
 
         8:          1
         9:          2

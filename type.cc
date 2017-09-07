@@ -1,7 +1,8 @@
-/** @file type.cc
+/****************************************************************************
+ * @file type.cc
  *
- * Types, both builtin, and created by the user.
- */
+ * Types, both builtin, and created by programmatically.
+ ****************************************************************************/
 
 #include <cassert>
 #include <limits>
@@ -15,11 +16,11 @@ using namespace std;
 
 // public:
 
-/**
+/************************************************************************//**
  * @param	name	Name of the field
  * @param	type	Fields type, e.g., "integer" or "T"
- */
-Field::Field(const std::string& name, const std::string& type)
+ ****************************************************************************/
+Field::Field(const std::string& name, ConstTDescPtr type)
 	: _name{name}, _type{type}
 {
 }
@@ -30,18 +31,18 @@ Field::Field(const std::string& name, const std::string& type)
 
 // public
 
-/**
+/************************************************************************//**
  * @param	minimum	The minimum value in the range
  * @param	maximum	The maximum value in the range
- */
+ ****************************************************************************/
 SubRange::SubRange(int minimum, int maximum)
 	: _min{minimum}, _max{maximum}
 {
 }
 
-/**
+/************************************************************************//**
  * @return the maximum() - minimum() + 1;
- */
+ ****************************************************************************/
 size_t SubRange::span() const	{
 	return maximum() - minimum() + 1;
 }
@@ -52,11 +53,12 @@ size_t SubRange::span() const	{
 
 // protected static
 
-	enum Kind {	Integer, Real, Boolean, Character, Array, SRange, Record, Enumeration	};
-
-	/// Return kind as a stirng
+/************************************************************************//**
+ * Return kind as a stirng
+ ****************************************************************************/
 const std::string TDesc::toString(Kind kind) {
 	switch (kind) {
+	case None:			return "unknown";
 	case Integer:		return "integer";
 	case Real:			return "real";
 	case Boolean:		return "boolean";
@@ -73,19 +75,19 @@ const std::string TDesc::toString(Kind kind) {
 
 // protected:
 
-/**
+/************************************************************************//**
  * @param	kind	The Type class's kind 
  * @param	size	Size, in bytes, of a object of this type
  * @param	range	The Type class's range
  * @param	base	The Type class's base type
  * @param	fields	The Type classe's fields
- */
+ ****************************************************************************/
 TDesc::TDesc(
 	TDesc::Kind		kind,
-	unsigned			size,
-	const SubRange&		range,
-	const std::string&	base,
-	const FieldVec&		fields)
+	unsigned		size,
+	const SubRange&	range,
+	ConstTDescPtr	base,
+	const FieldVec&	fields)
 
 	: _kind{kind}, _size(size), _range{range}, _base{base}, _fields{fields}
 {
@@ -93,20 +95,38 @@ TDesc::TDesc(
 
 // public
 
-/**
+/************************************************************************//**
  * @param	kind	The Type class's kind 
  * @param	size	Size, in bytes, of a object of this type 
  * @param	range	The Type class's range
  * @param	base	The Type class's base type
  * @param	fields	The Type classe's fields
- */
+ ****************************************************************************/
 TDescPtr TDesc::newTDesc(
 	TDesc::Kind		kind,
-	unsigned			size,
-	const SubRange&		range,
-	const std::string&	base,
-	const FieldVec&		fields)
+	unsigned		size,
+	const SubRange&	range,
+	ConstTDescPtr	base,
+	const FieldVec&	fields)
 {
 	return TDescPtr{ new TDesc(kind, size, range, base, fields) };
+}
+
+/************************************************************************//**
+ * @return true if I'm an ordinal type
+ ****************************************************************************/
+bool TDesc::isOrdinal() const {
+	switch(kind()) {
+	case None:			return false;
+	case Integer:		return true;
+	case Real:			return false;
+	case Boolean:		return true;
+	case Character:		return true;
+	case Array:			return false;
+	case SRange:		return true;
+	case Record:		return false;
+	case Enumeration:	return true;
+	default:			return false;
+	}
 }
 

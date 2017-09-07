@@ -70,7 +70,7 @@ Token TokenStream::get() {
 	case ':':									// : or :=?
 		if (!getch(ch))		ct.kind = Token::Colon;
 		else if ('=' == ch)	ct.kind = Token::Assign;
-		else { unget();		ct.kind = Token::Colon;	}
+		else {	unget();		ct.kind = Token::Colon;	}
 		return ct;
 
 	case '{':									// comment; { ... }
@@ -87,27 +87,15 @@ Token TokenStream::get() {
 		} while ('}' != ch);
 		return get();							// restart the scan..
 
-	case '%': case '(': case ')': case '*': case '+':
-	case ',': case '-': case '/': case ';': case '^':
-	case '=':
+	case '%': case '(': case ')': case '[': case ']':
+	case '*': case '+': case ',': case '-': case '/':
+	case ';': case '^': case '=':
 		return ct = { static_cast<Token::Kind>(ch) };
 
-	case '.': 									// real number, or just a '.'
-		ct.string_value = ch;
-		if (!getch(ch) || !isdigit(ch))
-			ct.kind = Token::Period;
-
-		else {									// Real...
-			ct.string_value = ch;
-			ct.kind = Token::RealNum;
-			while (getch(ch) && (isdigit(ch) || 'e' == ch || 'E' == ch))
-				ct.string_value += ch;
-			unget();
-
-			std::istringstream iss (ct.string_value);
-			iss >> ct.real_value;
-			return ct;
-		}
+	case '.': 									// '.', or '..'
+		if (!getch(ch))		ct.kind = Token::Period;
+		else if ('.' == ch)	ct.kind = Token::Ellipsis;
+		else {	unget();		ct.kind = Token::Period;	}
 		return ct;
 												// integer or real number
 	case '0': case '1': case '2': case '3': case '4':
@@ -115,7 +103,18 @@ Token TokenStream::get() {
 		ct.kind = Token::IntegerNum;			// Assume integer value...
 		ct.string_value = ch;
 		while (getch(ch)) {
-			if ('.' == ch || 'e' == ch || 'E' == ch)
+			if ('.' == ch) {
+				if (Token::IntegerNum == ct.kind)
+					ct.kind = Token::RealNum;
+
+				else {							// Assuming '..' and not 'e.'
+					unget();
+					ct.string_value.pop_back();
+					ct.kind = Token::IntegerNum;
+					break;
+				}
+
+			} else if ('e' == ch || 'E' == ch)
 				ct.kind = Token::RealNum;
 
 			else if (!isdigit(ch))
@@ -128,7 +127,6 @@ Token TokenStream::get() {
 		std::istringstream iss (ct.string_value);
 		if (Token::RealNum == ct.kind)
 			iss >> ct.real_value;
-
 		else
 			iss >> ct.integer_value;
 		return ct;
@@ -169,7 +167,7 @@ string Token::toString(Token::Kind k) {
 
 	case Kind::IntegerNum:	return "IntegerNum";	break;
 	case Kind::RealNum:		return "RealNum";		break;
-
+	case Kind::TypeDecl:	return "type";			break;
 	case Kind::ConsDecl:	return "const";			break;
 	case Kind::VarDecl:		return "var";			break;
 	case Kind::ProgDecl:	return "program";		break;
@@ -180,17 +178,14 @@ string Token::toString(Token::Kind k) {
 	case Kind::If:			return "if";			break;
 	case Kind::Then:		return "then";			break;
 	case Kind::Else:		return "else";			break;
+	case Kind::Ellipsis:	return "..";			break;
 	case Kind::While:		return "while";			break;
 	case Kind::Do:			return "do";			break;
 	case Kind::Repeat:		return "repeat";		break;
 	case Kind::Until:		return "until";			break;
 
-#if 1
-	case Kind::Type:		return "type";			break;
-#else
-	case Kind::Integer:		return "integer";		break;
-	case Kind::Real:		return "real";			break;
-#endif	
+	case Kind::IntegerType:	return "integer";		break;
+	case Kind::RealType:	return "real";			break;
 
 	case Kind::Array:		return "array";			break;
 	case Kind::Of:			return "of";			break;
@@ -273,22 +268,13 @@ TokenStream::KeywordTable	TokenStream::keywords = {
 	{	"end",			Token::End			},
 	{	"function",		Token::FuncDecl		},
 	{	"if",			Token::If			},
-
-#if 1
-	{	"integer",		Token::Type 		},
-#else
-	{	"integer",		Token::Integer		},
-#endif
+	{	"integer",		Token::IntegerType	},
 	{	"mod",			Token::Mod			},
 	{	"of",			Token::Of			},
 	{	"or",			Token::Or			},
 	{	"program",		Token::ProgDecl		},
 	{	"procedure",	Token::ProcDecl		},
-#if 1
-	{	"real",			Token::Type			},
-#else
-	{	"real",			Token::Real			},
-#endif
+	{	"real",			Token::RealType		},
 	{	"repeat",		Token::Repeat		},
 	{	"round",		Token::Round		},
 	{	"then",			Token::Then			},

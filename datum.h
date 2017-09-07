@@ -41,6 +41,7 @@ public:
 	static std::string toString(Kind k);	///< Return k as a string...
 
 	Datum();								///< Default constructor...
+	Datum(bool value);						///< Construct a boolean, as a integer
 	Datum(Integer value);					///< Construct a signed integer...
 	Datum(Unsigned value);					///< Construct an unsigned integer...
 	Datum(std::size_t value);				///< Construct an unsigned (size_t)...
@@ -91,15 +92,15 @@ Datum operator^	(const Datum& lhs,	const Datum& rhs);
 Datum operator<<(const Datum& lhs,	const Datum& rhs);
 Datum operator>>(const Datum& lhs,	const Datum& rhs);
 
-Datum operator<	(const Datum& lhs,	const Datum& rhs);
-Datum operator<=(const Datum& lhs,	const Datum& rhs);
-Datum operator==(const Datum& lhs,	const Datum& rhs);
-Datum operator>=(const Datum& lhs,	const Datum& rhs);
-Datum operator>	(const Datum& lhs,	const Datum& rhs);
-Datum operator!=(const Datum& lhs,	const Datum& rhs);
+bool operator<	(const Datum& lhs,	const Datum& rhs);
+bool operator<=(const Datum& lhs,	const Datum& rhs);
+bool operator==(const Datum& lhs,	const Datum& rhs);
+bool operator>=(const Datum& lhs,	const Datum& rhs);
+bool operator>	(const Datum& lhs,	const Datum& rhs);
+bool operator!=(const Datum& lhs,	const Datum& rhs);
 
-Datum operator&&(const Datum& lsh, const Datum& rhs);
-Datum operator||(const Datum& lsh, const Datum& rhs);
+bool operator&&(const Datum& lsh, const Datum& rhs);
+bool operator||(const Datum& lsh, const Datum& rhs);
 
 #endif
 

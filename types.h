@@ -10,6 +10,7 @@
 typedef	int			Integer;			///< Signed integer, or memory offset
 typedef	unsigned	Unsigned;			///< Unsigned value, or memory address
 typedef	double		Real;				///< Floating-point value	
+typedef char		Character;			///< ASCII character
 
 #endif
 

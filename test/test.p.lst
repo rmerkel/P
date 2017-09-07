@@ -48,7 +48,7 @@
 # test/test.p, 22: end.
    27: jump 9
    28: ret
-#test/test.p, 22: 
+# test/test.p, 22: 
 
         8:          0
         9:          1

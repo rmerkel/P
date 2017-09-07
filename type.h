@@ -11,24 +11,41 @@
 #include <memory>
 #include <vector>
 
+class TDesc; 
+
+/************************************************************************//**	
+ * Shared pointer to TDesc
+ ****************************************************************************/
+typedef std::shared_ptr<TDesc>	TDescPtr;
+
+/************************************************************************//**	
+ * constant TDescPtr.
+ ****************************************************************************/
+typedef const TDescPtr			ConstTDescPtr;
+
+/************************************************************************//**	
+ * Vector of TDescPtrs
+ ****************************************************************************/
+typedef std::vector<TDescPtr>	TDescPtrVec;
+
 /************************************************************************//**
  * Type Field - record field name and type pairs
  ****************************************************************************/
 class Field {
-	std::string	_name;					///< Name of the field
-	std::string	_type;					///< Field's type, e.g., "integer", "X"
+	std::string		_name;				///< Name of the field
+	ConstTDescPtr	_type;				///< Fields type
 
 public:
 	Field() {}							///< Default constructor
 										/// Constructor
-	Field(const std::string& name, const std::string& type);
-	virtual ~Field() {}				///< Destructor
+	Field(const std::string& name, ConstTDescPtr type);
+	virtual ~Field() {}					///< Destructor
 
 										/// Return the field's name
 	const std::string& name() const		{	return _name;		}
 
 										/// Return the field's type
-	const std::string& type() const		{	return _type;		}
+	ConstTDescPtr type() const			{	return _type;		}
 };
 
 /************************************************************************//**
@@ -58,41 +75,37 @@ public:
 	size_t span() const;
 };	
 
-class TDesc; 
-
-/************************************************************************//**	
- * Shared pointer to TDesc
- ****************************************************************************/
-typedef std::shared_ptr<TDesc>	TDescPtr;
-
-/************************************************************************//**	
- * constant TDescPtr.
- ****************************************************************************/
-typedef const TDescPtr			ConstTDescPtr;
-
-/************************************************************************//**	
- * Vector of shared pointers to TDescs
- ****************************************************************************/
-typedef std::vector<TDescPtr>	TDescPtrVec;
-
 /************************************************************************//**	
  * Type Descriptor
  ****************************************************************************/
 class TDesc {
 public:
 	/// Type class kinds
-	enum Kind {	Integer, Real, Boolean, Character, Array, SRange, Record, Enumeration	};
+	enum Kind {
+		None,						/// Placeholder for a valid type
+		Integer,
+		Real,
+		Boolean,
+		Character,
+		Array,
+		SRange,
+		Record,
+		Enumeration
+	};
 
 	/// Return kind as a stirng
 	static const std::string toString(Kind kind);
 
 	/// Create and return a shared pointer to a new TDesc
 	static TDescPtr newTDesc(
-		Kind				kind,
-		unsigned			size,
-		const SubRange&		range,
-		const std::string&	base,
-		const FieldVec&		fields);
+		Kind			kind,
+		unsigned		size,
+		const SubRange&	range,
+		ConstTDescPtr	base,
+		const FieldVec&	fields);
+
+	/// Default constructor
+	TDesc() : _kind(Integer), _size(0)	{}
 
 	virtual ~TDesc() {}					///< Destructor
 
@@ -106,25 +119,27 @@ public:
 	const SubRange& range() const		{	return _range;		}
 
 	/// Return my base type
-	const std::string& base() const		{	return _base;		}
+	ConstTDescPtr base() const			{	return _base;		}
 
 	/// Return my fields
 	const FieldVec& fields() const		{	return _fields;		}
+
+	bool isOrdinal() const;				/// Ordinal type?
 
 protected:
 	/// Constructor
 	TDesc(	Kind				kind,
 			unsigned			size,
 			const SubRange&		range,
-			const std::string&	base,
+			ConstTDescPtr		base,
 			const FieldVec&		fields);
 
 private:
-	Kind		_kind;					///< My kind
-	unsigned	_size;					///< Size of on object of my type
-	SubRange	_range;					///< My sub-range
-	std::string	_base;					///< Base type for Elementry, Array, Enumeration
-	FieldVec	_fields;				///< List of fields for Record
+	Kind			_kind;				///< My kind
+	unsigned		_size;				///< Size of on object of my type
+	SubRange		_range;				///< My sub-range
+	ConstTDescPtr	_base;				///< Base type for Elementry, Array, Enumeration
+	FieldVec		_fields;			///< List of fields for Record
 };
 
 #endif

@@ -32,7 +32,7 @@ ConstTDescPtr	Comp::intDesc = TDesc::newTDesc(
 	TDesc::Kind::Integer,
 	1,
 	SubRange(numeric_limits<Integer>::min(), numeric_limits<Integer>::max()),
-	"",
+	ConstTDescPtr(),
 	FieldVec());
 
 /// Type descriptor for reals
@@ -40,9 +40,18 @@ ConstTDescPtr Comp::realDesc = TDesc::newTDesc(
 	TDesc::Kind::Real,
 	1,
 	SubRange(numeric_limits<Real>::min(), numeric_limits<Real>::max()),
-	"",
+	ConstTDescPtr(),
 	FieldVec());
 
+/// Type descriptor for characters
+ConstTDescPtr Comp::charDesc = TDesc::newTDesc(
+	TDesc::Kind::Character,
+	1,
+	SubRange(0, 127), 
+	ConstTDescPtr(),
+	FieldVec());
+
+// private:
 // private:
 
 /********************************************************************************************//**
@@ -155,22 +164,43 @@ size_t Comp::emit(const OpCode op, int8_t level, Datum addr) {
 }
 
 /********************************************************************************************//**
+ * @param	type	Type descriptor to investagate
+ * @return  true if type can be treated as an Integer
+ ************************************************************************************************/
+bool Comp::isAnInteger(ConstTDescPtr type) {
+	return 	type->kind() == TDesc::Integer	|| 
+			(type->kind() == TDesc::SRange && type->base() == intDesc);
+}
+
+/********************************************************************************************//**
+ * @param	type	Type descriptor to investagate
+ * @return  true if type can be treated as an Real
+ ************************************************************************************************/
+bool Comp::isAReal(ConstTDescPtr type) {
+	return 	type->kind() == TDesc::Real		||
+			(type->kind() == TDesc::SRange && type->base() == realDesc);
+}
+
+/********************************************************************************************//**
  * Convert stack operand to a real as necessary. 
  * @param	lhs	The type of the left-hand-side
  * @param	rhs	The type of the right-hand-side 
- * @return  The promoted to Datum kind
  ************************************************************************************************/
-ConstTDescPtr Comp::promote (ConstTDescPtr lhs, ConstTDescPtr rhs) {
+void Comp::promote (ConstTDescPtr lhs, ConstTDescPtr rhs) {
 	if (lhs->kind() == rhs->kind())
-		return lhs;							// nothing to do
+		;									// nothing to do
 
-	else if (rhs->kind() == TDesc::Real)
+	else if ((isAnInteger(lhs) && isAnInteger(rhs)) || (isAReal(lhs) && isAReal(rhs)))
+		;									// nothing to do, again
+
+	else if (isAnInteger(lhs) && isAReal(rhs))
 		emit(OpCode::ITOR2);				// promote lhs (TOS-1) to a real
 
-	else
+	else if (isAReal(lhs) && isAnInteger(rhs))
 		emit(OpCode::ITOR);					// promote rhs to a real
-
-	return realDesc;
+	
+	else
+		error("incompatable binary types");
 }
 
 /********************************************************************************************//**
@@ -183,86 +213,89 @@ void Comp::assignPromote (ConstTDescPtr lhs, ConstTDescPtr rhs) {
 	if (lhs->kind() == rhs->kind())
 		;				// nothing to do
 
-		else if (rhs->kind() == TDesc::Real) {
-			error("rounding lhs to fit in an integer");
-			emit(OpCode::RTOI);					// promote rhs to a integer
+	else if ((isAnInteger(lhs) && isAnInteger(rhs)) || (isAReal(lhs) && isAReal(rhs)))
+		;				// nothing to do, again
+
+	else if (isAnInteger(lhs) && isAReal(rhs)) {
+		error("rounding lhs to fit in an integer");
+		emit(OpCode::RTOI);					// promote rhs to a integer	 
+
+	} else if (isAReal(lhs) && isAnInteger(rhs))
+		emit(OpCode::ITOR);                 // promote rhs to a real
+
+	else
+		error("incompatable binary types");
+}
+
+/********************************************************************************************//**
+ * Uses the cross index to write a listing on the output stream
+ *
+ * @param name		Name of the source file
+ * @param source 	The source file stream
+ * @param out		The listing file stream
+ ************************************************************************************************/
+ void Comp::listing(const string& name, istream& source, ostream& out) {
+	string 		line;   				// Current source line
+	unsigned 	linenum = 1;			// source line number
+	Unsigned	addr = 0;				// code address (index)
+
+	while (addr < indextbl.size()) {
+		while (linenum <= indextbl[addr]) {	// Print lines that lead up to code[addr]...
+			getline(source, line);	++linenum;
+			cout << "# " << name << ", " << linenum << ": " << line << "\n" << internal;
+		}
+
+		disasm(out, addr, (*code)[addr]);	// Disasmble resulting instructions...
+		while (linenum-1 == indextbl[++addr])
+			disasm(out, addr, (*code)[addr]);
+	}
+
+	while (getline(source, line))			// Any lines following '.' ...
+		cout << "# " << name << ", " << linenum++ << ": " << line << "\n" << internal;
+
+	out << endl;
+}
+
+/********************************************************************************************//**
+ * @param level  The block level
+ ************************************************************************************************/
+void Comp::purge(int level) {
+	for (auto i = symtbl.begin(); i != symtbl.end(); ) {
+		if (i->second.level() == level) {
+			if (verbose)
+				cout << progName << ": purging "
+					 << i->first << ": "
+					 << SymValue::toString(i->second.kind()) << ", "
+					 << static_cast<int>(i->second.level()) << ", "
+					 << i->second.value().integer()
+					 << " from the symbol table\n";
+			i = symtbl.erase(i);
 
 		} else
-			emit(OpCode::ITOR);                 // promote rhs to a real
+			++i;
 	}
+}
 
-	/********************************************************************************************//**
-	 * Uses the cross index to write a listing on the output stream
-	 *
-	 * @param name		Name of the source file
-	 * @param source 	The source file stream
-	 * @param out		The listing file stream
-	 ************************************************************************************************/
-	 void Comp::listing(const string& name, istream& source, ostream& out) {
-		string 		line;   				// Current source line
-		unsigned 	linenum = 1;			// source line number
-		Unsigned	addr = 0;				// code address (index)
-
-		while (addr < indextbl.size()) {
-			while (linenum <= indextbl[addr]) {	// Print lines that lead up to code[addr]...
-				getline(source, line);	++linenum;
-				cout << "# " << name << ", " << linenum << ": " << line << "\n" << internal;
-			}
-
-			disasm(out, addr, (*code)[addr]);	// Disasmble resulting instructions...
-			while (linenum-1 == indextbl[++addr])
-				disasm(out, addr, (*code)[addr]);
-		}
-
-		while (getline(source, line))			// Any lines following '.' ...
-			cout << "#" << name << ", " << linenum++ << ": " << line << "\n" << internal;
-
-		out << endl;
-	}
-
-	/********************************************************************************************//**
-	 * @param level  The block level
-	 ************************************************************************************************/
-	void Comp::purge(int level) {
-		for (auto i = symtbl.begin(); i != symtbl.end(); ) {
-			if (i->second.level() == level) {
-				if (verbose)
-					cout << progName << ": purging "
-						 << i->first << ": "
-						 << SymValue::toString(i->second.kind()) << ", "
-						 << static_cast<int>(i->second.level()) << ", "
-						 << i->second.value().integer()
-						 << " from the symbol table\n";
-				i = symtbl.erase(i);
-
-			} else
-				++i;
-		}
-	}
-
-	/********************************************************************************************//**
-	 * Local variables have an offset from the *end* of the current stack frame
-	 * (bp), while parameters have a negative offset from the *start* of the frame
-	 *  -- offset locals by the size of the activation frame.
-	 *
-	 *  @param	level	The current block level
-	 *  @param	val		The variable symbol table entry
-	 *  @return			Data type
-	 ************************************************************************************************/
-	ConstTDescPtr Comp::emitVarRef(int level, const SymValue& val) {
+/********************************************************************************************//**
+ * Local variables have an offset from the *end* of the current stack frame
+ * (bp), while parameters have a negative offset from the *start* of the frame
+ *  -- offset locals by the size of the activation frame.
+ *
+ *  @param	level	The current block level
+ *  @param	val		The variable symbol table entry
+ *  @return			Data type
+ ************************************************************************************************/
+ConstTDescPtr Comp::emitVarRef(int level, const SymValue& val) {
 	const auto offset = val.value().integer() >= 0 ? val.value().integer() + FrameSize : val.value().integer();
 	emit(OpCode::PushVar, level - val.level(), offset);
 	return val.type();
- }
+}
 
 /********************************************************************************************//**
  * Consume, and return the 'closest' (highest block level) identifer in the token stream...
  ************************************************************************************************/
-SymbolTable::iterator Comp::identRef() {
-	const string id = ts.current().string_value;	// Copy and, then 
-	next();											// Consme the identifier...
-
-	auto range = symtbl.equal_range(id);			// Should have already been defined...
+SymbolTable::iterator Comp::findClosest(const string& id) {
+	auto range = symtbl.equal_range(id);
 	if (range.first == range.second) {
 		error("Undefined identifier", id);
 		return symtbl.end();
@@ -275,6 +308,15 @@ SymbolTable::iterator Comp::identRef() {
 
 		return closest;
 	}
+}
+
+/********************************************************************************************//**
+ * Consume, and return the 'closest' (highest block level) identifer in the token stream...
+ ************************************************************************************************/
+SymbolTable::iterator Comp::identRef() {
+	const string id = ts.current().string_value;	// Copy and, then 
+	next();											// Consme the identifier...
+	return findClosest(id);
 }
 
 /********************************************************************************************//**
@@ -356,7 +398,7 @@ ConstTDescPtr Comp::factor(int level) {
 		expect(Token::CloseParen);
 
 	} else {
-		error("factor: syntax error; expected ident | num | { expr }, but got:",
+		error("factor: syntax error; expected ident | num | { expr }, got:",
 			Token::toString(current()));
 		next();
 	}
@@ -788,26 +830,13 @@ void Comp::constDeclList(int level) {
 void Comp::typeDecl(int level) {
 	const auto ident = nameDecl(level);				// Copy the identifier
 	expect(Token::EQU);								// Consume the "="
+	auto tdesc = type(level);
 
-#if 0	// TBD...
-	if (accept(Token::Integer))
-		kind = Datum::Kind::Integer;
-	else if (accept(Token::Real))
-		kind = Datum::Kind::Real;
-	else {
-	}
-
-
-	xxxxxxxxxxxxxxxx
-
-	const auto value = constExpr();					// Get the constant value
-
-	// Insert ident into the symbol table
-
-	symtbl.insert(	{ ident, SymValue(level, value)	}	);
 	if (verbose)
-		cout << progName << ": constDecl " << ident << ": " << level << ", " << value << "\n";
-#endif
+		cout << progName << ": type " << ident << " = "
+			 << TDesc::toString(tdesc->kind())	<< "\n";
+
+	symtbl.insert(	{ ident, SymValue(level, tdesc) }	);
 }
 
 /********************************************************************************************//**
@@ -938,34 +967,125 @@ void Comp::varDecl(int level, NameKindVec& idents) {
 	} while (accept(Token::Comma));
 
 	expect(Token::Colon);
-	const auto desc = type();
+	const auto desc = type(level);
 	for (auto& id : identifiers)
 		idents.push_back({ id, desc });
 }
 
 /********************************************************************************************//**
- * ":"  "integer" | "real"
+ * type = simple-type | 'real' | 'array' '[' simple-type-list ']' 'of' type ;
+ *
+ * Previously defined types, as well as  built-in types such as "integer" and "real" will have
+ * Token::Type, thus we only need to look for new type declaractions, e.g., "array...".
+ *
+ * @param	level	The current block level. 
  * @return the type description
  ************************************************************************************************/
-ConstTDescPtr Comp::type() {
+ConstTDescPtr Comp::type(int level) {
+	auto tdesc = intDesc;
+
+	if (accept(Token::Identifier, false)) {		// previously defined type
+		auto it = identRef();
+
+		if (it == symtbl.end() || it->second.kind() != SymValue::Kind::Type)
+			error("expected type, got ", it->first);
+		else
+			tdesc = it->second.type();
+
+	} else if (accept(Token::RealType))			// Real
+		return realDesc;
+
+	else if (accept(Token::Array)) {			// Array
+		expect(Token::OpenBrkt);
+		TDescPtrVec typeVec = simpleTypeList(level);
+		SubRange r = typeVec.empty() ? SubRange(0, 1) : typeVec[0]->range();
+		expect(Token::CloseBrkt);
+		expect(Token::Of);
+
+		tdesc = TDesc::newTDesc(TDesc::Array, r.span(), r, type(level), FieldVec());
+
+	} else										// simple-type
+		tdesc = simpleType(level);
+
+	return tdesc;
+}
+
+/********************************************************************************************//**
+ * simple-type = 'integer' | '(' ident-list ')' | const-expr '..' const-expr
+ *
+ * @note All simple-types are ordinal types.
+ * 
+ * @param	level	The current block level. 
+ * @return the type description
+ ************************************************************************************************/
+ConstTDescPtr Comp::simpleType(int level) {
 	auto type = intDesc;
-	const string id = ts.current().string_value;	// Copy the type-identifer
-	expect(Token::Type);
 
-	auto range = symtbl.equal_range(id);			// Should have already been defined...
-	if (range.first == range.second)
-		error("Undefined type identifier", id);
+	if (accept(Token::Identifier, false)) {		// Previously defined type, must be ordinal!
+		auto it = identRef();
 
-	else {											// Find the closest...
-		auto closest = range.first;
-		for (auto it = closest; it != range.second; ++it)
-			if (it->second.level() > closest->second.level())
-				closest = it;
+		if (it == symtbl.end() || it->second.kind() != SymValue::Kind::Type)
+			error("expected type, got ", it->first);
+		else if (!it->second.type()->isOrdinal())
+			error("expected ordinal type, got ", it->first);
+		else
+			type = it->second.type();
 
-		type = closest->second.type();
+	} else if (accept(Token::IntegerType))		// Integer
+		return intDesc;
+
+	else if (accept(Token::OpenParen)) {		// Enumeration
+		FieldVec		enums;
+
+		do {
+			enums.push_back( { nameDecl(level), charDesc } );
+		} while (accept(Token::Comma));
+		expect(Token::CloseParen);
+		SubRange r(0, enums.empty() ? 0 : enums.size());
+
+		type = TDesc::newTDesc(TDesc::Enumeration, 1, r, charDesc, enums);
+
+	} else {									// Sub-Range
+		ostringstream oss;
+
+		auto minValue = constExpr();
+		expect(Token::Ellipsis);
+		auto maxValue = constExpr();
+
+		if (minValue > maxValue) {
+			oss << "Minimum sub-range value (" << minValue << ")"
+				<< " is greater than the maximum value (" << maxValue << ")";
+			error(oss.str());
+			swap(minValue, maxValue);
+
+		} else if (minValue.kind() != Datum::Kind::Integer || maxValue.kind() != Datum::Kind::Integer) {
+			oss << "Both sub-range values must be ordinal types; " << minValue << ", " << maxValue;
+			error(oss.str());
+			minValue = 0; maxValue = 1;
+		}
+
+		SubRange r(minValue.integer(), maxValue.integer());
+
+		type = TDesc::newTDesc(TDesc::SRange, 1, r, intDesc, FieldVec());
 	}
 
 	return type;
+}
+
+
+/********************************************************************************************//**
+ * simple-type-lst: simple-type { ',' simple-type } ;
+ *
+ * @param	level	The current block level. 
+ ************************************************************************************************/
+TDescPtrVec Comp::simpleTypeList(int level) {
+	TDescPtrVec tdescs;
+
+	do {
+		tdescs.push_back(simpleType(level));
+	} while (accept(Token::Comma));
+
+	return tdescs;
 }
 
 /********************************************************************************************//**
@@ -987,7 +1107,7 @@ SymValue& Comp::subPrefixDecl(int level, SymValue::Kind kind) {
 
 	// Process the formal auguments, if any...
 	if (accept(Token::OpenParen)) {
-		// Note that the activation fram elevel is that of the *following* block!
+		// Note that the activation frame level is that of the *following* block!
 
 		NameKindVec	idents;					// vector of name/type pairs.
 		varDeclList(level+1, true, idents);
@@ -1020,7 +1140,7 @@ void Comp::procDecl(int level) {
 void Comp::funcDecl(int level) {
 	auto& val = subPrefixDecl(level, SymValue::Kind::Function);
 	expect(Token::Colon);
-	val.type(type());
+	val.type(type(level));
 	expect(Token::SemiColon);
 	blockDecl(val, level + 1);
 	expect(Token::SemiColon);	// function declarations end with a ';'!

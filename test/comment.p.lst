@@ -41,8 +41,8 @@
 # test/comment.p, 15: end.
    27: jump 9
    28: ret
-#test/comment.p, 15: 
-#test/comment.p, 16: {	unterminated comment, but we don't care as it follows the period!
+# test/comment.p, 15: 
+# test/comment.p, 16: {	unterminated comment, but we don't care as it follows the period!
 
         8:          0
         9:          1

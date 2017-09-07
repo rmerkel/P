@@ -74,7 +74,6 @@ public:
 	ConstTDescPtr type(TDescPtr type);			///< Set and return my type
 	ConstTDescPtr type() const;					///< Return my type
 
-
 private:
 	Kind			_kind;						///< None, Variable, Procedure, Function or Type
 	int				_level;						///< Block level (scope) for all types
