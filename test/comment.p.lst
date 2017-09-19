@@ -7,12 +7,12 @@
 # test/comment.p, 6: begin
     2: enter 2
 # test/comment.p, 7:    n := 0;
-    3: push 0
-    4: pushvar 0, 4
+    3: pushvar 0, 4
+    4: push 0
     5: assign
 # test/comment.p, 8:    f := 1;
-    6: push 1
-    7: pushvar 0, 5
+    6: pushvar 0, 5
+    7: push 1
     8: assign
 # test/comment.p, 9:    {	calculate factor (n)
 # test/comment.p, 10: 		comment continued on this line... }
@@ -24,19 +24,19 @@
    13: jneq 28
 # test/comment.p, 12:       n := n + 1;
    14: pushvar 0, 4
-   15: eval
-   16: push 1
-   17: add
-   18: pushvar 0, 4
+   15: pushvar 0, 4
+   16: eval
+   17: push 1
+   18: add
    19: assign
 # test/comment.p, 13:       f := f * n
    20: pushvar 0, 5
-   21: eval
+   21: pushvar 0, 5
+   22: eval
 # test/comment.p, 14:    end
-   22: pushvar 0, 4
-   23: eval
-   24: mul
-   25: pushvar 0, 5
+   23: pushvar 0, 4
+   24: eval
+   25: mul
    26: assign
 # test/comment.p, 15: end.
    27: jump 9

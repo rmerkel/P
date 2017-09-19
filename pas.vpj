@@ -265,6 +265,7 @@
 			<F N="interp.cc"/>
 			<F N="symbol.cc"/>
 			<F N="token.cc"/>
+			<F N="type.cc"/>
 		</Folder>
 		<Folder
 			Name="Header Files"
@@ -276,6 +277,8 @@
 			<F N="interp.h"/>
 			<F N="symbol.h"/>
 			<F N="token.h"/>
+			<F N="type.h"/>
+			<F N="types.h"/>
 		</Folder>
 		<Folder
 			Name="Resource Files"
@@ -301,20 +304,40 @@
 			Name="Test"
 			Filters=""
 			GUID="{74623FBD-74C2-48DA-9586-F190FFB3C274}">
-			<F N="comment.p"/>
-			<F N="divbyzero.p"/>
-			<F N="fact.p"/>
-			<F N="fact2.p"/>
-			<F N="fact3.p"/>
-			<F N="fahr.p"/>
-			<F N="fahr2.p"/>
-			<F N="min.p"/>
-			<F N="precedence.p"/>
-			<F N="repeatst.p"/>
-			<F N="simple.p"/>
-			<F N="test.p"/>
-			<F N="testif.p"/>
-			<F N="unknown.p"/>
+			<F N="test/comment.p"/>
+			<F N="test/comment.p.lst"/>
+			<F N="test/divbyzero.p"/>
+			<F N="test/divbyzero.p.lst"/>
+			<F N="test/fact.p"/>
+			<F N="test/fact.p.lst"/>
+			<F N="test/fact2.p"/>
+			<F N="test/fact2.p.lst"/>
+			<F N="test/fact3.p"/>
+			<F N="test/fact3.p.lst"/>
+			<F N="test/fahr.p"/>
+			<F N="test/fahr.p.lst"/>
+			<F N="test/fahr2.p"/>
+			<F N="test/fahr2.p.lst"/>
+			<F N="test/fahr3.p"/>
+			<F N="test/fahr3.p.lst"/>
+			<F N="test/min.p"/>
+			<F N="test/min.p.lst"/>
+			<F N="test/precedence.p"/>
+			<F N="test/precedence.p.lst"/>
+			<F N="test/real.p"/>
+			<F N="test/real.p.lst"/>
+			<F N="test/repeatst.p"/>
+			<F N="test/repeatst.p.lst"/>
+			<F N="test/simple.p"/>
+			<F N="test/simple.p.lst"/>
+			<F N="test/test.p"/>
+			<F N="test/test.p.lst"/>
+			<F N="test/testif.p"/>
+			<F N="test/testif.p.lst"/>
+			<F N="test/typetest.p"/>
+			<F N="test/typetest.p.lst"/>
+			<F N="test/unknown.p"/>
+			<F N="test/unknown.p.lst"/>
 			<F N="xpas.sh"/>
 		</Folder>
 	</Files>

@@ -101,8 +101,8 @@ struct Token {
 
 	Kind			kind;				///< Token type
 	std::string		string_value;		///< kind == Identifier
-	Integer			integer_value;      ///< Kind == IntegerNum
-	Real			real_value;			///< Kind == RealNum
+	int				integer_value;      ///< Kind == IntegerNum
+	double			real_value;			///< Kind == RealNum
 
 	/// Construct a token of type k, stirng value "", number value 0.
 	Token(Kind k) : kind{k}, integer_value{0} {}
@@ -154,7 +154,7 @@ private:								/// A map of keywords to their 'kind'
 	std::string 	line;				///< last line read from the stream
 
 	/// The current token
-	Token 			ct { Token::Kind::EOS };
+	Token 			ct { Token::EOS };
 
 	/// If *this* owns ip, delete it.
 	void close()							{ if (owns) delete ip;	}

@@ -21,12 +21,12 @@ using namespace std;
  ************************************************************************************************/
 string SymValue::toString(SymValue::Kind kind) {
 	switch(kind) {
-	case SymValue::Kind::None:		return "None";
-	case SymValue::Kind::Variable:	return "Variable";
-	case SymValue::Kind::Constant:	return "ConsInt";
-	case SymValue::Kind::Procedure:	return "Procedure";
-	case SymValue::Kind::Function:	return "Function";
-	case SymValue::Kind::Type:		return "Type";
+	case SymValue::None:		return "None";
+	case SymValue::Variable:	return "Variable";
+	case SymValue::Constant:	return "ConsInt";
+	case SymValue::Procedure:	return "Procedure";
+	case SymValue::Function:	return "Function";
+	case SymValue::Type:		return "Type";
 	default:
 		assert(false);
 		return "Unknown SymValue Kind!";
@@ -48,7 +48,7 @@ SymValue::SymValue() : _kind{Kind::None}, _level{0} {}
  * @param type	Type descriptor. Assumed to be for "integer"
  ************************************************************************************************/
 SymValue::SymValue(int level, Datum value, TDescPtr type)
-	: _kind{SymValue::Kind::Constant}, _level{level}, _value{value}, _type(type)
+	: _kind{SymValue::Constant}, _level{level}, _value{value}, _type(type)
 {
 }
 
@@ -59,8 +59,8 @@ SymValue::SymValue(int level, Datum value, TDescPtr type)
  * @param offset	The variables location as a ofset from the activation frame
  * @param type  	the variables type descriptor
  ************************************************************************************************/
-SymValue::SymValue(int level, Integer offset, TDescPtr type)
-	: _kind{SymValue::Kind::Variable}, _level{level}, _value{offset}, _type{type}
+SymValue::SymValue(int level, int offset, TDescPtr type)
+	: _kind{SymValue::Variable}, _level{level}, _value{offset}, _type{type}
 {
 }
 
@@ -75,7 +75,7 @@ SymValue::SymValue(int level, Integer offset, TDescPtr type)
  ************************************************************************************************/
 SymValue::SymValue(Kind kind, int level) : _kind{kind}, _level{level}, _value{0}
 {
-	assert(SymValue::Kind::Procedure == _kind || SymValue::Kind::Function == _kind);
+	assert(SymValue::Procedure == _kind || SymValue::Function == _kind);
 }
 
 

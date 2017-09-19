@@ -6,29 +6,29 @@
 # test/divbyzero.p, 5: begin
     2: enter 3
 # test/divbyzero.p, 6: 	y := 10;
-    3: push 10
-    4: pushvar 0, 5
+    3: pushvar 0, 5
+    4: push 10
     5: assign
 # test/divbyzero.p, 7: 	z := 0;
-    6: push 0
-    7: pushvar 0, 6
+    6: pushvar 0, 6
+    7: push 0
     8: assign
 # test/divbyzero.p, 8: 
 # test/divbyzero.p, 9: 	x := y / 2;
-    9: pushvar 0, 5
-   10: eval
-   11: push 2
-   12: div
-   13: pushvar 0, 4
+    9: pushvar 0, 4
+   10: pushvar 0, 5
+   11: eval
+   12: push 2
+   13: div
    14: assign
 # test/divbyzero.p, 10: 	x := y / z	{	opps!	}
-   15: pushvar 0, 5
-   16: eval
+   15: pushvar 0, 4
+   16: pushvar 0, 5
+   17: eval
 # test/divbyzero.p, 11: end.
-   17: pushvar 0, 6
-   18: eval
-   19: div
-   20: pushvar 0, 4
+   18: pushvar 0, 6
+   19: eval
+   20: div
    21: assign
    22: ret
 # test/divbyzero.p, 11: 
@@ -36,5 +36,5 @@
         9:         10
        10:          0
         8:          5
-Attempt to divide by zero @ pc (19)!
+Attempt to divide by zero @ pc (20)!
 ./pas: runtime error: divideByZero!

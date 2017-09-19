@@ -16,12 +16,12 @@
 # test/test.p, 15: begin
     2: enter 2
 # test/test.p, 16:    n := 0;
-    3: push 0
-    4: pushvar 0, 4
+    3: pushvar 0, 4
+    4: push 0
     5: assign
 # test/test.p, 17:    f := 1;
-    6: push 1
-    7: pushvar 0, 5
+    6: pushvar 0, 5
+    7: push 1
     8: assign
 # test/test.p, 18:    while n < nFacts do begin
     9: pushvar 0, 4
@@ -31,19 +31,19 @@
    13: jneq 28
 # test/test.p, 19:       n := n + 1;
    14: pushvar 0, 4
-   15: eval
-   16: push 1
-   17: add
-   18: pushvar 0, 4
+   15: pushvar 0, 4
+   16: eval
+   17: push 1
+   18: add
    19: assign
 # test/test.p, 20:       f := f * n
    20: pushvar 0, 5
-   21: eval
+   21: pushvar 0, 5
+   22: eval
 # test/test.p, 21:    end
-   22: pushvar 0, 4
-   23: eval
-   24: mul
-   25: pushvar 0, 5
+   23: pushvar 0, 4
+   24: eval
+   25: mul
    26: assign
 # test/test.p, 22: end.
    27: jump 9

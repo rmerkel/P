@@ -31,16 +31,16 @@ using namespace std;
 ConstTDescPtr	Comp::intDesc = TDesc::newTDesc(
 	TDesc::Kind::Integer,
 	1,
-	SubRange(numeric_limits<Integer>::min(), numeric_limits<Integer>::max()),
-	ConstTDescPtr(),
+	SubRange(numeric_limits<int>::min(), numeric_limits<int>::max()),
+	intDesc,
 	FieldVec());
 
 /// Type descriptor for reals
 ConstTDescPtr Comp::realDesc = TDesc::newTDesc(
 	TDesc::Kind::Real,
 	1,
-	SubRange(numeric_limits<Real>::min(), numeric_limits<Real>::max()),
-	ConstTDescPtr(),
+	SubRange(numeric_limits<double>::min(), numeric_limits<double>::max()),
+	realDesc,
 	FieldVec());
 
 /// Type descriptor for characters
@@ -48,10 +48,9 @@ ConstTDescPtr Comp::charDesc = TDesc::newTDesc(
 	TDesc::Kind::Character,
 	1,
 	SubRange(0, 127), 
-	ConstTDescPtr(),
+	charDesc,
 	FieldVec());
 
-// private:
 // private:
 
 /********************************************************************************************//**
@@ -168,8 +167,7 @@ size_t Comp::emit(const OpCode op, int8_t level, Datum addr) {
  * @return  true if type can be treated as an Integer
  ************************************************************************************************/
 bool Comp::isAnInteger(ConstTDescPtr type) {
-	return 	type->kind() == TDesc::Integer	|| 
-			(type->kind() == TDesc::SRange && type->base() == intDesc);
+	return 	type->kind() == TDesc::Integer || type->base() == intDesc;
 }
 
 /********************************************************************************************//**
@@ -177,8 +175,7 @@ bool Comp::isAnInteger(ConstTDescPtr type) {
  * @return  true if type can be treated as an Real
  ************************************************************************************************/
 bool Comp::isAReal(ConstTDescPtr type) {
-	return 	type->kind() == TDesc::Real		||
-			(type->kind() == TDesc::SRange && type->base() == realDesc);
+	return 	type->kind() == TDesc::Real || type->base() == realDesc;
 }
 
 /********************************************************************************************//**
@@ -237,7 +234,7 @@ void Comp::assignPromote (ConstTDescPtr lhs, ConstTDescPtr rhs) {
  void Comp::listing(const string& name, istream& source, ostream& out) {
 	string 		line;   				// Current source line
 	unsigned 	linenum = 1;			// source line number
-	Unsigned	addr = 0;				// code address (index)
+	unsigned	addr = 0;				// code address (index)
 
 	while (addr < indextbl.size()) {
 		while (linenum <= indextbl[addr]) {	// Print lines that lead up to code[addr]...
@@ -292,9 +289,12 @@ ConstTDescPtr Comp::emitVarRef(int level, const SymValue& val) {
 }
 
 /********************************************************************************************//**
- * Consume, and return the 'closest' (highest block level) identifer in the token stream...
+ * return the 'closest' (highest block level) identifer...
+ *
+ * @param	id	identifier to look up in the symbol table
+ * @return symtbl.end() or an iterator positioned at a symbol table entry.
  ************************************************************************************************/
-SymbolTable::iterator Comp::findClosest(const string& id) {
+SymbolTable::iterator Comp::lookup(const string& id) {
 	auto range = symtbl.equal_range(id);
 	if (range.first == range.second) {
 		error("Undefined identifier", id);
@@ -311,41 +311,33 @@ SymbolTable::iterator Comp::findClosest(const string& id) {
 }
 
 /********************************************************************************************//**
- * Consume, and return the 'closest' (highest block level) identifer in the token stream...
- ************************************************************************************************/
-SymbolTable::iterator Comp::identRef() {
-	const string id = ts.current().string_value;	// Copy and, then 
-	next();											// Consme the identifier...
-	return findClosest(id);
-}
-
-/********************************************************************************************//**
  * Push a variable's value, a constant value, or invoke a function, and push the results,
  * of a function.
  *
  * ident | ident [ ( expr-lst ) ]
  *
+ * @param	id		The variable or prodecure identifier
  * @param	level	The current block level 
  * @return	Data type 
  ************************************************************************************************/
-ConstTDescPtr Comp::identifier(int level) {
-	auto type = intDesc;					// Identifiers type
+ConstTDescPtr Comp::identFactor(int level, const string& id) {
+	auto type = intDesc;
+   	auto it = lookup(id);
 
-	auto it = identRef();
 	if (it != symtbl.end()) {
 		switch (it->second.kind()) {
-		case SymValue::Kind::Constant:
+		case SymValue::Constant:
 			type = it->second.type();
 			emit(OpCode::Push, 0, it->second.value());
 			break;
 
-		case SymValue::Kind::Variable:
+		case SymValue::Variable:
 			type = it->second.type();
-			emitVarRef(level, it->second);
+			variable(level, it);
 			emit(OpCode::Eval);
 			break;
 
-		case SymValue::Kind::Function:
+		case SymValue::Function:
 			type = it->second.type();		// Use the function return type
 			callStmt(it->first, it->second, level);
 			break;
@@ -371,10 +363,14 @@ ConstTDescPtr Comp::identifier(int level) {
 ConstTDescPtr Comp::factor(int level) {
 	auto type = intDesc;				// Factor data type
 
-	if (accept(Token::Identifier, false))
-		type = identifier(level);
+	if (accept(Token::Identifier, false)) {
+		// Copy, and then consume the identifer...
+    	const string id = ts.current().string_value;
+    	next();
 
-	else if (accept(Token::Round))  {	// round(expr) to an integer
+		type = identFactor(level, id);
+
+	} else if (accept(Token::Round))  {	// round(expr) to an integer
 		expect(Token::OpenParen);
 		type = expression(level);
 		expect(Token::CloseParen);	
@@ -440,13 +436,11 @@ ConstTDescPtr Comp::term(int level) {
 }
 
 /********************************************************************************************//**
- ************************************************************************************************/
-/**
  * [ ( + | - ] term
  *
  * @param	level	The current block level 
  * @return	Data type 
- */
+ ************************************************************************************************/
 ConstTDescPtr Comp::unary(int level) {
 	auto type = intDesc;					// Default factor data type
 
@@ -534,6 +528,20 @@ ConstTDescPtr Comp::expression(int level) {
 }
 
 /********************************************************************************************//**
+ * expr-lst: expression { ',' expression } ;
+ * @return a list (vector) of TDescPtrs, one for each array dimension
+ ************************************************************************************************/
+TDescPtrVec	Comp::expressionList(int level) {
+	TDescPtrVec	v;
+
+	do {
+		v.push_back(expression(level));
+	} while(accept(Token::Comma));
+
+	return v;
+}
+
+/********************************************************************************************//**
  * [ + | - ] number | (const) identifer
  *
  * @return A constant value
@@ -556,9 +564,13 @@ Datum Comp::constExpr() {
 		next();										// Consume the number
 
 	} else if (accept(Token::Identifier, false)) {
-		auto it = identRef();
+		// Copy, and then, consume the identifier..
+		const string id = ts.current().string_value;
+		next();
+
+		auto it = lookup(id);
 		if (it != symtbl.end()) {
-			if (it->second.kind() == SymValue::Kind::Constant)
+			if (it->second.kind() == SymValue::Constant)
 				value = sign * it->second.value();
 			else
 				error("Identifier is not a constant, variable or function", it->first);
@@ -570,42 +582,6 @@ Datum Comp::constExpr() {
 	}
 
 	return value;
-}
-
-/********************************************************************************************//**
- * ident = expression
- *
- * @param	name	The identifier value
- * @param	val		The identifiers symbol table entry value
- * @param	level	The current block level.
- ************************************************************************************************/
-void Comp::assignStmt(const string& name, const SymValue& val, int level) {
-	const auto rhs = expression(level);
-
-	switch(val.kind()) {
-	case SymValue::Kind::Variable:
-		assignPromote(val.type(), rhs);
-		emitVarRef(level, val);
-		emit(OpCode::Assign);
-		break;
-
-	case SymValue::Kind::Function:		// Save value in the frame's retValue element
-		assignPromote(val.type(), rhs);
-		emit(OpCode::PushVar, 0, FrameRetVal);
-		emit(OpCode::Assign);
-		break;
-
-	case SymValue::Kind::Constant:
-		error("Can't assign to a constant", name);
-		break;
-
-	case SymValue::Kind::Procedure:
-		error("Can't assign to a procedure", name);
-		break;
-
-	default:
-		assert(false);
-	}
 }
 
 /********************************************************************************************//**
@@ -641,30 +617,11 @@ void Comp::callStmt(const string& name, const SymValue& val, int level) {
 		error(oss.str());
 	}
 
-	if (SymValue::Kind::Procedure != val.kind() && SymValue::Kind::Function != val.kind())
+	if (SymValue::Procedure != val.kind() && SymValue::Function != val.kind())
 		error("Identifier is not a function or procedure", name);
 
 	emit(OpCode::Call, level - val.level(), val.value());
 }
-
-/********************************************************************************************//**
- * indentifier = expression | indentifier [ ( indentifier { , indentifier } ) ]
- *
- * @param	level	The current block level
- ************************************************************************************************/
-void Comp::identStmt(int level) {
-	auto it = identRef();
-
-	if (accept(Token::Assign))			// ident "=" expression
-		assignStmt(it->first, it->second, level);
-
-	else if (SymValue::Kind::Function == it->second.kind())
-		error("calling function without assignment", it->first);
-
-	else
-		callStmt(it->first, it->second, level);
-}
-
 
 /********************************************************************************************//**
  * while expr do statement...
@@ -743,6 +700,95 @@ void Comp::statementList(int level) {
 }
 
 /********************************************************************************************//**
+ * identifier [ '[' expression-list ']' ]
+ *
+ * @param	id		The variable or prodecure identifier
+ * @param	level	The current block level.
+ ************************************************************************************************/
+ConstTDescPtr Comp::variable(int level, SymbolTable::iterator it) {
+	auto type = it->second.type();
+
+	emitVarRef(level, it->second);
+	if (accept(Token::OpenBrkt)) {	// variable is an array, index into it
+		type = it->second.type()->base();
+
+#		warning("need to verify that id is, or is not, an array");
+
+		auto tvec = expressionList(level);
+		if (tvec.empty())
+			error("expected expression-list");
+		else if (tvec.size() > 1)
+			error("multidimensional arrays are not supported!");
+		else
+			emit(OpCode::Add);
+#		warning("assuming that sizeof(a[0]) == 1 Datum!");
+		expect(Token::CloseBrkt);
+	}
+
+	return type;
+}
+
+/********************************************************************************************//**
+ * variable := expression | identifier [ '(' expression-list ')' ]
+ *
+ * @param	id		The variable or prodecure identifier
+ * @param	level	The current block level.
+ ************************************************************************************************/
+void Comp::identStatement(int level, const string& id) {
+	auto lhs = lookup(id);
+	if (lhs == symtbl.end())
+		return;					// id is unidentified
+
+	// variable, function return value, or procedure call...
+
+	auto type = lhs->second.type();
+	switch(lhs->second.kind()) {
+	case SymValue::Function:			// emit reference to function return value
+		emit(OpCode::PushVar, 0, FrameRetVal);
+		break;
+
+	case SymValue::Procedure:			// emit a procedure call
+		callStmt(lhs->first, lhs->second, level);
+		return;
+
+	case SymValue::Variable:			// emit a reference to a variable, or array, value
+		type = variable(level, lhs);
+		break;
+
+	default:
+		error("expected variable, function return ref, or procedure call, got", lhs->first);
+	}
+
+	expect(Token::Assign);					// consume the ":="...
+	const auto rhs = expression(level);
+
+	// Emit the right hand side...
+
+	switch(lhs->second.kind()) {
+	case SymValue::Variable:
+		assignPromote(type, rhs);
+		emit(OpCode::Assign);
+		break;
+
+	case SymValue::Function:		// Save value in the frame's retValue element
+		assignPromote(type, rhs);
+		emit(OpCode::Assign);
+		break;
+
+	case SymValue::Constant:
+		error("Can't assign to a constant", lhs->first);
+		break;
+
+	case SymValue::Procedure:
+		error("Can't assign to a procedure", lhs->first);
+		break;
+
+	default:
+		assert(false);
+	}
+}
+
+/********************************************************************************************//**
  * [ ident = expr						|
  *   if expr then stmt { else stmt }	|
  *   while expr do stmt					|
@@ -752,10 +798,14 @@ void Comp::statementList(int level) {
  * @param	level	The current block level.
  ************************************************************************************************/
 void Comp::statement(int level) {
-	if (accept(Token::Identifier, false)) 			// assignment or proc call
-		identStmt(level);
+	if (accept(Token::Identifier, false)) {		// Assignment or procedure call
+		// Copy and then consume the l-value identifier...
+		const string id = ts.current().string_value;
+		next();
 
-	else if (accept(Token::Begin)) {				// begin ... end
+		identStatement(level, id);
+
+	} else if (accept(Token::Begin)) {				// begin ... end
 		statementList(level);
 		expect(Token::End);
 
@@ -984,11 +1034,13 @@ void Comp::varDecl(int level, NameKindVec& idents) {
 ConstTDescPtr Comp::type(int level) {
 	auto tdesc = intDesc;
 
-	if (accept(Token::Identifier, false)) {		// previously defined type
-		auto it = identRef();
+	// Make a copy in case the next token is an identifier...
+	const string id = ts.current().string_value;
 
-		if (it == symtbl.end() || it->second.kind() != SymValue::Kind::Type)
-			error("expected type, got ", it->first);
+	if (accept(Token::Identifier)) {			// previously defined type-name
+		auto it = lookup(id);
+		if (it == symtbl.end() || it->second.kind() != SymValue::Type)
+			error("expected type, got ", id);
 		else
 			tdesc = it->second.type();
 
@@ -998,7 +1050,13 @@ ConstTDescPtr Comp::type(int level) {
 	else if (accept(Token::Array)) {			// Array
 		expect(Token::OpenBrkt);
 		TDescPtrVec typeVec = simpleTypeList(level);
-		SubRange r = typeVec.empty() ? SubRange(0, 1) : typeVec[0]->range();
+		assert(!typeVec.empty());
+		SubRange r;
+		if (typeVec.size() > 1) {
+			error("multiple dimension arrays aren't supported!");
+			r = SubRange(0, 1);
+		} else
+			r = typeVec[0]->range();
 		expect(Token::CloseBrkt);
 		expect(Token::Of);
 
@@ -1021,10 +1079,11 @@ ConstTDescPtr Comp::type(int level) {
 ConstTDescPtr Comp::simpleType(int level) {
 	auto type = intDesc;
 
-	if (accept(Token::Identifier, false)) {		// Previously defined type, must be ordinal!
-		auto it = identRef();
-
-		if (it == symtbl.end() || it->second.kind() != SymValue::Kind::Type)
+	// Copy if next token is an identifier...
+	const string id = ts.current().string_value;
+	if (accept(Token::Identifier)) {			// Previously defined type, must be ordinal!
+		auto it = lookup(id);
+		if (it == symtbl.end() || it->second.kind() != SymValue::Type)
 			error("expected type, got ", it->first);
 		else if (!it->second.type()->isOrdinal())
 			error("expected ordinal type, got ", it->first);
@@ -1126,7 +1185,7 @@ SymValue& Comp::subPrefixDecl(int level, SymValue::Kind kind) {
  * @param	level	The current block level.
  ************************************************************************************************/
 void Comp::procDecl(int level) {
-	auto& val = subPrefixDecl(level, SymValue::Kind::Procedure);
+	auto& val = subPrefixDecl(level, SymValue::Procedure);
 	expect(Token::SemiColon);
 	blockDecl(val, level + 1);
 	expect(Token::SemiColon);				// procedure declarations end with a ';'!
@@ -1138,7 +1197,7 @@ void Comp::procDecl(int level) {
  * @param	level	The current block level.
  ************************************************************************************************/
 void Comp::funcDecl(int level) {
-	auto& val = subPrefixDecl(level, SymValue::Kind::Function);
+	auto& val = subPrefixDecl(level, SymValue::Function);
 	expect(Token::Colon);
 	val.type(type(level));
 	expect(Token::SemiColon);
@@ -1181,7 +1240,7 @@ void Comp::subDeclList(int level) {
  * @param	level	The current block level.
  * @return 	Entry point address
  ************************************************************************************************/
-Unsigned Comp::blockDecl(SymValue& val, int level) {
+unsigned Comp::blockDecl(SymValue& val, int level) {
 	constDeclList(level);						// declaractions...
 	typeDeclList(level);
 	auto dx = varDeclBlock(level);
@@ -1204,7 +1263,7 @@ Unsigned Comp::blockDecl(SymValue& val, int level) {
 	// block postfix... TBD; emit reti or retr for functions!
 
 	const auto sz = val.params().size();
-	if (SymValue::Kind::Function == val.kind())
+	if (SymValue::Function == val.kind())
 		emit(OpCode::Retf, 0, sz);	// function...
 	else
 		emit(OpCode::Ret, 0, sz);	// procedure...
@@ -1221,7 +1280,7 @@ void Comp::run() {
 	next();										// Fetch the 1st token
 
 	expect(Token::ProgDecl);					// Program heading...
-	auto& val = subPrefixDecl(level, SymValue::Kind::Procedure);
+	auto& val = subPrefixDecl(level, SymValue::Procedure);
 	expect(Token::SemiColon);
 
 	// Emit a call to the main procedure, followed by a halt

@@ -5,13 +5,13 @@
 # test/simple.p, 4: begin
     2: enter 2
 # test/simple.p, 5: 	x := 0;
-    3: push 0
-    4: pushvar 0, 4
+    3: pushvar 0, 4
+    4: push 0
     5: assign
 # test/simple.p, 6: 	y := 1
-    6: push 1
+    6: pushvar 0, 5
+    7: push 1
 # test/simple.p, 7: end.
-    7: pushvar 0, 5
     8: assign
     9: ret
 

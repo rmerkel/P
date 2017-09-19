@@ -61,10 +61,10 @@ void Interp::dump() {
  * @param lvl Number of levels down
  * @return The base, lvl's down the stack
  */
-Unsigned Interp::base(Unsigned lvl) {
+unsigned Interp::base(unsigned lvl) {
 	auto b = fp;
 	for (; lvl > 0; --lvl)
-		b = stack[b].uinteger();
+		b = stack[b].natural();
 
 	return b;
 }
@@ -74,7 +74,7 @@ Unsigned Interp::base(Unsigned lvl) {
  * @param	n	Maximum number of entries pushed down on the stack, if necessary, to make
  *  		    sufficient room for sp+n entries.
  */
-void Interp::mkStackSpace(Unsigned n) {
+void Interp::mkStackSpace(unsigned n) {
 	while (stack.size() <= static_cast<unsigned> (sp + n))
 		stack.push_back(-1);
 }
@@ -92,7 +92,7 @@ void Interp::push(Datum d) {
  * @param 	nlevel	Set the subroutines frame base nlevel's down
  * @param 	addr 	The address of the subroutine.
  */
-void Interp::call(int8_t nlevel, Unsigned addr) {
+void Interp::call(int8_t nlevel, unsigned addr) {
 	mkStackSpace(FrameSize);
 
 	const auto oldFp = fp;			// Save a copy before we modify it
@@ -115,9 +115,9 @@ void Interp::call(int8_t nlevel, Unsigned addr) {
  */
 void Interp::ret() {
 	sp = fp - 1; 					// "pop" the activaction frame
-	pc = stack[fp + FrameRetAddr].uinteger();
-	fp = stack[fp + FrameOldFp].uinteger();
-	sp -= ir.addr.uinteger();		// Pop parameters, if any...
+	pc = stack[fp + FrameRetAddr].natural();
+	fp = stack[fp + FrameOldFp].natural();
+	sp -= ir.addr.natural();		// Pop parameters, if any...
 }
 
 /// Unlink the stack frame, set the return address, and then push the function result
@@ -130,8 +130,8 @@ void Interp::retf() {
 
 /// @return Result::success or...
 Interp::Result Interp::step() {
-	auto prevPc = pc;					// The previous pc
-	ir = code[pc++];					// Fetch next instruction...
+	auto prevPc = pc;				// The previous pc
+	ir = code[pc++];				// Fetch next instruction...
 	++ncycles;
 
 	auto info = OpCodeInfo::info(ir.op);
@@ -152,7 +152,7 @@ Interp::Result Interp::step() {
 		break;
 
 	case OpCode::RTOI:	
-		stack[sp] = static_cast<Integer>(round(stack[sp].real()));
+		stack[sp] = static_cast<int>(round(stack[sp].real()));
 		break;
 
 	case OpCode::Neg:		stack[sp] = -stack[sp];					break;
@@ -163,7 +163,7 @@ Interp::Result Interp::step() {
 	
 	case OpCode::Div:
 		rhand = pop();
-		if ((rhand.kind() == Datum::Kind::Real && rhand.real() != 0) || rhand.integer() != 0)
+		if ((rhand.kind() == Datum::Real && rhand.real() != 0) || rhand.integer() != 0)
 			push(pop() / rhand);
 
 		else {
@@ -174,7 +174,7 @@ Interp::Result Interp::step() {
 
 	case OpCode::Rem:
 		rhand = pop();
-		if ((rhand.kind() == Datum::Kind::Real && rhand.real() != 0) || rhand.real() != 0)
+		if ((rhand.kind() == Datum::Real && rhand.real() != 0) || rhand.real() != 0)
 			push(pop() % rhand);
 
 		else {
@@ -197,28 +197,29 @@ Interp::Result Interp::step() {
 		push(base(ir.level) + ir.addr.integer());
 		break;
 
-	case OpCode::Eval: {	auto ea = pop(); push(stack[ea.uinteger()]);	}
+	case OpCode::Eval: {	auto ea = pop(); push(stack[ea.natural()]);	}
 		break;
 
 	case OpCode::Assign:
-		lastWrite = pop().uinteger();	// Save the effective address for dump()...
-		stack[lastWrite] = pop();
+		rhand = pop();					// Save the value
+		lastWrite = pop().natural();	// Save the effective address for dump()...
+		stack[lastWrite] = rhand;
 		break;
 
-	case OpCode::Call: 		call(ir.level, ir.addr.uinteger());		break;
+	case OpCode::Call: 		call(ir.level, ir.addr.natural());		break;
 	case OpCode::Ret:   	ret();  								break;
 	case OpCode::Retf: 		retf();									break;
 
 	case OpCode::Enter:
-		mkStackSpace(ir.addr.uinteger());
-			sp+=ir.addr.uinteger();
+		mkStackSpace(ir.addr.natural());
+			sp+=ir.addr.natural();
 			break;
 
-	case OpCode::Jump:		pc = ir.addr.uinteger();				break;
+	case OpCode::Jump:		pc = ir.addr.natural();					break;
 
 	case OpCode::JNEQ:
 		if (pop().integer() == 0)
-			pc = ir.addr.uinteger();
+			pc = ir.addr.natural();
 		break;
 
 	case OpCode::Halt:		return Result::halted;					break;

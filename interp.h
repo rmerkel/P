@@ -68,9 +68,9 @@ private:
 
 	InstrVector		code;					///< Code segment, indexed by pc
 	DatumVector		stack;					///< Data segment (stack), indexed by fp and sp
-	Unsigned		pc;						///< Program counter register; index of *next* instruction in code[]
-	Unsigned		fp;						///< Frame pointer register; index of the current mark block/frame in stack[]
-	Unsigned		sp;						///< Top of stack register (stack[sp])
+	unsigned		pc;						///< Program counter register; index of *next* instruction in code[]
+	unsigned		fp;						///< Frame pointer register; index of the current mark block/frame in stack[]
+	unsigned		sp;						///< Top of stack register (stack[sp])
 	Instr			ir;						///< *Current* instruction register (code[pc-1])
 
 	EAddr			lastWrite;				///< Last write effective address (to stack[]), if valid
@@ -81,15 +81,15 @@ private:
 
 protected:
 	///< Find the activation base 'lvl' levels up the stack...
-	Unsigned base(Unsigned lvl);
+	unsigned base(unsigned lvl);
 
-	void mkStackSpace(Unsigned n);	///< Make room for more stack entries...
+	void mkStackSpace(unsigned n);	///< Make room for more stack entries...
 
 	Datum pop();							///< Pop a Datum from the top of stack...
 	void push(Datum d);						///< Push a Datum onto the stack...
 
 	/// Call a subroutine...
-	void call(int8_t nlevel, Unsigned addr);
+	void call(int8_t nlevel, unsigned addr);
 	void ret();								///< Return from procedure...
 	void retf();							///< Return from a function...
 

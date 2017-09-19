@@ -15,8 +15,8 @@
 # test/fahr3.p, 14: begin
     2: enter 2
 # test/fahr3.p, 15: 	fahr := LOWER;
-    3: push 0.000000
-    4: pushvar 0, 4
+    3: pushvar 0, 4
+    4: push 0.000000
     5: assign
 # test/fahr3.p, 16: 	while fahr <= UPPER do begin
     6: pushvar 0, 4
@@ -25,23 +25,23 @@
     9: lte
    10: jneq 29
 # test/fahr3.p, 17: 		celsius := round(5.0 * (fahr-32.0) / 9.0);
-   11: push 5.000000
-   12: pushvar 0, 4
-   13: eval
-   14: push 32.000000
-   15: sub
-   16: mul
-   17: push 9.000000
-   18: div
-   19: rtoi
-   20: pushvar 0, 5
+   11: pushvar 0, 5
+   12: push 5.000000
+   13: pushvar 0, 4
+   14: eval
+   15: push 32.000000
+   16: sub
+   17: mul
+   18: push 9.000000
+   19: div
+   20: rtoi
    21: assign
 # test/fahr3.p, 18: 		fahr := fahr + STEP;
    22: pushvar 0, 4
-   23: eval
-   24: push 20.000000
-   25: add
-   26: pushvar 0, 4
+   23: pushvar 0, 4
+   24: eval
+   25: push 20.000000
+   26: add
    27: assign
 # test/fahr3.p, 19: 	end;
    28: jump 6

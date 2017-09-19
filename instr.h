@@ -56,7 +56,7 @@ enum class OpCode : unsigned char {
 	Push,								///< Push a constant integer value
 	PushVar,							///< Push variable address (base(level) + addr)
 	Eval,								///< Evaluate variable TOS = address, replace with value
-	Assign,								///< Assign; TOS = variable address, TOS-1 = value
+	Assign,								///< Assign; TOS-1 = variable address, TOS = value
 
 	Call,								///< Call a procedure, pushing a new acrivation Frame
 	Enter,								///< Allocate locals on the stack
@@ -119,6 +119,6 @@ struct Instr {
 typedef std::vector<Instr>					InstrVector;
 
 /// Disassemble an instruction...
-Unsigned disasm(std::ostream& out, Unsigned loc, const Instr& instr, const std::string label = "");
+unsigned disasm(std::ostream& out, unsigned loc, const Instr& instr, const std::string label = "");
 
 #endif

@@ -5,26 +5,26 @@
 # test/precedence.p, 4: begin
     2: enter 1
 # test/precedence.p, 5: 	x := 1 + 2 * 3 - 4;	{	s/b 3	}
-    3: push 1
-    4: push 2
-    5: push 3
-    6: mul
-    7: add
-    8: push 4
-    9: sub
-   10: pushvar 0, 4
+    3: pushvar 0, 4
+    4: push 1
+    5: push 2
+    6: push 3
+    7: mul
+    8: add
+    9: push 4
+   10: sub
    11: assign
 # test/precedence.p, 6: 	x := -1 + 2 * 3 - 4	{	s/b 1	}
-   12: push 1
-   13: neg
-   14: push 2
-   15: push 3
-   16: mul
-   17: add
-   18: push 4
+   12: pushvar 0, 4
+   13: push 1
+   14: neg
+   15: push 2
+   16: push 3
+   17: mul
+   18: add
+   19: push 4
 # test/precedence.p, 7: end .
-   19: sub
-   20: pushvar 0, 4
+   20: sub
    21: assign
    22: ret
 

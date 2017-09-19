@@ -33,7 +33,7 @@
 class SymValue {
 public:
 	/// Kinds of symbol table entries
-	enum class Kind : char {
+	enum Kind {
 		None,									///< Placeholder for a valid kind...
 		Variable,		  						///< A variable location and type
 		Constant,								///< A constant value and type
@@ -52,7 +52,7 @@ public:
 	SymValue(int level, Datum value, TDescPtr type);
 
 	/// Construct a Variable location
-	SymValue(int level, Integer offset, TDescPtr type);
+	SymValue(int level, int offset, TDescPtr type);
 
 	SymValue(Kind kind, int level);				///< Partially construct Procedure or Function
 

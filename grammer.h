@@ -10,7 +10,7 @@
  *                        [ type-decl-lst ';' ]
  *                        [ var-decl-blk ';' ]
  *                        [ sub-decl-lst ';' ]
- *                        { stmt-blk }
+ *                        { statement-blk }
  *                        ;
  *        const-decl-lst: 'const' const-decl { ';' const-decl } ;
  *            const-decl: identifier '=' const-expr ;
@@ -24,28 +24,28 @@
  *                        'array' '[' simple-type-list ']' 'of' type ;
  *       simple-type-lst: simple-type { ',' simple-type } ;
  *           simple-type: 'integer'                                             |
- *                        '(' ident-list ')'                                    |
+ *                        '(' identifer-list ')'                                |
  *                        const-expr '..' const-expr
- *             ident-lst: identifier { ',' identifier } ;
+ *         identifer-lst: identifier { ',' identifier } ;
  *          sub-decl-lst: func-decl | proc-decl ;
  *             proc-decl: 'procedure' identifier param-lst ';' block-decl ';' ;
  *             func-decl: 'function'  identifier param-lst ':' type ';' block-decl ';' ; 
  *             param-lst: [ '(' var-decl-lst ')' ] ;
- *              stmt-blk: 'begin' stmt-lst 'end' ;
+ *              variable: identifier ( '[' expression-list ']' ) ;
+ *         statement-blk: 'begin' stmt-lst 'end' ;
  *              stmt-lst: 'begin' statement {';' statement } 'end' ;
- *             statement: [ identifier '=' expression                           |
+ *             statement: [ variable '=' expression                             |
  *                          'if' cond 'then' statement { 'else' statement }     |
  *                          'while' cond 'do' statement                         |
  *                          'repeat' statement 'until' cond                     |
- *                          stmt-blk ] ;
+ *                          statement-blk ] ;
  *            const-expr: [ '+' | '-' ] number | identifier ;
- *              expr-lst: expression { ',' expression } ;
- *            expression: simple-expr { relo-op simple-expr } ;
- *               relo-op: '<' | '<=' | '=' | '>=' | '>' | '<>' ;
+ *        expression-lst: expression { ',' expression } ;
+ *            expression: simple-expr { '<' | '<=' | '=' | '>=' | '>' | '<>' simple-expr } ;
  *           simple-expr: [ '+' | '-' ] terminal { '+' | '-' | 'or' terminal } ;
  *              terminal: factor { '*' | '/' | 'rem' | 'and' factor } ;
- *                factor: identifier                                            |
- *                        identifier '(' [ expr-lst ] ')'                       |
+ *                factor: variable                                              |
+ *                        identifier [ '(' expression-lst ')' ]                 |
  *                        'round' '(' expression ')'                            |
  *                        number                                                |
  *                        '(' expression ')' ;
@@ -56,9 +56,6 @@
  * - () Grouping
  * - |  One of ...
  * - ;  End of production
- *
- * @author Randy Merkel, Slowly but Surly Software.
- * @copyright  (c) 2017 Slowly but Surly Software. All rights reserved.
  ************************************************************************************************/
 
 #ifndef	GRAMMER_H
