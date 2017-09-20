@@ -702,26 +702,35 @@ void Comp::statementList(int level) {
 /********************************************************************************************//**
  * identifier [ '[' expression-list ']' ]
  *
- * @param	id		The variable or prodecure identifier
+ * @param	id		The variable or array identifier
  * @param	level	The current block level.
  ************************************************************************************************/
 ConstTDescPtr Comp::variable(int level, SymbolTable::iterator it) {
 	auto type = it->second.type();
 
 	emitVarRef(level, it->second);
-	if (accept(Token::OpenBrkt)) {	// variable is an array, index into it
+	if (accept(Token::OpenBrkt)) {		// variable is an array, index into it
 		type = it->second.type()->base();
 
-#		warning("need to verify that id is, or is not, an array");
+		if (it->second.type()->kind() != TDesc::Array)
+			error("attempt to index into non-array", it->first);
 
 		auto tvec = expressionList(level);
 		if (tvec.empty())
 			error("expected expression-list");
+
 		else if (tvec.size() > 1)
 			error("multidimensional arrays are not supported!");
-		else
+
+		else {							// index into the array
+			if (type->size() != 1) {	// scale the index
+				emit(OpCode::Push, 0, type->size());
+				emit(OpCode::Mul);
+			}
+
 			emit(OpCode::Add);
-#		warning("assuming that sizeof(a[0]) == 1 Datum!");
+		}
+
 		expect(Token::CloseBrkt);
 	}
 
@@ -737,7 +746,7 @@ ConstTDescPtr Comp::variable(int level, SymbolTable::iterator it) {
 void Comp::identStatement(int level, const string& id) {
 	auto lhs = lookup(id);
 	if (lhs == symtbl.end())
-		return;					// id is unidentified
+		return;							// id is unidentified
 
 	// variable, function return value, or procedure call...
 
