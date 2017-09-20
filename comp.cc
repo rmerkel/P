@@ -32,7 +32,7 @@ ConstTDescPtr	Comp::intDesc = TDesc::newTDesc(
 	TDesc::Kind::Integer,
 	1,
 	SubRange(numeric_limits<int>::min(), numeric_limits<int>::max()),
-	intDesc,
+	ConstTDescPtr(),
 	FieldVec());
 
 /// Type descriptor for reals
@@ -40,7 +40,7 @@ ConstTDescPtr Comp::realDesc = TDesc::newTDesc(
 	TDesc::Kind::Real,
 	1,
 	SubRange(numeric_limits<double>::min(), numeric_limits<double>::max()),
-	realDesc,
+	ConstTDescPtr(),
 	FieldVec());
 
 /// Type descriptor for characters
@@ -48,7 +48,7 @@ ConstTDescPtr Comp::charDesc = TDesc::newTDesc(
 	TDesc::Kind::Character,
 	1,
 	SubRange(0, 127), 
-	charDesc,
+	ConstTDescPtr(),
 	FieldVec());
 
 // private:

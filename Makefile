@@ -11,6 +11,8 @@
 #   sudo update-alternatives --config c++
 ################################################################################
 
+CXX = c++
+
 # Support C++11, enable all, extra warnings, and generate dependency files
 CXXFLAGS +=-std=c++11 -Wall -Wextra -MMD -MP
 
