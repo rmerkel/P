@@ -1,173 +1,242 @@
 # test/typetest.p, 2: { Test advanced types	}
 # test/typetest.p, 3: program testtype ;
-# test/typetest.p, 4: type
-    0: call 0, 2
+# test/typetest.p, 4: 	{	integers, ranges and aliases	}
+# test/typetest.p, 5: 	procedure test1;
+    0: call 0, 117
     1: halt
-# test/typetest.p, 5: 	int = integer;
-# test/typetest.p, 6: 	rng = 0..9;
-# test/typetest.p, 7: 
-# test/typetest.p, 8: var
-# test/typetest.p, 9: 	i	: int;
-# test/typetest.p, 10: 	i2  : integer;
-# test/typetest.p, 11: 	r	: 0..9;
-# test/typetest.p, 12: 	r2	: rng;
-# test/typetest.p, 13: 	a	: array [rng] of int;
-# test/typetest.p, 14: 
-# test/typetest.p, 15: begin
-    2: enter 14
-# test/typetest.p, 16: 	i := 0;
+# test/typetest.p, 6: 	type
+# test/typetest.p, 7: 		int = integer;
+# test/typetest.p, 8: 		rng = 0..9;
+# test/typetest.p, 9: 	var
+# test/typetest.p, 10: 		i	: int;
+# test/typetest.p, 11: 		i2	: integer;
+# test/typetest.p, 12: 		r	: 0..9;
+# test/typetest.p, 13: 		r2	: rng;
+# test/typetest.p, 14: 	begin
+    2: enter 4
+# test/typetest.p, 15: 		i := 0;
     3: pushvar 0, 4
     4: push 0
     5: assign
-# test/typetest.p, 17: 	i := i + 1;
+# test/typetest.p, 16: 		i := i + 1;
     6: pushvar 0, 4
     7: pushvar 0, 4
     8: eval
     9: push 1
    10: add
    11: assign
-# test/typetest.p, 18: 
-# test/typetest.p, 19: 	r := 0;
-   12: pushvar 0, 6
+# test/typetest.p, 17: 
+# test/typetest.p, 18: 		i2 := 0;
+   12: pushvar 0, 5
    13: push 0
    14: assign
-# test/typetest.p, 20: 	r := r + 1;
-   15: pushvar 0, 6
-   16: pushvar 0, 6
+# test/typetest.p, 19: 		i2 := i2 + 1;
+   15: pushvar 0, 5
+   16: pushvar 0, 5
    17: eval
    18: push 1
    19: add
    20: assign
-# test/typetest.p, 21: 
-# test/typetest.p, 22: 	r2 := 0;
-   21: pushvar 0, 7
+# test/typetest.p, 20: 
+# test/typetest.p, 21: 		r := 0;
+   21: pushvar 0, 6
    22: push 0
    23: assign
-# test/typetest.p, 23: 	r2 := r2 + 1;
-   24: pushvar 0, 7
-   25: pushvar 0, 7
+# test/typetest.p, 22: 		r := r + 1;
+   24: pushvar 0, 6
+   25: pushvar 0, 6
    26: eval
    27: push 1
    28: add
    29: assign
-# test/typetest.p, 24: 	r2 := r2 + r;
+# test/typetest.p, 23: {		r := 10;			compilier error: out of range	}
+# test/typetest.p, 24: 
+# test/typetest.p, 25: 		r2 := 0;
    30: pushvar 0, 7
-   31: pushvar 0, 7
-   32: eval
-   33: pushvar 0, 6
-   34: eval
-   35: add
-   36: assign
-# test/typetest.p, 25: 
-# test/typetest.p, 26: 	i := 0;
-   37: pushvar 0, 4
-   38: push 0
-   39: assign
-# test/typetest.p, 27:  	while i < 10 do begin 
-   40: pushvar 0, 4
+   31: push 0
+   32: assign
+# test/typetest.p, 26: 		r2 := r2 + 1;
+   33: pushvar 0, 7
+   34: pushvar 0, 7
+   35: eval
+   36: push 1
+   37: add
+   38: assign
+# test/typetest.p, 27: 		r2 := r2 + r
+   39: pushvar 0, 7
+   40: pushvar 0, 7
    41: eval
-   42: push 10
-   43: lt
-   44: jneq 59
-# test/typetest.p, 28: 		a[i] := i;
-   45: pushvar 0, 8
-   46: pushvar 0, 4
-   47: eval
-   48: add
-   49: pushvar 0, 4
-   50: eval
-   51: assign
-# test/typetest.p, 29: 		i := i + 1
-   52: pushvar 0, 4
-   53: pushvar 0, 4
-   54: eval
-   55: push 1
-# test/typetest.p, 30: 	end;
-   56: add
-   57: assign
-   58: jump 40
-# test/typetest.p, 31: 
-# test/typetest.p, 32: 	i := 0;
-   59: pushvar 0, 4
-   60: push 0
-   61: assign
-# test/typetest.p, 33:  	while i < 10 do begin 
-   62: pushvar 0, 4
-   63: eval
-   64: push 10
-   65: lt
-   66: jneq 86
-# test/typetest.p, 34: 		a[i] := a[i] * 10;
-   67: pushvar 0, 8
-   68: pushvar 0, 4
-   69: eval
-   70: add
-   71: pushvar 0, 8
-   72: pushvar 0, 4
-   73: eval
-   74: add
+# test/typetest.p, 28: 	end;
+   42: pushvar 0, 6
+   43: eval
+   44: add
+   45: assign
+   46: ret
+# test/typetest.p, 29: 
+# test/typetest.p, 30: 	{	arrays	}
+# test/typetest.p, 31: 	procedure test2;
+# test/typetest.p, 32: 	type
+# test/typetest.p, 33: 		rng = 0..9;
+# test/typetest.p, 34: 	var
+# test/typetest.p, 35: 		i : integer;
+# test/typetest.p, 36: 		ir : rng;
+# test/typetest.p, 37: 		a : array[rng] of integer;
+# test/typetest.p, 38: 	begin
+   47: enter 12
+# test/typetest.p, 39: 		i := 0;
+   48: pushvar 0, 4
+   49: push 0
+   50: assign
+# test/typetest.p, 40:  		while i < 10 do begin 
+   51: pushvar 0, 4
+   52: eval
+   53: push 10
+   54: lt
+   55: jneq 70
+# test/typetest.p, 41: 			a[i] := i;
+   56: pushvar 0, 6
+   57: pushvar 0, 4
+   58: eval
+   59: add
+   60: pushvar 0, 4
+   61: eval
+   62: assign
+# test/typetest.p, 42: 			i := i + 1
+   63: pushvar 0, 4
+   64: pushvar 0, 4
+   65: eval
+   66: push 1
+# test/typetest.p, 43: 		end;
+   67: add
+   68: assign
+   69: jump 51
+# test/typetest.p, 44: 
+# test/typetest.p, 45: 		ir := 0;
+   70: pushvar 0, 5
+   71: push 0
+   72: assign
+# test/typetest.p, 46: 		repeat begin
+# test/typetest.p, 47: 			a[ir] := a[ir] * 10;
+   73: pushvar 0, 6
+   74: pushvar 0, 5
    75: eval
-   76: push 10
-   77: mul
-   78: assign
-# test/typetest.p, 35: 		i := i + 1
-   79: pushvar 0, 4
-   80: pushvar 0, 4
+   76: add
+   77: pushvar 0, 6
+   78: pushvar 0, 5
+   79: eval
+   80: add
    81: eval
-   82: push 1
-# test/typetest.p, 36: 	end	
-   83: add
+   82: push 10
+   83: mul
    84: assign
-# test/typetest.p, 37:  end.
-   85: jump 62
-   86: ret
+# test/typetest.p, 48: 			ir := ir + 1
+   85: pushvar 0, 5
+   86: pushvar 0, 5
+   87: eval
+   88: push 1
+# test/typetest.p, 49: 		end until ir = 10	{	compilier warning: may always be false	}
+   89: add
+   90: assign
+   91: pushvar 0, 5
+   92: eval
+   93: push 10
+# test/typetest.p, 50: 	end;
+   94: equ
+   95: jneq 73
+   96: ret
+# test/typetest.p, 51: 
+# test/typetest.p, 52: 	procedure test3;
+# test/typetest.p, 53: 	type
+# test/typetest.p, 54: 		enum = (	one, two, three	);
+# test/typetest.p, 55: 	var
+# test/typetest.p, 56: 		a2 : array [enum] of integer;
+# test/typetest.p, 57: 	begin
+   97: enter 4
+# test/typetest.p, 58: 		a2[one] := 1;
+   98: pushvar 0, 4
+   99: pushvar 0, 4
+  100: eval
+  101: add
+  102: push 1
+  103: assign
+# test/typetest.p, 59: 		a2[two] := 2;
+  104: pushvar 0, 4
+  105: pushvar 0, 5
+  106: eval
+  107: add
+  108: push 2
+  109: assign
+# test/typetest.p, 60: 		a2[three] := 3		{	ord(three)	}
+  110: pushvar 0, 4
+  111: pushvar 0, 6
+  112: eval
+  113: add
+  114: push 3
+# test/typetest.p, 61: 	end;
+  115: assign
+  116: ret
+# test/typetest.p, 62: 
+# test/typetest.p, 63: begin
+# test/typetest.p, 64: 	test1;
+  117: call 0, 2
+# test/typetest.p, 65: 	test2;
+  118: call 0, 47
+# test/typetest.p, 66: 	test3
+# test/typetest.p, 67: end.
+  119: call 0, 97
+  120: ret
 
-        8:          0
-        8:          1
-       10:          0
-       10:          1
-       11:          0
-       11:          1
-       11:          2
-        8:          0
        12:          0
-        8:          1
+       12:          1
+       13:          0
        13:          1
-        8:          2
-       14:          2
-        8:          3
-       15:          3
-        8:          4
-       16:          4
-        8:          5
-       17:          5
-        8:          6
-       18:          6
-        8:          7
-       19:          7
-        8:          8
-       20:          8
-        8:          9
-       21:          9
-        8:         10
-        8:          0
+       14:          0
+       14:          1
+       15:          0
+       15:          1
+       15:          2
        12:          0
-        8:          1
+       14:          0
+       12:          1
+       15:          1
+       12:          2
+       16:          2
+       12:          3
+       17:          3
+       12:          4
+       18:          4
+       12:          5
+       19:          5
+       12:          6
+       20:          6
+       12:          7
+       21:          7
+       12:          8
+       22:          8
+       12:          9
+       23:          9
+       12:         10
+       13:          0
+       14:          0
+       13:          1
+       15:         10
+       13:          2
+       16:         20
+       13:          3
+       17:         30
+       13:          4
+       18:         40
+       13:          5
+       19:         50
+       13:          6
+       20:         60
+       13:          7
+       21:         70
+       13:          8
+       22:         80
+       13:          9
+       23:         90
        13:         10
-        8:          2
-       14:         20
-        8:          3
-       15:         30
-        8:          4
-       16:         40
-        8:          5
-       17:         50
-        8:          6
-       18:         60
-        8:          7
-       19:         70
-        8:          8
-       20:         80
-        8:          9
-       21:         90
-        8:         10
+       22:          1
+       22:          2
+       12:          3

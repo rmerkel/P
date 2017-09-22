@@ -24,9 +24,9 @@
  *                        'array' '[' simple-type-list ']' 'of' type ;
  *       simple-type-lst: simple-type { ',' simple-type } ;
  *           simple-type: 'integer'                                             |
- *                        '(' identifer-list ')'                                |
+ *                        '(' identifier-lst ')'                                |
  *                        const-expr '..' const-expr
- *         identifer-lst: identifier { ',' identifier } ;
+ *        identifier-lst: identifier { ',' identifier } ;
  *          sub-decl-lst: func-decl | proc-decl ;
  *             proc-decl: 'procedure' identifier param-lst ';' block-decl ';' ;
  *             func-decl: 'function'  identifier param-lst ':' type ';' block-decl ';' ; 

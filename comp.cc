@@ -587,34 +587,34 @@ Datum Comp::constExpr() {
 /********************************************************************************************//**
  * Call a function or procedure...
  *
- * ident [ ( expr-list ) ]...
+ * ident [ '(' expr-list ')' ]...
  *
  * @param	name	The identifier value
  * @param	val		The identifiers symbol table entry value
  * @param	level	The current block level 
  ************************************************************************************************/
 void Comp::callStmt(const string& name, const SymValue& val, int level) {
-	expect(Token::OpenParen);
+	if (accept(Token::OpenParen)) {
+		unsigned nParams = 0;					// Count actual parameters
+		const auto& params = val.params();		// Formal parameter kinds
+		if (!accept(Token::CloseParen, false))
+			do {								// collect actual parameters
+				const auto kind = expression(level);
+				if (params.size() > nParams)
+					promote(kind, params[nParams]);
+				++nParams;
 
-	const auto& params = val.params();		// Formal parameter kinds
-	unsigned nParams = 0;					// Count actual parameters
-	if (!accept(Token::CloseParen, false))
-		do {								// collect actual parameters
-			const auto kind = expression(level);
-			if (params.size() > nParams)
-				promote(kind, params[nParams]);
-			++nParams;
+			} while (accept (Token::Comma));
 
-		} while (accept (Token::Comma));
+		expect(Token::CloseParen);
 
-	expect(Token::CloseParen);
-
-	if (nParams != params.size()) {			// Is the caller passing right # of params?
-		ostringstream oss;
-		oss << "passing " << nParams 
-			<< " parameters where " << params.size()
-			<< " where expected";
-		error(oss.str());
+		if (nParams != params.size()) {			// Is the caller passing right # of params?
+			ostringstream oss;
+			oss << "passing " << nParams 
+				<< " parameters where " << params.size()
+				<< " where expected";
+			error(oss.str());
+		}
 	}
 
 	if (SymValue::Procedure != val.kind() && SymValue::Function != val.kind())
@@ -1018,17 +1018,27 @@ void Comp::varDeclList(int level, bool params, NameKindVec& idents) {
  * @param[in,out]	idents	Vector of identifer, kind pairs
  ************************************************************************************************/
 void Comp::varDecl(int level, NameKindVec& idents) {
-	vector<string> identifiers;
 
-	// Find and append comma separated identifiers to the list...
-	do {
-		identifiers.push_back(nameDecl(level));
-	} while (accept(Token::Comma));
-
+	vector<string> ids = identifierList(level);
 	expect(Token::Colon);
 	const auto desc = type(level);
-	for (auto& id : identifiers)
+	for (auto& id : ids)
 		idents.push_back({ id, desc });
+}
+
+/********************************************************************************************//**
+ * identifier-lst : identifer { ',' identifier }
+ * @param			level	The current block level. 
+ * @return	List of identifiers in the identifier-lst
+ ************************************************************************************************/
+vector<string> Comp::identifierList(int level) {
+	vector<string> ids;
+
+	do {
+		ids.push_back(nameDecl(level));
+	} while (accept(Token::Comma));
+
+	return ids;
 }
 
 /********************************************************************************************//**
@@ -1105,13 +1115,20 @@ ConstTDescPtr Comp::simpleType(int level) {
 	else if (accept(Token::OpenParen)) {		// Enumeration
 		FieldVec		enums;
 
-		do {
-			enums.push_back( { nameDecl(level), charDesc } );
-		} while (accept(Token::Comma));
+		const auto ids = identifierList(level);
+		unsigned value = 0;
+		for (auto id : ids) {
+			enums.push_back( { id, intDesc } );
+			symtbl.insert(	{ id, SymValue(level, value, intDesc) }	);
+			if (verbose)
+				cout << progName << ": enumeration '" << id << "' = " << value << ", " << level << "\n";
+			++value;
+		}
+
 		expect(Token::CloseParen);
 		SubRange r(0, enums.empty() ? 0 : enums.size());
 
-		type = TDesc::newTDesc(TDesc::Enumeration, 1, r, charDesc, enums);
+		type = TDesc::newTDesc(TDesc::Enumeration, 1, r, intDesc, enums);
 
 	} else {									// Sub-Range
 		ostringstream oss;
