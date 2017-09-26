@@ -14,21 +14,6 @@
 
 using namespace std;
 
-// public static
-
-/********************************************************************************************//**
- * @param k	Kind whose name to return
- ************************************************************************************************/
-string Datum::toString(Kind k) {
-	switch (k) {
-	case Datum::Integer:	return "Integer";	break;
-	case Datum::Real:		return "Real";		break;
-	default:
-		assert(false);
-		return "Unknown Datum Kind!";
-	}
-}
-
 // public
 
 /********************************************************************************************//**
@@ -120,19 +105,38 @@ double Datum::real() const			{	return r;	};
 // operators
 
 /********************************************************************************************//**
+ * @brief Datum::Kind stream put operator
+ *
+ * Puts Datum value on os per it's discriminator. 
+ *
+ * @param	os		Stream to write kind on
+ * @param	kind	Value to write on os
+ * @return	os 
+ ************************************************************************************************/
+ostream& operator<<(std::ostream& os, const Datum::Kind& kind) {
+	switch (kind) {
+	case Datum::Integer:	return os << "Integer";	break;
+	case Datum::Real:		return os << "Real";	break;
+	default:
+		assert(false);
+		return os << "Unknown Datum Kind!";
+	}
+}
+
+/********************************************************************************************//**
  * @brief Datum stream put operator
  *
  * Puts Datum value on os per it's discriminator. 
  *
- * @param	os	Stream to write d's value to 
- * @param	d	Datum whose value to write 
+ * @param	os		Stream to write value on
+ * @param	value	Value to write  on os
  * @return	os 
  ************************************************************************************************/
-ostream& operator<<(std::ostream& os, const Datum& d) {
-	switch (d.kind()) {
-	case Datum::Integer:	os << d.integer();	break;
-	case Datum::Real:		os << d.real();	break;
-	default:	assert(false);  os << 0;
+ostream& operator<<(std::ostream& os, const Datum& value) {
+	switch (value.kind()) {
+	case Datum::Integer:	os << value.integer();	break;
+	case Datum::Real:		os << value.real();		break;
+	default: assert(false); os << 0;
 	}
 
 	return os;

@@ -7,6 +7,7 @@
 #ifndef	TYPE_H
 #define	TYPE_H
 
+#include <iostream>
 #include <string>
 #include <memory>
 #include <vector>
@@ -49,6 +50,14 @@ public:
 };
 
 /************************************************************************//**
+ * @brief Field put operator
+ *
+ * @param	os		Stream to put the value one
+ * @param	field	Value to put on os
+ ****************************************************************************/
+std::ostream& operator<<(std::ostream& os, const Field& field);
+
+/************************************************************************//**
  * A vector of Field's
  ****************************************************************************/
 typedef std::vector<Field>	FieldVec;
@@ -75,6 +84,14 @@ public:
 	size_t span() const;
 };	
 
+/************************************************************************//**
+ * @brief SubRange put operator
+ *
+ * @param	os		Stream to put the value one
+ * @param	srange	Value to put on os
+ ****************************************************************************/
+std::ostream& operator<<(std::ostream& os, const SubRange& srange);
+
 /************************************************************************//**	
  * Type Descriptor
  ****************************************************************************/
@@ -93,19 +110,23 @@ public:
 		Enumeration
 	};
 
-	/// Return kind as a stirng
-	static const std::string toString(Kind kind);
-
 	/// Create and return a shared pointer to a new TDesc
 	static TDescPtr newTDesc(
-		Kind			kind,
-		unsigned		size,
-		const SubRange&	range,
-		ConstTDescPtr	base,
-		const FieldVec&	fields);
+				Kind			kind,
+				unsigned		size,
+		const	SubRange&		range = SubRange(),
+				ConstTDescPtr	base = ConstTDescPtr(),
+		const	FieldVec&		fields = FieldVec());
 
 	/// Default constructor
 	TDesc() : _kind(Integer), _size(0)	{}
+
+	/// Constructor
+	TDesc(			Kind			kind,
+					unsigned		size,
+			const	SubRange&		range	= SubRange(),
+					ConstTDescPtr	base	= ConstTDescPtr(),
+			const	FieldVec&		fields	= FieldVec());
 
 	virtual ~TDesc() {}					///< Destructor
 
@@ -124,15 +145,8 @@ public:
 	/// Return my fields
 	const FieldVec& fields() const		{	return _fields;		}
 
-	bool isOrdinal() const;				/// Ordinal type?
-
-protected:
-	/// Constructor
-	TDesc(	Kind				kind,
-			unsigned			size,
-			const SubRange&		range,
-			ConstTDescPtr		base,
-			const FieldVec&		fields);
+	bool isOrdinal() const;				///< Ordinal type?
+	bool isElmentary() const;			///< Elementary type? 
 
 private:
 	Kind			_kind;				///< My kind
@@ -141,6 +155,9 @@ private:
 	ConstTDescPtr	_base;				///< Base type for Elementry, Array, Enumeration
 	FieldVec		_fields;			///< List of fields for Record
 };
+
+std::ostream& operator<<(std::ostream& os, const TDesc::Kind& value);
+std::ostream& operator<<(std::ostream& os, const TDesc& value);
 
 #endif
 

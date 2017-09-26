@@ -11,6 +11,7 @@
 #define SYMBOL_H
 
 #include <cstdint>
+#include <iostream>
 #include <map>
 #include <sstream>
 
@@ -41,8 +42,6 @@ public:
 		Function,								///< A function entry point and return type
 		Type									///< Entry in the type system
 	};
-
-	static std::string toString(Kind kind);		///< Return a kind as a string
 
 	typedef std::vector<Kind> KindVec;			///< Vector of Kinds
 	
@@ -81,6 +80,8 @@ private:
 	TDescPtr		_type;						///< Type, n/a for Procedures
 	TDescPtrVec		_params;					///< Subroutine parameter kinds
 };
+
+std::ostream& operator<<(std::ostream& os, const SymValue::Kind& kind);
 
 /********************************************************************************************//**
  * A SymbolTable; a multimap of symbol identifiers to SymValue's

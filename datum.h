@@ -35,8 +35,6 @@ public:
 
 	typedef std::vector<Kind>	KindVec;	///< Vector of Datum Kind's
 
-	static std::string toString(Kind k);	///< Return k as a string...
-
 	Datum();								///< Default constructor...
 	Datum(bool value);						///< Construct a boolean, as a integer
 	Datum(int value);						///< Construct a signed integer...
@@ -69,7 +67,8 @@ private:
  ************************************************************************************************/
 typedef	std::vector<Datum>	DatumVector;
 
-std::ostream& operator<<(std::ostream& os, const Datum& d);
+std::ostream& operator<<(std::ostream& os, const Datum::Kind& kind);
+std::ostream& operator<<(std::ostream& os, const Datum& value);
 
 Datum operator+	(const Datum& lhs,	const Datum& rhs);
 Datum operator-	(const Datum& lhs,	const Datum& rhs);

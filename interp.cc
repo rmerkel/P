@@ -304,22 +304,31 @@ size_t Interp::cycles() const {
 	return ncycles;
 }
 
-// public static
+// operators
 
-/**
- * @param	r	Result who's name we want
- * @return	r's name string.
- */
-string Interp::toString(Result r) {
-	switch (r) {
-	case Result::success:			return "success";			break;
-	case Result::divideByZero:		return "divideByZero";		break;
-	case Result::badFetch:			return "badFetch";			break;
-	case Result::unknownInstr:		return "unknownInstr";		break;
-	case Result::stackOverflow:		return "stackOverflow";		break;
-	case Result::stackUnderflow:	return "stackUnderflow";	break;
-	case Result::halted:			return "halted";			break;
-	default:						return "undefined error!";
+/********************************************************************************************//**
+ * @brief Interp::Result stream put operator
+ *
+ * Puts Result value on os
+ *
+ * @param	os		Stream to write value to 
+ * @param	result	The value to write 
+ * @return	os 
+ ************************************************************************************************/
+ostream& operator<<(std::ostream& os, const Interp::Result& result) {
+	switch (result) {
+	case Interp::success:			os << "success";		break;
+	case Interp::divideByZero:		os << "divideByZero";	break;
+	case Interp::badFetch:			os << "badFetch";		break;
+	case Interp::unknownInstr:		os << "unknownInstr";	break;
+	case Interp::stackOverflow:		os << "stackOverflow";	break;
+	case Interp::stackUnderflow:	os << "stackUnderflow";	break;
+	case Interp::halted:			os << "halted";			break;
+	default:
+		return os << "undefined result!";
+		assert(false);
 	}
+
+	return os;
 }
 

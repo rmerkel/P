@@ -25,6 +25,19 @@ Field::Field(const std::string& name, ConstTDescPtr type)
 {
 }
 
+// operators
+
+/********************************************************************************************//**
+ * @brief Field stream put operator
+ *
+ * @param	os		The stream to write field on
+ * @param	field	Datum whose value to write 
+ * @return	os 
+ ************************************************************************************************/
+ostream& operator<<(std::ostream& os, const Field& field) {
+	return os << field.name() << ", " << field.type()->kind();
+}
+
 /****************************************************************************
  * Sub-Range - minimum to maximum
  ****************************************************************************/
@@ -47,67 +60,56 @@ size_t SubRange::span() const	{
 	return maximum() - minimum() + 1;
 }
 
+// operators
+
+/********************************************************************************************//**
+ * Puts value on os
+ *
+ * @param	os		The stream to write field's value on
+ * @param	srange	Value to write 
+ * @return	os
+ ************************************************************************************************/
+ostream& operator<<(std::ostream& os, const SubRange& srange) {
+	return os << srange.minimum() << ".." << srange.maximum();
+}
+
 /************************************************************************//**	
  * Type Descriptor
  ****************************************************************************/
-
-// protected static
-
-/************************************************************************//**
- * Return kind as a stirng
- ****************************************************************************/
-const std::string TDesc::toString(Kind kind) {
-	switch (kind) {
-	case None:			return "unknown";
-	case Integer:		return "integer";
-	case Real:			return "real";
-	case Boolean:		return "boolean";
-	case Character:		return "character";
-	case Array:			return "array";
-	case SRange:		return "subrange";
-	case Record:		return "record";
-	case Enumeration:	return "enumeration";
-	default:
-		assert(0);
-		return "unknown!";
-	}
-}
-
-// protected:
-
-/************************************************************************//**
- * @param	kind	The Type class's kind 
- * @param	size	Size, in bytes, of a object of this type
- * @param	range	The Type class's range
- * @param	base	The Type class's base type
- * @param	fields	The Type classe's fields
- ****************************************************************************/
-TDesc::TDesc(
-	TDesc::Kind		kind,
-	unsigned		size,
-	const SubRange&	range,
-	ConstTDescPtr	base,
-	const FieldVec&	fields)
-
-	: _kind{kind}, _size(size), _range{range}, _base{base}, _fields{fields}
-{
-}
 
 // public
 
 /************************************************************************//**
  * @param	kind	The Type class's kind 
+ * @param	size	Size, in bytes, of a object of this type
+ * @param	range	The Type class's range. Defaults to SubRange().
+ * @param	base	The Type class's base type. Defaults to ConstTDescPtr().
+ * @param	fields	The Type classe's fields. Defaults to FieldVec().
+ ****************************************************************************/
+TDesc::TDesc(
+			TDesc::Kind		kind,
+			unsigned		size,
+	const	SubRange&		range,
+			ConstTDescPtr	base,
+	const	FieldVec&		fields)
+
+	: _kind{kind}, _size(size), _range{range}, _base{base}, _fields{fields}
+{
+}
+
+/************************************************************************//**
+ * @param	kind	The Type class's kind 
  * @param	size	Size, in bytes, of a object of this type 
- * @param	range	The Type class's range
- * @param	base	The Type class's base type
- * @param	fields	The Type classe's fields
+ * @param	range	The Type class's range. Default is SubRange().
+ * @param	base	The Type class's base type. Default is ConstTDescPtr().
+ * @param	fields	The Type classe's fields. Default is FieldVec().
  ****************************************************************************/
 TDescPtr TDesc::newTDesc(
-	TDesc::Kind		kind,
-	unsigned		size,
-	const SubRange&	range,
-	ConstTDescPtr	base,
-	const FieldVec&	fields)
+			TDesc::Kind		kind,
+			unsigned		size,
+	const	SubRange&		range,
+			ConstTDescPtr	base,
+	const	FieldVec&		fields)
 {
 	return TDescPtr{ new TDesc(kind, size, range, base, fields) };
 }
@@ -128,5 +130,69 @@ bool TDesc::isOrdinal() const {
 	case Enumeration:	return true;
 	default:			return false;
 	}
+}
+
+/************************************************************************//**
+ * @return true if I'm an ordinal type
+ ****************************************************************************/
+bool TDesc::isElmentary() const {
+	switch(kind()) {
+	case None:			return false;
+	case Integer:		return true;
+	case Real:			return true;
+	case Boolean:		return true;
+	case Character:		return true;
+	default:			return false;
+	}
+}
+
+// operators
+
+/********************************************************************************************//**
+ * @brief TDesc::Kind stream put operator
+ *
+ * @param	os		Stream to write value on
+ * @param	value	Value to write  on os
+ * @return	os 
+ ************************************************************************************************/
+ostream& operator<<(std::ostream& os, const TDesc::Kind& value) {
+	switch (value) {
+	case TDesc::None:			os << "unknown";		break;
+	case TDesc::Integer:		os << "integer";		break;
+	case TDesc::Real:			os << "real";			break;
+	case TDesc::Boolean:		os << "boolean";		break;
+	case TDesc::Character:		os << "character";		break;
+	case TDesc::Array:			os << "array";			break;
+	case TDesc::SRange:			os << "subrange";		break;
+	case TDesc::Record:			os << "record";			break;
+	case TDesc::Enumeration:	os << "enumeration";	break;
+
+	default: 					os << "unknown kind"; assert(false);
+	}
+
+	return os;
+}
+
+/********************************************************************************************//**
+ * @brief TDesc put operator
+ *
+ * @param	os		The stream to write field's value on
+ * @param	type	Value to write 
+ * @return	os
+ ************************************************************************************************/
+ostream& operator<<(std::ostream& os, const TDesc& type) {
+	os 	<<	type.kind()		<< ", "
+		<<	type.size()		<< ", ("
+		<<	type.range()	<< "), ("
+		<<	*type.base()	<< "), ((";
+
+	const auto flds = type.fields();
+	if (flds.size() == 1)
+		os << flds[0];
+	else
+		for (auto& f : flds)
+			os << f << ", ";
+
+	return os << "))";
 }
 

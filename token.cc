@@ -155,78 +155,6 @@ Token TokenStream::get() {
 	}
 }
 
-// public static
-
-/// Return a string with k's name
-string Token::toString(Token::Kind k) {
-	switch(k) {
-	case Kind::Unknown:		return "unknown";		break;
-	case Kind::BadComment:	return "bad comment";	break;
-
-	case Kind::Identifier:	return "identifier";	break;
-
-	case Kind::IntegerNum:	return "IntegerNum";	break;
-	case Kind::RealNum:		return "RealNum";		break;
-	case Kind::TypeDecl:	return "type";			break;
-	case Kind::ConsDecl:	return "const";			break;
-	case Kind::VarDecl:		return "var";			break;
-	case Kind::ProgDecl:	return "program";		break;
-	case Kind::ProcDecl:	return "procedure";		break;
-	case Kind::FuncDecl:	return "function";		break;
-	case Kind::Begin:		return "begin";			break;
-	case Kind::End:			return "end";			break;
-	case Kind::If:			return "if";			break;
-	case Kind::Then:		return "then";			break;
-	case Kind::Else:		return "else";			break;
-	case Kind::Ellipsis:	return "..";			break;
-	case Kind::While:		return "while";			break;
-	case Kind::Do:			return "do";			break;
-	case Kind::Repeat:		return "repeat";		break;
-	case Kind::Until:		return "until";			break;
-
-	case Kind::IntegerType:	return "integer";		break;
-	case Kind::RealType:	return "real";			break;
-
-	case Kind::Array:		return "array";			break;
-	case Kind::Of:			return "of";			break;
-
-	case Kind::Round:		return "round";			break;
-
-	case Kind::EOS:			return "EOS";			break;
-
-	case Kind::EQU:			return "=";				break;
-	case Kind::LTE:			return "<=";			break;
-	case Kind::GTE:			return ">=";			break;
-	case Kind::Or:			return "or";			break;
-	case Kind::And:			return "and";			break;
-	case Kind::NEQ:			return "<>";			break;
-
-	case Kind::LT:			return "<";				break;
-	case Kind::GT:			return ">";				break;
-
-	case Kind::Add:			return "+";				break;
-	case Kind::Subtract:	return "-";				break;
-	case Kind::Multiply:	return "*";				break;
-	case Kind::Divide:		return "/";				break;
-
-	case Kind::OpenParen:	return "(";				break;
-	case Kind::CloseParen:	return ")";				break;
-	case Kind::OpenBrkt:	return "[";				break;
-	case Kind::CloseBrkt:	return "]";				break;
-	case Kind::Comma:		return ",";				break;
-	case Kind::Period:		return ".";				break;
-	case Kind::Colon:		return ":";				break;
-	case Kind::SemiColon:	return ";";				break;
-	case Kind::Assign:		return ":=";			break;
-
-	default: {
-			ostringstream oss;
-			oss << "Unknown Kind: " << static_cast<unsigned>(k) <<  "!" << ends;
-			return oss.str();
-		}
-	}
-}
-
 /************************************************************************************************
  *	TokenStream
  ************************************************************************************************/
@@ -268,7 +196,7 @@ TokenStream::KeywordTable	TokenStream::keywords = {
 	{	"end",			Token::End			},
 	{	"function",		Token::FuncDecl		},
 	{	"if",			Token::If			},
-	{	"integer",		Token::IntegerType	},
+	{	"integer",		Token::IntType		},
 	{	"mod",			Token::Mod			},
 	{	"of",			Token::Of			},
 	{	"or",			Token::Or			},
@@ -282,4 +210,81 @@ TokenStream::KeywordTable	TokenStream::keywords = {
 	{	"var",			Token::VarDecl		},
 	{	"while",		Token::While		}
 };
+
+// operators
+
+/********************************************************************************************//**
+ * @brief Token::Kind stream put operator
+ *
+ * @param	os		Stream to write kind to 
+ * @param	kind	Token kind to write  or os
+ * @return	os 
+ ************************************************************************************************/
+ostream& operator<<(std::ostream& os, const Token::Kind& kind) {
+	switch (kind) {
+	case Token::Unknown:	os << "unknown";		break;
+	case Token::BadComment:	os << "bad comment";	break;
+
+	case Token::Identifier:	os << "identifier";		break;
+
+	case Token::IntegerNum:	os << "IntegerNum";		break;
+	case Token::RealNum:	os << "RealNum";		break;
+	case Token::TypeDecl:	os << "type";			break;
+	case Token::ConsDecl:	os << "const";			break;
+	case Token::VarDecl:	os << "var";			break;
+	case Token::ProgDecl:	os << "program";		break;
+	case Token::ProcDecl:	os << "procedure";		break;
+	case Token::FuncDecl:	os << "function";		break;
+	case Token::Begin:		os << "begin";			break;
+	case Token::End:		os << "end";			break;
+	case Token::If:			os << "if";				break;
+	case Token::Then:		os << "then";			break;
+	case Token::Else:		os << "else";			break;
+	case Token::Ellipsis:	os << "..";				break;
+	case Token::While:		os << "while";			break;
+	case Token::Do:			os << "do";				break;
+	case Token::Repeat:		os << "repeat";			break;
+	case Token::Until:		os << "until";			break;
+
+	case Token::IntType:	os << "integer";		break;
+	case Token::RealType:	os << "real";			break;
+
+	case Token::Array:		os << "array";			break;
+	case Token::Of:			os << "of";				break;
+
+	case Token::Round:		os << "round";			break;
+
+	case Token::EOS:		os << "EOS";			break;
+
+	case Token::EQU:		os << "=";				break;
+	case Token::LTE:		os << "<=";				break;
+	case Token::GTE:		os << ">=";				break;
+	case Token::Or:			os << "or";				break;
+	case Token::And:		os << "and";			break;
+	case Token::NEQ:		os << "<>";				break;
+
+	case Token::LT:			os << "<";				break;
+	case Token::GT:			os << ">";				break;
+
+	case Token::Add:		os << "+";				break;
+	case Token::Subtract:	os << "-";				break;
+	case Token::Multiply:	os << "*";				break;
+	case Token::Divide:		os << "/";				break;
+
+	case Token::OpenParen:	os << "(";				break;
+	case Token::CloseParen:	os << ")";				break;
+	case Token::OpenBrkt:	os << "[";				break;
+	case Token::CloseBrkt:	os << "]";				break;
+	case Token::Comma:		os << ",";				break;
+	case Token::Period:		os << ".";				break;
+	case Token::Colon:		os << ":";				break;
+	case Token::SemiColon:	os << ";";				break;
+	case Token::Assign:		os << ":=";				break;
+
+	default:
+			os << "Unknown Kind: " << static_cast<unsigned>(kind) <<  "!";
+	}
+
+	return os;
+}
 

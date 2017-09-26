@@ -15,6 +15,7 @@
 #include <iostream>
 #include <fstream>
 #include <limits>
+#include <sstream>
 #include <vector>
 
 using namespace std;
@@ -27,29 +28,12 @@ using namespace std;
 
 // built-in types
 
-/// Type descriptor for integers
-ConstTDescPtr	Comp::intDesc = TDesc::newTDesc(
-	TDesc::Kind::Integer,
-	1,
-	SubRange(numeric_limits<int>::min(), numeric_limits<int>::max()),
-	ConstTDescPtr(),
-	FieldVec());
-
-/// Type descriptor for reals
-ConstTDescPtr Comp::realDesc = TDesc::newTDesc(
-	TDesc::Kind::Real,
-	1,
-	SubRange(numeric_limits<double>::min(), numeric_limits<double>::max()),
-	ConstTDescPtr(),
-	FieldVec());
-
-/// Type descriptor for characters
-ConstTDescPtr Comp::charDesc = TDesc::newTDesc(
-	TDesc::Kind::Character,
-	1,
-	SubRange(0, 127), 
-	ConstTDescPtr(),
-	FieldVec());
+ConstTDescPtr Comp::intDesc	 = TDesc::newTDesc(	TDesc::Kind::Integer,
+												1,
+												SubRange(numeric_limits<int>::min(),
+														 numeric_limits<int>::max()));
+ConstTDescPtr Comp::realDesc = TDesc::newTDesc(TDesc::Kind::Real, 1);
+ConstTDescPtr Comp::charDesc = TDesc::newTDesc(TDesc::Kind::Character, 1, SubRange(0, 127));
 
 // private:
 
@@ -69,7 +53,7 @@ void Comp::error(const std::string& msg) {
  * @param name Parameter to msg.
  ************************************************************************************************/
 void Comp::error(const std::string& msg, const std::string& name) {
-	error (msg + " \'" + name + "\'");
+	error (msg + " '" + name + "'");
 }
 
 /********************************************************************************************//**
@@ -80,18 +64,17 @@ Token Comp::next() {
 
 	if (Token::Unknown == t.kind) {
 		ostringstream oss;
-		oss
-			<< "Unknown token: '" << t.string_value
-			<< "', (0x" << hex << t.integer_value << ")";
+		oss << "Unknown token: '" << t.string_value << "', (0x" << hex << t.integer_value << ")";
 		error(oss.str());
 		return next();
 	}
 
 	if (verbose)
 		cout
-			<< progName << ": getting '"
-			<< Token::toString(t.kind) << "', "
-			<< t.string_value << ", " << t.integer_value << "\n";
+			<< progName			<< ": getting '"
+			<< t.kind			<< "', "
+			<< t.string_value	<< ", "
+			<< t.integer_value	<< "\n";
 
 	return t;
 }
@@ -124,7 +107,9 @@ bool Comp::accept(Token::Kind kind, bool get) {
 bool Comp::expect(Token::Kind kind, bool get) {
 	if (accept(kind, get)) return true;
 
-	error("expected", Token::toString(kind) + "\' got \'" + Token::toString(current()));
+	ostringstream oss;
+	oss << "expected '" << kind << "' got '" << current() << "'";
+	error(oss.str());
 	return false;
 }
 
@@ -262,7 +247,7 @@ void Comp::purge(int level) {
 			if (verbose)
 				cout << progName << ": purging "
 					 << i->first << ": "
-					 << SymValue::toString(i->second.kind()) << ", "
+					 << i->second.kind() << ", "
 					 << static_cast<int>(i->second.level()) << ", "
 					 << i->second.value().integer()
 					 << " from the symbol table\n";
@@ -394,8 +379,9 @@ ConstTDescPtr Comp::factor(int level) {
 		expect(Token::CloseParen);
 
 	} else {
-		error("factor: syntax error; expected ident | num | { expr }, got:",
-			Token::toString(current()));
+		ostringstream oss;
+		oss << "factor: syntax error; expected ident | num | { expr }, got: " << current();
+		error(oss.str());
 		next();
 	}
 
@@ -610,9 +596,7 @@ void Comp::callStmt(const string& name, const SymValue& val, int level) {
 
 		if (nParams != params.size()) {			// Is the caller passing right # of params?
 			ostringstream oss;
-			oss << "passing " << nParams 
-				<< " parameters where " << params.size()
-				<< " where expected";
+			oss << "passing " << nParams << " parameters, where " << params.size() << " expected";
 			error(oss.str());
 		}
 	}
@@ -709,8 +693,8 @@ ConstTDescPtr Comp::variable(int level, SymbolTable::iterator it) {
 	auto type = it->second.type();
 
 	emitVarRef(level, it->second);
-	if (accept(Token::OpenBrkt)) {		// variable is an array, index into it
-		type = it->second.type()->base();
+	if (accept(Token::OpenBrkt)) {			// variable is an array, index into it
+		type = it->second.type()->base();	// Use the array base type...
 
 		if (it->second.type()->kind() != TDesc::Array)
 			error("attempt to index into non-array", it->first);
@@ -722,7 +706,24 @@ ConstTDescPtr Comp::variable(int level, SymbolTable::iterator it) {
 		else if (tvec.size() > 1)
 			error("multidimensional arrays are not supported!");
 
-		else {							// index into the array
+		/*
+		 * type: the array base type
+		 * tvec[0]: the index type... comp the base type of sub-ranges and enum's
+		 */
+		else if ( tvec[0] 													!= type		||
+				 (tvec[0]->kind() == TDesc::SRange		&& tvec[0]->base()	!= type)	||
+				 (tvec[0]->kind() == TDesc::Enumeration	&& tvec[0]->base()	!= type)) {
+			ostringstream oss;
+			oss << "incompatable array index type" << tvec[0]->kind();
+
+#if 1	// temp/test
+			cerr
+				<< "type: " << type->kind() << ", "
+				<< "tvec: " << tvec[0]->kind() << ", "
+				<< "base: " << tvec[0]->base()->kind() << endl;
+#endif
+
+		} else {							// index into the array
 			if (type->size() != 1) {	// scale the index
 				emit(OpCode::Push, 0, type->size());
 				emit(OpCode::Mul);
@@ -892,8 +893,7 @@ void Comp::typeDecl(int level) {
 	auto tdesc = type(level);
 
 	if (verbose)
-		cout << progName << ": type " << ident << " = "
-			 << TDesc::toString(tdesc->kind())	<< "\n";
+		cout << progName << ": type " << ident << " = " << tdesc->kind()	<< "\n";
 
 	symtbl.insert(	{ ident, SymValue(level, tdesc) }	);
 }
@@ -995,7 +995,7 @@ void Comp::varDeclList(int level, bool params, NameKindVec& idents) {
 				 << ": var/param " 	<< id.name << ": " 
 				 << level 			<< ", "
 			     << dx	 			<< ", " 
-				 << TDesc::toString(id.type->kind()) << "\n";
+				 << id.type->kind() << "\n";
 
 		symtbl.insert( { id.name, SymValue(level, dx++, id.type)	} );
 	}
@@ -1109,7 +1109,7 @@ ConstTDescPtr Comp::simpleType(int level) {
 		else
 			type = it->second.type();
 
-	} else if (accept(Token::IntegerType))		// Integer
+	} else if (accept(Token::IntType))			// Integer
 		return intDesc;
 
 	else if (accept(Token::OpenParen)) {		// Enumeration

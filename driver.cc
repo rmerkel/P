@@ -159,8 +159,8 @@ int main(int argc, char* argv[]) {
 		}
 
 		const Interp::Result r = machine(code, verbose);
-		if (Interp::Result::success != r)
-			cerr << progName << ": runtime error: " << Interp::toString(r) << "!\n";
+		if (Interp::success != r)
+			cerr << progName << ": runtime error: " << r << "!\n";
 
 		if (verbose) cout << progName << ": Ending pl/0c after " << machine.cycles() << " machine cycles\n";
 	}

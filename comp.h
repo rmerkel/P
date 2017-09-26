@@ -49,7 +49,7 @@ private:
 	SourceIndex			indextbl;			///< Source cross-index for listings
 
 	// built-in types
-	static	ConstTDescPtr	intDesc;		///< integer type descriptor
+	static	ConstTDescPtr	intDesc;		///< Integer type descriptor
 	static	ConstTDescPtr	realDesc;		///< Real type descriptor
 	static 	ConstTDescPtr	charDesc;		///< Character type descriptor
 

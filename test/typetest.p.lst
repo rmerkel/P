@@ -1,8 +1,10 @@
+type: integer, tvec: subrange, base: integer
+type: integer, tvec: subrange, base: integer
 # test/typetest.p, 2: { Test advanced types	}
 # test/typetest.p, 3: program testtype ;
 # test/typetest.p, 4: 	{	integers, ranges and aliases	}
 # test/typetest.p, 5: 	procedure test1;
-    0: call 0, 117
+    0: call 0, 115
     1: halt
 # test/typetest.p, 6: 	type
 # test/typetest.p, 7: 		int = integer;
@@ -120,30 +122,28 @@
    73: pushvar 0, 6
    74: pushvar 0, 5
    75: eval
-   76: add
-   77: pushvar 0, 6
-   78: pushvar 0, 5
+   76: pushvar 0, 6
+   77: pushvar 0, 5
+   78: eval
    79: eval
-   80: add
-   81: eval
-   82: push 10
-   83: mul
-   84: assign
+   80: push 10
+   81: mul
+   82: assign
 # test/typetest.p, 48: 			ir := ir + 1
-   85: pushvar 0, 5
-   86: pushvar 0, 5
-   87: eval
-   88: push 1
+   83: pushvar 0, 5
+   84: pushvar 0, 5
+   85: eval
+   86: push 1
 # test/typetest.p, 49: 		end until ir = 10	{	compilier warning: may always be false	}
-   89: add
-   90: assign
-   91: pushvar 0, 5
-   92: eval
-   93: push 10
+   87: add
+   88: assign
+   89: pushvar 0, 5
+   90: eval
+   91: push 10
 # test/typetest.p, 50: 	end;
-   94: equ
-   95: jneq 73
-   96: ret
+   92: equ
+   93: jneq 73
+   94: ret
 # test/typetest.p, 51: 
 # test/typetest.p, 52: 	procedure test3;
 # test/typetest.p, 53: 	type
@@ -151,40 +151,40 @@
 # test/typetest.p, 55: 	var
 # test/typetest.p, 56: 		a2 : array [enum] of integer;
 # test/typetest.p, 57: 	begin
-   97: enter 4
+   95: enter 4
 # test/typetest.p, 58: 		a2[one] := 1;
-   98: pushvar 0, 4
-   99: pushvar 0, 4
-  100: eval
-  101: add
-  102: push 1
-  103: assign
+   96: pushvar 0, 4
+   97: pushvar 0, 4
+   98: eval
+   99: add
+  100: push 1
+  101: assign
 # test/typetest.p, 59: 		a2[two] := 2;
-  104: pushvar 0, 4
-  105: pushvar 0, 5
-  106: eval
-  107: add
-  108: push 2
-  109: assign
+  102: pushvar 0, 4
+  103: pushvar 0, 5
+  104: eval
+  105: add
+  106: push 2
+  107: assign
 # test/typetest.p, 60: 		a2[three] := 3		{	ord(three)	}
-  110: pushvar 0, 4
-  111: pushvar 0, 6
-  112: eval
-  113: add
-  114: push 3
+  108: pushvar 0, 4
+  109: pushvar 0, 6
+  110: eval
+  111: add
+  112: push 3
 # test/typetest.p, 61: 	end;
-  115: assign
-  116: ret
+  113: assign
+  114: ret
 # test/typetest.p, 62: 
 # test/typetest.p, 63: begin
 # test/typetest.p, 64: 	test1;
-  117: call 0, 2
+  115: call 0, 2
 # test/typetest.p, 65: 	test2;
-  118: call 0, 47
+  116: call 0, 47
 # test/typetest.p, 66: 	test3
 # test/typetest.p, 67: end.
-  119: call 0, 97
-  120: ret
+  117: call 0, 95
+  118: ret
 
        12:          0
        12:          1
@@ -219,24 +219,24 @@
        13:          0
        14:          0
        13:          1
-       15:         10
+       14:          0
        13:          2
-       16:         20
+       14:          0
        13:          3
-       17:         30
+       14:          0
        13:          4
-       18:         40
+       14:          0
        13:          5
-       19:         50
+       14:          0
        13:          6
-       20:         60
+       14:         10
        13:          7
-       21:         70
+       14:          0
        13:          8
-       22:         80
+       14:         40
        13:          9
-       23:         90
+       14:         40
        13:         10
        22:          1
        22:          2
-       12:          3
+       52:          3

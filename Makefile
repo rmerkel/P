@@ -28,7 +28,7 @@ endif
 # Project files
 ################################################################################
 
-SRCS	= datum.cc driver.cc instr.cc comp.cc interp.cc symbol.cc token.cc type.cc
+SRCS	= $(wildcard *.cc)
 ALLSRCS	= $(SRCS) $(wildcard *.h)
 OBJS	= $(SRCS:.cc=.o)
 DEPS	= $(SRCS:.cc=.d)

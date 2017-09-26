@@ -15,6 +15,7 @@
 
 #include "datum.h"
 
+#include <iostream>
 #include <map>
 #include <sstream>
 #include <set>
@@ -51,7 +52,7 @@ struct Token {
 		Until,							///< "until"
 		Ellipsis,						///< ".."
 
-		IntegerType,					///< "integer"
+		IntType,						///< "integer"
 		RealType,						///< "real"
 		Array,							///< "array"
 		Of,								///< "of"
@@ -96,8 +97,6 @@ struct Token {
 
 	/// A set of Token kinds
 	typedef std::set<Kind>	KindSet;
-
-	static std::string toString(Kind k); ///< Return k's name
 
 	Kind			kind;				///< Token type
 	std::string		string_value;		///< kind == Identifier
@@ -157,7 +156,9 @@ private:								/// A map of keywords to their 'kind'
 	Token 			ct { Token::EOS };
 
 	/// If *this* owns ip, delete it.
-	void close()							{ if (owns) delete ip;	}
+	void close()						{	if (owns) delete ip;	}
 };
+
+std::ostream& operator<<(std::ostream& os, const Token::Kind& kind);
 
 #endif

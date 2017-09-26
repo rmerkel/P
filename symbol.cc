@@ -13,26 +13,6 @@
 
 using namespace std;
 
-// public static
-
-/********************************************************************************************//**
- * @param	kind	Symbol table Kind
- * @return	kind's name
- ************************************************************************************************/
-string SymValue::toString(SymValue::Kind kind) {
-	switch(kind) {
-	case SymValue::None:		return "None";
-	case SymValue::Variable:	return "Variable";
-	case SymValue::Constant:	return "ConsInt";
-	case SymValue::Procedure:	return "Procedure";
-	case SymValue::Function:	return "Function";
-	case SymValue::Type:		return "Type";
-	default:
-		assert(false);
-		return "Unknown SymValue Kind!";
-	}
-}
-
 // public
 
 /********************************************************************************************//**
@@ -132,4 +112,31 @@ TDescPtrVec& SymValue::params() 					{   return _params;			}
  * @return Subrountine kinds
  ************************************************************************************************/
 const TDescPtrVec& SymValue::params() const 		{   return _params;			}
+
+// operators
+
+/********************************************************************************************//**
+ * @brief Datum::Kind stream put operator
+ *
+ * Puts Datum value on os per it's discriminator. 
+ *
+ * @param	os		Stream to write d's value to 
+ * @param	kind	Datum kind whose value to write 
+ * @return	os 
+ ************************************************************************************************/
+ostream& operator<<(std::ostream& os, const SymValue::Kind& kind) {
+	switch(kind) {
+	case SymValue::None:		os << "None";		break;
+	case SymValue::Variable:	os << "Variable";	break;
+	case SymValue::Constant:	os << "ConsInt";	break;
+	case SymValue::Procedure:	os << "Procedure";	break;
+	case SymValue::Function:	os << "Function";	break;
+	case SymValue::Type:		os << "Type";		break;
+	default:
+		assert(false);
+		os << "Unknown SymValue Kind!";
+	}
+	
+	return os;
+}
 

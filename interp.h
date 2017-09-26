@@ -10,6 +10,7 @@
 #ifndef	INTERP_H
 #define INTERP_H
 
+#include <iostream>
 #include <cstdint>
 #include <vector>
 
@@ -24,7 +25,7 @@
 class Interp {
 public:
 	/// Interpeter results
-	enum class Result {
+	enum Result {
 		success,							///< No errors
 		divideByZero,						///< Divide by zero
 		badFetch,							///< Attempt to fetch uninitialized code
@@ -33,8 +34,6 @@ public:
 		stackUnderflow,						///< Attempt to access an empty stack
 		halted								///< Machine has halted
 	};
-
-	static std::string toString(Result r);	///< Return the results name
 
 	Interp();
 	virtual ~Interp() {}
@@ -96,5 +95,7 @@ protected:
 	Result step();							///< Single step the machine...
 	Result run();							///< Run the machine...
 };
+
+std::ostream& operator<<(std::ostream& os, const Interp::Result& result);
 
 #endif
