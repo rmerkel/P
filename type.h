@@ -15,12 +15,12 @@
 class TDesc; 
 
 /************************************************************************//**	
- * Shared pointer to TDesc
+ * Pointer to TDesc
  ****************************************************************************/
 typedef std::shared_ptr<TDesc>	TDescPtr;
 
 /************************************************************************//**	
- * constant TDescPtr.
+ * Constant TDescPtr.
  ****************************************************************************/
 typedef const TDescPtr			ConstTDescPtr;
 
@@ -38,23 +38,14 @@ class Field {
 
 public:
 	Field() {}							///< Default constructor
-										/// Constructor
 	Field(const std::string& name, ConstTDescPtr type);
 	virtual ~Field() {}					///< Destructor
 
-										/// Return the field's name
-	const std::string& name() const		{	return _name;		}
-
-										/// Return the field's type
-	ConstTDescPtr type() const			{	return _type;		}
+	const std::string& name() const;	///< Return the fields name
+	ConstTDescPtr type() const;			///< Return the fields type
 };
 
-/************************************************************************//**
- * @brief Field put operator
- *
- * @param	os		Stream to put the value one
- * @param	field	Value to put on os
- ****************************************************************************/
+bool operator==(const Field& lhs, const Field& rhs);
 std::ostream& operator<<(std::ostream& os, const Field& field);
 
 /************************************************************************//**
@@ -74,26 +65,28 @@ public:
 	SubRange(int minimum, int maximum);	///< Constructor
 	virtual ~SubRange() {}				///< Destructor
 
-	/// Return minimum value
-	int minimum() const					{	return _min;		}
-
-	/// Return maximum value
-	int maximum() const					{	return _max;		}
-
-	/// Return my span
-	size_t span() const;
+	int minimum() const;				///< Return my minimum value
+	int maximum() const;				///< Return my maximum value
+	size_t span() const;				///< Return my range's span
 };	
 
-/************************************************************************//**
- * @brief SubRange put operator
- *
- * @param	os		Stream to put the value one
- * @param	srange	Value to put on os
- ****************************************************************************/
+bool operator==(const Field& lhs, const Field& rhs);
 std::ostream& operator<<(std::ostream& os, const SubRange& srange);
 
 /************************************************************************//**	
  * Type Descriptor
+ *                       Index
+ * Kind   size Sub-Range Type Base   Fields Ordinal Elementry
+ * ------ ---- --------- ---- ------ ------ ------- ---------
+ * None     0	   - 	  -		-		-	   N	   N
+ * Int		1  IMIN-IMAX  -		-		-	   Y	   Y
+ * Real     1      -      -		-		-	   N	   Y
+ * Bool     1    0 - 1    -		-		-	   Y       Y
+ * Char     1    0 - 127  -		-		-	   Y	   Y
+ * Array    N   Min-Max   T1	T2		-	   N	   N
+ * SRange   1	Min-Max   -		Int		-	   Y	   N
+ * Record   N	   -	  -		-	  Fields   N	   N
+ * Enum		1	Min-Max   -		Int		-	   Y	   N
  ****************************************************************************/
 class TDesc {
 public:
@@ -114,37 +107,29 @@ public:
 	static TDescPtr newTDesc(
 				Kind			kind,
 				unsigned		size,
-		const	SubRange&		range = SubRange(),
-				ConstTDescPtr	base = ConstTDescPtr(),
-		const	FieldVec&		fields = FieldVec());
+		const	SubRange&		range	= SubRange(),
+				ConstTDescPtr	rtype	= ConstTDescPtr(),
+				ConstTDescPtr	base	= ConstTDescPtr(),
+		const	FieldVec&		fields	= FieldVec());
 
-	/// Default constructor
-	TDesc() : _kind(Integer), _size(0)	{}
+	TDesc() : _kind(None), _size(0)	{}	///< Default constructor
 
 	/// Constructor
-	TDesc(			Kind			kind,
-					unsigned		size,
-			const	SubRange&		range	= SubRange(),
-					ConstTDescPtr	base	= ConstTDescPtr(),
-			const	FieldVec&		fields	= FieldVec());
+	TDesc(		Kind			kind,
+				unsigned		size,
+		const	SubRange&		range	= SubRange(),
+				ConstTDescPtr	rtype	= ConstTDescPtr(),
+				ConstTDescPtr	base	= ConstTDescPtr(),
+		const	FieldVec&		fields	= FieldVec());
 
 	virtual ~TDesc() {}					///< Destructor
 
-	/// Return my kind
-	Kind kind() const					{	return _kind;		}
-
-	/// Return my size, in bytes
-	unsigned size() const				{	return _size;		}
-
-	/// Return my sub-range
-	const SubRange& range() const		{	return _range;		}
-
-	/// Return my base type
-	ConstTDescPtr base() const			{	return _base;		}
-
-	/// Return my fields
-	const FieldVec& fields() const		{	return _fields;		}
-
+	Kind kind() const;					///< Return my kind...
+	unsigned size() const;				///< Return my size, in Datums
+	const SubRange& range() const;		///< Return my sub-range
+	ConstTDescPtr rtype() const;		///< Return my array index type
+	ConstTDescPtr base() const;			///< Return by base type
+	const FieldVec& fields() const;		///< Return my fields
 	bool isOrdinal() const;				///< Ordinal type?
 	bool isElmentary() const;			///< Elementary type? 
 
@@ -152,10 +137,12 @@ private:
 	Kind			_kind;				///< My kind
 	unsigned		_size;				///< Size of on object of my type
 	SubRange		_range;				///< My sub-range
+	ConstTDescPtr	_rtype;				///< Arrays index (sub-range) type
 	ConstTDescPtr	_base;				///< Base type for Elementry, Array, Enumeration
 	FieldVec		_fields;			///< List of fields for Record
 };
 
+bool operator==(const Field& lhs, const Field& rhs);
 std::ostream& operator<<(std::ostream& os, const TDesc::Kind& value);
 std::ostream& operator<<(std::ostream& os, const TDesc& value);
 

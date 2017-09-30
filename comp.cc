@@ -152,7 +152,7 @@ size_t Comp::emit(const OpCode op, int8_t level, Datum addr) {
  * @return  true if type can be treated as an Integer
  ************************************************************************************************/
 bool Comp::isAnInteger(ConstTDescPtr type) {
-	return 	type->kind() == TDesc::Integer || type->base() == intDesc;
+	return	type->kind() == TDesc::Integer || type->base() == intDesc;
 }
 
 /********************************************************************************************//**
@@ -160,7 +160,7 @@ bool Comp::isAnInteger(ConstTDescPtr type) {
  * @return  true if type can be treated as an Real
  ************************************************************************************************/
 bool Comp::isAReal(ConstTDescPtr type) {
-	return 	type->kind() == TDesc::Real || type->base() == realDesc;
+	return	type->kind() == TDesc::Real || type->base() == realDesc;
 }
 
 /********************************************************************************************//**
@@ -294,6 +294,17 @@ SymbolTable::iterator Comp::lookup(const string& id) {
 		return closest;
 	}
 }
+
+#if	0
+/********************************************************************************************//**
+ * @param	id	identifier to look up in the symbol table
+ * @return 	The type that id identifiers, intDesc if id is undefined.
+ ************************************************************************************************/
+ConstTDescPtr Comp::lookupType(const string& id) {
+	const auto it = lookup(id);
+	return it == symtbl.end() ? intDesc : it->second.type();
+}
+#endif
 
 /********************************************************************************************//**
  * Push a variable's value, a constant value, or invoke a function, and push the results,
@@ -686,6 +697,8 @@ void Comp::statementList(int level) {
 /********************************************************************************************//**
  * identifier [ '[' expression-list ']' ]
  *
+ * Emits a variable reference, including array indexes.
+ *
  * @param	id		The variable or array identifier
  * @param	level	The current block level.
  ************************************************************************************************/
@@ -703,35 +716,20 @@ ConstTDescPtr Comp::variable(int level, SymbolTable::iterator it) {
 		if (tvec.empty())
 			error("expected expression-list");
 
-		else if (tvec.size() > 1)
+		else if (tvec.size() > 1) {
 			error("multidimensional arrays are not supported!");
 
-		/*
-		 * type: the array base type
-		 * tvec[0]: the index type... comp the base type of sub-ranges and enum's
-		 */
-		else if ( tvec[0] 													!= type		||
-				 (tvec[0]->kind() == TDesc::SRange		&& tvec[0]->base()	!= type)	||
-				 (tvec[0]->kind() == TDesc::Enumeration	&& tvec[0]->base()	!= type)) {
+											// is the index the right type
+		} else if (type->rtype() != tvec[0]) {
 			ostringstream oss;
 			oss << "incompatable array index type" << tvec[0]->kind();
 
-#if 1	// temp/test
-			cerr
-				<< "type: " << type->kind() << ", "
-				<< "tvec: " << tvec[0]->kind() << ", "
-				<< "base: " << tvec[0]->base()->kind() << endl;
-#endif
-
-		} else {							// index into the array
-			if (type->size() != 1) {	// scale the index
-				emit(OpCode::Push, 0, type->size());
-				emit(OpCode::Mul);
-			}
-
-			emit(OpCode::Add);
+		} else if (type->size() != 1) {		// scale the index
+			emit(OpCode::Push, 0, type->size());
+			emit(OpCode::Mul);
 		}
 
+		emit(OpCode::Add);					// index into the array
 		expect(Token::CloseBrkt);
 	}
 
@@ -741,6 +739,8 @@ ConstTDescPtr Comp::variable(int level, SymbolTable::iterator it) {
 /********************************************************************************************//**
  * variable := expression | identifier [ '(' expression-list ')' ]
  *
+ * Emits code for an assignment statement, or a procedure call...
+ *
  * @param	id		The variable or prodecure identifier
  * @param	level	The current block level.
  ************************************************************************************************/
@@ -749,9 +749,7 @@ void Comp::identStatement(int level, const string& id) {
 	if (lhs == symtbl.end())
 		return;							// id is unidentified
 
-	// variable, function return value, or procedure call...
-
-	auto type = lhs->second.type();
+	auto type = lhs->second.type();		// Emit the lvalue...
 	switch(lhs->second.kind()) {
 	case SymValue::Function:			// emit reference to function return value
 		emit(OpCode::PushVar, 0, FrameRetVal);
@@ -765,33 +763,33 @@ void Comp::identStatement(int level, const string& id) {
 		type = variable(level, lhs);
 		break;
 
+	case SymValue::Constant:
+		error("Can't assign to a constant", lhs->first);
+		break;
+
 	default:
 		error("expected variable, function return ref, or procedure call, got", lhs->first);
 	}
 
-	expect(Token::Assign);					// consume the ":="...
+	expect(Token::Assign);				// Emit the rvalue...
 	const auto rhs = expression(level);
 
-	// Emit the right hand side...
-
-	switch(lhs->second.kind()) {
+	switch(lhs->second.kind()) {		// Emit the assignment
 	case SymValue::Variable:
 		assignPromote(type, rhs);
 		emit(OpCode::Assign);
 		break;
 
-	case SymValue::Function:		// Save value in the frame's retValue element
+	case SymValue::Function:			// Save value in the frame's retValue element
 		assignPromote(type, rhs);
 		emit(OpCode::Assign);
 		break;
 
-	case SymValue::Constant:
-		error("Can't assign to a constant", lhs->first);
-		break;
-
+#if 0
 	case SymValue::Procedure:
 		error("Can't assign to a procedure", lhs->first);
 		break;
+#endif
 
 	default:
 		assert(false);
@@ -832,21 +830,22 @@ void Comp::statement(int level) {
 }
 
 /********************************************************************************************//**
- * Scans and returns the next token in the stream which is expected to be an identifier. Checks
- * to see, and reports, if the identifier has already been delcared in this scope (level).
+ * If next token is an identifer, checks to see, and reports, if the identifier was previously 
+ * defined in the current scope (level), and returns the identifer string. Returns "unknown" if
+ *  the next token is not an identifer.
  *
  * @param 	level	The current block level.
  * @return 	the next identifer in the token stream, "unknown" if the next token wasn't an
  *  		identifier.
  ************************************************************************************************/
 const std::string Comp::nameDecl(int level) {
-	const string id = ts.current().string_value;			// Copy the identifer
+	const string id = ts.current().string_value;	// Copy the identifer
 
-	if (expect(Token::Identifier)) {						// Consume the identifier
-		auto range = symtbl.equal_range(id);				// Already defined?
+	if (expect(Token::Identifier)) {				// Consume the identifier
+		auto range = symtbl.equal_range(id);		// Already defined?
 		for (auto it = range.first; it != range.second; ++it) {
 			if (it->second.level() == level) {
-				error("identifier previously defined", id);
+				error("previously defined", id);
 				break;
 			}
 		}
@@ -1079,7 +1078,7 @@ ConstTDescPtr Comp::type(int level) {
 		expect(Token::CloseBrkt);
 		expect(Token::Of);
 
-		tdesc = TDesc::newTDesc(TDesc::Array, r.span(), r, type(level), FieldVec());
+		tdesc = TDesc::newTDesc(TDesc::Array, r.span(), r, ConstTDescPtr(), type(level), FieldVec());
 
 	} else										// simple-type
 		tdesc = simpleType(level);
@@ -1128,7 +1127,7 @@ ConstTDescPtr Comp::simpleType(int level) {
 		expect(Token::CloseParen);
 		SubRange r(0, enums.empty() ? 0 : enums.size());
 
-		type = TDesc::newTDesc(TDesc::Enumeration, 1, r, intDesc, enums);
+		type = TDesc::newTDesc(TDesc::Enumeration, 1, r, ConstTDescPtr(), intDesc, enums);
 
 	} else {									// Sub-Range
 		ostringstream oss;
@@ -1151,7 +1150,7 @@ ConstTDescPtr Comp::simpleType(int level) {
 
 		SubRange r(minValue.integer(), maxValue.integer());
 
-		type = TDesc::newTDesc(TDesc::SRange, 1, r, intDesc, FieldVec());
+		type = TDesc::newTDesc(TDesc::SRange, 1, r, ConstTDescPtr(), intDesc, FieldVec());
 	}
 
 	return type;
@@ -1332,8 +1331,8 @@ void Comp::run() {
  ************************************************************************************************/
 Comp::Comp(const string& pName) : progName {pName}, nErrors{0}, verbose {false}, ts{cin} {
 	// insert builtin types into the symbol table
-	symtbl.insert(	{"integer", SymValue(0, intDesc)	} );
-	symtbl.insert(	{"real",	SymValue(0, realDesc)	} );
+	symtbl.insert(	{ "integer", SymValue(0, intDesc)	} );
+	symtbl.insert(	{ "real",	SymValue(0, realDesc)	} );
 }
 
 /********************************************************************************************//**

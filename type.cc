@@ -17,15 +17,40 @@ using namespace std;
 // public:
 
 /************************************************************************//**
- * @param	name	Name of the field
- * @param	type	Fields type, e.g., "integer" or "T"
+ * @brief Constructor
+ * @param	name	The fields name
+ * @param	type	The fields type, e.g., "integer" or "T"
  ****************************************************************************/
 Field::Field(const std::string& name, ConstTDescPtr type)
 	: _name{name}, _type{type}
 {
 }
 
+/********************************************************************************************//**
+ * @return my fields name
+ ************************************************************************************************/
+const std::string& Field::name() const {
+	return _name;
+}
+
+/********************************************************************************************//**
+ * @return my fields type
+ ************************************************************************************************/
+ConstTDescPtr Field::type() const {
+	return _type;
+}
+
 // operators
+
+/********************************************************************************************//**
+ * @param lhs	The left-hand side
+ * @param rhs	The right-hand side
+ * @return true if lhs == rhs
+ ************************************************************************************************/
+bool operator==(const Field& lhs, const Field& rhs) {
+	return	lhs.name()	== rhs.name()	&&
+			lhs.type()	== rhs.type();
+}
 
 /********************************************************************************************//**
  * @brief Field stream put operator
@@ -53,6 +78,16 @@ SubRange::SubRange(int minimum, int maximum)
 {
 }
 
+/********************************************************************************************//**
+ * @return my minmum value
+ ************************************************************************************************/
+int SubRange::minimum() const					{	return _min;		}
+
+/********************************************************************************************//**
+ * @return my maximum value
+ ************************************************************************************************/
+int SubRange::maximum() const					{	return _max;		}
+
 /************************************************************************//**
  * @return the maximum() - minimum() + 1;
  ****************************************************************************/
@@ -61,6 +96,17 @@ size_t SubRange::span() const	{
 }
 
 // operators
+
+/********************************************************************************************//**
+ * @brief SubRange equality operator
+ * @param lhs	The left-hand side
+ * @param rhs	The right-hand side
+ * @return true if lhs == rhs
+ ************************************************************************************************/
+bool operator==(const SubRange& lhs, const SubRange& rhs) {
+	return	lhs.minimum() == rhs.minimum()	&&
+			lhs.maximum() == rhs.minimum();
+}
 
 /********************************************************************************************//**
  * Puts value on os
@@ -80,54 +126,85 @@ ostream& operator<<(std::ostream& os, const SubRange& srange) {
 // public
 
 /************************************************************************//**
- * @param	kind	The Type class's kind 
+ * @param	kind	The type kind 
  * @param	size	Size, in bytes, of a object of this type
- * @param	range	The Type class's range. Defaults to SubRange().
- * @param	base	The Type class's base type. Defaults to ConstTDescPtr().
- * @param	fields	The Type classe's fields. Defaults to FieldVec().
+ * @param	range	The type sub-range range. Defaults to SubRange().
+ * @param	rtype	The type array type. Defaults to ConstTDescPtr().
+ * @param	base	The type base type. Defaults to ConstTDescPtr().
+ * @param	fields	The type fields. Defaults to FieldVec().
  ****************************************************************************/
 TDesc::TDesc(
 			TDesc::Kind		kind,
 			unsigned		size,
 	const	SubRange&		range,
+			ConstTDescPtr	rtype,
 			ConstTDescPtr	base,
 	const	FieldVec&		fields)
 
-	: _kind{kind}, _size(size), _range{range}, _base{base}, _fields{fields}
+	: _kind{kind}, _size(size), _range{range}, _rtype(rtype), _base{base}, _fields{fields}
 {
 }
 
 /************************************************************************//**
- * @param	kind	The Type class's kind 
- * @param	size	Size, in bytes, of a object of this type 
- * @param	range	The Type class's range. Default is SubRange().
- * @param	base	The Type class's base type. Default is ConstTDescPtr().
- * @param	fields	The Type classe's fields. Default is FieldVec().
+ * @param	kind	The type kind 
+ * @param	size	Size, in bytes, of a object of this type
+ * @param	range	The type sub-range range. Defaults to SubRange().
+ * @param	rtype	The type array type. Defaults to ConstTDescPtr().
+ * @param	base	The type base type. Defaults to ConstTDescPtr().
+ * @param	fields	The type fields. Defaults to FieldVec().
  ****************************************************************************/
 TDescPtr TDesc::newTDesc(
 			TDesc::Kind		kind,
 			unsigned		size,
 	const	SubRange&		range,
+			ConstTDescPtr	rtype,
 			ConstTDescPtr	base,
 	const	FieldVec&		fields)
 {
-	return TDescPtr{ new TDesc(kind, size, range, base, fields) };
+	return TDescPtr{ new TDesc(kind, size, range, rtype, base, fields) };
 }
+
+/************************************************************************//**
+ * @return my kind
+ ****************************************************************************/
+TDesc::Kind TDesc::kind() const			{	return _kind;		}
+
+/************************************************************************//**
+ * @return my size, in bytes
+ ****************************************************************************/
+unsigned TDesc::size() const			{	return _size;		}
+
+/************************************************************************//**
+ * @return my sub-range
+ ****************************************************************************/
+const SubRange& TDesc::range() const	{	return _range;		}
+
+/************************************************************************//**
+ * @return my array index type
+ ****************************************************************************/
+ConstTDescPtr TDesc::rtype() const		{	return _rtype;		}
+
+/************************************************************************//**
+ * @return my base type
+ ****************************************************************************/
+ConstTDescPtr TDesc::base() const		{	return _base;		}
+
+/************************************************************************//**
+ * @return my fields
+ ****************************************************************************/
+const FieldVec& TDesc::fields() const	{	return _fields;		}
 
 /************************************************************************//**
  * @return true if I'm an ordinal type
  ****************************************************************************/
 bool TDesc::isOrdinal() const {
 	switch(kind()) {
-	case None:			return false;
 	case Integer:		return true;
-	case Real:			return false;
 	case Boolean:		return true;
 	case Character:		return true;
-	case Array:			return false;
 	case SRange:		return true;
-	case Record:		return false;
 	case Enumeration:	return true;
+
 	default:			return false;
 	}
 }
@@ -137,16 +214,32 @@ bool TDesc::isOrdinal() const {
  ****************************************************************************/
 bool TDesc::isElmentary() const {
 	switch(kind()) {
-	case None:			return false;
 	case Integer:		return true;
 	case Real:			return true;
 	case Boolean:		return true;
 	case Character:		return true;
+
 	default:			return false;
 	}
 }
 
 // operators
+
+/********************************************************************************************//**
+ * @brief TDesc equality operator
+ * @param lhs	The left-hand side
+ * @param rhs	The right-hand side
+ * @return true if lhs == rhs
+ ************************************************************************************************/
+bool operator==(const TDesc& lhs, const TDesc& rhs) {
+	return	lhs.kind()			== rhs.kind()		&&
+			lhs.size()			== rhs.size()		&&
+			lhs.range()			== rhs.range()		&&
+			lhs.base()			== rhs.base()		&&
+			lhs.fields()		== rhs.fields()		&&
+			lhs.isOrdinal()		== rhs.isOrdinal()	&&
+			lhs.isElmentary()	== rhs.isElmentary();
+}
 
 /********************************************************************************************//**
  * @brief TDesc::Kind stream put operator
@@ -183,8 +276,8 @@ ostream& operator<<(std::ostream& os, const TDesc::Kind& value) {
 ostream& operator<<(std::ostream& os, const TDesc& type) {
 	os 	<<	type.kind()		<< ", "
 		<<	type.size()		<< ", ("
-		<<	type.range()	<< "), ("
-		<<	*type.base()	<< "), ((";
+		<<	type.range()	<< "), "
+		<<	type.base()	<< ", ((";
 
 	const auto flds = type.fields();
 	if (flds.size() == 1)

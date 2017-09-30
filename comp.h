@@ -107,6 +107,11 @@ private:
 	/// lookup identifier in the symbol table...
 	SymbolTable::iterator lookup(const std::string& id);
 
+#if	0
+	/// Lookup type by its identifier
+	ConstTDescPtr lookupType(const std::string& id);
+#endif
+
 	/// variable sub-production...
 	ConstTDescPtr variable(int level, SymbolTable::iterator it);
 

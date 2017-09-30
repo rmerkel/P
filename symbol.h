@@ -1,7 +1,7 @@
 /********************************************************************************************//**
  * @file	symbol.h
  *
- * The Pascal-Lite Symbol table
+ * The Pascal-Lite Compilier Symbol table
  *
  * @author Randy Merkel, Slowly but Surly Software.
  * @copyright  (c) 2017 Slowly but Surly Software. All rights reserved.
@@ -54,7 +54,6 @@ public:
 	SymValue(int level, int offset, TDescPtr type);
 
 	SymValue(Kind kind, int level);				///< Partially construct Procedure or Function
-
 	SymValue(int level, TDescPtr type);			///< Construct Type
 
 	/// Descructor
