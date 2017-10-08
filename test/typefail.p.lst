@@ -70,20 +70,20 @@
    43: assign
 # test/typefail.p, 24: 
 # test/typefail.p, 25: 	a2[one] := 1;
-   44: pushvar 0, 7
+   44: pushvar 0, 16
    45: pushvar 0, 4
    46: eval
    47: add
    48: push 1
    49: assign
 # test/typefail.p, 26: 	a2[2] := 2;				{	error: got integer, expected enum		}
-   50: pushvar 0, 7
+   50: pushvar 0, 16
    51: push 2
    52: add
    53: push 2
    54: assign
 # test/typefail.p, 27: 	a2[two + 1] := 3		{	error: expected enum, got integer		}
-   55: pushvar 0, 7
+   55: pushvar 0, 16
    56: pushvar 0, 5
    57: eval
    58: push 1

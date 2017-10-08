@@ -87,13 +87,6 @@ std::ostream& operator<<(std::ostream& os, const SubRange& srange);
  * |  Record |	N   |     -     |   -   |   -  | Fields |   N     |	   N     
  * |  Enum	 |	1   |    X-Y    |   -   |   -  |   -    |	Y     |	   N     
  *
- * Old;
- *
- * | Kind    | Size | Sub-Range | IType | Base | Fields | Ordinal | Elementry 
- * | :------ | :--: | :-------: | :---: | :--: | :----: | :-----: | :-------:
- * |  SRange |	1   |    1-10   |   -   |  Int |   -    |	Y     |	    N
- * |  Enum	 |	1   |    X-Y    |   -   |  Int |   -    |	Y     |	    N
- *
  * Key:
  * - IType - is the sub-range (index) type for arrays
  * - Base - is the base type for arrays, sub-ranges and enumerations
@@ -151,9 +144,9 @@ public:
 	bool isElmentary() const;			///< Elementary type? 
 
 private:
-	Kind		_kind;					///< My kind
-	unsigned	_size;					///< Size of on object of my type
-	SubRange	_range;					///< My sub-range
+	Kind		_kind;					///< My kind, (type class)
+	unsigned	_size;					///< Size of on object of my type, in Datums
+	SubRange	_range;					///< My sub-range. For arrays, the array span
 	TDescPtr	_rtype;					///< Arrays index (sub-range) type
 	TDescPtr	_base;					///< Base type for Elementry, Array, Enumeration
 	FieldVec	_fields;				///< List of fields for Record

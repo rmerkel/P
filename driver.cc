@@ -29,10 +29,11 @@
  * program.
  *
  * @bug
- * - More pl0c than Pascal at this point
  * - No arrays or strings, just signed integers and reals
  * - No input/output instructions.
  * - No interactive mode for debugging; just automatic single stepping (verbose == true)
+ * - No records
+ * - Overly simple constant expressions; can't detect if a[10] is within range.
  *
  * @version 0.1 - Initial fork from pl0c, using pascal <>, =, etc...
  * @version 0.2 - Program declaraction
@@ -41,6 +42,7 @@
  * @version 0.5 - Added enumerations
  * @version 0.6 - Fixed array index type checks
  * @version 0.7 - Supports non-zero based array indexes
+ * @version 0.8 - Supports multiple dimensioned arrays. Fixed promotion bug
  *  
  * @author Randy Merkel, Slowly but Surly Software.
  * @copyright  (c) 2017 Slowly but Surly Software. All rights reserved.
@@ -74,7 +76,7 @@ static void help() {
 
 /// Print the version number as major.minor
 static void printVersion() {
-	cout << progName << ": verson: 0.7\n";		// make sure to update the verison in mainpage!!
+	cout << progName << ": verson: 0.8\n";		// make sure to update the verison in mainpage!!
 }
 
 /** Parse the command line arguments...
@@ -155,16 +157,16 @@ int main(int argc, char* argv[]) {
 	else if (0 == (nErrors = comp(inputFile, code, verbose))) {
 		if (verbose) {
 			if (inputFile == "-")
-				cout << progName << ": loading program from standard input, and starting pl/0c...\n";
+				cout << progName << ": loading program from standard input, and starting pascal-lite...\n";
 			else
-				cout << progName << ": loading program '" << inputFile << "', and starting pl/0c...\n";
+				cout << progName << ": loading program '" << inputFile << "', and starting pascal-lite...\n";
 		}
 
 		const Interp::Result r = machine(code, verbose);
 		if (Interp::success != r)
 			cerr << progName << ": runtime error: " << r << "!\n";
 
-		if (verbose) cout << progName << ": Ending pl/0c after " << machine.cycles() << " machine cycles\n";
+		if (verbose) cout << progName << ": Ending pascal-lite after " << machine.cycles() << " machine cycles\n";
 	}
 
 	return nErrors;

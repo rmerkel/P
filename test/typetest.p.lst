@@ -9,13 +9,15 @@
 # test/typetest.p, 7: 
 # test/typetest.p, 8: var
 # test/typetest.p, 9: 	i : int;
-# test/typetest.p, 10: 	r : rng;
-# test/typetest.p, 11: 	a : array[rng] of integer;
-# test/typetest.p, 12: 	a2 : array [enum] of int;
-# test/typetest.p, 13: 
-# test/typetest.p, 14: begin
-    2: enter 16
-# test/typetest.p, 15: 	i := 1; i := i + 1;
+# test/typetest.p, 10: 	j : integer;
+# test/typetest.p, 11: 	r : rng;
+# test/typetest.p, 12: 	a : array[rng] of integer;
+# test/typetest.p, 13: 	a2 : array [enum] of int;
+# test/typetest.p, 14: 	a3 : array [0..4] of array [0..4] of real;
+# test/typetest.p, 15: 
+# test/typetest.p, 16: begin
+    2: enter 42
+# test/typetest.p, 17: 	i := 1; i := i + 1;
     3: pushvar 0, 4
     4: push 1
     5: assign
@@ -25,29 +27,29 @@
     9: push 1
    10: add
    11: assign
-# test/typetest.p, 16: 	r := 1; r := r + 1;
-   12: pushvar 0, 5
+# test/typetest.p, 18: 	r := 1; r := r + 1;
+   12: pushvar 0, 6
    13: push 1
    14: assign
-   15: pushvar 0, 5
-   16: pushvar 0, 5
+   15: pushvar 0, 6
+   16: pushvar 0, 6
    17: eval
    18: push 1
    19: add
    20: assign
-# test/typetest.p, 17: 
-# test/typetest.p, 18: 	i := 1;	{	fill a[] with its index	}
+# test/typetest.p, 19: 
+# test/typetest.p, 20: 	i := 1;	{	fill a[] with its index	}
    21: pushvar 0, 4
    22: push 1
    23: assign
-# test/typetest.p, 19:  	while i < 11 do begin 
+# test/typetest.p, 21:  	while i < 11 do begin 
    24: pushvar 0, 4
    25: eval
    26: push 11
    27: lt
    28: jneq 45
-# test/typetest.p, 20: 		a[i] := i;
-   29: pushvar 0, 6
+# test/typetest.p, 22: 		a[i] := i;
+   29: pushvar 0, 7
    30: pushvar 0, 4
    31: eval
    32: push 1
@@ -56,30 +58,30 @@
    35: pushvar 0, 4
    36: eval
    37: assign
-# test/typetest.p, 21: 		i := i + 1
+# test/typetest.p, 23: 		i := i + 1
    38: pushvar 0, 4
    39: pushvar 0, 4
    40: eval
    41: push 1
-# test/typetest.p, 22: 	end;
+# test/typetest.p, 24: 	end;
    42: add
    43: assign
    44: jump 24
-# test/typetest.p, 23: 
-# test/typetest.p, 24: 	r := 1;	{	multiply by 10			}
-   45: pushvar 0, 5
+# test/typetest.p, 25: 
+# test/typetest.p, 26: 	r := 1;	{	multiply by 10			}
+   45: pushvar 0, 6
    46: push 1
    47: assign
-# test/typetest.p, 25: 	repeat begin
-# test/typetest.p, 26: 		a[r] := a[r] * 10;
-   48: pushvar 0, 6
-   49: pushvar 0, 5
+# test/typetest.p, 27: 	repeat begin
+# test/typetest.p, 28: 		a[r] := a[r] * 10;
+   48: pushvar 0, 7
+   49: pushvar 0, 6
    50: eval
    51: push 1
    52: sub
    53: add
-   54: pushvar 0, 6
-   55: pushvar 0, 5
+   54: pushvar 0, 7
+   55: pushvar 0, 6
    56: eval
    57: push 1
    58: sub
@@ -88,90 +90,209 @@
    61: push 10
    62: mul
    63: assign
-# test/typetest.p, 27: 		r := r + 1
-   64: pushvar 0, 5
-   65: pushvar 0, 5
+# test/typetest.p, 29: 		r := r + 1
+   64: pushvar 0, 6
+   65: pushvar 0, 6
    66: eval
    67: push 1
-# test/typetest.p, 28: 	end until r = 11;
+# test/typetest.p, 30: 	end until r = 11;
    68: add
    69: assign
-   70: pushvar 0, 5
+   70: pushvar 0, 6
    71: eval
    72: push 11
    73: equ
    74: jneq 48
-# test/typetest.p, 29: 
-# test/typetest.p, 30: 	a2[one]	:= 1;
-   75: pushvar 0, 7
+# test/typetest.p, 31: 
+# test/typetest.p, 32: 	a2[one]	:= 1;
+   75: pushvar 0, 17
    76: pushvar 0, 4
    77: eval
    78: add
    79: push 1
    80: assign
-# test/typetest.p, 31: 	a2[two]	:= 2;
-   81: pushvar 0, 7
+# test/typetest.p, 33: 	a2[two]	:= 2;
+   81: pushvar 0, 17
    82: pushvar 0, 5
    83: eval
    84: add
    85: push 2
    86: assign
-# test/typetest.p, 32: 	a2[three] := 3
-   87: pushvar 0, 7
+# test/typetest.p, 34: 	a2[three] := 3;
+   87: pushvar 0, 17
    88: pushvar 0, 6
    89: eval
    90: add
    91: push 3
-# test/typetest.p, 33: end .
    92: assign
-   93: ret
+# test/typetest.p, 35: 
+# test/typetest.p, 36: 	i := 0;	{	fill a3[] with it's index	}
+   93: pushvar 0, 4
+   94: push 0
+   95: assign
+# test/typetest.p, 37: 	while (i < 5) do begin
+   96: pushvar 0, 4
+   97: eval
+   98: push 5
+   99: lt
+  100: jneq 141
+# test/typetest.p, 38: 		j := 0;
+  101: pushvar 0, 5
+  102: push 0
+  103: assign
+# test/typetest.p, 39: 		while (j < 5) do begin
+  104: pushvar 0, 5
+  105: eval
+  106: push 5
+  107: lt
+  108: jneq 134
+# test/typetest.p, 40: 			a3[i][j] := 1.0 * (i + j);
+  109: pushvar 0, 21
+  110: pushvar 0, 4
+  111: eval
+  112: push 5
+  113: mul
+  114: add
+  115: pushvar 0, 5
+  116: eval
+  117: add
+  118: push 1.000000
+  119: pushvar 0, 4
+  120: eval
+  121: pushvar 0, 5
+  122: eval
+  123: add
+  124: itor
+  125: mul
+  126: assign
+# test/typetest.p, 41: 			j := j + 1
+  127: pushvar 0, 5
+  128: pushvar 0, 5
+  129: eval
+  130: push 1
+# test/typetest.p, 42: 		end;
+  131: add
+  132: assign
+  133: jump 104
+# test/typetest.p, 43: 		i := i + 1
+  134: pushvar 0, 4
+  135: pushvar 0, 4
+  136: eval
+  137: push 1
+# test/typetest.p, 44: 	end
+  138: add
+  139: assign
+# test/typetest.p, 45: end .
+  140: jump 96
+  141: ret
 
         8:          1
         8:          2
-        9:          1
-        9:          2
-        8:          1
        10:          1
+       10:          2
+        8:          1
+       11:          1
         8:          2
-       11:          2
+       12:          2
         8:          3
-       12:          3
+       13:          3
         8:          4
-       13:          4
+       14:          4
         8:          5
-       14:          5
+       15:          5
         8:          6
-       15:          6
+       16:          6
         8:          7
-       16:          7
+       17:          7
         8:          8
-       17:          8
+       18:          8
         8:          9
-       18:          9
+       19:          9
         8:         10
-       19:         10
+       20:         10
         8:         11
-        9:          1
+       10:          1
+       11:         10
+       10:          2
+       12:         20
+       10:          3
+       13:         30
+       10:          4
+       14:         40
+       10:          5
+       15:         50
+       10:          6
+       16:         60
+       10:          7
+       17:         70
+       10:          8
+       18:         80
+       10:          9
+       19:         90
        10:         10
+       20:        100
+       10:         11
+       32:          1
+       20:          2
+       32:          3
+        8:          0
+        9:          0
+       25:   0.000000
+        9:          1
+       26:   1.000000
         9:          2
-       11:         20
+       27:   2.000000
         9:          3
-       12:         30
+       28:   3.000000
         9:          4
-       13:         40
+       29:   4.000000
         9:          5
-       14:         50
-        9:          6
-       15:         60
-        9:          7
-       16:         70
-        9:          8
-       17:         80
-        9:          9
-       18:         90
-        9:         10
-       19:        100
-        9:         11
-       22:          1
-       22:          2
-       21:          3
+        8:          1
+        9:          0
+       30:   1.000000
+        9:          1
+       31:   2.000000
+        9:          2
+       32:   3.000000
+        9:          3
+       33:   4.000000
+        9:          4
+       34:   5.000000
+        9:          5
+        8:          2
+        9:          0
+       35:   2.000000
+        9:          1
+       36:   3.000000
+        9:          2
+       37:   4.000000
+        9:          3
+       38:   5.000000
+        9:          4
+       39:   6.000000
+        9:          5
+        8:          3
+        9:          0
+       40:   3.000000
+        9:          1
+       41:   4.000000
+        9:          2
+       42:   5.000000
+        9:          3
+       43:   6.000000
+        9:          4
+       44:   7.000000
+        9:          5
+        8:          4
+        9:          0
+       45:   4.000000
+        9:          1
+       46:   5.000000
+        9:          2
+       47:   6.000000
+        9:          3
+       48:   7.000000
+        9:          4
+       49:   8.000000
+        9:          5
+        8:          5

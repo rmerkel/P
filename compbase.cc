@@ -237,7 +237,7 @@ const std::string CompBase::nameDecl(int level) {
 		auto range = symtbl.equal_range(id);		// Already defined?
 		for (auto it = range.first; it != range.second; ++it) {
 			if (it->second.level() == level) {
-				error("previously defined", id);
+				error("previously was defined", id);
 				break;
 			}
 		}

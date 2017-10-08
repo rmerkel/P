@@ -44,30 +44,38 @@ bool Comp::isAReal(TDescPtr type) {
 
 
 /********************************************************************************************//**
- * Convert stack operand to a real as necessary. 
+ * Promote binary stack operands as necessary. 
+ *
  * @param	lhs	The type of the left-hand-side
  * @param	rhs	The type of the right-hand-side 
+ *
+ * @return	Type type of the promoted type
  ************************************************************************************************/
-void Comp::promote (TDescPtr lhs, TDescPtr rhs) {
+TDescPtr Comp::promote (TDescPtr lhs, TDescPtr rhs) {
+	TDescPtr type = lhs;					// Assume that lhs and rhs have the same types
 	if (lhs->kind() == rhs->kind())
 		;									// nothing to do
 
 	else if ((isAnInteger(lhs) && isAnInteger(rhs)) || (isAReal(lhs) && isAReal(rhs)))
 		;									// nothing to do, again
 
-	else if (isAnInteger(lhs) && isAReal(rhs))
+	else if (isAnInteger(lhs) && isAReal(rhs)) {
 		emit(OpCode::ITOR2);				// promote lhs (TOS-1) to a real
+		type = rhs;
 
-	else if (isAReal(lhs) && isAnInteger(rhs))
+	} else if (isAReal(lhs) && isAnInteger(rhs))
 		emit(OpCode::ITOR);					// promote rhs to a real
 	
 	else
 		error("incompatable binary types");
+
+	return type;
 }
 
 /********************************************************************************************//**
  * Convert rhs of assign to real if necessary, or emit error would need to be
  * converted to an integer. 
+ *
  * @param	lhs	The type of the left-hand-side
  * @param	rhs	The type of the right-hand-side 
  ************************************************************************************************/
@@ -192,23 +200,23 @@ TDescPtr Comp::factor(int level) {
  * @return	Data type  
  ************************************************************************************************/
 TDescPtr Comp::term(int level) {
-	const auto lhs = factor(level);
+	auto lhs = factor(level);
 
 	for (;;) {
 		if (accept(Token::Multiply)) {
-			promote(lhs, factor(level));
+			lhs = promote(lhs, factor(level));
 			emit(OpCode::Mul);
 			
 		} else if (accept(Token::Divide)) {
-			promote(lhs, factor(level));
+			lhs = promote(lhs, factor(level));
 			emit(OpCode::Div);	
 			
 		} else if (accept(Token::Mod)) {
-			promote(lhs, factor(level));
+			lhs = promote(lhs, factor(level));
 			emit(OpCode::Rem);
 
 		} else if (accept(Token::And)) {
-			promote(lhs, factor(level));
+			lhs = promote(lhs, factor(level));
 			emit(OpCode::LAND);
 
 		} else
@@ -253,15 +261,15 @@ TDescPtr Comp::simpleExpr(int level) {
 
 	for (;;) {
 		if (accept(Token::Add)) {
-			promote(lhs, unary(level));
+			lhs = promote(lhs, unary(level));
 			emit(OpCode::Add);
 
 		} else if (accept(Token::Subtract)) {
-			promote(lhs, unary(level));
+			lhs = promote(lhs, unary(level));
 			emit(OpCode::Sub);
 
 		} else if (accept(Token::Or)) {
-			promote(lhs, unary(level));
+			lhs = promote(lhs, unary(level));
 			emit(OpCode::LOR);
 
 		} else
@@ -283,27 +291,27 @@ TDescPtr Comp::expression(int level) {
 
 	for (;;) {
 		if (accept(Token::LTE)) {
-			promote(lhs, simpleExpr(level));
+			lhs = promote(lhs, simpleExpr(level));
 			emit(OpCode::LTE);
 
 		} else if (accept(Token::LT)) {
-			promote(lhs, simpleExpr(level));
+			lhs = promote(lhs, simpleExpr(level));
 			emit(OpCode::LT);
 
 		} else if (accept(Token::GT)) {
-			promote(lhs, simpleExpr(level));
+			lhs = promote(lhs, simpleExpr(level));
 			emit(OpCode::GT);
 			
 		} else if (accept(Token::GTE)) {
-			promote(lhs, simpleExpr(level));
+			lhs = promote(lhs, simpleExpr(level));
 			emit(OpCode::GTE);
 			
 		} else if (accept(Token::EQU)) {
-			promote(lhs, simpleExpr(level));
+			lhs = promote(lhs, simpleExpr(level));
 			emit(OpCode::EQU);
 
 		} else if (accept(Token::NEQ)) {
-			promote(lhs, simpleExpr(level));
+			lhs = promote(lhs, simpleExpr(level));
 			emit(OpCode::NEQU);
 
 		} else
@@ -495,41 +503,45 @@ void Comp::statementList(int level) {
  * @param	level	The current block level.
  ************************************************************************************************/
 TDescPtr Comp::variable(int level, SymbolTable::iterator it) {
-	auto type = it->second.type();
+	auto type = it->second.type();			// Default is the symbol type
 
 	emitVarRef(level, it->second);
 	if (accept(Token::OpenBrkt)) {			// variable is an array, index into it
-		auto atype = it->second.type();		// kind s/b TDesc::Array
-		type = atype->base();				// Return the array base type...
+		do {
+			auto atype = type;				// The arrays type; kind s/b TDesc::Array
+			type = atype->base();			// We'll return the arrays base type...
 
-		if (atype->kind() != TDesc::Array)
-			error("attempt to index into non-array", it->first);
+			if (atype->kind() != TDesc::Array)
+				error("attempt to index into non-array", it->first);
 
-		auto tvec = expressionList(level);
-		if (tvec.empty())
-			error("expected expression-list");
+			auto indexes = expressionList(level);
+			if (indexes.empty())
+				error("expected expression-list");
 
-		else if (tvec.size() > 1)
-			error("multidimensional arrays are not supported!");
+			else if (indexes.size() > 1)
+				error("multidimensional arrays are not supported!");
 
-		else if (atype->rtype()->kind() != tvec[0]->kind()) {
-			ostringstream oss;				// index isn't the right type
-			oss
-				<< "incompatable array index type, expected "
-				<< atype->rtype()->kind() << " got " << tvec[0]->kind();
-			error(oss.str());
+			else if (atype->rtype()->kind() != indexes[0]->kind()) {
+				ostringstream oss;
+				oss	<< "incompatable array index type, expected "
+					<< atype->rtype()->kind() << " got " << indexes[0]->kind();
+				error(oss.str());
 
-		} else if (type->size() != 1) {		// scale the index
-			emit(OpCode::Push, 0, type->size());
-			emit(OpCode::Mul);
-		}
+			} else if (type->size() != 1) {	// scale the index
+				emit(OpCode::Push, 0, type->size());
+				emit(OpCode::Mul);
+			}
 
-		if (atype->range().minimum() != 0) {	// offset non-zero based array index
-			emit(OpCode::Push, 0, atype->range().minimum());
-			emit(OpCode::Sub);
-		}
-		emit(OpCode::Add);					// index into the array
-		expect(Token::CloseBrkt);
+			// offset index for non-zero based arrays
+			if (atype->range().minimum() != 0) {
+				emit(OpCode::Push, 0, atype->range().minimum());
+				emit(OpCode::Sub);
+			}
+
+			emit(OpCode::Add);				// index into the array
+			expect(Token::CloseBrkt);
+
+		} while (accept(Token::OpenBrkt));
 	}
 
 	return type;
@@ -762,7 +774,16 @@ void Comp::varDeclList(int level, bool params, NameKindVec& idents) {
 			     << dx	 			<< ", " 
 				 << id.type->kind() << "\n";
 
-		symtbl.insert( { id.name, SymValue(level, dx++, id.type)	} );
+		auto range = symtbl.equal_range(id.name);		// Already defined?
+		for (auto it = range.first; it != range.second; ++it) {
+			if (it->second.level() == level) {
+				error("previously was defined", id.name);
+				continue;
+			}
+		}
+
+		symtbl.insert( { id.name, SymValue(level, dx, id.type)	} );
+		dx += id.type->size();
 	}
 }
 
@@ -783,7 +804,6 @@ void Comp::varDeclList(int level, bool params, NameKindVec& idents) {
  * @param[in,out]	idents	Vector of identifer, kind pairs
  ************************************************************************************************/
 void Comp::varDecl(int level, NameKindVec& idents) {
-
 	vector<string> ids = identifierList(level);
 	expect(Token::Colon);
 	const auto desc = type(level);
@@ -845,7 +865,10 @@ TDescPtr Comp::type(int level) {
 		expect(Token::CloseBrkt);				// "]"
 		expect(Token::Of);
 
-		tdesc = TDesc::newTDesc(TDesc::Array, r.span(), r, typeVec[0], type(level), FieldVec());
+		auto base = type(level);				// Get the arrays base type
+		size_t sz = r.span() * base->size();	// # of elements * each element size
+
+		tdesc = TDesc::newTDesc(TDesc::Array, sz, r, typeVec[0], base);
 
 	} else										// simple-type
 		tdesc = simpleType(level);

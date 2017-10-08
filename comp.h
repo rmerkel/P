@@ -30,7 +30,7 @@ private:
 	bool isAReal(TDescPtr type);			///< Is type a Real?
 
 	/// Promote data type if necessary...
-	void promote (TDescPtr lhs, TDescPtr rhs);
+	TDescPtr promote (TDescPtr lhs, TDescPtr rhs);
 
 	/// Promote assigned data type if necessary...
 	void assignPromote (TDescPtr lhs, TDescPtr rhs);
