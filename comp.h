@@ -10,14 +10,7 @@
 #ifndef	COMP_H
 #define	COMP_H
 
-#include <set>
-#include <string>
-#include <utility>
-
-#include "instr.h"
-#include "datum.h"
-#include "symbol.h"
-#include "token.h"
+#include "compbase.h"
 
 /********************************************************************************************//**
  * A Pascal-Lite Compilier
@@ -28,101 +21,31 @@
  * operator which specifies the input stream, the location of the emitted code, and weather to
  * emit a travlelog (verbose messages).
  ************************************************************************************************/
-class Comp {
+class Comp : public CompBase {
 public:
 	Comp(const std::string& pName);			///< Constructor; use pName for error messages
-	virtual ~Comp() {}						///< Destructor
-
-	/// Run the compiler
-	unsigned operator()(const std::string& inFile, InstrVector& prog, bool verb = false);
 
 private:
-	/// A table, indexed by instruction address, yeilding source line numbers
-	typedef std::vector<unsigned> SourceIndex;
-
-	std::string			progName;			///< The compilier's name, used in error messages
-	unsigned			nErrors;			///< Total # of compilier errors
-	bool				verbose;			///< Dump debugging information if true
-	TokenStream			ts;					///< The input token stream (the source)
-	SymbolTable			symtbl;				///< Symbol table
-	InstrVector*		code;				///< Emitted code
-	SourceIndex			indextbl;			///< Source cross-index for listings
-
-	// built-in types
-	static	ConstTDescPtr	intDesc;		///< Integer type descriptor
-	static	ConstTDescPtr	realDesc;		///< Real type descriptor
-	static 	ConstTDescPtr	charDesc;		///< Character type descriptor
-
-	/// Name, kind pair
-	struct NameKind {
-		std::string		name;				///< Variable/parameter
-		TDescPtr		type;				///< it's type descriptor
-
-		/// Construct a name/kind pair
-		NameKind(const std::string n, TDescPtr p) : name{n}, type{p} {}
-	};
-
-	/// A vector of name kind pairs
-	typedef std::vector<NameKind>	NameKindVec;
-
-	void error(const std::string& msg);		///< Write an error message...
-
-	/// Write an error message...
-	void error(const std::string& msg, const std::string& name);
-
-	Token next();							///< Read and return the next token...
-
-	/// Return the current token kind..
-	Token::Kind current() 					{	return ts.current().kind;	}
-
-	/// Accept the next token if it's a k...
-	bool accept(Token::Kind k, bool get = true);
-
-	/// Expect the next token to be a k...
-	bool expect(Token::Kind k, bool get = true);
-
-	bool oneOf(Token::KindSet set);			///< Is the current token one of the given set?
-
-	/// Emit an instruction...
-	size_t emit(const OpCode op, int8_t level = 0, Datum addr = 0);
-
-	bool isAnInteger(ConstTDescPtr type);	///< Is type an integer?
-	bool isAReal(ConstTDescPtr type);		///< Is type a Real?
+	bool isAnInteger(TDescPtr type);		///< Is type an integer?
+	bool isAReal(TDescPtr type);			///< Is type a Real?
 
 	/// Promote data type if necessary...
-	void promote (ConstTDescPtr lhs, ConstTDescPtr rhs);
+	void promote (TDescPtr lhs, TDescPtr rhs);
 
 	/// Promote assigned data type if necessary...
-	void assignPromote (ConstTDescPtr lhs, ConstTDescPtr rhs);
-
-	/// Create a listing...
-	void listing(const std::string& name, std::istream& source, std::ostream& out);
-
-	/// Purge symtbl of entries from a given block level
-	void purge(int level);
-
-	/// Emit a variable reference, e.g., an absolute address...
-	ConstTDescPtr emitVarRef(int level, const SymValue& val);
-
-	/// lookup identifier in the symbol table...
-	SymbolTable::iterator lookup(const std::string& id);
-
-#if	0
-	/// Lookup type by its identifier
-	ConstTDescPtr lookupType(const std::string& id);
-#endif
+	void assignPromote (TDescPtr lhs, TDescPtr rhs);
 
 	/// variable sub-production...
-	ConstTDescPtr variable(int level, SymbolTable::iterator it);
+	TDescPtr variable(int level, SymbolTable::iterator it);
 
 	/// factor-identifier sub-production...
-	ConstTDescPtr identFactor(int level, const std::string& id);
+	TDescPtr identFactor(int level, const std::string& id);
 
-	ConstTDescPtr factor(int level);		///< factor production...
-	ConstTDescPtr term(int level);			///< terminal production...
-	ConstTDescPtr unary(int level);			///< unary-expr sub-production...
-	ConstTDescPtr simpleExpr(int level);	///< simple-expr production...
-	ConstTDescPtr expression(int level);	///< expression production...
+	TDescPtr factor(int level);				///< factor production...
+	TDescPtr term(int level);				///< terminal production...
+	TDescPtr unary(int level);				///< unary-expr production...
+	TDescPtr simpleExpr(int level);			///< simple-expr production...
+	TDescPtr expression(int level);			///< expression production...
 	TDescPtrVec	expressionList(int level);	///< expression-list production...
 	Datum constExpr();						///< const-expr production...
 
@@ -138,7 +61,6 @@ private:
 
 	void statement(int level);				///< statement production...
 	void statementList(int level);			///< statement-list-production...
-	const std::string nameDecl(int level);	///< name (identifier) check...
 	void constDeclList(int level);			///< const-declaration-list production...
 	void constDecl(int level);				///< constant-declaration production...
 
@@ -155,8 +77,8 @@ private:
 	/// identifier-lst production...
 	std::vector<std::string> identifierList(int level);
 
-	ConstTDescPtr type(int level);			///< type production...
-	ConstTDescPtr simpleType(int level);	///< simple-type production...
+	TDescPtr type(int level);				///< type production...
+	TDescPtr simpleType(int level);			///< simple-type production...
 	TDescPtrVec simpleTypeList(int level);	///< simple-type-list productions...
 
 	/// Subroutine-declaration production...
@@ -168,7 +90,7 @@ private:
 	/// block-declaration production...
 	unsigned blockDecl(SymValue& val, int level);
 
-	void run();								///< runs the compilier...
+	virtual void run();						///< run the compilier...
 };
 
 #endif

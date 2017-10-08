@@ -1,17 +1,17 @@
-# test/simple.p, 2: program simple ;
-# test/simple.p, 3: var x, y : integer;
+# test/simple.p, 1: program simple ;
+# test/simple.p, 2: var x, y : integer;
     0: call 0, 2
     1: halt
-# test/simple.p, 4: begin
+# test/simple.p, 3: begin
     2: enter 2
-# test/simple.p, 5: 	x := 0;
+# test/simple.p, 4: 	x := 0;
     3: pushvar 0, 4
     4: push 0
     5: assign
-# test/simple.p, 6: 	y := 1
+# test/simple.p, 5: 	y := 1
     6: pushvar 0, 5
     7: push 1
-# test/simple.p, 7: end.
+# test/simple.p, 6: end.
     8: assign
     9: ret
 

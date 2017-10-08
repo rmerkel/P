@@ -14,11 +14,13 @@ begin
 	i := one;				{	error: expected integer, got enum		}
 
 	r := 0;
-	while r < 10 do begin 	{	warning: condition might always be true	}
+	while r < 10 do begin 	{	*** warning: condition might always be true	}
 		a[r] := r;
 		r := r + 1
 	end;
-	r := 10;				{	error: out-of-range/range check error	}
+	r := 10;				{	*** error: out-of-range/range check error	}
+	a[10] := 10;			{	*** error: out-of-range/range check error	}
+	a[1+9] := 10;			{	*** error: out-of-range/range check error	}
 
 	a2[one] := 1;
 	a2[2] := 2;				{	error: got integer, expected enum		}

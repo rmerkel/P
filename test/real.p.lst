@@ -1,36 +1,36 @@
 ./pas: rounding lhs to fit in an integer near line 7
-# test/real.p, 2: program testReal ;
-# test/real.p, 3: var
+# test/real.p, 1: program testReal ;
+# test/real.p, 2: var
     0: call 0, 2
     1: halt
-# test/real.p, 4: 	f : real; i : integer;
-# test/real.p, 5: 
-# test/real.p, 6: begin
+# test/real.p, 3: 	f : real; i : integer;
+# test/real.p, 4: 
+# test/real.p, 5: begin
     2: enter 2
-# test/real.p, 7: 	i := 1;
+# test/real.p, 6: 	i := 1;
     3: pushvar 0, 5
     4: push 1
     5: assign
-# test/real.p, 8: 	i := 2.0;
+# test/real.p, 7: 	i := 2.0;
     6: pushvar 0, 5
     7: push 2.000000
     8: rtoi
     9: assign
-# test/real.p, 9: 	f := round(2.5);
+# test/real.p, 8: 	f := round(2.5);
    10: pushvar 0, 4
    11: push 2.500000
    12: rtoi
    13: itor
    14: assign
-# test/real.p, 10: 	f := 4;
+# test/real.p, 9: 	f := 4;
    15: pushvar 0, 4
    16: push 4
    17: itor
    18: assign
-# test/real.p, 11: 	f := 5.0;
+# test/real.p, 10: 	f := 5.0;
    19: pushvar 0, 4
    20: push 5.000000
    21: assign
-# test/real.p, 12: end .
+# test/real.p, 11: end .
    22: ret
 

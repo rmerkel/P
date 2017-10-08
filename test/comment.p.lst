@@ -1,44 +1,44 @@
-# test/comment.p, 2: { "main" starts here... }
-# test/comment.p, 3: program comment ;
-# test/comment.p, 4: const nFacts = 10;
+# test/comment.p, 1: { "main" starts here... }
+# test/comment.p, 2: program comment ;
+# test/comment.p, 3: const nFacts = 10;
     0: call 0, 2
     1: halt
-# test/comment.p, 5: var n, f : integer;	{ var z; parser doesn't see 'z' }
-# test/comment.p, 6: begin
+# test/comment.p, 4: var n, f : integer;	{ var z; parser doesn't see 'z' }
+# test/comment.p, 5: begin
     2: enter 2
-# test/comment.p, 7:    n := 0;
+# test/comment.p, 6:    n := 0;
     3: pushvar 0, 4
     4: push 0
     5: assign
-# test/comment.p, 8:    f := 1;
+# test/comment.p, 7:    f := 1;
     6: pushvar 0, 5
     7: push 1
     8: assign
-# test/comment.p, 9:    {	calculate factor (n)
-# test/comment.p, 10: 		comment continued on this line... }
-# test/comment.p, 11:    while n < nFacts do begin
+# test/comment.p, 8:    {	calculate factor (n)
+# test/comment.p, 9: 		comment continued on this line... }
+# test/comment.p, 10:    while n < nFacts do begin
     9: pushvar 0, 4
    10: eval
    11: push 10
    12: lt
    13: jneq 28
-# test/comment.p, 12:       n := n + 1;
+# test/comment.p, 11:       n := n + 1;
    14: pushvar 0, 4
    15: pushvar 0, 4
    16: eval
    17: push 1
    18: add
    19: assign
-# test/comment.p, 13:       f := f * n
+# test/comment.p, 12:       f := f * n
    20: pushvar 0, 5
    21: pushvar 0, 5
    22: eval
-# test/comment.p, 14:    end
+# test/comment.p, 13:    end
    23: pushvar 0, 4
    24: eval
    25: mul
    26: assign
-# test/comment.p, 15: end.
+# test/comment.p, 14: end.
    27: jump 9
    28: ret
 # test/comment.p, 15: 

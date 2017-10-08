@@ -39,6 +39,8 @@
  * @version 0.3 - Removed the C/C++ bit and shift operations
  * @version 0.4 - Added types, limited to ranges and arrays.
  * @version 0.5 - Added enumerations
+ * @version 0.6 - Fixed array index type checks
+ * @version 0.7 - Supports non-zero based array indexes
  *  
  * @author Randy Merkel, Slowly but Surly Software.
  * @copyright  (c) 2017 Slowly but Surly Software. All rights reserved.
@@ -72,7 +74,7 @@ static void help() {
 
 /// Print the version number as major.minor
 static void printVersion() {
-	cout << progName << ": verson: 0.5\n";	// makesure to update the verison in mainpage!!
+	cout << progName << ": verson: 0.7\n";		// make sure to update the verison in mainpage!!
 }
 
 /** Parse the command line arguments...

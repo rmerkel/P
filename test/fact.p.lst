@@ -1,31 +1,31 @@
-# test/fact.p, 2: { Calculate 11 (0..10) factorials
-# test/fact.p, 3: {	 n		    n!	}
-# test/fact.p, 4: {  ---  ---------	}
-# test/fact.p, 5: {	 0		    0	}
-# test/fact.p, 6: {	 1		    1	}
-# test/fact.p, 7: {	 2		    2	}
-# test/fact.p, 8: {	 3		    6	}
-# test/fact.p, 9: {	...				}
-# test/fact.p, 10: {	 9	  362,880	}
-# test/fact.p, 11: {	10	3,628,800	}
-# test/fact.p, 12: 
-# test/fact.p, 13: program fact ;
-# test/fact.p, 14: const nFacts = 10;
+# test/fact.p, 1: { Calculate 11 (0..10) factorials
+# test/fact.p, 2: {	 n		    n!	}
+# test/fact.p, 3: {  ---  ---------	}
+# test/fact.p, 4: {	 0		    0	}
+# test/fact.p, 5: {	 1		    1	}
+# test/fact.p, 6: {	 2		    2	}
+# test/fact.p, 7: {	 3		    6	}
+# test/fact.p, 8: {	...				}
+# test/fact.p, 9: {	 9	  362,880	}
+# test/fact.p, 10: {	10	3,628,800	}
+# test/fact.p, 11: 
+# test/fact.p, 12: program fact ;
+# test/fact.p, 13: const nFacts = 10;
     0: call 0, 25
     1: halt
-# test/fact.p, 15: var p : integer;
-# test/fact.p, 16: procedure factorial(n : integer) ; begin
-# test/fact.p, 17:         p := 1;
+# test/fact.p, 14: var p : integer;
+# test/fact.p, 15: procedure factorial(n : integer) ; begin
+# test/fact.p, 16:         p := 1;
     2: pushvar 1, 4
     3: push 1
     4: assign
-# test/fact.p, 18:         while n > 0 do begin
+# test/fact.p, 17:         while n > 0 do begin
     5: pushvar 0, -1
     6: eval
     7: push 0
     8: gt
     9: jneq 24
-# test/fact.p, 19:             p := p * n;
+# test/fact.p, 18:             p := p * n;
    10: pushvar 1, 4
    11: pushvar 1, 4
    12: eval
@@ -33,23 +33,23 @@
    14: eval
    15: mul
    16: assign
-# test/fact.p, 20:             n := n - 1
+# test/fact.p, 19:             n := n - 1
    17: pushvar 0, -1
    18: pushvar 0, -1
    19: eval
    20: push 1
-# test/fact.p, 21:         end
+# test/fact.p, 20:         end
    21: sub
    22: assign
-# test/fact.p, 22:     end;
+# test/fact.p, 21:     end;
    23: jump 5
    24: ret
-# test/fact.p, 23: 
-# test/fact.p, 24: begin
+# test/fact.p, 22: 
+# test/fact.p, 23: begin
    25: enter 1
-# test/fact.p, 25:     factorial(nFacts)
+# test/fact.p, 24:     factorial(nFacts)
    26: push 10
-# test/fact.p, 26: end.
+# test/fact.p, 25: end.
    27: call 0, 2
    28: ret
 

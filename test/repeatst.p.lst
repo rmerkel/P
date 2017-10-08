@@ -1,51 +1,51 @@
-# test/repeatst.p, 2: { Calculate 11 (0..10) factorials
-# test/repeatst.p, 3: {	 n		    n!	}
-# test/repeatst.p, 4: {  ---  ---------	}
-# test/repeatst.p, 5: {	 0		    0	}
-# test/repeatst.p, 6: {	 1		    1	}
-# test/repeatst.p, 7: {	 2		    2	}
-# test/repeatst.p, 8: {	 3		    6	}
-# test/repeatst.p, 9: {	...				}
-# test/repeatst.p, 10: {	 9	  362,880	}
-# test/repeatst.p, 11: {	10	3,628,800	}
-# test/repeatst.p, 12: 
-# test/repeatst.p, 13: program repeatst ;
-# test/repeatst.p, 14: var n, f : integer;
+# test/repeatst.p, 1: { Calculate 11 (0..10) factorials
+# test/repeatst.p, 2: {	 n		    n!	}
+# test/repeatst.p, 3: {  ---  ---------	}
+# test/repeatst.p, 4: {	 0		    0	}
+# test/repeatst.p, 5: {	 1		    1	}
+# test/repeatst.p, 6: {	 2		    2	}
+# test/repeatst.p, 7: {	 3		    6	}
+# test/repeatst.p, 8: {	...				}
+# test/repeatst.p, 9: {	 9	  362,880	}
+# test/repeatst.p, 10: {	10	3,628,800	}
+# test/repeatst.p, 11: 
+# test/repeatst.p, 12: program repeatst ;
+# test/repeatst.p, 13: var n, f : integer;
     0: call 0, 2
     1: halt
-# test/repeatst.p, 15: begin
+# test/repeatst.p, 14: begin
     2: enter 2
-# test/repeatst.p, 16: 	n := 0;
+# test/repeatst.p, 15: 	n := 0;
     3: pushvar 0, 4
     4: push 0
     5: assign
-# test/repeatst.p, 17: 	f := 1;
+# test/repeatst.p, 16: 	f := 1;
     6: pushvar 0, 5
     7: push 1
     8: assign
-# test/repeatst.p, 18: 	repeat
-# test/repeatst.p, 19: 		begin
-# test/repeatst.p, 20: 			n := n + 1;
+# test/repeatst.p, 17: 	repeat
+# test/repeatst.p, 18: 		begin
+# test/repeatst.p, 19: 			n := n + 1;
     9: pushvar 0, 4
    10: pushvar 0, 4
    11: eval
    12: push 1
    13: add
    14: assign
-# test/repeatst.p, 21: 			f := f * n
+# test/repeatst.p, 20: 			f := f * n
    15: pushvar 0, 5
    16: pushvar 0, 5
    17: eval
-# test/repeatst.p, 22: 		end
+# test/repeatst.p, 21: 		end
    18: pushvar 0, 4
    19: eval
    20: mul
    21: assign
-# test/repeatst.p, 23: 	until n >= 10
+# test/repeatst.p, 22: 	until n >= 10
    22: pushvar 0, 4
    23: eval
    24: push 10
-# test/repeatst.p, 24: end.
+# test/repeatst.p, 23: end.
    25: gte
    26: jneq 9
    27: ret

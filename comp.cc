@@ -22,153 +22,33 @@ using namespace std;
 
 /************************************************************************************************
  * class PL0CComp
- *
- * private static :
  ************************************************************************************************/
-
-// built-in types
-
-ConstTDescPtr Comp::intDesc	 = TDesc::newTDesc(	TDesc::Kind::Integer,
-												1,
-												SubRange(numeric_limits<int>::min(),
-														 numeric_limits<int>::max()));
-ConstTDescPtr Comp::realDesc = TDesc::newTDesc(TDesc::Kind::Real, 1);
-ConstTDescPtr Comp::charDesc = TDesc::newTDesc(TDesc::Kind::Character, 1, SubRange(0, 127));
 
 // private:
-
-/********************************************************************************************//**
- * Write a diagnostic on standard error output, incrementing the error count.
- * @param msg The error message
- ************************************************************************************************/
-void Comp::error(const std::string& msg) {
-	cerr << progName << ": " << msg << " near line " << ts.lineNum << endl;
-	++nErrors;
-}
-
-/********************************************************************************************//**
- * Write a diagnostic in the form "msg 'name'", on standard error output, incrementing the error
- * count.
- * @param msg The error message
- * @param name Parameter to msg.
- ************************************************************************************************/
-void Comp::error(const std::string& msg, const std::string& name) {
-	error (msg + " '" + name + "'");
-}
-
-/********************************************************************************************//**
- * @return The next token from the token stream
- ************************************************************************************************/
-Token Comp::next() {
-	const Token t = ts.get();
-
-	if (Token::Unknown == t.kind) {
-		ostringstream oss;
-		oss << "Unknown token: '" << t.string_value << "', (0x" << hex << t.integer_value << ")";
-		error(oss.str());
-		return next();
-	}
-
-	if (verbose)
-		cout
-			<< progName			<< ": getting '"
-			<< t.kind			<< "', "
-			<< t.string_value	<< ", "
-			<< t.integer_value	<< "\n";
-
-	return t;
-}
-
-/********************************************************************************************//**
- * Returns true, and optionally consumes the current token, if the current tokens "kind" is equal to kind.
- *
- * @param	kind	The token Kind to accept.
- * @param	get		Consume the token, if true. Defaults true.
- *
- * @return	true if the current token is a kind.
- ************************************************************************************************/
-bool Comp::accept(Token::Kind kind, bool get) {
-	if (current() == kind) {
-		if (get) next();			// consume the token
-		return true;
-	}
-
-	return false;
-}
-
-/********************************************************************************************//**
- * Evaluate and return accept(kind, get). Generate an error if accept() returns false.
- *
- * @param	kind	The token Kind to accept.
- * @param	get		Consume the token, if true. Defaults true.
- *
- * @return	true if the current token is a k.
- ************************************************************************************************/
-bool Comp::expect(Token::Kind kind, bool get) {
-	if (accept(kind, get)) return true;
-
-	ostringstream oss;
-	oss << "expected '" << kind << "' got '" << current() << "'";
-	error(oss.str());
-	return false;
-}
-
-/********************************************************************************************//**
- * @param set	Token kind set to test
- * @return true if current() is a member of set.
- ************************************************************************************************/
-bool Comp::oneOf(Token::KindSet set) {
-	return set.end() != set.find(current());
-}
-
-/********************************************************************************************//**
- * Assembles op, level, addr into a new instruction, and then appends the instruciton on
- * the end of code[], returning it's address/index in code[].
- *
- * Side effect; updates the cross index for the listing.
- *
- * @param	op		The pl0 instruction operation code
- * @param	level	The pl0 instruction block level value. Defaults to zero.
- * @param	addr	The pl0 instructions address/value. Defaults to zero.
- *
- * @return The address (code[] index) of the new instruction.
- ************************************************************************************************/
-size_t Comp::emit(const OpCode op, int8_t level, Datum addr) {
-	const int lvl = static_cast<int>(level);
-	if (verbose)
-		cout
-			<< progName << ": emitting " << code->size() << ": "
-			<< OpCodeInfo::info(op).name() << " " << lvl << ", "
-			<< addr.integer() << "\n";
-
-	code->push_back({op, level, addr});
-	indextbl.push_back(ts.lineNum);			// update the cross index
-
-	return code->size() - 1;				// so it's the address of just emitted instruction
-}
 
 /********************************************************************************************//**
  * @param	type	Type descriptor to investagate
  * @return  true if type can be treated as an Integer
  ************************************************************************************************/
-bool Comp::isAnInteger(ConstTDescPtr type) {
-	return	type->kind() == TDesc::Integer || type->base() == intDesc;
+bool Comp::isAnInteger(TDescPtr type) {
+	return type->kind() == TDesc::Integer;
 }
 
 /********************************************************************************************//**
  * @param	type	Type descriptor to investagate
  * @return  true if type can be treated as an Real
  ************************************************************************************************/
-bool Comp::isAReal(ConstTDescPtr type) {
-	return	type->kind() == TDesc::Real || type->base() == realDesc;
+bool Comp::isAReal(TDescPtr type) {
+	return	type->kind() == TDesc::Real;
 }
+
 
 /********************************************************************************************//**
  * Convert stack operand to a real as necessary. 
  * @param	lhs	The type of the left-hand-side
  * @param	rhs	The type of the right-hand-side 
  ************************************************************************************************/
-void Comp::promote (ConstTDescPtr lhs, ConstTDescPtr rhs) {
+void Comp::promote (TDescPtr lhs, TDescPtr rhs) {
 	if (lhs->kind() == rhs->kind())
 		;									// nothing to do
 
@@ -191,7 +71,7 @@ void Comp::promote (ConstTDescPtr lhs, ConstTDescPtr rhs) {
  * @param	lhs	The type of the left-hand-side
  * @param	rhs	The type of the right-hand-side 
  ************************************************************************************************/
-void Comp::assignPromote (ConstTDescPtr lhs, ConstTDescPtr rhs) {
+void Comp::assignPromote (TDescPtr lhs, TDescPtr rhs) {
 	if (lhs->kind() == rhs->kind())
 		;				// nothing to do
 
@@ -210,103 +90,6 @@ void Comp::assignPromote (ConstTDescPtr lhs, ConstTDescPtr rhs) {
 }
 
 /********************************************************************************************//**
- * Uses the cross index to write a listing on the output stream
- *
- * @param name		Name of the source file
- * @param source 	The source file stream
- * @param out		The listing file stream
- ************************************************************************************************/
- void Comp::listing(const string& name, istream& source, ostream& out) {
-	string 		line;   				// Current source line
-	unsigned 	linenum = 1;			// source line number
-	unsigned	addr = 0;				// code address (index)
-
-	while (addr < indextbl.size()) {
-		while (linenum <= indextbl[addr]) {	// Print lines that lead up to code[addr]...
-			getline(source, line);	++linenum;
-			cout << "# " << name << ", " << linenum << ": " << line << "\n" << internal;
-		}
-
-		disasm(out, addr, (*code)[addr]);	// Disasmble resulting instructions...
-		while (linenum-1 == indextbl[++addr])
-			disasm(out, addr, (*code)[addr]);
-	}
-
-	while (getline(source, line))			// Any lines following '.' ...
-		cout << "# " << name << ", " << linenum++ << ": " << line << "\n" << internal;
-
-	out << endl;
-}
-
-/********************************************************************************************//**
- * @param level  The block level
- ************************************************************************************************/
-void Comp::purge(int level) {
-	for (auto i = symtbl.begin(); i != symtbl.end(); ) {
-		if (i->second.level() == level) {
-			if (verbose)
-				cout << progName << ": purging "
-					 << i->first << ": "
-					 << i->second.kind() << ", "
-					 << static_cast<int>(i->second.level()) << ", "
-					 << i->second.value().integer()
-					 << " from the symbol table\n";
-			i = symtbl.erase(i);
-
-		} else
-			++i;
-	}
-}
-
-/********************************************************************************************//**
- * Local variables have an offset from the *end* of the current stack frame
- * (bp), while parameters have a negative offset from the *start* of the frame
- *  -- offset locals by the size of the activation frame.
- *
- *  @param	level	The current block level
- *  @param	val		The variable symbol table entry
- *  @return			Data type
- ************************************************************************************************/
-ConstTDescPtr Comp::emitVarRef(int level, const SymValue& val) {
-	const auto offset = val.value().integer() >= 0 ? val.value().integer() + FrameSize : val.value().integer();
-	emit(OpCode::PushVar, level - val.level(), offset);
-	return val.type();
-}
-
-/********************************************************************************************//**
- * return the 'closest' (highest block level) identifer...
- *
- * @param	id	identifier to look up in the symbol table
- * @return symtbl.end() or an iterator positioned at a symbol table entry.
- ************************************************************************************************/
-SymbolTable::iterator Comp::lookup(const string& id) {
-	auto range = symtbl.equal_range(id);
-	if (range.first == range.second) {
-		error("Undefined identifier", id);
-		return symtbl.end();
-
-	} else {										// Find the closest...
-		auto closest = range.first;
-		for (auto it = closest; it != range.second; ++it)
-			if (it->second.level() > closest->second.level())
-				closest = it;
-
-		return closest;
-	}
-}
-
-#if	0
-/********************************************************************************************//**
- * @param	id	identifier to look up in the symbol table
- * @return 	The type that id identifiers, intDesc if id is undefined.
- ************************************************************************************************/
-ConstTDescPtr Comp::lookupType(const string& id) {
-	const auto it = lookup(id);
-	return it == symtbl.end() ? intDesc : it->second.type();
-}
-#endif
-
-/********************************************************************************************//**
  * Push a variable's value, a constant value, or invoke a function, and push the results,
  * of a function.
  *
@@ -316,8 +99,8 @@ ConstTDescPtr Comp::lookupType(const string& id) {
  * @param	level	The current block level 
  * @return	Data type 
  ************************************************************************************************/
-ConstTDescPtr Comp::identFactor(int level, const string& id) {
-	auto type = intDesc;
+TDescPtr Comp::identFactor(int level, const string& id) {
+	auto type = TDesc::intDesc;
    	auto it = lookup(id);
 
 	if (it != symtbl.end()) {
@@ -328,8 +111,7 @@ ConstTDescPtr Comp::identFactor(int level, const string& id) {
 			break;
 
 		case SymValue::Variable:
-			type = it->second.type();
-			variable(level, it);
+			type = variable(level, it);
 			emit(OpCode::Eval);
 			break;
 
@@ -353,11 +135,12 @@ ConstTDescPtr Comp::identFactor(int level, const string& id) {
  * number                               |
  * ( expr )
  * 
- * @param	level	The current block level.
+ * @param level		The current block level.
+ *
  * @return	Data type 
  ************************************************************************************************/
-ConstTDescPtr Comp::factor(int level) {
-	auto type = intDesc;				// Factor data type
+TDescPtr Comp::factor(int level) {
+	auto type = TDesc::intDesc;			// Factor data type
 
 	if (accept(Token::Identifier, false)) {
 		// Copy, and then consume the identifer...
@@ -373,17 +156,19 @@ ConstTDescPtr Comp::factor(int level) {
 
 		if (type->kind() == TDesc::Real) {
 			emit(OpCode::RTOI);
-			type = intDesc;
+			type = TDesc::intDesc;
 		}
 		
 	} else if (accept(Token::IntegerNum, false)) {
-		emit(OpCode::Push, 0, ts.current().integer_value);
+		int value = ts.current().integer_value;
+		emit(OpCode::Push, 0, value);
 		expect(Token::IntegerNum);
-		
+		type = TDesc::intDesc;
+
 	} else if (accept(Token::RealNum, false)) {
-		type = realDesc;
 		emit(OpCode::Push, 0, ts.current().real_value);
 		expect(Token::RealNum);
+		type = TDesc::realDesc;
 
 	} else if (accept(Token::OpenParen)) {
 		type = expression(level);
@@ -402,10 +187,11 @@ ConstTDescPtr Comp::factor(int level) {
 /********************************************************************************************//**
  * fact { ( * | / | mod | and ) fact } ;
  *
- * @param level	The current block level 
+ * @param level		The current block level 
+ *
  * @return	Data type  
  ************************************************************************************************/
-ConstTDescPtr Comp::term(int level) {
+TDescPtr Comp::term(int level) {
 	const auto lhs = factor(level);
 
 	for (;;) {
@@ -435,11 +221,12 @@ ConstTDescPtr Comp::term(int level) {
 /********************************************************************************************//**
  * [ ( + | - ] term
  *
- * @param	level	The current block level 
+ * @param level		The current block level 
+ *
  * @return	Data type 
  ************************************************************************************************/
-ConstTDescPtr Comp::unary(int level) {
-	auto type = intDesc;					// Default factor data type
+TDescPtr Comp::unary(int level) {
+	auto type = TDesc::intDesc;				// Default factor data type
 
 	if (accept(Token::Add)) 
 		type = term(level);					// ignore unary + 
@@ -457,10 +244,11 @@ ConstTDescPtr Comp::unary(int level) {
 /********************************************************************************************//**
  * term { (+ | - | or ) term } ;
  *
- * @param	level	The current block level. 
+ * @param level		The current block level. 
+ *
  * @return	Data type  
  ************************************************************************************************/
-ConstTDescPtr Comp::simpleExpr(int level) {
+TDescPtr Comp::simpleExpr(int level) {
 	auto lhs = unary(level);
 
 	for (;;) {
@@ -486,10 +274,11 @@ ConstTDescPtr Comp::simpleExpr(int level) {
 /********************************************************************************************//**
  * simpleExpr { (< | <= | = | >= | > | <> ) simpleExpr } ;
  *
- * @param level	The current block level 
+ * @param level		The current block level 
+ *
  * @return	Data type. 
  ************************************************************************************************/
-ConstTDescPtr Comp::expression(int level) {
+TDescPtr Comp::expression(int level) {
 	auto lhs = simpleExpr(level);
 
 	for (;;) {
@@ -526,6 +315,9 @@ ConstTDescPtr Comp::expression(int level) {
 
 /********************************************************************************************//**
  * expr-lst: expression { ',' expression } ;
+ *
+ * @param level		The current block level 
+ *
  * @return a list (vector) of TDescPtrs, one for each array dimension
  ************************************************************************************************/
 TDescPtrVec	Comp::expressionList(int level) {
@@ -702,33 +494,40 @@ void Comp::statementList(int level) {
  * @param	id		The variable or array identifier
  * @param	level	The current block level.
  ************************************************************************************************/
-ConstTDescPtr Comp::variable(int level, SymbolTable::iterator it) {
+TDescPtr Comp::variable(int level, SymbolTable::iterator it) {
 	auto type = it->second.type();
 
 	emitVarRef(level, it->second);
 	if (accept(Token::OpenBrkt)) {			// variable is an array, index into it
-		type = it->second.type()->base();	// Use the array base type...
+		auto atype = it->second.type();		// kind s/b TDesc::Array
+		type = atype->base();				// Return the array base type...
 
-		if (it->second.type()->kind() != TDesc::Array)
+		if (atype->kind() != TDesc::Array)
 			error("attempt to index into non-array", it->first);
 
 		auto tvec = expressionList(level);
 		if (tvec.empty())
 			error("expected expression-list");
 
-		else if (tvec.size() > 1) {
+		else if (tvec.size() > 1)
 			error("multidimensional arrays are not supported!");
 
-											// is the index the right type
-		} else if (type->rtype() != tvec[0]) {
-			ostringstream oss;
-			oss << "incompatable array index type" << tvec[0]->kind();
+		else if (atype->rtype()->kind() != tvec[0]->kind()) {
+			ostringstream oss;				// index isn't the right type
+			oss
+				<< "incompatable array index type, expected "
+				<< atype->rtype()->kind() << " got " << tvec[0]->kind();
+			error(oss.str());
 
 		} else if (type->size() != 1) {		// scale the index
 			emit(OpCode::Push, 0, type->size());
 			emit(OpCode::Mul);
 		}
 
+		if (atype->range().minimum() != 0) {	// offset non-zero based array index
+			emit(OpCode::Push, 0, atype->range().minimum());
+			emit(OpCode::Sub);
+		}
 		emit(OpCode::Add);					// index into the array
 		expect(Token::CloseBrkt);
 	}
@@ -785,12 +584,6 @@ void Comp::identStatement(int level, const string& id) {
 		emit(OpCode::Assign);
 		break;
 
-#if 0
-	case SymValue::Procedure:
-		error("Can't assign to a procedure", lhs->first);
-		break;
-#endif
-
 	default:
 		assert(false);
 	}
@@ -827,33 +620,6 @@ void Comp::statement(int level) {
 		repeatStmt(level);
 
 	// else: nothing
-}
-
-/********************************************************************************************//**
- * If next token is an identifer, checks to see, and reports, if the identifier was previously 
- * defined in the current scope (level), and returns the identifer string. Returns "unknown" if
- *  the next token is not an identifer.
- *
- * @param 	level	The current block level.
- * @return 	the next identifer in the token stream, "unknown" if the next token wasn't an
- *  		identifier.
- ************************************************************************************************/
-const std::string Comp::nameDecl(int level) {
-	const string id = ts.current().string_value;	// Copy the identifer
-
-	if (expect(Token::Identifier)) {				// Consume the identifier
-		auto range = symtbl.equal_range(id);		// Already defined?
-		for (auto it = range.first; it != range.second; ++it) {
-			if (it->second.level() == level) {
-				error("previously defined", id);
-				break;
-			}
-		}
-
-		return id;
-	}
-
-	return "unknown";
 }
 
 /********************************************************************************************//**
@@ -932,7 +698,7 @@ void Comp::constDecl(int level) {
 	expect(Token::EQU);							// Consume the "="
 	auto value = constExpr();					// Get the constant value
 
-	ConstTDescPtr type = value.kind() == Datum::Kind::Integer ? intDesc : realDesc;
+	TDescPtr type = value.kind() == Datum::Kind::Integer ? TDesc::intDesc : TDesc::realDesc;
 
 	symtbl.insert(	{ ident, SymValue(level, value, type) }	);
 	if (verbose)
@@ -1049,8 +815,8 @@ vector<string> Comp::identifierList(int level) {
  * @param	level	The current block level. 
  * @return the type description
  ************************************************************************************************/
-ConstTDescPtr Comp::type(int level) {
-	auto tdesc = intDesc;
+TDescPtr Comp::type(int level) {
+	auto tdesc = TDesc::intDesc;
 
 	// Make a copy in case the next token is an identifier...
 	const string id = ts.current().string_value;
@@ -1063,10 +829,10 @@ ConstTDescPtr Comp::type(int level) {
 			tdesc = it->second.type();
 
 	} else if (accept(Token::RealType))			// Real
-		return realDesc;
+		return TDesc::realDesc;
 
 	else if (accept(Token::Array)) {			// Array
-		expect(Token::OpenBrkt);
+		expect(Token::OpenBrkt);				// "["
 		TDescPtrVec typeVec = simpleTypeList(level);
 		assert(!typeVec.empty());
 		SubRange r;
@@ -1075,10 +841,11 @@ ConstTDescPtr Comp::type(int level) {
 			r = SubRange(0, 1);
 		} else
 			r = typeVec[0]->range();
-		expect(Token::CloseBrkt);
+
+		expect(Token::CloseBrkt);				// "]"
 		expect(Token::Of);
 
-		tdesc = TDesc::newTDesc(TDesc::Array, r.span(), r, ConstTDescPtr(), type(level), FieldVec());
+		tdesc = TDesc::newTDesc(TDesc::Array, r.span(), r, typeVec[0], type(level), FieldVec());
 
 	} else										// simple-type
 		tdesc = simpleType(level);
@@ -1094,8 +861,8 @@ ConstTDescPtr Comp::type(int level) {
  * @param	level	The current block level. 
  * @return the type description
  ************************************************************************************************/
-ConstTDescPtr Comp::simpleType(int level) {
-	auto type = intDesc;
+TDescPtr Comp::simpleType(int level) {
+	auto type = TDesc::intDesc;
 
 	// Copy if next token is an identifier...
 	const string id = ts.current().string_value;
@@ -1109,33 +876,36 @@ ConstTDescPtr Comp::simpleType(int level) {
 			type = it->second.type();
 
 	} else if (accept(Token::IntType))			// Integer
-		return intDesc;
+		return TDesc::intDesc;
 
 	else if (accept(Token::OpenParen)) {		// Enumeration
 		FieldVec		enums;
 
 		const auto ids = identifierList(level);
-		unsigned value = 0;
+		SubRange r(0, ids.empty() ? 0 : ids.size());
+		expect(Token::CloseParen);
+
+		// Create the type, excluding the fields (enumerations)
+		auto t = TDesc::newTDesc(TDesc::Enumeration, 1, r, TDescPtr(), TDesc::intDesc);
+
+		unsigned value = 0;						// Each enumeration gets a value...
 		for (auto id : ids) {
-			enums.push_back( { id, intDesc } );
-			symtbl.insert(	{ id, SymValue(level, value, intDesc) }	);
+			enums.push_back( { id, TDesc::intDesc } );
+			symtbl.insert(	{ id, SymValue(level, value, t) }	);
 			if (verbose)
 				cout << progName << ": enumeration '" << id << "' = " << value << ", " << level << "\n";
 			++value;
 		}
 
-		expect(Token::CloseParen);
-		SubRange r(0, enums.empty() ? 0 : enums.size());
-
-		type = TDesc::newTDesc(TDesc::Enumeration, 1, r, ConstTDescPtr(), intDesc, enums);
+		t->fields(enums);
+		type = t;
 
 	} else {									// Sub-Range
-		ostringstream oss;
-
 		auto minValue = constExpr();
 		expect(Token::Ellipsis);
 		auto maxValue = constExpr();
 
+		ostringstream oss;
 		if (minValue > maxValue) {
 			oss << "Minimum sub-range value (" << minValue << ")"
 				<< " is greater than the maximum value (" << maxValue << ")";
@@ -1150,7 +920,7 @@ ConstTDescPtr Comp::simpleType(int level) {
 
 		SubRange r(minValue.integer(), maxValue.integer());
 
-		type = TDesc::newTDesc(TDesc::SRange, 1, r, ConstTDescPtr(), intDesc, FieldVec());
+		type = TDesc::newTDesc(TDesc::Integer, 1, r);
 	}
 
 	return type;
@@ -1329,46 +1099,9 @@ void Comp::run() {
  * Construct a new compilier with the token stream initially bound to std::cin.
  * @param	pName	The prefix string used by error and verbose/diagnostic messages.
  ************************************************************************************************/
-Comp::Comp(const string& pName) : progName {pName}, nErrors{0}, verbose {false}, ts{cin} {
+Comp::Comp(const string& pName) : CompBase (pName) {
 	// insert builtin types into the symbol table
-	symtbl.insert(	{ "integer", SymValue(0, intDesc)	} );
-	symtbl.insert(	{ "real",	SymValue(0, realDesc)	} );
-}
-
-/********************************************************************************************//**
- * @param	inFile	The source file name, where "-" means the standard input stream
- * @param	prog	The generated machine code is appended here
- * @param	verb	Output verbose messages if true
- * @return	The number of errors encountered
- ************************************************************************************************/
-unsigned Comp::operator()(const string& inFile, InstrVector& prog, bool verb) {
-	code = &prog;
-	verbose = verb;
-
-	if ("-" == inFile)  {						// "-" means standard input
-		ts.set_input(cin);
-		run();
-
-		// Just disasmemble as we can't rewind standard input!
-		for (unsigned loc = 0; loc < code->size(); ++loc)
-			disasm(cout, loc, (*code)[loc]);
-
-	} else {
-		ifstream ifile(inFile);
-		if (!ifile.is_open())
-			error("error opening source file", inFile);
-
-		else {
-			ts.set_input(ifile);
-			run();
-
-			ifile.close();						// Rewind the source (seekg(0) isn't working!)...
-			ifile.open(inFile);
-			listing(inFile, ifile, cout);		// 	create a listing...
-		}
-	}
-	code = 0;
-
-	return nErrors;
+	symtbl.insert( { "integer",	SymValue(0, TDesc::intDesc)		} );
+	symtbl.insert( { "real",	SymValue(0, TDesc::realDesc)	} );
 }
 

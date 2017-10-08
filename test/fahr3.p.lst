@@ -1,30 +1,30 @@
-# test/fahr3.p, 2: { print Fahrenheit-Celsius table	}
-# test/fahr3.p, 3: {	third version; integers & reals	}
-# test/fahr3.p, 4: 
-# test/fahr3.p, 5: program fahr3 ;
-# test/fahr3.p, 6: const
+# test/fahr3.p, 1: { print Fahrenheit-Celsius table	}
+# test/fahr3.p, 2: {	third version; integers & reals	}
+# test/fahr3.p, 3: 
+# test/fahr3.p, 4: program fahr3 ;
+# test/fahr3.p, 5: const
     0: call 0, 2
     1: halt
-# test/fahr3.p, 7: 	LOWER =   0.0;	{	lower table limit	}
-# test/fahr3.p, 8: 	UPPER = 300.0;	{	upper table limit	}
-# test/fahr3.p, 9: 	STEP  =  20.0;	{	table step size		}
-# test/fahr3.p, 10: 
-# test/fahr3.p, 11: var
-# test/fahr3.p, 12: 	fahr : real ; celsius : integer;
-# test/fahr3.p, 13: 
-# test/fahr3.p, 14: begin
+# test/fahr3.p, 6: 	LOWER =   0.0;	{	lower table limit	}
+# test/fahr3.p, 7: 	UPPER = 300.0;	{	upper table limit	}
+# test/fahr3.p, 8: 	STEP  =  20.0;	{	table step size		}
+# test/fahr3.p, 9: 
+# test/fahr3.p, 10: var
+# test/fahr3.p, 11: 	fahr : real ; celsius : integer;
+# test/fahr3.p, 12: 
+# test/fahr3.p, 13: begin
     2: enter 2
-# test/fahr3.p, 15: 	fahr := LOWER;
+# test/fahr3.p, 14: 	fahr := LOWER;
     3: pushvar 0, 4
     4: push 0.000000
     5: assign
-# test/fahr3.p, 16: 	while fahr <= UPPER do begin
+# test/fahr3.p, 15: 	while fahr <= UPPER do begin
     6: pushvar 0, 4
     7: eval
     8: push 300.000000
     9: lte
    10: jneq 29
-# test/fahr3.p, 17: 		celsius := round(5.0 * (fahr-32.0) / 9.0);
+# test/fahr3.p, 16: 		celsius := round(5.0 * (fahr-32.0) / 9.0);
    11: pushvar 0, 5
    12: push 5.000000
    13: pushvar 0, 4
@@ -36,16 +36,16 @@
    19: div
    20: rtoi
    21: assign
-# test/fahr3.p, 18: 		fahr := fahr + STEP;
+# test/fahr3.p, 17: 		fahr := fahr + STEP;
    22: pushvar 0, 4
    23: pushvar 0, 4
    24: eval
    25: push 20.000000
    26: add
    27: assign
-# test/fahr3.p, 19: 	end;
+# test/fahr3.p, 18: 	end;
    28: jump 6
-# test/fahr3.p, 20:  end.
+# test/fahr3.p, 19:  end.
    29: ret
 
         8:   0.000000

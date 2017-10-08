@@ -1,36 +1,36 @@
 ./pas: passing 2 parameters, where 1 expected near line 30
-# test/fact3.p, 2: { Calculate 11 (0..10) factorials
-# test/fact3.p, 3: {	 n		    n!	}
-# test/fact3.p, 4: {  ---  ---------	}
-# test/fact3.p, 5: {	 0		    0	}
-# test/fact3.p, 6: {	 1		    1	}
-# test/fact3.p, 7: {	 2		    2	}
-# test/fact3.p, 8: {	 3		    6	}
-# test/fact3.p, 9: {	...				}
-# test/fact3.p, 10: {	 9	  362,880	}
-# test/fact3.p, 11: {	10	3,628,800	}
-# test/fact3.p, 12: 
-# test/fact3.p, 13: program fact3 ;
-# test/fact3.p, 14: const nFacts = 10;
+# test/fact3.p, 1: { Calculate 11 (0..10) factorials
+# test/fact3.p, 2: {	 n		    n!	}
+# test/fact3.p, 3: {  ---  ---------	}
+# test/fact3.p, 4: {	 0		    0	}
+# test/fact3.p, 5: {	 1		    1	}
+# test/fact3.p, 6: {	 2		    2	}
+# test/fact3.p, 7: {	 3		    6	}
+# test/fact3.p, 8: {	...				}
+# test/fact3.p, 9: {	 9	  362,880	}
+# test/fact3.p, 10: {	10	3,628,800	}
+# test/fact3.p, 11: 
+# test/fact3.p, 12: program fact3 ;
+# test/fact3.p, 13: const nFacts = 10;
     0: call 0, 30
     1: halt
-# test/fact3.p, 15: var result : integer;
-# test/fact3.p, 16: function factorial(n : integer) : integer ;
-# test/fact3.p, 17: 	var p : integer;
-# test/fact3.p, 18: 
-# test/fact3.p, 19: 	begin
+# test/fact3.p, 14: var result : integer;
+# test/fact3.p, 15: function factorial(n : integer) : integer ;
+# test/fact3.p, 16: 	var p : integer;
+# test/fact3.p, 17: 
+# test/fact3.p, 18: 	begin
     2: enter 1
-# test/fact3.p, 20: 		p := 1;
+# test/fact3.p, 19: 		p := 1;
     3: pushvar 0, 4
     4: push 1
     5: assign
-# test/fact3.p, 21: 		while n > 0 do begin
+# test/fact3.p, 20: 		while n > 0 do begin
     6: pushvar 0, -1
     7: eval
     8: push 0
     9: gt
    10: jneq 25
-# test/fact3.p, 22: 			p := p * n;
+# test/fact3.p, 21: 			p := p * n;
    11: pushvar 0, 4
    12: pushvar 0, 4
    13: eval
@@ -38,31 +38,31 @@
    15: eval
    16: mul
    17: assign
-# test/fact3.p, 23: 			n := n - 1
+# test/fact3.p, 22: 			n := n - 1
    18: pushvar 0, -1
    19: pushvar 0, -1
    20: eval
    21: push 1
-# test/fact3.p, 24: 		end;
+# test/fact3.p, 23: 		end;
    22: sub
    23: assign
    24: jump 6
-# test/fact3.p, 25: 		factorial := p;
+# test/fact3.p, 24: 		factorial := p;
    25: pushvar 0, 3
    26: pushvar 0, 4
    27: eval
    28: assign
-# test/fact3.p, 26: 	end;
+# test/fact3.p, 25: 	end;
    29: retf
-# test/fact3.p, 27: 
-# test/fact3.p, 28: begin
+# test/fact3.p, 26: 
+# test/fact3.p, 27: begin
    30: enter 1
-# test/fact3.p, 29: 	{ call with wrong number of parameters! }
-# test/fact3.p, 30:     result := factorial(nFacts, nFacts)
+# test/fact3.p, 28: 	{ call with wrong number of parameters! }
+# test/fact3.p, 29:     result := factorial(nFacts, nFacts)
    31: pushvar 0, 4
    32: push 10
    33: push 10
-# test/fact3.p, 31: end.
+# test/fact3.p, 30: end.
    34: call 0, 2
    35: assign
    36: ret

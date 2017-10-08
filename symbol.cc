@@ -92,12 +92,12 @@ Datum SymValue::value() const						{	return _value;			}
  * @param type	New symbol type
  * @return My function return type
  ************************************************************************************************/
-ConstTDescPtr SymValue::type(TDescPtr type)			{	return _type = type;	}
+TDescPtr SymValue::type(TDescPtr type)				{	return _type = type;	}
 
 /********************************************************************************************//**
  * @return My type
  ************************************************************************************************/
-ConstTDescPtr SymValue::type() const				{	return _type;			}
+TDescPtr SymValue::type() const						{	return _type;			}
 
 /********************************************************************************************//**
  * Return subrountine paramer kinds, in order of declaractions.

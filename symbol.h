@@ -69,8 +69,8 @@ public:
 	TDescPtrVec& params();						///< Return my subrountine parameter kinds
 	const TDescPtrVec& params() const;			///< Return my subrountine parameter kinds
 
-	ConstTDescPtr type(TDescPtr type);			///< Set and return my type
-	ConstTDescPtr type() const;					///< Return my type
+	TDescPtr type(TDescPtr type);				///< Set and return my type
+	TDescPtr type() const;						///< Return my type
 
 private:
 	Kind			_kind;						///< None, Variable, Procedure, Function or Type

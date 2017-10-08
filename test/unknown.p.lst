@@ -2,17 +2,17 @@
 ./pas: expected ':=' got 'IntegerNum' near line 4
 ./pas: expected 'end' got 'bad comment' near line 6
 ./pas: expected '.' got 'bad comment' near line 6
-# test/unknown.p, 2: program unknown ;
-# test/unknown.p, 3: var x : integer;
+# test/unknown.p, 1: program unknown ;
+# test/unknown.p, 2: var x : integer;
     0: call 0, 2
     1: halt
-# test/unknown.p, 4: begin
+# test/unknown.p, 3: begin
     2: enter 1
-# test/unknown.p, 5: 	x # 123;	{	unknown operator "#"!
+# test/unknown.p, 4: 	x # 123;	{	unknown operator "#"!
     3: pushvar 0, 4
     4: push 123
     5: assign
-# test/unknown.p, 6: end .
-# test/unknown.p, 7: 
+# test/unknown.p, 5: end .
+# test/unknown.p, 6: 
     6: ret
 
