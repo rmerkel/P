@@ -495,9 +495,9 @@ void Comp::statementList(int level) {
 }
 
 /********************************************************************************************//**
- * identifier [ '[' expression-list ']' ]
+ * identifier [ '[' expression-list ']' { '[' expression-list /]' } ] 
  *
- * Emits a variable reference, including array indexes.
+ * Emits a variable reference, optionally with array indexes.
  *
  * @param	id		The variable or array identifier
  * @param	level	The current block level.
@@ -508,7 +508,7 @@ TDescPtr Comp::variable(int level, SymbolTable::iterator it) {
 	emitVarRef(level, it->second);
 	if (accept(Token::OpenBrkt)) {			// variable is an array, index into it
 		do {
-			auto atype = type;				// The arrays type; kind s/b TDesc::Array
+			auto atype = type;				// The arrays type, e.g, TDesc::Array
 			type = atype->base();			// We'll return the arrays base type...
 
 			if (atype->kind() != TDesc::Array)
@@ -518,27 +518,33 @@ TDescPtr Comp::variable(int level, SymbolTable::iterator it) {
 			if (indexes.empty())
 				error("expected expression-list");
 
-			else if (indexes.size() > 1)
-				error("multidimensional arrays are not supported!");
+			unsigned nindexes = indexes.size();
+			for (auto index : indexes) {
+				if (atype->rtype()->kind() != index->kind()) {
+					ostringstream oss;
+					oss	<< "incompatable array index type, expected "
+						<< atype->rtype()->kind() << " got " << index->kind();
+					error(oss.str());
+					
+				} else if (type->size() != 1) {
+					emit(OpCode::Push, 0, type->size());
+					emit(OpCode::Mul);		// scale the index
+				}
 
-			else if (atype->rtype()->kind() != indexes[0]->kind()) {
-				ostringstream oss;
-				oss	<< "incompatable array index type, expected "
-					<< atype->rtype()->kind() << " got " << indexes[0]->kind();
-				error(oss.str());
+				// offset index for non-zero based arrays
+				if (atype->range().minimum() != 0) {
+					emit(OpCode::Push, 0, atype->range().minimum());
+					emit(OpCode::Sub);
+				}
 
-			} else if (type->size() != 1) {	// scale the index
-				emit(OpCode::Push, 0, type->size());
-				emit(OpCode::Mul);
+				emit(OpCode::Add);			// index into the array
+				
+				if (--nindexes) {			// reditect if there's another index
+					auto atype = type;		// The arrays type; kind s/b TDesc::Array
+					type = atype->base();	// We'll return the arrays base type...
+				}
 			}
 
-			// offset index for non-zero based arrays
-			if (atype->range().minimum() != 0) {
-				emit(OpCode::Push, 0, atype->range().minimum());
-				emit(OpCode::Sub);
-			}
-
-			emit(OpCode::Add);				// index into the array
 			expect(Token::CloseBrkt);
 
 		} while (accept(Token::OpenBrkt));
@@ -853,22 +859,51 @@ TDescPtr Comp::type(int level) {
 
 	else if (accept(Token::Array)) {			// Array
 		expect(Token::OpenBrkt);				// "["
-		TDescPtrVec typeVec = simpleTypeList(level);
-		assert(!typeVec.empty());
-		SubRange r;
-		if (typeVec.size() > 1) {
-			error("multiple dimension arrays aren't supported!");
-			r = SubRange(0, 1);
-		} else
-			r = typeVec[0]->range();
 
-		expect(Token::CloseBrkt);				// "]"
+		TDescPtrVec indexes = simpleTypeList(level);
+#if 1
+		TDescPtr tp = 0;
+		for (auto index : indexes) {
+			const SubRange r = index->range();
+			if (tp == 0) {
+				tp = TDesc::newTDesc(TDesc::Array, r.span(), r, index);
+				tdesc = tp;						// Remember the first array...
+
+			} else {							// Following indexes...
+				tp->base(TDesc::newTDesc(TDesc::Array, r.span(), r, index));
+				tp->size(tp->size() * r.span());
+				tp = tp->base();
+			}
+		}
+
+		expect(Token::CloseBrkt);				// "] of"
 		expect(Token::Of);
 
-		auto base = type(level);				// Get the arrays base type
-		size_t sz = r.span() * base->size();	// # of elements * each element size
+		tp->base(type(level));					// Get the arrays base type
+		tp->size(tp->size() * tp->base()->size());
 
-		tdesc = TDesc::newTDesc(TDesc::Array, sz, r, typeVec[0], base);
+#else
+
+		assert(!indexes.empty());
+		if (indexes.empty())
+			error("expected simple-type list");
+
+		else {
+			SubRange r;
+			if (indexes.size() > 1) {
+				error("multiple dimension arrays aren't supported!");
+				r = SubRange(0, 1);
+			} else
+				r = indexes[0]->range();
+
+			expect(Token::CloseBrkt);			// "] of"
+			expect(Token::Of);
+
+			auto base = type(level);			// Get the arrays base type
+			size_t sz = r.span() * base->size(); // # of elements * each element size
+			tdesc = TDesc::newTDesc(TDesc::Array, sz, r, indexes[0], base);
+		}
+#endif
 
 	} else										// simple-type
 		tdesc = simpleType(level);

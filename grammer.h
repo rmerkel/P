@@ -34,6 +34,9 @@
  *           func-decl = 'function'  identifier param-lst ':' type ';' block-decl ';' ; 
  *           param-lst = [ '(' var-decl-lst ')' ] ;
  *            variable = identifier [ '[' expression-lst ']' { '[' expression-lst ']' } ] ;
+ *            variable = identifier [ composite-var { composit-var } ] ;
+ *       composite-var = '[' expression-lst ']'                                             |
+ *                       '.' identifier ;                                                     x
  *       statement-blk = 'begin' statement-lst 'end' ;
  *       statement-lst = 'begin' statement {';' statement } 'end' ;
  *           statement = [  variable '=' expression                                         |

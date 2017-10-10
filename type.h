@@ -116,12 +116,12 @@ public:
 
 	// pre-defined types
 
-	static TDescPtr intDesc;		///< Integer type description
-	static TDescPtr constIntDesc;	///< Constant integer type description
-	static TDescPtr realDesc;		///< Real type description
-	static TDescPtr constRealDesc;	///< Constant real type description
-	static TDescPtr charDesc;		///< Character type description
-	static TDescPtr boolDesc;		///< Boolean type descriptor
+	static TDescPtr intDesc;			///< Integer type description
+	static TDescPtr constIntDesc;		///< Constant integer type description
+	static TDescPtr realDesc;			///< Real type description
+	static TDescPtr constRealDesc;		///< Constant real type description
+	static TDescPtr charDesc;			///< Character type description
+	static TDescPtr boolDesc;			///< Boolean type descriptor
 
 	/// Constructor
 	TDesc(		Kind		kind,
@@ -134,12 +134,27 @@ public:
 	virtual ~TDesc() {}					///< Destructor
 
 	Kind kind() const;					///< Return my kind...
+	Kind kind(Kind kind);				///< Set, and then, return my kind
+
 	unsigned size() const;				///< Return my size, in Datums
+	unsigned size(unsigned sz);			///< Set, and return my size, in Datums
+
 	const SubRange& range() const;		///< Return my sub-range
-	TDescPtr rtype() const;				///< Return my array index type
+
+	/// Set and return my sub-range
+	const SubRange& range(const SubRange& range);
+
 	TDescPtr base() const;				///< Return by base type
+	TDescPtr base(TDescPtr type);		///< Set, and return by base type
+
+	TDescPtr rtype() const;				///< Return my array index type
+	TDescPtr rtype(TDescPtr type);		///< Set, and return my array index type
+
 	const FieldVec& fields() const;		///< Return my fields
-	void fields(const FieldVec& flds);	///< Set my fields
+
+	/// Set and return my fields
+	const FieldVec& fields(const FieldVec& flds);
+
 	bool isOrdinal() const;				///< Ordinal type?
 	bool isElmentary() const;			///< Elementary type? 
 

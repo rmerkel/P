@@ -213,38 +213,73 @@ TDesc::TDesc(
 /************************************************************************//**
  * @return my kind
  ****************************************************************************/
-TDesc::Kind TDesc::kind() const			{	return _kind;		}
+TDesc::Kind TDesc::kind() const			{	return _kind;			}
+
+/************************************************************************//**
+ * @param kind My new kind
+ * @return my kind
+ ****************************************************************************/
+TDesc::Kind TDesc::kind(TDesc::Kind kind) {
+	return _kind = kind;
+}
 
 /************************************************************************//**
  * @return my size, in bytes
  ****************************************************************************/
-unsigned TDesc::size() const			{	return _size;		}
+unsigned TDesc::size() const			{	return _size;			}
+
+/************************************************************************//**
+ * @param sz My new size
+ * @return my size, in bytes
+ ****************************************************************************/
+unsigned TDesc::size(unsigned sz) 		{	return _size = sz;		}
 
 /************************************************************************//**
  * @return my sub-range
  ****************************************************************************/
-const SubRange& TDesc::range() const	{	return _range;		}
+const SubRange& TDesc::range() const	{	return _range;			}
+
+/************************************************************************//**
+ * @param rng my new sub-range
+ * @return my sub-range
+ ****************************************************************************/
+const SubRange& TDesc::range(const SubRange& rng) {
+	return _range =rng;
+}
 
 /************************************************************************//**
  * @return my array index type
  ****************************************************************************/
-TDescPtr TDesc::rtype() const			{	return _rtype;		}
+TDescPtr TDesc::rtype() const 			{	return _rtype;			}
+
+/************************************************************************//**
+ * @param type my new array index type
+ * @return my array index type
+ ****************************************************************************/
+TDescPtr TDesc::rtype(TDescPtr type) 	{	return _rtype = type;	}
 
 /************************************************************************//**
  * @return my base type
  ****************************************************************************/
-TDescPtr TDesc::base() const			{	return _base;		}
+TDescPtr TDesc::base() const			{	return _base;			}
+
+/************************************************************************//**
+ * @param type my new base type
+ * @return my base type
+ ****************************************************************************/
+TDescPtr TDesc::base(TDescPtr type) 	{	return _base = type;	}
 
 /************************************************************************//**
  * @return my fields
  ****************************************************************************/
-const FieldVec& TDesc::fields() const	{	return _fields;		}
+const FieldVec& TDesc::fields() const	{	return _fields;			}
 
 /************************************************************************//**
- * @param flds	My new fields
+ * @param flds my new fields
+ * @return my fields
  ****************************************************************************/
-void TDesc::fields(const FieldVec& flds) {
-	_fields = flds;
+const FieldVec& TDesc::fields(const FieldVec& flds) {
+	return _fields = flds;
 }
 
 /************************************************************************//**
