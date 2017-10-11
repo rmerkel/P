@@ -1,6 +1,6 @@
 /** @file instr.cc
  *
- * Pascal-Lite Opcodes and instruction format
+ * Pascal-lite Opcodes and instruction format
  *
  * @author Randy Merkel, Slowly but Surly Software.
  * @copyright  (c) 2017 Slowly but Surly Software. All rights reserved.
@@ -26,6 +26,12 @@ const OpCodeInfo::InfoMap OpCodeInfo::opInfoTbl {
 	{ OpCode::ITOR,		OpCodeInfo{ "itor",		1			}	},
 	{ OpCode::ITOR2,	OpCodeInfo{ "itor2",	1			}	},
 	{ OpCode::RTOI,		OpCodeInfo{ "rtoi",		1			}	},
+	{ OpCode::TRUNC,	OpCodeInfo{ "trunc",	1			}	},
+	{ OpCode::ABS,		OpCodeInfo{	"abs",		1			}	},
+	{ OpCode::ATAN,		OpCodeInfo{	"atan",		1			}	},
+	{ OpCode::EXP,		OpCodeInfo{ "exp",		1			}	},
+	{ OpCode::LOG,		OpCodeInfo{ "log",		1			}	},
+	{ OpCode::ODD,		OpCodeInfo{ "odd",		1			}	},
 
 	// Binary operations
 
@@ -44,6 +50,7 @@ const OpCodeInfo::InfoMap OpCodeInfo::opInfoTbl {
 
 	{ OpCode::LOR,		OpCodeInfo{ "lor",		2			}	},
 	{ OpCode::LAND,		OpCodeInfo{ "land",		2			}	},
+	{ OpCode::LNOT,		OpCodeInfo{ "lnot",		2			}	},
 
 	// Push/pop
 

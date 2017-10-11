@@ -11,9 +11,9 @@
 
 program fact2 ;
 const nFacts = 10;
-var result : integer;
-function factorial(n : integer) : integer ;
-	var p : integer;
+var result : Integer;
+function factorial(n : Integer) : Integer ;
+	var p : Integer;
 
 	begin
 		p := 1;

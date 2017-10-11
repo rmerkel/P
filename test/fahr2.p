@@ -8,7 +8,7 @@ const
 	STEP  =  20.0;	{	table step size		}
 
 var
-	fahr, celsius : real;
+	fahr, celsius : Real;
 
 begin
 	fahr := LOWER;

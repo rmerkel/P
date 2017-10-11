@@ -1,5 +1,5 @@
 program unknown ;
-var x : integer;
+var x : Integer;
 begin
 	x # 123;	{	unknown operator "#"!
 end .

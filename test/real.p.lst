@@ -3,7 +3,7 @@
 # test/real.p, 2: var
     0: call 0, 2
     1: halt
-# test/real.p, 3: 	f : real; i : integer;
+# test/real.p, 3: 	f : Real; i : Integer;
 # test/real.p, 4: 
 # test/real.p, 5: begin
     2: enter 2
@@ -16,7 +16,7 @@
     7: push 2.000000
     8: rtoi
     9: assign
-# test/real.p, 8: 	f := round(2.5);
+# test/real.p, 8: 	f := Round(2.5);
    10: pushvar 0, 4
    11: push 2.500000
    12: rtoi

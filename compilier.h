@@ -1,5 +1,5 @@
 /********************************************************************************************//**
- * @file compbase.h
+ * @file compilier.h
  *
  * A recursive decent compilier base.
  *
@@ -20,14 +20,14 @@
 #include "token.h"
 
 /********************************************************************************************//**
- * Recursive decent compilier base
+ * Framework for a recursive decent compilier
  *
  * Language independent utilities for a recursive decent compilier.
  ************************************************************************************************/
-class CompBase {
+class Compilier {
 public:
-	CompBase(const std::string& pName);		///< Constructor; use pName for error messages
-	virtual ~CompBase() {}					///< Destructor
+	Compilier(const std::string& pName);	///< Constructor; use pName for error messages
+	virtual ~Compilier() {}					///< Destructor
 
 	/// Run the compiler
 	unsigned operator()(const std::string& inFile, InstrVector& prog, bool verb = false);

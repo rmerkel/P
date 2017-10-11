@@ -1,6 +1,6 @@
 /** @file interp.cc
  *
- * Pascal-Lite interpreter in C++
+ * Pascal-lite interpreter in C++
  *
  * @author Randy Merkel, Slowly but Surly Software.
  * @copyright  (c) 2017 Slowly but Surly Software. All rights reserved.
@@ -141,88 +141,99 @@ Interp::Result Interp::step() {
 	}
 
 	Datum	rhand;						// right-hand side of a binary operation
-
 	switch(ir.op) {
-	case OpCode::ITOR:
-		stack[sp] = stack[sp].integer() * 1.0;
+	case OpCode::ITOR:	stack[sp] = stack[sp].integer() * 1.0;					break;
+	case OpCode::ITOR2:	stack[sp-1] = stack[sp-1].integer() * 1.0;				break;
+	case OpCode::RTOI:	stack[sp] = static_cast<int>(round(stack[sp].real()));	break;
+	case OpCode::TRUNC:	stack[sp] = static_cast<int>(stack[sp].real());			break;
+	case OpCode::ABS:
+		if (stack[sp].kind() == Datum::Integer)
+			stack[sp] = abs(stack[sp].integer());
+		else
+			stack[sp] = fabs(stack[sp].real());
 		break;
 
-	case OpCode::ITOR2:
-		stack[sp-1] = stack[sp-1].integer() * 1.0;
+	case OpCode::ATAN:
+		if (stack[sp].kind() == Datum::Integer)
+			stack[sp] = atan(stack[sp].integer());
+		else
+			stack[sp] = atan(stack[sp].real());
 		break;
 
-	case OpCode::RTOI:	
-		stack[sp] = static_cast<int>(round(stack[sp].real()));
+	case OpCode::EXP:
+		if (stack[sp].kind() == Datum::Integer)
+			stack[sp] = exp(stack[sp].integer());
+		else
+			stack[sp] = exp(stack[sp].real());
 		break;
 
-	case OpCode::Neg:		stack[sp] = -stack[sp];					break;
+	case OpCode::LOG:
+		rhand = pop();
+		if ((rhand.kind() == Datum::Real && rhand.real() == 0) || (rhand.kind() == Datum::Integer && rhand.integer() == 0)) {
+			cerr << "Attempt to take log(0) @ pc (" << prevPc << ")!\n";
+			return Result::divideByZero;
 
-	case OpCode::Add:		rhand = pop(); push(pop() + rhand);		break;
-	case OpCode::Sub:		rhand = pop(); push(pop() - rhand); 	break;
-	case OpCode::Mul:		rhand = pop(); push(pop() * rhand);		break;
+		} else if (rhand.kind() == Datum::Integer)
+			push(log(rhand.integer()));
+		else
+			push(log(rhand.real()));
+		break;
+
+	case OpCode::ODD:	stack[sp] = (stack[sp].natural() & 1) == 1;				break;
+	case OpCode::Neg:	stack[sp] = -stack[sp];									break;
+	case OpCode::Add:	rhand = pop(); push(pop() + rhand);						break;
+	case OpCode::Sub:	rhand = pop(); push(pop() - rhand); 					break;
+	case OpCode::Mul:	rhand = pop(); push(pop() * rhand);						break;
 	
 	case OpCode::Div:
 		rhand = pop();
-		if ((rhand.kind() == Datum::Real && rhand.real() != 0) || rhand.integer() != 0)
-			push(pop() / rhand);
-
-		else {
+		if ((rhand.kind() == Datum::Real && rhand.real() == 0) || (rhand.kind() == Datum::Integer && rhand.integer() == 0)) {
 			cerr << "Attempt to divide by zero @ pc (" << prevPc << ")!\n";
 			return Result::divideByZero;
-		}
+
+		} else
+			push(pop() / rhand);
 		break;
 
 	case OpCode::Rem:
 		rhand = pop();
-		if ((rhand.kind() == Datum::Real && rhand.real() != 0) || rhand.real() != 0)
-			push(pop() % rhand);
-
-		else {
+		if ((rhand.kind() == Datum::Real && rhand.real() == 0) || (rhand.kind() == Datum::Integer && rhand.integer() == 0)) {
 			cerr << "attempt to divide by zero @ pc (" << prevPc << ")!\n";
 			return Result::divideByZero;
-		}
+
+		} else
+			push(pop() % rhand);
 		break;
 
-	case OpCode::LT:		rhand = pop(); push(pop()  < rhand); 	break;
-	case OpCode::LTE:   	rhand = pop(); push(pop() <= rhand); 	break;
-	case OpCode::EQU:   	rhand = pop(); push(pop() == rhand); 	break;
-	case OpCode::GTE:   	rhand = pop(); push(pop() >= rhand); 	break;
-	case OpCode::GT:		rhand = pop(); push(pop()  > rhand); 	break;
-	case OpCode::NEQU:   	rhand = pop(); push(pop() != rhand); 	break;
-	case OpCode::LOR:   	rhand = pop(); push(pop() || rhand); 	break;
-	case OpCode::LAND:  	rhand = pop(); push(pop() && rhand); 	break;
-	case OpCode::Push: 		push(ir.addr);							break;
+	case OpCode::LT:	rhand = pop(); push(pop()  < rhand); 					break;
+	case OpCode::LTE:   rhand = pop(); push(pop() <= rhand); 					break;
+	case OpCode::EQU:   rhand = pop(); push(pop() == rhand); 					break;
+	case OpCode::GTE:  	rhand = pop(); push(pop() >= rhand); 					break;
+	case OpCode::GT:	rhand = pop(); push(pop()  > rhand); 					break;
+	case OpCode::NEQU: 	rhand = pop(); push(pop() != rhand); 					break;
 
-	case OpCode::PushVar:
-		push(base(ir.level) + ir.addr.integer());
-		break;
+	case OpCode::LOR:  	rhand = pop(); push(pop() || rhand); 					break;
+	case OpCode::LAND: 	rhand = pop(); push(pop() && rhand); 					break;
+	case OpCode::LNOT:	stack[sp] = !stack[sp];									break;
 
-	case OpCode::Eval: {	auto ea = pop(); push(stack[ea.natural()]);	}
-		break;
-
+	case OpCode::Push: 	push(ir.addr);											break;
+	case OpCode::PushVar: push(base(ir.level) + ir.addr.integer());				break;
+	case OpCode::Eval: { auto ea = pop(); push(stack[ea.natural()]); }			break;
 	case OpCode::Assign:
 		rhand = pop();					// Save the value
 		lastWrite = pop().natural();	// Save the effective address for dump()...
 		stack[lastWrite] = rhand;
 		break;
 
-	case OpCode::Call: 		call(ir.level, ir.addr.natural());		break;
-	case OpCode::Ret:   	ret();  								break;
-	case OpCode::Retf: 		retf();									break;
+	case OpCode::Call: 	call(ir.level, ir.addr.natural());						break;
+	case OpCode::Ret:   ret();  												break;
+	case OpCode::Retf: 	retf();													break;
 
-	case OpCode::Enter:
-		mkStackSpace(ir.addr.natural());
-			sp+=ir.addr.natural();
-			break;
+	case OpCode::Enter: mkStackSpace(ir.addr.natural()); sp+=ir.addr.natural(); break;
+	case OpCode::Jump:	pc = ir.addr.natural();									break;
+	case OpCode::JNEQ:	if (pop().integer() == 0) pc = ir.addr.natural();		break;
 
-	case OpCode::Jump:		pc = ir.addr.natural();					break;
-
-	case OpCode::JNEQ:
-		if (pop().integer() == 0)
-			pc = ir.addr.natural();
-		break;
-
-	case OpCode::Halt:		return Result::halted;					break;
+	case OpCode::Halt:	return Result::halted;									break;
 
 	default:
 		cerr 	<< "Unknown op code: " << OpCodeInfo::info(ir.op).name()

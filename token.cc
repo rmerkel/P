@@ -2,7 +2,7 @@
  *
  * TokenStream implementation. Started life as the Token and TokenStream classes from The C++
  * Programming Language, 4th Edition, by Stroustrup, and then modified to work on the integer based
- * Pascal-Lite machine.
+ * Pascal-lite machine.
  *
  * @author Randy Merkel, Slowly but Surly Software.
  * @copyright  (c) 2017 Slowly but Surly Software. All rights reserved.
@@ -53,16 +53,27 @@ Token TokenStream::get() {
 	} while (isspace(ch));
 
 	switch (ch) {
-	case '>':									// >, >> or >=?
+	case '=': return ct.kind = Token::EQU;			break;
+	case '+': return ct.kind = Token::Add;			break;
+	case '-': return ct.kind = Token::Subtract;		break;
+	case '*': return ct.kind = Token::Multiply;		break;
+	case '/': return ct.kind = Token::Divide;		break;
+
+	case '(': return ct.kind = Token::OpenParen;	break;
+	case ')': return ct.kind = Token::CloseParen;	break;
+	case '[': return ct.kind = Token::OpenBrkt;		break;
+	case ']': return ct.kind = Token::CloseBrkt;	break;
+	case ',': return ct.kind = Token::Comma;		break;
+	case ';': return ct.kind = Token::SemiColon;	break;
+
+	case '>':									// >, or >=?
 		if (!getch(ch))		ct.kind = Token::GT;
-		else if ('>' == ch)	ct.kind = Token::ShiftR;
 		else if ('=' == ch)	ct.kind = Token::GTE;
 		else {	unget();	ct.kind = Token::GT;	}
 		return ct;
 
-	case '<':									// <, << or <=?
+	case '<':									// <, or <=?
 		if (!getch(ch))		ct.kind = Token::LT;
-		else if ('<' == ch)	ct.kind = Token::ShiftL;
 		else if ('=' == ch)	ct.kind = Token::LTE;
 		else {	unget();	ct.kind = Token::LT;	}
 		return ct;
@@ -70,7 +81,7 @@ Token TokenStream::get() {
 	case ':':									// : or :=?
 		if (!getch(ch))		ct.kind = Token::Colon;
 		else if ('=' == ch)	ct.kind = Token::Assign;
-		else {	unget();		ct.kind = Token::Colon;	}
+		else {	unget();	ct.kind = Token::Colon;	}
 		return ct;
 
 	case '{':									// comment; { ... }
@@ -87,15 +98,10 @@ Token TokenStream::get() {
 		} while ('}' != ch);
 		return get();							// restart the scan..
 
-	case '%': case '(': case ')': case '[': case ']':
-	case '*': case '+': case ',': case '-': case '/':
-	case ';': case '^': case '=':
-		return ct = { static_cast<Token::Kind>(ch) };
-
 	case '.': 									// '.', or '..'
 		if (!getch(ch))		ct.kind = Token::Period;
 		else if ('.' == ch)	ct.kind = Token::Ellipsis;
-		else {	unget();		ct.kind = Token::Period;	}
+		else {	unget();	ct.kind = Token::Period;	}
 		return ct;
 												// integer or real number
 	case '0': case '1': case '2': case '3': case '4':
@@ -186,26 +192,33 @@ void TokenStream::set_input(std::istream* p) {
 // privite static
 
 TokenStream::KeywordTable	TokenStream::keywords = {
+	{	"Abs",			Token::Abs			},
 	{	"and",			Token::And			},
 	{	"array",		Token::Array		},
+	{	"Atan",			Token::Atan			},
 	{	"begin",		Token::Begin		},
-	{	"type",			Token::TypeDecl		},
 	{   "const",		Token::ConsDecl		},
 	{	"do",			Token::Do			},
 	{	"else",			Token::Else			},
 	{	"end",			Token::End			},
+	{	"Exp",			Token::Exp			},
 	{	"function",		Token::FuncDecl		},
 	{	"if",			Token::If			},
-	{	"integer",		Token::IntType		},
+	{	"Integer",		Token::IntType		},
+	{	"Log",			Token::Log			},
 	{	"mod",			Token::Mod			},
+	{	"not",			Token::Not			},
+	{	"Odd",			Token::Odd			},
 	{	"of",			Token::Of			},
-	{	"or",			Token::Or			},
+	{	"Ord",			Token::Ord			},
 	{	"program",		Token::ProgDecl		},
 	{	"procedure",	Token::ProcDecl		},
-	{	"real",			Token::RealType		},
+	{	"Real",			Token::RealType		},
 	{	"repeat",		Token::Repeat		},
-	{	"round",		Token::Round		},
+	{	"Round",		Token::Round		},
 	{	"then",			Token::Then			},
+	{	"Trunc",		Token::Trunc		},
+	{	"type",			Token::TypeDecl		},
 	{	"until",		Token::Until		},
 	{	"var",			Token::VarDecl		},
 	{	"while",		Token::While		}
@@ -226,45 +239,43 @@ ostream& operator<<(std::ostream& os, const Token::Kind& kind) {
 	case Token::BadComment:	os << "bad comment";	break;
 
 	case Token::Identifier:	os << "identifier";		break;
-
 	case Token::IntegerNum:	os << "IntegerNum";		break;
 	case Token::RealNum:	os << "RealNum";		break;
-	case Token::TypeDecl:	os << "type";			break;
+
 	case Token::ConsDecl:	os << "const";			break;
-	case Token::VarDecl:	os << "var";			break;
-	case Token::ProgDecl:	os << "program";		break;
-	case Token::ProcDecl:	os << "procedure";		break;
 	case Token::FuncDecl:	os << "function";		break;
+	case Token::ProcDecl:	os << "procedure";		break;
+	case Token::ProgDecl:	os << "program";		break;
+	case Token::TypeDecl:	os << "type";			break;
+	case Token::VarDecl:	os << "var";			break;
+
 	case Token::Begin:		os << "begin";			break;
 	case Token::End:		os << "end";			break;
 	case Token::If:			os << "if";				break;
 	case Token::Then:		os << "then";			break;
 	case Token::Else:		os << "else";			break;
-	case Token::Ellipsis:	os << "..";				break;
 	case Token::While:		os << "while";			break;
 	case Token::Do:			os << "do";				break;
 	case Token::Repeat:		os << "repeat";			break;
 	case Token::Until:		os << "until";			break;
 
-	case Token::IntType:	os << "integer";		break;
-	case Token::RealType:	os << "real";			break;
+	case Token::Ellipsis:	os << "..";				break;
+
+	case Token::IntType:	os << "Integer";		break;
+	case Token::RealType:	os << "Real";			break;
 
 	case Token::Array:		os << "array";			break;
 	case Token::Of:			os << "of";				break;
 
-	case Token::Round:		os << "round";			break;
-
-	case Token::EOS:		os << "EOS";			break;
-
-	case Token::EQU:		os << "=";				break;
+	case Token::LT:			os << "<";				break;
 	case Token::LTE:		os << "<=";				break;
+	case Token::EQU:		os << "=";				break;
 	case Token::GTE:		os << ">=";				break;
-	case Token::Or:			os << "or";				break;
-	case Token::And:		os << "and";			break;
+	case Token::GT:			os << ">";				break;
 	case Token::NEQ:		os << "<>";				break;
 
-	case Token::LT:			os << "<";				break;
-	case Token::GT:			os << ">";				break;
+	case Token::Or:			os << "or";				break;
+	case Token::And:		os << "and";			break;
 
 	case Token::Add:		os << "+";				break;
 	case Token::Subtract:	os << "-";				break;
@@ -280,6 +291,16 @@ ostream& operator<<(std::ostream& os, const Token::Kind& kind) {
 	case Token::Colon:		os << ":";				break;
 	case Token::SemiColon:	os << ";";				break;
 	case Token::Assign:		os << ":=";				break;
+
+	case Token::Round:		os << "Round";			break;
+	case Token::Trunc:		os << "Trunc";			break;
+	case Token::Abs:		os << "Abs";			break;
+	case Token::Atan:		os << "Atan";			break;
+	case Token::Exp:		os << "Exp";			break;
+	case Token::Log:		os << "Log";			break;
+	case Token::Odd:		os << "Odd";			break;
+
+	case Token::EOS:		os << "EOS";			break;
 
 	default:
 			os << "Unknown Kind: " << static_cast<unsigned>(kind) <<  "!";

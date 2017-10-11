@@ -10,7 +10,7 @@
 # test/fahr3.p, 8: 	STEP  =  20.0;	{	table step size		}
 # test/fahr3.p, 9: 
 # test/fahr3.p, 10: var
-# test/fahr3.p, 11: 	fahr : real ; celsius : integer;
+# test/fahr3.p, 11: 	fahr : Real ; celsius : Integer;
 # test/fahr3.p, 12: 
 # test/fahr3.p, 13: begin
     2: enter 2
@@ -24,7 +24,7 @@
     8: push 300.000000
     9: lte
    10: jneq 29
-# test/fahr3.p, 16: 		celsius := round(5.0 * (fahr-32.0) / 9.0);
+# test/fahr3.p, 16: 		celsius := Round(5.0 * (fahr-32.0) / 9.0);
    11: pushvar 0, 5
    12: push 5.000000
    13: pushvar 0, 4

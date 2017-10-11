@@ -3,7 +3,7 @@
 ./pas: expected 'end' got 'bad comment' near line 6
 ./pas: expected '.' got 'bad comment' near line 6
 # test/unknown.p, 1: program unknown ;
-# test/unknown.p, 2: var x : integer;
+# test/unknown.p, 2: var x : Integer;
     0: call 0, 2
     1: halt
 # test/unknown.p, 3: begin

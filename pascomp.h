@@ -1,7 +1,7 @@
 /********************************************************************************************//**
- * @file comp.h
+ * @file pascomp.h
  *
- * The Pascal-Lite compilier.
+ * The Pascal-lite compilier.
  *
  * @author Randy Merkel, Slowly but Surly Software.
  * @copyright  (c) 2017 Slowly but Surly Software. All rights reserved.
@@ -10,20 +10,21 @@
 #ifndef	COMP_H
 #define	COMP_H
 
-#include "compbase.h"
+#include "compilier.h"
 
 /********************************************************************************************//**
- * A Pascal-Lite Compilier
+ * A Pascal-lite Compilier
  *
- * A recursive decent compilier, evolved from
- * https://en.wikipedia.org/wiki/Recursive_descent_parser#C_implementation. Construction binds
- * a program name with the instance, used in error messages. The compilier is run via the call
- * operator which specifies the input stream, the location of the emitted code, and weather to
- * emit a travlelog (verbose messages).
+ * Productions for the Pascal-lite recursive decent compilier.
+ *
+ * Evolved from https://en.wikipedia.org/wiki/Recursive_descent_parser#C_implementation.
+ * Construction binds a program name with the instance, used in error messages. The compilier is
+ * run via the call operator, specifing the input stream, the location of the emitted code, and
+ * wheather to emit a travlelog (verbose messages).
  ************************************************************************************************/
-class Comp : public CompBase {
+class PasComp : public Compilier {
 public:
-	Comp(const std::string& pName);			///< Constructor; use pName for error messages
+	PasComp(const std::string& pName);		///< Constructor; use pName for error messages
 
 private:
 	bool isAnInteger(TDescPtr type);		///< Is type an integer?
@@ -38,6 +39,8 @@ private:
 	/// variable sub-production...
 	TDescPtr variable(int level, SymbolTable::iterator it);
 
+	TDescPtr builtInFunc(int level);		///< built-in functions
+
 	/// factor-identifier sub-production...
 	TDescPtr identFactor(int level, const std::string& id);
 
@@ -47,7 +50,7 @@ private:
 	TDescPtr simpleExpr(int level);			///< simple-expr production...
 	TDescPtr expression(int level);			///< expression production...
 	TDescPtrVec	expressionList(int level);	///< expression-list production...
-	Datum constExpr();						///< const-expr production...
+	std::pair<bool,Datum> constExpr();		///< const-expr production...
 
 	/// call-statement production...
 	void callStmt(const std::string& name, const SymValue& val, int level);
@@ -77,8 +80,10 @@ private:
 	/// identifier-lst production...
 	std::vector<std::string> identifierList(int level);
 
-	TDescPtr type(int level);				///< type production...
-	TDescPtr simpleType(int level);			///< simple-type production...
+	TDescPtr type(int level);				///< type productions...
+	TDescPtr simpleType(int level);			///< simple-type productions...
+	TDescPtr ordinalType(int level);		///< ordinal type productions...
+	TDescPtr structuredType(int level);		///< structured-type productions...
 	TDescPtrVec simpleTypeList(int level);	///< simple-type-list productions...
 
 	/// Subroutine-declaration production...

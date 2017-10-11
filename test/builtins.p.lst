@@ -1,0 +1,147 @@
+# test/builtins.p, 1: { test builtin functions and procedures	}
+# test/builtins.p, 2: program builtins ;
+# test/builtins.p, 3: type
+    0: call 0, 2
+    1: halt
+# test/builtins.p, 4: 	e = (zero, one, two, three);
+# test/builtins.p, 5: 
+# test/builtins.p, 6: var
+# test/builtins.p, 7: 	i : Integer; 
+# test/builtins.p, 8: 	r : Real;
+# test/builtins.p, 9: 
+# test/builtins.p, 10: begin
+    2: enter 2
+# test/builtins.p, 11: 	i := 1;					{ result: 1			}
+    3: pushvar 0, 4
+    4: push 1
+    5: assign
+# test/builtins.p, 12: 	i := Round(2.0);		{ result: 2			}
+    6: pushvar 0, 4
+    7: push 2.000000
+    8: rtoi
+    9: assign
+# test/builtins.p, 13: 	i := Round(2.5);		{ result: 3 		}
+   10: pushvar 0, 4
+   11: push 2.500000
+   12: rtoi
+   13: assign
+# test/builtins.p, 14: 	i := Trunc(4.0);		{ result: 4 		}
+   14: pushvar 0, 4
+   15: push 4.000000
+   16: trunc
+   17: assign
+# test/builtins.p, 15: 	i := Trunc(5.9);		{ result: 5 		}
+   18: pushvar 0, 4
+   19: push 5.900000
+   20: trunc
+   21: assign
+# test/builtins.p, 16: 	i := IntMax;			{ result 2**32		}
+   22: pushvar 0, 4
+   23: push 2147483647
+   24: assign
+# test/builtins.p, 17: 	
+# test/builtins.p, 18: 	i := Abs(1);			{ result: 1			}
+   25: pushvar 0, 4
+   26: push 1
+   27: abs
+   28: assign
+# test/builtins.p, 19: 	i := Abs(-1);			{ result: 1			}
+   29: pushvar 0, 4
+   30: push 1
+   31: neg
+   32: abs
+   33: assign
+# test/builtins.p, 20: 	r := Abs(1.5);			{ result 1.5		}
+   34: pushvar 0, 5
+   35: push 1.500000
+   36: abs
+   37: assign
+# test/builtins.p, 21: 	r := Abs(-1.5);			{ result 1.5		}
+   38: pushvar 0, 5
+   39: push 1.500000
+   40: neg
+   41: abs
+   42: assign
+# test/builtins.p, 22: 
+# test/builtins.p, 23: 	i := Ord(three);		{ result: 3			}
+   43: pushvar 0, 4
+   44: push 3
+   45: assign
+# test/builtins.p, 24: 	i := Ord(i-1);			{ result: 2			}
+   46: pushvar 0, 4
+   47: pushvar 0, 4
+   48: eval
+   49: push 1
+   50: sub
+   51: assign
+# test/builtins.p, 25: 
+# test/builtins.p, 26: {	i := Ord(1.2)			error: ordinal value expected	}
+# test/builtins.p, 27: 
+# test/builtins.p, 28: 	r := Atan(1);			{ result:  0.785398	}
+   52: pushvar 0, 5
+   53: push 1
+   54: atan
+   55: assign
+# test/builtins.p, 29: 	r := Atan(1.0);			{ result:  0.785398	}
+   56: pushvar 0, 5
+   57: push 1.000000
+   58: atan
+   59: assign
+# test/builtins.p, 30: 
+# test/builtins.p, 31: 	r := Exp(1);			{ result: 2.718282	}
+   60: pushvar 0, 5
+   61: push 1
+   62: exp
+   63: assign
+# test/builtins.p, 32: 	r := Exp(1.0);			{ result: 2.718282	}
+   64: pushvar 0, 5
+   65: push 1.000000
+   66: exp
+   67: assign
+# test/builtins.p, 33: 
+# test/builtins.p, 34: 	r := Log(1);			{ result: 0.0		}
+   68: pushvar 0, 5
+   69: push 1
+   70: log
+   71: assign
+# test/builtins.p, 35: 	r := Log(1.0);			{ result: 0.0		}
+   72: pushvar 0, 5
+   73: push 1.000000
+   74: log
+   75: assign
+# test/builtins.p, 36: 
+# test/builtins.p, 37: 	i := Odd(10);			{ result: 0			}
+   76: pushvar 0, 4
+   77: push 10
+   78: odd
+   79: assign
+# test/builtins.p, 38: 	i := Odd(10+1)			{ result: 1			}
+   80: pushvar 0, 4
+   81: push 10
+   82: push 1
+   83: add
+# test/builtins.p, 39: end .
+   84: odd
+   85: assign
+   86: ret
+
+        8:          1
+        8:          2
+        8:          3
+        8:          4
+        8:          5
+        8: 2147483647
+        8:          1
+        8:          1
+        9:   1.500000
+        9:   1.500000
+        8:          3
+        8:          2
+        9:   0.785398
+        9:   0.785398
+        9:   2.718282
+        9:   2.718282
+        9:   0.000000
+        9:   0.000000
+        8:          0
+        8:          1

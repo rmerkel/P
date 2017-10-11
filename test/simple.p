@@ -1,5 +1,5 @@
 program simple ;
-var x, y : integer;
+var x, y : Integer;
 begin
 	x := 0;
 	y := 1

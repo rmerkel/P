@@ -1,7 +1,7 @@
 /********************************************************************************************//**
  * @file	symbol.cc
  *
- * The Pascal-Lite Symbol table implementation
+ * The Pascal-lite Symbol table implementation
  *
  * @author Randy Merkel, Slowly but Surly Software.
  * @copyright  (c) 2017 Slowly but Surly Software. All rights reserved.
@@ -13,6 +13,38 @@
 
 using namespace std;
 
+// public static
+
+/********************************************************************************************//**
+ * @return a constant symbol value
+ *
+ * Constants have a integer value, data type (descriptor), and an active frame/block level. 
+ *
+ * @param level	The base/frame level, e.g., 0 for the current frame.
+ * @param value The constant data value.
+ * @param type	Type descriptor. Assumed to be for "Integer"
+ *
+ * @return a constant symbol table entry
+ ************************************************************************************************/
+SymValue SymValue::makeConst(int level, Datum value, TDescPtr type) {
+	return SymValue(SymValue::Constant, level, value, type, TDescPtrVec());
+}
+
+/********************************************************************************************//**
+ * @return a variable symbol value
+ *
+ * Variables have a type, location, as an offset from a block/frame, n levels down.
+ *
+ * @param level		The base/frame level, e.g., 0 for "current frame..
+ * @param offset	The variables location as a ofset from the activation frame
+ * @param type  	the variables type descriptor
+ *
+ * @return a variable symbol table entry
+ ************************************************************************************************/
+SymValue SymValue::makeVar(int level, int offset, TDescPtr type) {
+	return SymValue(SymValue::Variable, level, offset, type, TDescPtrVec());
+}
+
 // public
 
 /********************************************************************************************//**
@@ -21,11 +53,26 @@ using namespace std;
 SymValue::SymValue() : _kind{Kind::None}, _level{0} {}
 
 /********************************************************************************************//**
+ * @brief Construct a symbol value from it's components
+ *
+ * @param kind		The symbol kind, e.g., Constant, Variable, etc...
+ * @param level		The base/frame level, e.g., 0 for the current frame.
+ * @param value 	The symbols data value, variable offset, etc...
+ * @param type		The symbol data value type
+ * @param params	SubRoutine parameter type array
+ ************************************************************************************************/
+SymValue::SymValue(Kind kind, int level, const Datum& value, TDescPtr type, const TDescPtrVec& params)
+	: _kind{kind}, _level{level}, _value{value}, _type{type}, _params{params}
+{
+}
+
+#if 0
+/********************************************************************************************//**
  * Constants have a integer value, data type (descriptor), and an active frame/block level. 
  *
  * @param level	The base/frame level, e.g., 0 for the current frame.
  * @param value The constant data value.
- * @param type	Type descriptor. Assumed to be for "integer"
+ * @param type	Type descriptor. Assumed to be for "Integer"
  ************************************************************************************************/
 SymValue::SymValue(int level, Datum value, TDescPtr type)
 	: _kind{SymValue::Constant}, _level{level}, _value{value}, _type(type)
@@ -43,6 +90,7 @@ SymValue::SymValue(int level, int offset, TDescPtr type)
 	: _kind{SymValue::Variable}, _level{level}, _value{offset}, _type{type}
 {
 }
+#endif
 
 /********************************************************************************************//**
  * Constructs a partially defined Function or Procedure. The entry point address and return type,

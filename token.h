@@ -1,6 +1,6 @@
 /**	@file	token.h
  *
- *  The Pascal-Lite scanner.
+ *  The Pascal-lite scanner.
  *
  * Started life as the Token and TokenStream classes for the calulator example from The C++
  * Programming Language, 4th Edition, by Stroustrup, modified in an initial port of Wirth's PL/0
@@ -28,19 +28,21 @@ struct Token {
 	 *  numbers. Single character tokens are represented by the integer value of
 	 *  its character
 	 */
-	enum Kind : char {
+	enum Kind {
 		Unknown,						///< Unknown token kind; (integer_value)
 		BadComment,						///< Unterminated comment, started at line # (integer_value)
 
 		Identifier,	  		  			///< An identifier (string_value)
 		IntegerNum,						///< Integer literal number (integer_value)
 		RealNum,						///< Real literal number (real_value)
-		TypeDecl,						///< "type" declaraction
+
 		ConsDecl,						///< "const" constant declaration
-		VarDecl,						///< "var" variable (mutable) declaration
-		ProgDecl,						///< "program" declaraction
-		ProcDecl,						///< "procedure" declaraction
 		FuncDecl,						///< "function" declaration
+		ProcDecl,						///< "procedure" declaraction
+		ProgDecl,						///< "program" declaraction
+		TypeDecl,						///< "type" declaraction
+		VarDecl,						///< "var" variable (mutable) declaration
+
 		Begin,							///< "begin" ... "end"
 		End,							///< "end"
 		If,								///< "if" condition "then" ...
@@ -50,49 +52,57 @@ struct Token {
 		Do,								///< "do"
 		Repeat,							///< "repeat" ... "until"
 		Until,							///< "until"
+
 		Ellipsis,						///< ".."
 
-		IntType,						///< "integer"
-		RealType,						///< "real"
+		IntType,						///< "Integer"
+		RealType,						///< "Real"
+
 		Array,							///< "array"
 		Of,								///< "of"
 
-		Round,							///< round real to integer
-
-		Assign,							///< Assignment (:=)
-
+		LT,								///< Less than
 		LTE,							///< Less than or equal? (<=)
+		EQU,							///< Is equal? (=)
 		GTE,							///< Greater then or equal? (>=)
-		Or,								///< Or? 
-		And,							///< And?
+		GT,								///< Greater then
 		NEQ,                           	///< Not equal? (<>)
 
-		ShiftL,							///< Left shift "<<"
-		ShiftR,							///< Right shift ">>"Number
+		And,							///< And?
+		Or,								///< Or? 
+		Not,							///< Not?
 
-		Mod,							///< Modulus (remainder)
-		EOS,							///< End of stream
-
-		// End of non-printing character codes for ASCII and UNICODE (ordinal value 32)
-
-		EQU			= '=',				///< Is equal? (=)
-
-		LT			= '<',				///< Less than
-		GT			= '>',				///< Greater then
-
-		Add			= '+',				///< Addition
-		Subtract	= '-',				///< Subtraction
+		Add,							///< Addition
+		Subtract,						///< Subtraction
 		Multiply	= '*',				///< Multiplication
 		Divide 		= '/',				///< Division
 
-		OpenParen	= '(',				///< Opening parentheses
-		CloseParen	= ')',				///< Closing parentheses
-		OpenBrkt	= '[',				///< Opening bracket
-		CloseBrkt	= ']',				///< Closing bracket
-		Comma		= ',',				///< Decl separator
-		Period		= '.',				///< Period
-		Colon		= ':',				///< Identifier ':' type
-		SemiColon	= ';',				///< Statement separator
+		OpenParen,						///< Opening parentheses
+		CloseParen,						///< Closing parentheses
+		OpenBrkt,						///< Opening bracket
+		CloseBrkt,						///< Closing bracket
+
+		Comma,							///< Decl separator
+		Period,							///< Period
+		Colon,							///< Identifier ':' type
+		SemiColon,						///< Statement separator
+
+		// built-in functions...
+
+		Round,							///< round real to integer
+		Trunc,							///< truncate real to integer
+		Abs,							///< Absolute value
+		Atan,							///< Arc tangent
+		Exp,							///< e to the given power 
+		Log,							///< natural log
+		Odd,							///< Evenly divisable by 2?
+
+		Assign,							///< Assignment (:=)
+		Mod,							///< Modulus (remainder)
+		Ord,							///< Convert ordinal value to ordinal
+
+		EOS			= 127				///< End of stream
+
 	};
 
 	/// A set of Token kinds

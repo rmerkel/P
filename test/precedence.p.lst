@@ -1,5 +1,5 @@
 # test/precedence.p, 1: program precedence ;
-# test/precedence.p, 2: var x : integer;
+# test/precedence.p, 2: var x : Integer;
     0: call 0, 2
     1: halt
 # test/precedence.p, 3: begin

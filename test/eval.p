@@ -2,7 +2,7 @@
 {	emits two itor2 instructions					}
 program eval ;
 var 
-	r : real;
+	r : Real;
 begin
 	r := 1 + 3 * 10.0
 end .

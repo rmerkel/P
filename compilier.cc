@@ -1,13 +1,13 @@
 /********************************************************************************************//**
- * @file compbase.cc
+ * @file compilier.cc
  *
- * class CompBaseBase implementation.
+ * class Compilier implementation.
  *
  * @author Randy Merkel, Slowly but Surly Software.
  * @copyright  (c) 2017 Slowly but Surly Software. All rights reserved.
  ************************************************************************************************/
 
-#include "compbase.h"
+#include "compilier.h"
 #include "interp.h"
 
 #include <cassert>
@@ -21,7 +21,7 @@
 using namespace std;
 
 /************************************************************************************************
- * class CompBaseBase
+ * class Compilier
  ************************************************************************************************/
 
 // protected:
@@ -30,7 +30,7 @@ using namespace std;
  * Write a diagnostic on standard error output, incrementing the error count.
  * @param msg The error message
  ************************************************************************************************/
-void CompBase::error(const std::string& msg) {
+void Compilier::error(const std::string& msg) {
 	cerr << progName << ": " << msg << " near line " << ts.lineNum << endl;
 	++nErrors;
 }
@@ -41,14 +41,14 @@ void CompBase::error(const std::string& msg) {
  * @param msg The error message
  * @param name Parameter to msg.
  ************************************************************************************************/
-void CompBase::error(const std::string& msg, const std::string& name) {
+void Compilier::error(const std::string& msg, const std::string& name) {
 	error (msg + " '" + name + "'");
 }
 
 /********************************************************************************************//**
  * @return The next token from the token stream
  ************************************************************************************************/
-Token CompBase::next() {
+Token Compilier::next() {
 	const Token t = ts.get();
 
 	if (Token::Unknown == t.kind) {
@@ -75,7 +75,7 @@ Token CompBase::next() {
  *
  * @return	true if the current token is a kind.
  ************************************************************************************************/
-bool CompBase::accept(Token::Kind kind, bool get) {
+bool Compilier::accept(Token::Kind kind, bool get) {
 	if (current() == kind) {
 		if (get) next();			// consume the token
 		return true;
@@ -92,7 +92,7 @@ bool CompBase::accept(Token::Kind kind, bool get) {
  *
  * @return	true if the current token is a k.
  ************************************************************************************************/
-bool CompBase::expect(Token::Kind kind, bool get) {
+bool Compilier::expect(Token::Kind kind, bool get) {
 	if (accept(kind, get)) return true;
 
 	ostringstream oss;
@@ -105,7 +105,7 @@ bool CompBase::expect(Token::Kind kind, bool get) {
  * @param set	Token kind set to test
  * @return true if current() is a member of set.
  ************************************************************************************************/
-bool CompBase::oneOf(Token::KindSet set) {
+bool Compilier::oneOf(Token::KindSet set) {
 	return set.end() != set.find(current());
 }
 
@@ -121,7 +121,7 @@ bool CompBase::oneOf(Token::KindSet set) {
  *
  * @return The address (code[] index) of the new instruction.
  ************************************************************************************************/
-size_t CompBase::emit(const OpCode op, int8_t level, Datum addr) {
+size_t Compilier::emit(const OpCode op, int8_t level, Datum addr) {
 	const int lvl = static_cast<int>(level);
 	if (verbose)
 		cout	<< progName << ": emitting " << code->size() << ": "
@@ -143,7 +143,7 @@ size_t CompBase::emit(const OpCode op, int8_t level, Datum addr) {
  *  @param	val		The variable symbol table entry
  *  @return			Data type
  ************************************************************************************************/
-TDescPtr CompBase::emitVarRef(int level, const SymValue& val) {
+TDescPtr Compilier::emitVarRef(int level, const SymValue& val) {
 	const auto offset = val.value().integer() >= 0 ? val.value().integer() + FrameSize : val.value().integer();
 	emit(OpCode::PushVar, level - val.level(), offset);
 	return val.type();
@@ -156,7 +156,7 @@ TDescPtr CompBase::emitVarRef(int level, const SymValue& val) {
  * @param source 	The source file stream
  * @param out		The listing file stream
  ************************************************************************************************/
- void CompBase::listing(const string& name, istream& source, ostream& out) {
+ void Compilier::listing(const string& name, istream& source, ostream& out) {
 	string 		line;   				// Current source line
 	unsigned 	linenum = 1;			// source line number
 	unsigned	addr = 0;				// code address (index)
@@ -181,7 +181,7 @@ TDescPtr CompBase::emitVarRef(int level, const SymValue& val) {
 /********************************************************************************************//**
  * @param level  The block level
  ************************************************************************************************/
-void CompBase::purge(int level) {
+void Compilier::purge(int level) {
 	for (auto i = symtbl.begin(); i != symtbl.end(); ) {
 		if (i->second.level() == level) {
 			if (verbose)
@@ -205,7 +205,7 @@ void CompBase::purge(int level) {
  * @param	id	identifier to look up in the symbol table
  * @return symtbl.end() or an iterator positioned at a symbol table entry.
  ************************************************************************************************/
-SymbolTable::iterator CompBase::lookup(const string& id) {
+SymbolTable::iterator Compilier::lookup(const string& id) {
 	auto range = symtbl.equal_range(id);
 	if (range.first == range.second) {
 		error("Undefined identifier", id);
@@ -230,7 +230,7 @@ SymbolTable::iterator CompBase::lookup(const string& id) {
  * @return 	the next identifer in the token stream, "unknown" if the next token wasn't an
  *  		identifier.
  ************************************************************************************************/
-const std::string CompBase::nameDecl(int level) {
+const std::string Compilier::nameDecl(int level) {
 	const string id = ts.current().string_value;	// Copy the identifer
 
 	if (expect(Token::Identifier)) {				// Consume the identifier
@@ -257,7 +257,7 @@ const std::string CompBase::nameDecl(int level) {
  *
  * @param	pName	The prefix string used by error and verbose/diagnostic messages.
  ************************************************************************************************/
-CompBase::CompBase(const string& pName) : progName {pName}, nErrors{0}, verbose {false}, ts{cin}
+Compilier::Compilier(const string& pName) : progName {pName}, nErrors{0}, verbose {false}, ts{cin}
 {
 }
 
@@ -267,7 +267,7 @@ CompBase::CompBase(const string& pName) : progName {pName}, nErrors{0}, verbose 
  * @param	verb	Output verbose messages if true
  * @return	The number of errors encountered
  ************************************************************************************************/
-unsigned CompBase::operator()(const string& inFile, InstrVector& prog, bool verb) {
+unsigned Compilier::operator()(const string& inFile, InstrVector& prog, bool verb) {
 	code = &prog;
 	verbose = verb;
 

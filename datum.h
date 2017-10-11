@@ -1,7 +1,7 @@
 /********************************************************************************************//**
  * @file datum.h
  *
- *  Pascal-Lite Machine's data type
+ *  Pascal-lite Machine's data type
  *
  * A Datum maybe an Interger, for values or for data addresses, or Real values. Includes vectors
  * and Ranges of Datum's. 
@@ -15,7 +15,7 @@
 #include <utility>
 
 /********************************************************************************************//**
- * A Pascal-Lite Data Value
+ * A Pascal-lite Data Value
  *  
  * Datums contain a signed or unsigned integer, or a floating point/real value.
  * Signed and unsigned integer values are freely interchangeable, but

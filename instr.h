@@ -1,7 +1,7 @@
 /** @file instr.h
  *
- * Pascal-Lite machine operation codes, machine instruction format, activation frame format, and
- * associated utilities used by both the compiler (Comp) and the interpreter (Interp).
+ * Pascal-lite machine operation codes, machine instruction format, activation frame format, and
+ * associated utilities used by both the compiler (PasComp) and the interpreter (Interp).
  *
  * @author Randy Merkel, Slowly but Surly Software.
  * @copyright  (c) 2017 Slowly but Surly Software. All rights reserved.
@@ -33,9 +33,15 @@ enum Frame {
 enum class OpCode : unsigned char {
 	Neg,								///< Unary negation
 
-	ITOR,								///< Unary convert an interger to real
-	ITOR2,								///< Unary convert TOS-1 to real
-	RTOI,								///< Unary round real to integer
+	ITOR,								///< Unary convert integer TOS to real
+	ITOR2,								///< Unary convert integer TOS-1 to real
+	RTOI,								///< Unary round real TOS to integer
+	TRUNC,								///< Unary truncate real TOS to integer
+	ABS,								///< Unary replace TOS with abs(TOS)
+	ATAN,								///< Unary replace TOS with atan(TOS)
+	EXP,								///< Unary replace TOS with exp(TOS)
+	LOG,								///< Unary replace TOS with log(TOS)
+	ODD,								///< Unary is TOS an odd number?
 
 	Add,								///< Addition
 	Sub,								///< Subtraction
@@ -51,7 +57,8 @@ enum class OpCode : unsigned char {
 	NEQU,								///< Does not equal
 
 	LOR,								///< Logical or
-	LAND,								///< Integer logical and
+	LAND,								///< Logical and
+	LNOT,								///< Logical not
 	
 	Push,								///< Push a constant integer value
 	PushVar,							///< Push variable address (base(level) + addr)

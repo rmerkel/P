@@ -1,7 +1,7 @@
 /********************************************************************************************//**
  * @file	symbol.h
  *
- * The Pascal-Lite Compilier Symbol table
+ * The Pascal-lite Compilier Symbol table
  *
  * @author Randy Merkel, Slowly but Surly Software.
  * @copyright  (c) 2017 Slowly but Surly Software. All rights reserved.
@@ -45,13 +45,19 @@ public:
 
 	typedef std::vector<Kind> KindVec;			///< Vector of Kinds
 	
-	SymValue();									///< Default constructor; undefined entry
+	static SymValue makeConst(int level, Datum value, TDescPtr type);
+	static SymValue makeVar(int level, int ofset, TDescPtr type);
 
+	SymValue();									///< Default constructor; undefined entry
+	SymValue(Kind kind, int level, const Datum& value, TDescPtr type, const TDescPtrVec& params);
+
+#if 0
 	/// Construct a constant value
 	SymValue(int level, Datum value, TDescPtr type);
 
 	/// Construct a Variable location
 	SymValue(int level, int offset, TDescPtr type);
+#endif
 
 	SymValue(Kind kind, int level);				///< Partially construct Procedure or Function
 	SymValue(int level, TDescPtr type);			///< Construct Type

@@ -11,8 +11,8 @@
 
 program fact ;
 const nFacts = 10;
-var p : integer;
-procedure factorial(n : integer) ; begin
+var p : Integer;
+procedure factorial(n : Integer) ; begin
         p := 1;
         while n > 0 do begin
             p := p * n;

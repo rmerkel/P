@@ -12,7 +12,7 @@
 # test/test.p, 12: const nFacts = 10;
     0: call 0, 2
     1: halt
-# test/test.p, 13: var n, f : integer;	
+# test/test.p, 13: var n, f : Integer;	
 # test/test.p, 14: begin
     2: enter 2
 # test/test.p, 15:    n := 0;

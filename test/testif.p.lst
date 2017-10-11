@@ -1,5 +1,5 @@
 # test/testif.p, 1: program testif ;
-# test/testif.p, 2: var x, y, z : integer;
+# test/testif.p, 2: var x, y, z : Integer;
     0: call 0, 2
     1: halt
 # test/testif.p, 3: begin

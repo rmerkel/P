@@ -1,8 +1,8 @@
 /** @file driver.cc
  *
- * The driver routine for the Pascal-Lite Programming Language compiler/interpreter.
+ * The driver routine for the Pascal-lite Programming Language compiler/interpreter.
  *
- * @mainpage Pascal-Lite Programming Language
+ * @mainpage Pascal-lite Programming Language
  *
  * Yet another small, interpreted, computer language... just for the fun of it!
  *
@@ -11,14 +11,14 @@
  * compilier supports a dialect between PL/0 and Pascal.
  *
  * Like PL/0, 'pas' is a combination compiler and interpreter; it first runs the compiler
- * (Comp), and if no errors where encountered, it runs the results in the interpreter
+ * (PasComp), and if no errors where encountered, it runs the results in the interpreter
  * (Interp). A listing and machine output are written to standard output.
  *
  * The compiler started life as a copy of the C example at
  * https://en.wikipedia.org/wiki/Recursive_descent_parser, modified to emit code per Wirth's
  * interpret procedure while using the TokenStream class (TokenStream) from *The C++
  * Programming Language*, 4th Edition, by Stroustrup. Finally, modified, step by step to 
- * support Pascal proper. By default, Comp writes a listing to standard output, but the
+ * support Pascal proper. By default, PasComp writes a listing to standard output, but the
  *  verbose (-v) option will also log tokens found and code emitted.
  *
  * The machine/interpreter stated life as a C/C++ port of Wirth's machine (procedure interpret),
@@ -35,21 +35,23 @@
  * - No records
  * - Overly simple constant expressions; can't detect if a[10] is within range.
  *
- * @version 0.1 - Initial fork from pl0c, using pascal <>, =, etc...
- * @version 0.2 - Program declaraction
- * @version 0.3 - Removed the C/C++ bit and shift operations
- * @version 0.4 - Added types, limited to ranges and arrays.
- * @version 0.5 - Added enumerations
- * @version 0.6 - Fixed array index type checks
- * @version 0.7 - Supports non-zero based array indexes
- * @version 0.8 - Supports multiple dimensioned arrays. Fixed promotion bug
- * @version 0.9 - Supports a[i,j] and a[i][j] syntax
+ * @version 0.1  - Initial fork from pl0c, using pascal <>, =, etc...
+ * @version 0.2  - Program declaraction
+ * @version 0.3  - Removed the C/C++ bit and shift operations
+ * @version 0.4  - Added types, limited to ranges and arrays.
+ * @version 0.5  - Added enumerations
+ * @version 0.6  - Fixed array index type checks
+ * @version 0.7  - Supports non-zero based array indexes
+ * @version 0.8  - Supports multiple dimensioned arrays. Fixed promotion bug
+ * @version 0.9  - Supports a[i,j] and a[i][j] syntax
+ * @version 0.10 - Adding built-in functions and constants, refactored types, capitalized
+ * 				   built-in "nouns" and functions. WIP.
  *  
  * @author Randy Merkel, Slowly but Surly Software.
  * @copyright  (c) 2017 Slowly but Surly Software. All rights reserved.
  */
 
-#include "comp.h"
+#include "pascomp.h"
 #include "interp.h"
 
 #include <iostream>
@@ -77,7 +79,7 @@ static void help() {
 
 /// Print the version number as major.minor
 static void printVersion() {
-	cout << progName << ": verson: 0.9\n";		// make sure to update the verison in mainpage!!
+	cout << progName << ": verson: 0.10\n";		// make sure to update the verison in mainpage!!
 }
 
 /** Parse the command line arguments...
@@ -143,7 +145,7 @@ static bool parseCommandline(const vector<string>& args) {
 int main(int argc, char* argv[]) {
 	progName = argv[0];
 
-	Comp		comp{progName};					// The compiler...
+	PasComp		comp{progName};					// The compiler...
 	Interp 		machine;						// The machine...
 	InstrVector	code;							// Machine instructions...
 	unsigned 	nErrors = 0;

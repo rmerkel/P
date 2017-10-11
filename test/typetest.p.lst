@@ -3,17 +3,17 @@
 # test/typetest.p, 3: type
     0: call 0, 2
     1: halt
-# test/typetest.p, 4: 	int = integer;
+# test/typetest.p, 4: 	int = Integer;
 # test/typetest.p, 5: 	rng = 1..10;
 # test/typetest.p, 6: 	enum = (	one, two, three	);
 # test/typetest.p, 7: 
 # test/typetest.p, 8: var
 # test/typetest.p, 9: 	i : int;
-# test/typetest.p, 10: 	j : integer;
+# test/typetest.p, 10: 	j : Integer;
 # test/typetest.p, 11: 	r : rng;
-# test/typetest.p, 12: 	a : array[rng] of integer;
+# test/typetest.p, 12: 	a : array[rng] of Integer;
 # test/typetest.p, 13: 	a2 : array [enum] of int;
-# test/typetest.p, 14: 	a3 : array [0..4] of array [0..4] of real;
+# test/typetest.p, 14: 	a3 : array [0..4] of array [0..4] of Real;
 # test/typetest.p, 15: 
 # test/typetest.p, 16: begin
     2: enter 42
@@ -106,85 +106,82 @@
 # test/typetest.p, 31: 
 # test/typetest.p, 32: 	a2[one]	:= 1;
    75: pushvar 0, 17
-   76: pushvar 0, 4
-   77: eval
-   78: add
-   79: push 1
-   80: assign
+   76: push 0
+   77: add
+   78: push 1
+   79: assign
 # test/typetest.p, 33: 	a2[two]	:= 2;
-   81: pushvar 0, 17
-   82: pushvar 0, 5
-   83: eval
-   84: add
-   85: push 2
-   86: assign
+   80: pushvar 0, 17
+   81: push 1
+   82: add
+   83: push 2
+   84: assign
 # test/typetest.p, 34: 	a2[three] := 3;
-   87: pushvar 0, 17
-   88: pushvar 0, 6
-   89: eval
-   90: add
-   91: push 3
-   92: assign
+   85: pushvar 0, 17
+   86: push 2
+   87: add
+   88: push 3
+   89: assign
 # test/typetest.p, 35: 
 # test/typetest.p, 36: 	i := 0;	{	fill a3[] with it's index	}
-   93: pushvar 0, 4
-   94: push 0
-   95: assign
+   90: pushvar 0, 4
+   91: push 0
+   92: assign
 # test/typetest.p, 37: 	while (i < 5) do begin
-   96: pushvar 0, 4
-   97: eval
-   98: push 5
-   99: lt
-  100: jneq 141
+   93: pushvar 0, 4
+   94: eval
+   95: push 5
+   96: lt
+   97: jneq 138
 # test/typetest.p, 38: 		j := 0;
-  101: pushvar 0, 5
-  102: push 0
-  103: assign
+   98: pushvar 0, 5
+   99: push 0
+  100: assign
 # test/typetest.p, 39: 		while (j < 5) do begin
-  104: pushvar 0, 5
-  105: eval
-  106: push 5
-  107: lt
-  108: jneq 134
+  101: pushvar 0, 5
+  102: eval
+  103: push 5
+  104: lt
+  105: jneq 131
 # test/typetest.p, 40: 			a3[i][j] := 1.0 * (i + j);
-  109: pushvar 0, 21
-  110: pushvar 0, 4
-  111: eval
-  112: push 5
-  113: mul
+  106: pushvar 0, 21
+  107: pushvar 0, 4
+  108: eval
+  109: push 5
+  110: mul
+  111: add
+  112: pushvar 0, 5
+  113: eval
   114: add
-  115: pushvar 0, 5
-  116: eval
-  117: add
-  118: push 1.000000
-  119: pushvar 0, 4
-  120: eval
-  121: pushvar 0, 5
-  122: eval
-  123: add
-  124: itor
-  125: mul
-  126: assign
+  115: push 1.000000
+  116: pushvar 0, 4
+  117: eval
+  118: pushvar 0, 5
+  119: eval
+  120: add
+  121: itor
+  122: mul
+  123: assign
 # test/typetest.p, 41: 			j := j + 1
-  127: pushvar 0, 5
-  128: pushvar 0, 5
-  129: eval
-  130: push 1
+  124: pushvar 0, 5
+  125: pushvar 0, 5
+  126: eval
+  127: push 1
 # test/typetest.p, 42: 		end;
-  131: add
-  132: assign
-  133: jump 104
+  128: add
+  129: assign
+  130: jump 101
 # test/typetest.p, 43: 		i := i + 1
-  134: pushvar 0, 4
-  135: pushvar 0, 4
-  136: eval
-  137: push 1
+  131: pushvar 0, 4
+  132: pushvar 0, 4
+  133: eval
+  134: push 1
 # test/typetest.p, 44: 	end
-  138: add
-  139: assign
+  135: add
+  136: assign
 # test/typetest.p, 45: end .
-  140: jump 96
-  141: ret
+  137: jump 93
+  138: ret
 
         8:          1
         8:          2
@@ -232,9 +229,9 @@
        10:         10
        20:        100
        10:         11
-       32:          1
-       20:          2
-       32:          3
+       21:          1
+       22:          2
+       23:          3
         8:          0
         9:          0
        25:   0.000000

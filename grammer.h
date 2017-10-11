@@ -8,10 +8,10 @@
  *
  *             program = block-decl 'begin' statement-lst 'end' '.' ;
  *          block-decl = [ const-decl-lst ';' ]
- *                       [ type-decl-lst ';' ]
- *                       [ var-decl-blk ';' ]
- *                       [ sub-decl-lst ';' ]
- *                       { statement-blk } ;
+ *                       [ type-decl-lst ';'  ]
+ *                       [ var-decl-blk ';'   ]
+ *                       [ sub-decl-lst ';'   ]
+ *                       { statement-blk }    ;
  *      const-decl-lst = 'const' const-decl { ';' const-decl } ;
  *          const-decl = identifier '=' const-expr ;
  *       type-decl-lst = type-decl { ';' type-decl } ;
@@ -19,15 +19,15 @@
  *        var-decl-blk = 'var' var-decl-lst ;
  *        var-decl-lst = var-decl { ';' var-decl } ;
  *            var-decl = identifier-lst : type ;
- *                type = simple-type                                                        |
- *                       'real'                                                             |
- *                       'array' '[' simple-type-list ']' 'of' type                         |
+ *                type = simple-type | structured-type | pointer-type ;
+ *         simple-type = 'real' | ordinal-type ;
+ *        ordinal-type = '(' identifier-lst ')' | const-expr '..' const-expr                |
+ *                       'Boolean' | 'Integer' | 'Char' ;
+ *     structured-type = 'array' '[' simple-type-list ']' 'of' type                         |
  *                       'record' field-lst 'end' ;                                           X
  *           field-lst = var-decl-lst ;                                                       X
+ *        pointer-type = '^' identifier ;                                                     X
  *     simple-type-lst = simple-type { ',' simple-type } ;
- *         simple-type = 'integer'                                                          |
- *                       '(' identifier-lst ')'                                             |
- *                       const-expr '..' const-expr
  *      identifier-lst = identifier { ',' identifier } ;
  *        sub-decl-lst = func-decl | proc-decl ;
  *           proc-decl = 'procedure' identifier param-lst ';' block-decl ';' ;
@@ -36,7 +36,7 @@
  *            variable = identifier [ '[' expression-lst ']' { '[' expression-lst ']' } ] ;
  *            variable = identifier [ composite-var { composit-var } ] ;
  *       composite-var = '[' expression-lst ']'                                             |
- *                       '.' identifier ;                                                     x
+ *                       '.' identifier ;                                                     X
  *       statement-blk = 'begin' statement-lst 'end' ;
  *       statement-lst = 'begin' statement {';' statement } 'end' ;
  *           statement = [  variable '=' expression                                         |
@@ -56,7 +56,7 @@
  *                       'round' '(' expression ')'                                         |
  *                       number                                                             |
  *                       '(' expression ')' ;
- *      
+ *       
  *      EBNF Key:
  *           X   Not implemented
  *           {}  Repeat zero or more times

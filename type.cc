@@ -19,7 +19,7 @@ using namespace std;
 /************************************************************************//**
  * @brief Constructor
  * @param	name	The fields name
- * @param	type	The fields type, e.g., "integer" or "T"
+ * @param	type	The fields type, e.g., "Integer" or "T"
  ****************************************************************************/
 Field::Field(const std::string& name, TDescPtr type)
 	: _name{name}, _type{type}
@@ -362,13 +362,13 @@ bool operator==(const TDesc& lhs, const TDesc& rhs) {
  ************************************************************************************************/
 ostream& operator<<(std::ostream& os, const TDesc::Kind& value) {
 	switch (value) {
-	case TDesc::Integer:		os << "integer";		break;
-	case TDesc::Real:			os << "real";			break;
-	case TDesc::Boolean:		os << "boolean";		break;
-	case TDesc::Character:		os << "character";		break;
+	case TDesc::Integer:		os << "Integer";		break;
+	case TDesc::Real:			os << "Real";			break;
+	case TDesc::Boolean:		os << "Boolean";		break;
+	case TDesc::Character:		os << "Char";			break;
 	case TDesc::Array:			os << "array";			break;
 	case TDesc::Record:			os << "record";			break;
-	case TDesc::Enumeration:	os << "enumeration";	break;
+	case TDesc::Enumeration:	os << "Enumeration";	break;
 
 	default: 					os << "unknown kind"; assert(false);
 	}

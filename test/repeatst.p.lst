@@ -10,7 +10,7 @@
 # test/repeatst.p, 10: {	10	3,628,800	}
 # test/repeatst.p, 11: 
 # test/repeatst.p, 12: program repeatst ;
-# test/repeatst.p, 13: var n, f : integer;
+# test/repeatst.p, 13: var n, f : Integer;
     0: call 0, 2
     1: halt
 # test/repeatst.p, 14: begin

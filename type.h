@@ -1,7 +1,7 @@
 /************************************************************************//**
  * @file type.h
  *
- * Pascal-Lite type system. Type descriptors, record fields and sub-ranges.
+ * Pascal-lite type system. Type descriptors, record fields and sub-ranges.
  ****************************************************************************/
 
 #ifndef	TYPE_H
