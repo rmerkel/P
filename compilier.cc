@@ -145,7 +145,7 @@ size_t Compilier::emit(const OpCode op, int8_t level, Datum addr) {
  ************************************************************************************************/
 TDescPtr Compilier::emitVarRef(int level, const SymValue& val) {
 	const auto offset = val.value().integer() >= 0 ? val.value().integer() + FrameSize : val.value().integer();
-	emit(OpCode::PushVar, level - val.level(), offset);
+	emit(OpCode::PUSHVAR, level - val.level(), offset);
 	return val.type();
 }
 

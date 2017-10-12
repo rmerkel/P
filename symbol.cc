@@ -16,7 +16,7 @@ using namespace std;
 // public static
 
 /********************************************************************************************//**
- * @return a constant symbol value
+ * @brief return a constant symbol value
  *
  * Constants have a integer value, data type (descriptor), and an active frame/block level. 
  *
@@ -24,14 +24,14 @@ using namespace std;
  * @param value The constant data value.
  * @param type	Type descriptor. Assumed to be for "Integer"
  *
- * @return a constant symbol table entry
+ * @return a constant symbol value
  ************************************************************************************************/
 SymValue SymValue::makeConst(int level, Datum value, TDescPtr type) {
 	return SymValue(SymValue::Constant, level, value, type, TDescPtrVec());
 }
 
 /********************************************************************************************//**
- * @return a variable symbol value
+ * @brief return a variable symbol value
  *
  * Variables have a type, location, as an offset from a block/frame, n levels down.
  *
@@ -39,10 +39,27 @@ SymValue SymValue::makeConst(int level, Datum value, TDescPtr type) {
  * @param offset	The variables location as a ofset from the activation frame
  * @param type  	the variables type descriptor
  *
- * @return a variable symbol table entry
+ * @return a variable symbol value
  ************************************************************************************************/
 SymValue SymValue::makeVar(int level, int offset, TDescPtr type) {
 	return SymValue(SymValue::Variable, level, offset, type, TDescPtrVec());
+}
+
+/********************************************************************************************//**
+ * @brief return a partilly defined sub-routine.
+ *
+ * The entry point address and return type, function only, has to be set later. 
+ *
+ * @invariant kind must be equal to Procedure or Function
+ *
+ * @param kind	The token kind, Procedure or Function.
+ * @param level	The token base/frame level, e.g., 0 for "current frame.
+ * 
+ * @return a partial sub-routine symbol value
+ ************************************************************************************************/
+SymValue SymValue::makeSbr(Kind kind, int level) {
+	assert(SymValue::Procedure == kind || SymValue::Function == kind);
+	return SymValue(kind, level, 0, TDescPtr(), TDescPtrVec());
 }
 
 // public
@@ -65,47 +82,6 @@ SymValue::SymValue(Kind kind, int level, const Datum& value, TDescPtr type, cons
 	: _kind{kind}, _level{level}, _value{value}, _type{type}, _params{params}
 {
 }
-
-#if 0
-/********************************************************************************************//**
- * Constants have a integer value, data type (descriptor), and an active frame/block level. 
- *
- * @param level	The base/frame level, e.g., 0 for the current frame.
- * @param value The constant data value.
- * @param type	Type descriptor. Assumed to be for "Integer"
- ************************************************************************************************/
-SymValue::SymValue(int level, Datum value, TDescPtr type)
-	: _kind{SymValue::Constant}, _level{level}, _value{value}, _type(type)
-{
-}
-
-/********************************************************************************************//**
- * Variables have a type, location, as an offset from a block/frame, n levels down.
- *
- * @param level		The base/frame level, e.g., 0 for "current frame..
- * @param offset	The variables location as a ofset from the activation frame
- * @param type  	the variables type descriptor
- ************************************************************************************************/
-SymValue::SymValue(int level, int offset, TDescPtr type)
-	: _kind{SymValue::Variable}, _level{level}, _value{offset}, _type{type}
-{
-}
-#endif
-
-/********************************************************************************************//**
- * Constructs a partially defined Function or Procedure. The entry point address and return type,
- * Function only, has to be set later. 
- *
- * @invariant kind must be equal to Procedure or Function
- *
- * @param kind	The token kind, Procedure or Function.
- * @param level	The token base/frame level, e.g., 0 for "current frame.
- ************************************************************************************************/
-SymValue::SymValue(Kind kind, int level) : _kind{kind}, _level{level}, _value{0}
-{
-	assert(SymValue::Procedure == _kind || SymValue::Function == _kind);
-}
-
 
 /********************************************************************************************//**
  * Types have a block/frame level, and of course, a type descriptor.

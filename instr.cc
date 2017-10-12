@@ -21,7 +21,7 @@ using namespace std;
 const OpCodeInfo::InfoMap OpCodeInfo::opInfoTbl {
 	// Unary operations
 
-	{ OpCode::Neg,		OpCodeInfo{ "neg",		1			}	},
+	{ OpCode::NEG,		OpCodeInfo{ "neg",		1			}	},
 
 	{ OpCode::ITOR,		OpCodeInfo{ "itor",		1			}	},
 	{ OpCode::ITOR2,	OpCodeInfo{ "itor2",	1			}	},
@@ -31,15 +31,29 @@ const OpCodeInfo::InfoMap OpCodeInfo::opInfoTbl {
 	{ OpCode::ATAN,		OpCodeInfo{	"atan",		1			}	},
 	{ OpCode::EXP,		OpCodeInfo{ "exp",		1			}	},
 	{ OpCode::LOG,		OpCodeInfo{ "log",		1			}	},
-	{ OpCode::ODD,		OpCodeInfo{ "odd",		1			}	},
+	{ OpCode::ODD,		OpCodeInfo{ "Odd",		1			}	},
+#if 0	// TBD
+	{ OpCode::PRED,		OpCodeInfo{ "PROD",		1			}	},
+#endif
+	{ OpCode::SIN,		OpCodeInfo{ "Sin",		1			}	},
+	{ OpCode::SQR,		OpCodeInfo{ "Sqr",		1			}	},
+	{ OpCode::SQRT,		OpCodeInfo{ "Sqrt",		1			}	},
+#if	0	// TBD
+	{ OpCode::SUCC,		OpCodeInfo{ "Succ",		1			}	},
+#endif
+
+	// Builtin procedures
+
+	{ OpCode::WRITE,	OpCodeInfo{ "Write",	1			}	},
+	{ OpCode::WRITELN,	OpCodeInfo{ "Writeln",	1			}	},
 
 	// Binary operations
 
-	{ OpCode::Add,		OpCodeInfo{ "add",		2   		}	},
-	{ OpCode::Sub,		OpCodeInfo{ "sub",		2			}	},
-	{ OpCode::Mul,		OpCodeInfo{ "mul",		2			}	},
-	{ OpCode::Div,		OpCodeInfo{ "div",		2			}	},
-	{ OpCode::Rem,		OpCodeInfo{ "rem",		2			}	},
+	{ OpCode::ADD,		OpCodeInfo{ "add",		2   		}	},
+	{ OpCode::SUB,		OpCodeInfo{ "sub",		2			}	},
+	{ OpCode::MUL,		OpCodeInfo{ "mul",		2			}	},
+	{ OpCode::DIV,		OpCodeInfo{ "div",		2			}	},
+	{ OpCode::REM,		OpCodeInfo{ "rem",		2			}	},
 
 	{ OpCode::LT,		OpCodeInfo{ "lt",		2			}	},
 	{ OpCode::LTE,		OpCodeInfo{ "lte",		2			}	},
@@ -54,21 +68,21 @@ const OpCodeInfo::InfoMap OpCodeInfo::opInfoTbl {
 
 	// Push/pop
 
-	{ OpCode::Push,		OpCodeInfo{ "push",		1			}	},
-	{ OpCode::PushVar,	OpCodeInfo{ "pushvar",	1			}	},
-	{ OpCode::Eval,		OpCodeInfo{ "eval",		2			}	},
-	{ OpCode::Assign,	OpCodeInfo{ "assign",	2			}	},
+	{ OpCode::PUSH,		OpCodeInfo{ "push",		1			}	},
+	{ OpCode::PUSHVAR,	OpCodeInfo{ "pushvar",	1			}	},
+	{ OpCode::EVAL,		OpCodeInfo{ "eval",		2			}	},
+	{ OpCode::ASSIGN,	OpCodeInfo{ "assign",	2			}	},
 
 	// Call/return/jump...
 
-	{ OpCode::Call,		OpCodeInfo{ "call",		0			}	},
-	{ OpCode::Enter,	OpCodeInfo{ "enter",	0			}	},	// Size isn't staticly know
-	{ OpCode::Ret,		OpCodeInfo{ "ret",		FrameSize	}	},
-	{ OpCode::Retf,		OpCodeInfo{ "retf",		FrameSize	}	}, 	// Pops frame, push return value
-	{ OpCode::Jump,		OpCodeInfo{ "jump",		0			}	},
+	{ OpCode::CALL,		OpCodeInfo{ "call",		0			}	},
+	{ OpCode::ENTER,	OpCodeInfo{ "enter",	0			}	},	// Size isn't staticly know
+	{ OpCode::RET,		OpCodeInfo{ "ret",		FrameSize	}	},
+	{ OpCode::RETF,		OpCodeInfo{ "retf",		FrameSize	}	}, 	// Pops frame, push return value
+	{ OpCode::JUMP,		OpCodeInfo{ "jump",		0			}	},
 	{ OpCode::JNEQ,		OpCodeInfo{ "jneq",		0			}	},
 
-	{ OpCode::Halt,		OpCodeInfo{ "halt",		0			}   }
+	{ OpCode::HALT,		OpCodeInfo{ "halt",		0			}   }
 };
 
 // public static
@@ -107,15 +121,15 @@ unsigned disasm(ostream& out, unsigned loc, const Instr& instr, const string lab
 	out << setw(5) << loc << ": " << OpCodeInfo::info(instr.op).name();
 
 	switch(instr.op) {
-	case OpCode::Push:
-	case OpCode::Enter:
-	case OpCode::Jump:
+	case OpCode::PUSH:
+	case OpCode::ENTER:
+	case OpCode::JUMP:
 	case OpCode::JNEQ:
 		out << " " << instr.addr;
 		break;
 
-	case OpCode::PushVar:
-	case OpCode::Call:
+	case OpCode::PUSHVAR:
+	case OpCode::CALL:
 		out << " "	<< level << ", " << instr.addr;
 		break;
 

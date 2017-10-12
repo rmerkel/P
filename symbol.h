@@ -47,19 +47,14 @@ public:
 	
 	static SymValue makeConst(int level, Datum value, TDescPtr type);
 	static SymValue makeVar(int level, int ofset, TDescPtr type);
+	static SymValue makeSbr(Kind kind, int level);
 
 	SymValue();									///< Default constructor; undefined entry
 	SymValue(Kind kind, int level, const Datum& value, TDescPtr type, const TDescPtrVec& params);
 
 #if 0
-	/// Construct a constant value
-	SymValue(int level, Datum value, TDescPtr type);
-
-	/// Construct a Variable location
-	SymValue(int level, int offset, TDescPtr type);
-#endif
-
 	SymValue(Kind kind, int level);				///< Partially construct Procedure or Function
+#endif
 	SymValue(int level, TDescPtr type);			///< Construct Type
 
 	/// Descructor

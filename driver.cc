@@ -29,10 +29,9 @@
  * program.
  *
  * @bug
- * - No arrays or strings, just signed integers and reals
+ * - No records, files or strings
  * - No input/output instructions.
- * - No interactive mode for debugging; just automatic single stepping (verbose == true)
- * - No records
+ * - No interactive debugging; just automatic single stepping (verbose == true)
  * - Overly simple constant expressions; can't detect if a[10] is within range.
  *
  * @version 0.1  - Initial fork from pl0c, using pascal <>, =, etc...
@@ -46,6 +45,7 @@
  * @version 0.9  - Supports a[i,j] and a[i][j] syntax
  * @version 0.10 - Adding built-in functions and constants, refactored types, capitalized
  * 				   built-in "nouns" and functions. WIP.
+ * @version 0.11 - Primitive Write and Writeln, refactoring.
  *  
  * @author Randy Merkel, Slowly but Surly Software.
  * @copyright  (c) 2017 Slowly but Surly Software. All rights reserved.
@@ -79,7 +79,7 @@ static void help() {
 
 /// Print the version number as major.minor
 static void printVersion() {
-	cout << progName << ": verson: 0.10\n";		// make sure to update the verison in mainpage!!
+	cout << progName << ": verson: 0.11\n";		// make sure to update the verison in mainpage!!
 }
 
 /** Parse the command line arguments...

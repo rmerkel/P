@@ -31,8 +31,7 @@ enum Frame {
 
 /// Operation codes; restricted to 256 operations, maximum
 enum class OpCode : unsigned char {
-	Neg,								///< Unary negation
-
+	NEG,								///< Unary negation
 	ITOR,								///< Unary convert integer TOS to real
 	ITOR2,								///< Unary convert integer TOS-1 to real
 	RTOI,								///< Unary round real TOS to integer
@@ -42,12 +41,24 @@ enum class OpCode : unsigned char {
 	EXP,								///< Unary replace TOS with exp(TOS)
 	LOG,								///< Unary replace TOS with log(TOS)
 	ODD,								///< Unary is TOS an odd number?
+#if	0	// TBD
+	PRED,								///< Unary replace TOS = precedding TOS value
+#endif
+	SIN,								///< Unary replace TOS with sin(TOS)
+	SQR,								///< Unary replace TOS with TOS * TOS
+	SQRT,								///< Unary replace TOS with sqrt(TOS)
+#if	0	// TBD
+	SUCC,								///< Unary replace with succeeding TOS value
+#endif
 
-	Add,								///< Addition
-	Sub,								///< Subtraction
-	Mul,								///< Multiplication
-	Div,								///< Division
-	Rem,								///< Remainder
+	WRITE,								///< Write on standard output
+	WRITELN,							///< Write newline on standard output
+
+	ADD,								///< Addition
+	SUB,								///< Subtraction
+	MUL,								///< Multiplication
+	DIV,								///< Division
+	REM,								///< Remainder
 
 	LT,									///< Less than
 	LTE,								///< Less then or equal
@@ -60,19 +71,19 @@ enum class OpCode : unsigned char {
 	LAND,								///< Logical and
 	LNOT,								///< Logical not
 	
-	Push,								///< Push a constant integer value
-	PushVar,							///< Push variable address (base(level) + addr)
-	Eval,								///< Evaluate variable TOS = address, replace with value
-	Assign,								///< Assign; TOS-1 = variable address, TOS = value
+	PUSH,								///< Push a constant integer value
+	PUSHVAR,							///< Push variable address (base(level) + addr)
+	EVAL,								///< Evaluate variable TOS = address, replace with value
+	ASSIGN,								///< Assign; TOS-1 = variable address, TOS = value
 
-	Call,								///< Call a procedure, pushing a new acrivation Frame
-	Enter,								///< Allocate locals on the stack
-	Ret,								///< Return from procedure; unlink Frame
-	Retf,								///< Return from function; push result
-	Jump,								///< Jump to a location
+	CALL,								///< Call a procedure, pushing a new acrivation Frame
+	ENTER,								///< Allocate locals on the stack
+	RET,								///< Return from procedure; unlink Frame
+	RETF,								///< Return from function; push result
+	JUMP,								///< Jump to a location
 	JNEQ,								///< Condition = pop(); Jump if condition == false (0)
 
-	Halt = 255							///< Halt the machine
+	HALT = 255							///< Halt the machine
 };
 
 /** OpCode Information
@@ -114,7 +125,7 @@ struct Instr {
 	OpCode			op;					///< Operation code
 
 	/// Default constructor; results in pushConst 0, 0...
-	Instr() : level{0}, op{OpCode::Halt}
+	Instr() : level{0}, op{OpCode::HALT}
 		{}
 
 	/// Construct an instruction from it's components...

@@ -96,6 +96,16 @@ struct Token {
 		Exp,							///< e to the given power 
 		Log,							///< natural log
 		Odd,							///< Evenly divisable by 2?
+#if 0	// TBD
+		Pred,							///< Previous ordinal of value
+#endif
+		Sin,							///< Sine of value
+		Sqr,							///< Square of value
+		Sqrt,							///< Square root of value
+#if	0	// TBD
+		Succ,							///< Next ordinal of value
+#endif
+		Writeln,						///< Write on standard output
 
 		Assign,							///< Assignment (:=)
 		Mod,							///< Modulus (remainder)

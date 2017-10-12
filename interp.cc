@@ -128,6 +128,31 @@ void Interp::retf() {
 	push(temp);
 }
 
+/**
+ * @return false on stack underflow, true otherwise
+ */
+bool Interp::print() {
+	// TOS is the number of preceeding entries to print
+	const auto nargs = stack[sp].natural();
+
+	if (nargs > sp) {
+		cerr << "Stack underflow @ pc " << pc << endl;
+		return false;
+
+	} else if (nargs > 0) {
+		// note: fixed if precesion is specified, scientific otherwise...
+		for (unsigned i = 0; i < nargs-1; i++)
+			cout << setw(11) << setprecision(6) << fixed
+				 << stack[sp - nargs + i] << " ";
+		cout << stack[sp-1]; // last arg
+	}
+
+	sp -= nargs + 1;					// consume args & the  arg count
+
+	cout << fixed;
+	return true;
+}
+
 /// @return Result::success or...
 Interp::Result Interp::step() {
 	auto prevPc = pc;				// The previous pc
@@ -180,12 +205,47 @@ Interp::Result Interp::step() {
 		break;
 
 	case OpCode::ODD:	stack[sp] = (stack[sp].natural() & 1) == 1;				break;
-	case OpCode::Neg:	stack[sp] = -stack[sp];									break;
-	case OpCode::Add:	rhand = pop(); push(pop() + rhand);						break;
-	case OpCode::Sub:	rhand = pop(); push(pop() - rhand); 					break;
-	case OpCode::Mul:	rhand = pop(); push(pop() * rhand);						break;
+#if	0	// TBD
+	case OpCode::PRED:	???														break;
+#endif
+	case OpCode::SIN:
+		if (stack[sp].kind() == Datum::Integer)
+			stack[sp] = sin(stack[sp].integer());
+		else
+			stack[sp] = sin(stack[sp].real());
+		break;
+
+	case OpCode::SQR:	// note that Datum lacks a *= operator
+		if (stack[sp].kind() == Datum::Integer)
+			stack[sp] = stack[sp].integer() * stack[sp].integer();
+		else
+			stack[sp] = stack[sp].real() * stack[sp].real();
+		break;
+
+	case OpCode::SQRT:
+		if (stack[sp].kind() == Datum::Integer)
+			stack[sp] = sqrt(stack[sp].integer());
+		else
+			stack[sp] = sqrt(stack[sp].real());
+		break;
+
+#if	0	// TBD
+	case OpCode::SUCC:	???														break;
+#endif
+	case OpCode::WRITE: if (!print()) return Result::stackUnderflow;			break;
+			
+	case OpCode::WRITELN:
+		if (!print())
+			return Result::stackUnderflow;
+		cout << '\n';
+		break;
+
+	case OpCode::NEG:	stack[sp] = -stack[sp];									break;
+	case OpCode::ADD:	rhand = pop(); push(pop() + rhand);						break;
+	case OpCode::SUB:	rhand = pop(); push(pop() - rhand); 					break;
+	case OpCode::MUL:	rhand = pop(); push(pop() * rhand);						break;
 	
-	case OpCode::Div:
+	case OpCode::DIV:
 		rhand = pop();
 		if ((rhand.kind() == Datum::Real && rhand.real() == 0) || (rhand.kind() == Datum::Integer && rhand.integer() == 0)) {
 			cerr << "Attempt to divide by zero @ pc (" << prevPc << ")!\n";
@@ -195,7 +255,7 @@ Interp::Result Interp::step() {
 			push(pop() / rhand);
 		break;
 
-	case OpCode::Rem:
+	case OpCode::REM:
 		rhand = pop();
 		if ((rhand.kind() == Datum::Real && rhand.real() == 0) || (rhand.kind() == Datum::Integer && rhand.integer() == 0)) {
 			cerr << "attempt to divide by zero @ pc (" << prevPc << ")!\n";
@@ -216,24 +276,24 @@ Interp::Result Interp::step() {
 	case OpCode::LAND: 	rhand = pop(); push(pop() && rhand); 					break;
 	case OpCode::LNOT:	stack[sp] = !stack[sp];									break;
 
-	case OpCode::Push: 	push(ir.addr);											break;
-	case OpCode::PushVar: push(base(ir.level) + ir.addr.integer());				break;
-	case OpCode::Eval: { auto ea = pop(); push(stack[ea.natural()]); }			break;
-	case OpCode::Assign:
+	case OpCode::PUSH: 	push(ir.addr);											break;
+	case OpCode::PUSHVAR: push(base(ir.level) + ir.addr.integer());				break;
+	case OpCode::EVAL: { auto ea = pop(); push(stack[ea.natural()]); }			break;
+	case OpCode::ASSIGN:
 		rhand = pop();					// Save the value
 		lastWrite = pop().natural();	// Save the effective address for dump()...
 		stack[lastWrite] = rhand;
 		break;
 
-	case OpCode::Call: 	call(ir.level, ir.addr.natural());						break;
-	case OpCode::Ret:   ret();  												break;
-	case OpCode::Retf: 	retf();													break;
+	case OpCode::CALL: 	call(ir.level, ir.addr.natural());						break;
+	case OpCode::RET:   ret();  												break;
+	case OpCode::RETF: 	retf();													break;
 
-	case OpCode::Enter: mkStackSpace(ir.addr.natural()); sp+=ir.addr.natural(); break;
-	case OpCode::Jump:	pc = ir.addr.natural();									break;
+	case OpCode::ENTER: mkStackSpace(ir.addr.natural()); sp+=ir.addr.natural(); break;
+	case OpCode::JUMP:	pc = ir.addr.natural();									break;
 	case OpCode::JNEQ:	if (pop().integer() == 0) pc = ir.addr.natural();		break;
 
-	case OpCode::Halt:	return Result::halted;									break;
+	case OpCode::HALT:	return Result::halted;									break;
 
 	default:
 		cerr 	<< "Unknown op code: " << OpCodeInfo::info(ir.op).name()

@@ -115,12 +115,12 @@ TDescPtr PasComp::identFactor(int level, const string& id) {
 		switch (it->second.kind()) {
 		case SymValue::Constant:
 			type = it->second.type();
-			emit(OpCode::Push, 0, it->second.value());
+			emit(OpCode::PUSH, 0, it->second.value());
 			break;
 
 		case SymValue::Variable:
 			type = variable(level, it);
-			emit(OpCode::Eval);
+			emit(OpCode::EVAL);
 			break;
 
 		case SymValue::Function:
@@ -227,6 +227,61 @@ TDescPtr PasComp::builtInFunc(int level)
 			oss << "expeced integer value, got: " << current();
 		emit(OpCode::ODD);
 
+#if 0	// TBD
+	} else if (accept(Token::Pred)) {	// Replace TOS with its predicessor
+		expect(Token::OpenParen);
+		type = expression(level);
+		expect(Token::CloseParen);	
+
+		if (type->kind().isOrdinal())
+			oss << "expeced ordinal value, got: " << current();
+		emit(OpCode::PRED);
+#endif
+
+	} else if (accept(Token::Sin)) {	// Replace TOS with sin(TOS)
+		expect(Token::OpenParen);
+		type = expression(level);
+		expect(Token::CloseParen);	
+
+		if (type->kind() == TDesc::Integer)
+			type = TDesc::realDesc;		// Always produces a real
+		else if (type->kind() != TDesc::Real)
+			oss << "expeced integer, or real value, got: " << current();
+		emit(OpCode::SIN);
+
+	} else if (accept(Token::Sqr)) {	// Replace TOS with TOS * TOS
+		expect(Token::OpenParen);
+		type = expression(level);
+		expect(Token::CloseParen);	
+
+		if (type->kind() == TDesc::Integer)
+			type = TDesc::realDesc;		// Always produces a real
+		else if (type->kind() != TDesc::Real)
+			oss << "expeced integer, or real value, got: " << current();
+		emit(OpCode::SQR);
+
+	} else if (accept(Token::Sqrt)) {	// Replace TOS with sqrt(TOS)
+		expect(Token::OpenParen);
+		type = expression(level);
+		expect(Token::CloseParen);	
+
+		if (type->kind() == TDesc::Integer)
+			type = TDesc::realDesc;		// Always produces a real
+		else if (type->kind() != TDesc::Real)
+			oss << "expeced integer, or real value, got: " << current();
+		emit(OpCode::SQRT);
+
+#if 0	// TBD
+	} else if (accept(Token::Succ)) {	// Replace TOS with is TOS odd?
+		expect(Token::OpenParen);
+		type = expression(level);
+		expect(Token::CloseParen);	
+
+		if (type->kind().isOrdinal())
+			oss << "expeced ordinal value, got: " << current();
+		emit(OpCode::SUCC);
+#endif
+
 	} else if (accept(Token::Ord)) {	// replace ordinal with it's ordinal
 		expect(Token::OpenParen);
 		type = expression(level);
@@ -270,12 +325,12 @@ TDescPtr PasComp::factor(int level) {
 
 	} else if (accept(Token::IntegerNum, false)) {
 		int value = ts.current().integer_value;
-		emit(OpCode::Push, 0, value);
+		emit(OpCode::PUSH, 0, value);
 		expect(Token::IntegerNum);
 		type = TDesc::intDesc;
 
 	} else if (accept(Token::RealNum, false)) {
-		emit(OpCode::Push, 0, ts.current().real_value);
+		emit(OpCode::PUSH, 0, ts.current().real_value);
 		expect(Token::RealNum);
 		type = TDesc::realDesc;
 
@@ -306,15 +361,15 @@ TDescPtr PasComp::term(int level) {
 	for (;;) {
 		if (accept(Token::Multiply)) {
 			lhs = promote(lhs, factor(level));
-			emit(OpCode::Mul);
+			emit(OpCode::MUL);
 			
 		} else if (accept(Token::Divide)) {
 			lhs = promote(lhs, factor(level));
-			emit(OpCode::Div);	
+			emit(OpCode::DIV);	
 			
 		} else if (accept(Token::Mod)) {
 			lhs = promote(lhs, factor(level));
-			emit(OpCode::Rem);
+			emit(OpCode::REM);
 
 		} else if (accept(Token::And)) {
 			lhs = promote(lhs, factor(level));
@@ -342,7 +397,7 @@ TDescPtr PasComp::unary(int level) {
 
 	else if (accept(Token::Subtract)) {
 		type = term(level);
-		emit(OpCode::Neg);
+		emit(OpCode::NEG);
 
 	} else									
 		type = term(level);
@@ -363,11 +418,11 @@ TDescPtr PasComp::simpleExpr(int level) {
 	for (;;) {
 		if (accept(Token::Add)) {
 			lhs = promote(lhs, unary(level));
-			emit(OpCode::Add);
+			emit(OpCode::ADD);
 
 		} else if (accept(Token::Subtract)) {
 			lhs = promote(lhs, unary(level));
-			emit(OpCode::Sub);
+			emit(OpCode::SUB);
 
 		} else if (accept(Token::Or)) {
 			lhs = promote(lhs, unary(level));
@@ -514,7 +569,7 @@ void PasComp::callStmt(const string& name, const SymValue& val, int level) {
 	if (SymValue::Procedure != val.kind() && SymValue::Function != val.kind())
 		error("Identifier is not a function or procedure", name);
 
-	emit(OpCode::Call, level - val.level(), val.value());
+	emit(OpCode::CALL, level - val.level(), val.value());
 }
 
 /********************************************************************************************//**
@@ -531,7 +586,7 @@ void PasComp::callStmt(const string& name, const SymValue& val, int level) {
 	expect(Token::Do);					// consume "do"
 	statement(level);
 
-	emit(OpCode::Jump, 0, cond_pc);		// Jump back to expr test...
+	emit(OpCode::JUMP, 0, cond_pc);		// Jump back to expr test...
 
 	if (verbose)
 		cout << progName << ": patching address at " << jmp_pc << " to " << code->size() << "\n";
@@ -554,7 +609,7 @@ void PasComp::callStmt(const string& name, const SymValue& val, int level) {
 	// Jump over else statement, but only if there is an else
 	const bool Else = accept(Token::Else);
 	size_t else_pc = 0;
-	if (Else) else_pc = emit(OpCode::Jump, 0, 0);
+	if (Else) else_pc = emit(OpCode::JUMP, 0, 0);
 
 	if (verbose)
 		cout << progName << ": patching address at " << jmp_pc << " to " << code->size() << "\n";
@@ -626,17 +681,17 @@ TDescPtr PasComp::variable(int level, SymbolTable::iterator it) {
 					error(oss.str());
 					
 				} else if (type->size() != 1) {
-					emit(OpCode::Push, 0, type->size());
-					emit(OpCode::Mul);		// scale the index
+					emit(OpCode::PUSH, 0, type->size());
+					emit(OpCode::MUL);		// scale the index
 				}
 
 				// offset index for non-zero based arrays
 				if (atype->range().minimum() != 0) {
-					emit(OpCode::Push, 0, atype->range().minimum());
-					emit(OpCode::Sub);
+					emit(OpCode::PUSH, 0, atype->range().minimum());
+					emit(OpCode::SUB);
 				}
 
-				emit(OpCode::Add);			// index into the array
+				emit(OpCode::ADD);			// index into the array
 				
 				if (--nindexes) {			// reditect if there's another index
 					auto atype = type;		// The arrays type; kind s/b TDesc::Array
@@ -668,7 +723,7 @@ void PasComp::identStatement(int level, const string& id) {
 	auto type = lhs->second.type();		// Emit the lvalue...
 	switch(lhs->second.kind()) {
 	case SymValue::Function:			// emit reference to function return value
-		emit(OpCode::PushVar, 0, FrameRetVal);
+		emit(OpCode::PUSHVAR, 0, FrameRetVal);
 		break;
 
 	case SymValue::Procedure:			// emit a procedure call
@@ -693,12 +748,12 @@ void PasComp::identStatement(int level, const string& id) {
 	switch(lhs->second.kind()) {		// Emit the assignment
 	case SymValue::Variable:
 		assignPromote(type, rhs);
-		emit(OpCode::Assign);
+		emit(OpCode::ASSIGN);
 		break;
 
 	case SymValue::Function:			// Save value in the frame's retValue element
 		assignPromote(type, rhs);
-		emit(OpCode::Assign);
+		emit(OpCode::ASSIGN);
 		break;
 
 	default:
@@ -735,6 +790,19 @@ void PasComp::statement(int level) {
 
 	else if (accept(Token::Repeat))					// "repeat" until...
 		repeatStmt(level);
+
+	else if (accept(Token::Writeln)) {				// Writeln [ '(' expr { ',' expr } ')' ]
+		unsigned nargs = 0;
+		if (accept(Token::OpenParen)) {
+			do {
+				auto expr = expression(level);
+				++nargs;
+			} while (accept(Token::Comma));
+			expect(Token::CloseParen);
+		}
+		emit(OpCode::PUSH, 0, nargs);
+		emit(OpCode::WRITELN);
+	}
 
 	// else: nothing
 }
@@ -820,11 +888,7 @@ void PasComp::constDecl(int level) {
 
 	TDescPtr type = value.second.kind() == Datum::Kind::Integer ? TDesc::intDesc : TDesc::realDesc;
 
-#if 1
 	symtbl.insert(	{ ident, SymValue::makeConst(level, value.second, type) } );
-#else
-	symtbl.insert(	{ ident, SymValue(level, value.second, type) }	);
-#endif
 	if (verbose)
 		cout << progName << ": constDecl " << ident << ": " << level << ", " << value.second << "\n";
 }
@@ -894,11 +958,7 @@ void PasComp::varDeclList(int level, bool params, NameKindVec& idents) {
 			}
 		}
 
-#if 1
 		symtbl.insert( { id.name, SymValue::makeVar(level, dx, id.type)	} );
-#else
-		symtbl.insert( { id.name, SymValue(level, dx, id.type)	} );
-#endif
 		dx += id.type->size();
 	}
 }
@@ -970,7 +1030,7 @@ TDescPtr PasComp::type(int level) {
 	} else if ((tdesc = simpleType(level)))
 		;
 
-#if 0
+#if 0	// TBD
 	else if ((tdesc = pointerType(level)))
 		;
 #endif
@@ -1039,11 +1099,7 @@ TDescPtr PasComp::ordinalType(int level) {
 		unsigned value = 0;						// Each enumeration gets a value...
 		for (auto id : ids) {
 			enums.push_back( { id, TDesc::intDesc } );
-#if 1
 			symtbl.insert(	{ id, SymValue::makeConst(level, Datum(value), t) }	);
-#else
-			symtbl.insert(	{ id, SymValue(level, Datum(value), t) }	);
-#endif
 			if (verbose)
 				cout << progName << ": enumeration '" << id << "' = " << value << ", " << level << "\n";
 			++value;
@@ -1121,7 +1177,7 @@ TDescPtr PasComp::structuredType(int level) {
 		tp->base(type(level));					// Get the arrays base type
 		tp->size(tp->size() * tp->base()->size());
 
-#if 0
+#if 0	// TBD
 	} else if (accept(Token::Record)) {			// Record
 		expect(Token::End);
 #endif
@@ -1158,7 +1214,7 @@ SymValue& PasComp::subPrefixDecl(int level, SymValue::Kind kind) {
 	SymbolTable::iterator	it;				// Will point to the new symbol table entry...
 
 	auto ident = nameDecl(level);			// insert the name into the symbol table
-	it = symtbl.insert( { ident, SymValue(kind, level)	} );
+	it = symtbl.insert( { ident, SymValue::makeSbr(kind, level)	} );
 	if (verbose)
 		cout << progName << ": subPrefixDecl " << ident << ": " << level << ", 0\n";
 
@@ -1250,7 +1306,7 @@ unsigned PasComp::blockDecl(SymValue& val, int level) {
 	 * if dx == 0 (the subroutine has zero locals.
 	 */
 
-	const auto addr = dx > 0 ? emit(OpCode::Enter, 0, dx) : code->size();
+	const auto addr = dx > 0 ? emit(OpCode::ENTER, 0, dx) : code->size();
 	val.value(addr);
 
 	if (expect(Token::Begin)) {					// "begin" statements... "end"
@@ -1262,9 +1318,9 @@ unsigned PasComp::blockDecl(SymValue& val, int level) {
 
 	const auto sz = val.params().size();
 	if (SymValue::Function == val.kind())
-		emit(OpCode::Retf, 0, sz);	// function...
+		emit(OpCode::RETF, 0, sz);	// function...
 	else
-		emit(OpCode::Ret, 0, sz);	// procedure...
+		emit(OpCode::RET, 0, sz);	// procedure...
 
 	purge(level);								// Remove symbols only visible at this level
 
@@ -1282,8 +1338,8 @@ void PasComp::run() {
 	expect(Token::SemiColon);
 
 	// Emit a call to the main procedure, followed by a halt
-	const auto call_pc = emit(OpCode::Call, level, 0);
-	emit(OpCode::Halt);
+	const auto call_pc = emit(OpCode::CALL, level, 0);
+	emit(OpCode::HALT);
 
 	const auto addr = blockDecl(val, level);	// emit the first block 
 	if (verbose)
@@ -1308,6 +1364,6 @@ PasComp::PasComp(const string& pName) : Compilier (pName) {
 	symtbl.insert( { "Real",	SymValue(0, TDesc::realDesc)	} );
 
 	// insert builtin constants into the symbol table
-	symtbl.insert( { "IntMax", SymValue::makeConst(0, numeric_limits<int>::max(), TDesc::intDesc) } );
+	symtbl.insert( { "MaxInt", SymValue::makeConst(0, numeric_limits<int>::max(), TDesc::intDesc) } );
 }
 

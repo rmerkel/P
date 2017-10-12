@@ -195,7 +195,7 @@ TokenStream::KeywordTable	TokenStream::keywords = {
 	{	"Abs",			Token::Abs			},
 	{	"and",			Token::And			},
 	{	"array",		Token::Array		},
-	{	"Atan",			Token::Atan			},
+	{	"ArcTan",		Token::Atan			},
 	{	"begin",		Token::Begin		},
 	{   "const",		Token::ConsDecl		},
 	{	"do",			Token::Do			},
@@ -205,7 +205,7 @@ TokenStream::KeywordTable	TokenStream::keywords = {
 	{	"function",		Token::FuncDecl		},
 	{	"if",			Token::If			},
 	{	"Integer",		Token::IntType		},
-	{	"Log",			Token::Log			},
+	{	"Ln",			Token::Log			},
 	{	"mod",			Token::Mod			},
 	{	"not",			Token::Not			},
 	{	"Odd",			Token::Odd			},
@@ -213,15 +213,25 @@ TokenStream::KeywordTable	TokenStream::keywords = {
 	{	"Ord",			Token::Ord			},
 	{	"program",		Token::ProgDecl		},
 	{	"procedure",	Token::ProcDecl		},
+#if 0	// TBD
+	{	"Pred",			Token::Pred			},
+#endif
 	{	"Real",			Token::RealType		},
 	{	"repeat",		Token::Repeat		},
 	{	"Round",		Token::Round		},
+	{	"Sin",			Token::Sin			},
+	{	"Sqr",			Token::Sqr			},
+	{	"Sqrt",			Token::Sqrt			},
+#if 0	// TBD
+	{	"Succ",			Token::Succ			},
+#endif
 	{	"then",			Token::Then			},
 	{	"Trunc",		Token::Trunc		},
 	{	"type",			Token::TypeDecl		},
 	{	"until",		Token::Until		},
 	{	"var",			Token::VarDecl		},
-	{	"while",		Token::While		}
+	{	"while",		Token::While		},
+	{	"Writeln",		Token::Writeln		}
 };
 
 // operators
@@ -295,10 +305,20 @@ ostream& operator<<(std::ostream& os, const Token::Kind& kind) {
 	case Token::Round:		os << "Round";			break;
 	case Token::Trunc:		os << "Trunc";			break;
 	case Token::Abs:		os << "Abs";			break;
-	case Token::Atan:		os << "Atan";			break;
+	case Token::Atan:		os << "ArcTan";			break;
 	case Token::Exp:		os << "Exp";			break;
-	case Token::Log:		os << "Log";			break;
+	case Token::Log:		os << "Ln";				break;
 	case Token::Odd:		os << "Odd";			break;
+#if 0	// TBD
+	case Token::Prec:		os << "Prec";			break;
+#endif
+	case Token::Sin:		os << "Sin";			break;
+	case Token::Sqr:		os << "Sqr";			break;
+	case Token::Sqrt:		os << "Sqrt";			break;
+#if 0	// TBD
+	case Token::Succ:		os << "Succ";			break;
+#endif
+	case Token::Writeln:	os << "Writeln";		break;
 
 	case Token::EOS:		os << "EOS";			break;
 
