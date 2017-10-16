@@ -30,7 +30,7 @@ public:
 	/// Datum "kinds"
 	enum Kind {
 		Integer,							///< Signed integer
-		Real								///< Real
+		Real								///< Floating point
 	};
 
 	typedef std::vector<Kind>	KindVec;	///< Vector of Datum Kind's

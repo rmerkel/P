@@ -16,7 +16,7 @@
 # test/typefail.p, 11: 	a2 : array [enum] of Integer;
 # test/typefail.p, 12: 
 # test/typefail.p, 13: begin
-    2: enter 16
+    2: enter 15
 # test/typefail.p, 14: 	i := one;				{	error: expected Integer, got enum		}
     3: pushvar 0, 4
     4: push 0
@@ -25,69 +25,87 @@
 # test/typefail.p, 16: 	r := 0;
     6: pushvar 0, 5
     7: push 0
-    8: assign
+    8: llimit 0
+    9: ulimit 9
+   10: assign
 # test/typefail.p, 17: 	while r < 10 do begin 	{	*** warning: condition might always be true	}
-    9: pushvar 0, 5
-   10: eval
-   11: push 10
-   12: lt
-   13: jneq 28
+   11: pushvar 0, 5
+   12: eval
+   13: push 10
+   14: lt
+   15: jneq 34
 # test/typefail.p, 18: 		a[r] := r;
-   14: pushvar 0, 6
-   15: pushvar 0, 5
-   16: eval
-   17: add
-   18: pushvar 0, 5
-   19: eval
-   20: assign
-# test/typefail.p, 19: 		r := r + 1
-   21: pushvar 0, 5
+   16: pushvar 0, 6
+   17: pushvar 0, 5
+   18: eval
+   19: llimit 0
+   20: ulimit 9
+   21: add
    22: pushvar 0, 5
    23: eval
-   24: push 1
+   24: assign
+# test/typefail.p, 19: 		r := r + 1
+   25: pushvar 0, 5
+   26: pushvar 0, 5
+   27: eval
+   28: push 1
 # test/typefail.p, 20: 	end;
-   25: add
-   26: assign
-   27: jump 9
+   29: add
+   30: llimit 0
+   31: ulimit 9
+   32: assign
+   33: jump 11
 # test/typefail.p, 21: 	r := 10;				{	*** error: out-of-range/range check error	}
-   28: pushvar 0, 5
-   29: push 10
-   30: assign
+   34: pushvar 0, 5
+   35: push 10
+   36: llimit 0
+   37: ulimit 9
+   38: assign
 # test/typefail.p, 22: 	a[10] := 10;			{	*** error: out-of-range/range check error	}
-   31: pushvar 0, 6
-   32: push 10
-   33: add
-   34: push 10
-   35: assign
+   39: pushvar 0, 6
+   40: push 10
+   41: llimit 0
+   42: ulimit 9
+   43: add
+   44: push 10
+   45: assign
 # test/typefail.p, 23: 	a[1+9] := 10;			{	*** error: out-of-range/range check error	}
-   36: pushvar 0, 6
-   37: push 1
-   38: push 9
-   39: add
-   40: add
-   41: push 10
-   42: assign
+   46: pushvar 0, 6
+   47: push 1
+   48: push 9
+   49: add
+   50: llimit 0
+   51: ulimit 9
+   52: add
+   53: push 10
+   54: assign
 # test/typefail.p, 24: 
 # test/typefail.p, 25: 	a2[one] := 1;
-   43: pushvar 0, 16
-   44: push 0
-   45: add
-   46: push 1
-   47: assign
+   55: pushvar 0, 16
+   56: push 0
+   57: llimit 0
+   58: ulimit 2
+   59: add
+   60: push 1
+   61: assign
 # test/typefail.p, 26: 	a2[2] := 2;				{	error: got Integer, expected enum		}
-   48: pushvar 0, 16
-   49: push 2
-   50: add
-   51: push 2
-   52: assign
+   62: pushvar 0, 16
+   63: push 2
+   64: llimit 0
+   65: ulimit 2
+   66: add
+   67: push 2
+   68: assign
 # test/typefail.p, 27: 	a2[two + 1] := 3		{	error: expected enum, got Integer		}
-   53: pushvar 0, 16
-   54: push 1
-   55: push 1
-   56: add
-   57: add
-   58: push 3
+   69: pushvar 0, 16
+   70: push 1
+   71: push 1
+   72: add
+   73: llimit 0
+   74: ulimit 2
+   75: add
+   76: push 3
 # test/typefail.p, 28: end .
-   59: assign
-   60: ret
+   77: assign
+   78: ret
 

@@ -14,11 +14,11 @@
 #include <iomanip>
 #include <iostream>
 #include <fstream>
-#include <limits>
 #include <sstream>
 #include <vector>
 
 using namespace std;
+using namespace rel_ops;
 
 /************************************************************************************************
  * class PasComp
@@ -88,13 +88,19 @@ void PasComp::assignPromote (TDescPtr lhs, TDescPtr rhs) {
 
 	else if (isAnInteger(lhs) && isAReal(rhs)) {
 		error("rounding lhs to fit in an integer");
-		emit(OpCode::RTOI);					// promote rhs to a integer	 
+		emit(OpCode::ROUND);				// promote rhs to a integer	 
 
 	} else if (isAReal(lhs) && isAnInteger(rhs))
 		emit(OpCode::ITOR);                 // promote rhs to a real
 
 	else
 		error("incompatable binary types");
+
+	// Emit limit checks, unless range is impossible to exceed
+	if (lhs->isOrdinal() && lhs->range() != TDesc::maxRange) {
+		emit(OpCode::LLIMIT, 0, lhs->range().minimum());
+		emit(OpCode::ULIMIT, 0, lhs->range().maximum());
+	}
 }
 
 /********************************************************************************************//**
@@ -125,7 +131,7 @@ TDescPtr PasComp::identFactor(int level, const string& id) {
 
 		case SymValue::Function:
 			type = it->second.type();		// Use the function return type
-			callStmt(it->first, it->second, level);
+			callstatement(level, it);
 			break;
 
 		default:
@@ -156,7 +162,7 @@ TDescPtr PasComp::builtInFunc(int level)
 			error(oss.str());
 
 		} else {
-			emit(OpCode::RTOI);
+			emit(OpCode::ROUND);
 			type = TDesc::intDesc;
 		}
 
@@ -227,16 +233,14 @@ TDescPtr PasComp::builtInFunc(int level)
 			oss << "expeced integer value, got: " << current();
 		emit(OpCode::ODD);
 
-#if 0	// TBD
 	} else if (accept(Token::Pred)) {	// Replace TOS with its predicessor
 		expect(Token::OpenParen);
 		type = expression(level);
 		expect(Token::CloseParen);	
 
-		if (type->kind().isOrdinal())
+		if (type->isOrdinal())
 			oss << "expeced ordinal value, got: " << current();
-		emit(OpCode::PRED);
-#endif
+		emit(OpCode::PRED, 0, type->range().minimum());
 
 	} else if (accept(Token::Sin)) {	// Replace TOS with sin(TOS)
 		expect(Token::OpenParen);
@@ -271,16 +275,14 @@ TDescPtr PasComp::builtInFunc(int level)
 			oss << "expeced integer, or real value, got: " << current();
 		emit(OpCode::SQRT);
 
-#if 0	// TBD
 	} else if (accept(Token::Succ)) {	// Replace TOS with is TOS odd?
 		expect(Token::OpenParen);
 		type = expression(level);
 		expect(Token::CloseParen);	
 
-		if (type->kind().isOrdinal())
+		if (type->isOrdinal())
 			oss << "expeced ordinal value, got: " << current();
-		emit(OpCode::SUCC);
-#endif
+		emit(OpCode::SUCC, 0, type->range().maximum());
 
 	} else if (accept(Token::Ord)) {	// replace ordinal with it's ordinal
 		expect(Token::OpenParen);
@@ -540,14 +542,13 @@ pair<bool,Datum> PasComp::constExpr() {
  *
  * ident [ '(' expr-list ')' ]...
  *
- * @param	name	The identifier value
- * @param	val		The identifiers symbol table entry value
  * @param	level	The current block level 
+ * @param	it		The sub-routines symbol table entry
  ************************************************************************************************/
-void PasComp::callStmt(const string& name, const SymValue& val, int level) {
+void PasComp::callstatement(int level, SymbolTable::iterator it) {
 	if (accept(Token::OpenParen)) {
 		unsigned nParams = 0;					// Count actual parameters
-		const auto& params = val.params();		// Formal parameter kinds
+		const auto& params = it->second.params();		// Formal parameter kinds
 		if (!accept(Token::CloseParen, false))
 			do {								// collect actual parameters
 				const auto kind = expression(level);
@@ -566,10 +567,10 @@ void PasComp::callStmt(const string& name, const SymValue& val, int level) {
 		}
 	}
 
-	if (SymValue::Procedure != val.kind() && SymValue::Function != val.kind())
-		error("Identifier is not a function or procedure", name);
+	if (SymValue::Procedure != it->second.kind() && SymValue::Function != it->second.kind())
+		error("Identifier is not a function or procedure", it->first);
 
-	emit(OpCode::CALL, level - val.level(), val.value());
+	emit(OpCode::CALL, level - it->second.level(), it->second.value());
 }
 
 /********************************************************************************************//**
@@ -577,7 +578,7 @@ void PasComp::callStmt(const string& name, const SymValue& val, int level) {
  *
  * @param	level	The current block level.
  ************************************************************************************************/
- void PasComp::whileStmt(int level) {
+ void PasComp::whileStatement(int level) {
 	const auto cond_pc = code->size();	// Start of while expr
 	expression(level);
 
@@ -598,7 +599,7 @@ void PasComp::callStmt(const string& name, const SymValue& val, int level) {
  *
  * @param	level 	The current block level
  ************************************************************************************************/
- void PasComp::ifStmt(int level) {
+ void PasComp::ifStatement(int level) {
 	expression(level);
 
 	// Jump if conditon is false
@@ -629,7 +630,7 @@ void PasComp::callStmt(const string& name, const SymValue& val, int level) {
  *
  * @param	level 	The current block level
  ************************************************************************************************/
- void PasComp::repeatStmt(int level) {
+ void PasComp::repeateStatement(int level) {
 	 const size_t loop_pc = code->size();			// jump here until expr fails
 	 statement(level);
 	 expect(Token::Until);
@@ -638,7 +639,57 @@ void PasComp::callStmt(const string& name, const SymValue& val, int level) {
  }
 
 /********************************************************************************************//**
- * stmt { ; stmt }
+ * for identifier := expresson ( to | downto ) condition do statement
+ *
+ * @param	level	The current block level.
+ ************************************************************************************************/
+ void PasComp::forStatement(int level) {
+	expect(Token::Identifier, false);	// "for identifier := expression..."
+	const string id = ts.current().string_value;
+	next();
+	auto var = lookup(id);
+	if (var == symtbl.end())
+		return;							// Unidentified
+	assignStatement(level, var, true);										//		addr
+
+	int inc;							// ".. ( to | downto ) .."
+	if (accept(Token::To))
+		inc = 1;						// "to"
+	else {
+		expect(Token::DownTo);
+		inc = -1;						// "downto"
+	}
+
+	const auto cond_pc = code->size();	// Check condition
+	emit(OpCode::DUP);					// Duplicate variable refernece				addr, addr
+	emit(OpCode::EVAL);					// 											addr, value
+	expression(level);					// 											addr, value, cond
+	emit(OpCode::LTE);					// 											addr, cond?
+
+	// jump if expr is false...
+	const auto jmp_pc = emit(OpCode::JNEQ, 0, 0);								//	addr
+
+	expect(Token::Do);					// "do statement"
+	statement(level);
+
+	emit(OpCode::DUP);					// iterate 									addr, addr
+	emit(OpCode::DUP);															//	addr, addr, addr
+	emit(OpCode::EVAL);															//	addr, addr, value
+	emit(OpCode::PUSH, 0, inc);													//	addr, addr, value, 1
+	emit(OpCode::ADD);															//	addr, addr, new_value
+	emit(OpCode::ASSIGN);														//	addr
+
+	emit(OpCode::JUMP, 0, cond_pc);
+
+	const auto pop_pc = emit(OpCode::POP);
+
+	if (verbose)
+		cout << progName << ": patching address at " << pop_pc << " to " << code->size() << "\n";
+	(*code)[jmp_pc].addr = pop_pc;
+ }
+
+/********************************************************************************************//**
+ * statement { ; statement }
  *
  * @param	level		The current block level.
  ************************************************************************************************/
@@ -655,6 +706,7 @@ void PasComp::statementList(int level) {
  *
  * @param	id		The variable or array identifier
  * @param	level	The current block level.
+ * @return	The identifier type
  ************************************************************************************************/
 TDescPtr PasComp::variable(int level, SymbolTable::iterator it) {
 	auto type = it->second.type();			// Default is the symbol type
@@ -674,6 +726,9 @@ TDescPtr PasComp::variable(int level, SymbolTable::iterator it) {
 
 			unsigned nindexes = indexes.size();
 			for (auto index : indexes) {
+				emit(OpCode::LLIMIT, 0, atype->range().minimum());
+				emit(OpCode::ULIMIT, 0, atype->range().maximum());
+
 				if (atype->rtype()->kind() != index->kind()) {
 					ostringstream oss;
 					oss	<< "incompatable array index type, expected "
@@ -693,7 +748,7 @@ TDescPtr PasComp::variable(int level, SymbolTable::iterator it) {
 
 				emit(OpCode::ADD);			// index into the array
 				
-				if (--nindexes) {			// reditect if there's another index
+				if (--nindexes) {			// link to next (base) if there's another index
 					auto atype = type;		// The arrays type; kind s/b TDesc::Array
 					type = atype->base();	// We'll return the arrays base type...
 				}
@@ -705,6 +760,37 @@ TDescPtr PasComp::variable(int level, SymbolTable::iterator it) {
 	}
 
 	return type;
+}
+
+/********************************************************************************************//**
+ * variable := expression 
+ *
+ * @param	id		The variable, or function, identifier
+ * @param	level	The current block level.
+ * @param	dup		Duplicate reference to the variable if true
+ *
+ * @return	Reference to the variable reference
+ ************************************************************************************************/
+void PasComp::assignStatement(int level, SymbolTable::iterator it, bool dup) {
+	auto type = it->second.type();		// Emit the lvalue...
+
+	// Emit the l-value, a variable or a function reference...
+	if (it->second.kind() == SymValue::Function)
+		emit(OpCode::PUSHVAR, 0, FrameRetVal);
+	else if (it->second.kind() == SymValue::Variable)
+		type = variable(level, it);
+	else
+		error("expected a variable or a function, got:", it->first);
+
+	if (dup)
+		emit(OpCode::DUP);
+
+	expect(Token::Assign);
+
+	// Emit the r-value and assignment...
+
+	assignPromote(type, expression(level));
+	emit(OpCode::ASSIGN);
 }
 
 /********************************************************************************************//**
@@ -720,18 +806,14 @@ void PasComp::identStatement(int level, const string& id) {
 	if (lhs == symtbl.end())
 		return;							// id is unidentified
 
-	auto type = lhs->second.type();		// Emit the lvalue...
 	switch(lhs->second.kind()) {
-	case SymValue::Function:			// emit reference to function return value
-		emit(OpCode::PUSHVAR, 0, FrameRetVal);
+	case SymValue::Procedure:			// emit a procedure call
+		callstatement(level, lhs);
 		break;
 
-	case SymValue::Procedure:			// emit a procedure call
-		callStmt(lhs->first, lhs->second, level);
-		return;
-
+	case SymValue::Function:			// emit reference to function return value
 	case SymValue::Variable:			// emit a reference to a variable, or array, value
-		type = variable(level, lhs);
+		assignStatement(level, lhs);
 		break;
 
 	case SymValue::Constant:
@@ -740,24 +822,6 @@ void PasComp::identStatement(int level, const string& id) {
 
 	default:
 		error("expected variable, function return ref, or procedure call, got", lhs->first);
-	}
-
-	expect(Token::Assign);				// Emit the rvalue...
-	const auto rhs = expression(level);
-
-	switch(lhs->second.kind()) {		// Emit the assignment
-	case SymValue::Variable:
-		assignPromote(type, rhs);
-		emit(OpCode::ASSIGN);
-		break;
-
-	case SymValue::Function:			// Save value in the frame's retValue element
-		assignPromote(type, rhs);
-		emit(OpCode::ASSIGN);
-		break;
-
-	default:
-		assert(false);
 	}
 }
 
@@ -775,21 +839,23 @@ void PasComp::statement(int level) {
 		// Copy and then consume the l-value identifier...
 		const string id = ts.current().string_value;
 		next();
-
 		identStatement(level, id);
 
 	} else if (accept(Token::Begin)) {				// begin ... end
 		statementList(level);
 		expect(Token::End);
 
-	} else if (accept(Token::If)) 					// if expr...
-		ifStmt(level);
+	} else if (accept(Token::If)) 					// if expr then stmt { then stmt... }
+		ifStatement(level);
 
-	else if (accept(Token::While))					// "while" expr...
-		whileStmt(level);
+	else if (accept(Token::While))					// while expr do stmt...
+		whileStatement(level);
 
-	else if (accept(Token::Repeat))					// "repeat" until...
-		repeatStmt(level);
+	else if (accept(Token::Repeat))					// "repeat" stmt until expr...
+		repeateStatement(level);
+
+	else if (accept(Token::For))					// 'for' var ':=' expr ( 'to' | 'downto') expr 'do' stmt...
+		forStatement(level);
 
 	else if (accept(Token::Writeln)) {				// Writeln [ '(' expr { ',' expr } ')' ]
 		unsigned nargs = 0;
@@ -845,7 +911,7 @@ void PasComp::typeDecl(int level) {
 	if (verbose)
 		cout << progName << ": type " << ident << " = " << tdesc->kind()	<< "\n";
 
-	symtbl.insert(	{ ident, SymValue(level, tdesc) }	);
+	symtbl.insert(	{ ident, SymValue::makeType(level, tdesc) }	);
 }
 
 /********************************************************************************************//**
@@ -1090,7 +1156,7 @@ TDescPtr PasComp::ordinalType(int level) {
 		FieldVec		enums;
 
 		const auto ids = identifierList(level);
-		SubRange r(0, ids.empty() ? 0 : ids.size());
+		SubRange r(0, ids.empty() ? 0 : ids.size()-1);
 		expect(Token::CloseParen);
 
 		// Create the type, excluding the fields (enumerations)
@@ -1179,6 +1245,9 @@ TDescPtr PasComp::structuredType(int level) {
 
 #if 0	// TBD
 	} else if (accept(Token::Record)) {			// Record
+		do (
+			varaible-decl-list(level)
+		} while(accept(Token::Comma);
 		expect(Token::End);
 #endif
 	}
@@ -1359,11 +1428,14 @@ void PasComp::run() {
  * @param	pName	The prefix string used by error and verbose/diagnostic messages.
  ************************************************************************************************/
 PasComp::PasComp(const string& pName) : Compilier (pName) {
-	// insert builtin types into the symbol table
-	symtbl.insert( { "Integer",	SymValue(0, TDesc::intDesc)		} );
-	symtbl.insert( { "Real",	SymValue(0, TDesc::realDesc)	} );
 
-	// insert builtin constants into the symbol table
-	symtbl.insert( { "MaxInt", SymValue::makeConst(0, numeric_limits<int>::max(), TDesc::intDesc) } );
+	// Insert builtin types into the symbol table
+
+	symtbl.insert( { "Integer",	SymValue::makeType(0, TDesc::intDesc)	} );
+	symtbl.insert( { "Real",	SymValue::makeType(0, TDesc::realDesc)	} );
+
+	// Insert builtin constants into the symbol table
+
+	symtbl.insert( { "MaxInt", SymValue::makeConst(0, TDesc::maxRange.maximum(), TDesc::intDesc) } );
 }
 

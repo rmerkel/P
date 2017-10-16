@@ -46,7 +46,7 @@ SymValue SymValue::makeVar(int level, int offset, TDescPtr type) {
 }
 
 /********************************************************************************************//**
- * @brief return a partilly defined sub-routine.
+ * @brief return a partially defined sub-routine.
  *
  * The entry point address and return type, function only, has to be set later. 
  *
@@ -60,6 +60,20 @@ SymValue SymValue::makeVar(int level, int offset, TDescPtr type) {
 SymValue SymValue::makeSbr(Kind kind, int level) {
 	assert(SymValue::Procedure == kind || SymValue::Function == kind);
 	return SymValue(kind, level, 0, TDescPtr(), TDescPtrVec());
+}
+
+/********************************************************************************************//**
+ * @brief return a type symbol value
+ *
+ * Types have a block/frame level, and of course, a type descriptor.
+ *
+ * @param level	The token base/frame level, e.g., 0 for "current frame.
+ * @param type type description
+ *
+ * @return a type symbol value
+ ************************************************************************************************/
+SymValue SymValue::makeType(int level, TDescPtr type) {
+	return SymValue(Kind::Type, level, 0, type, TDescPtrVec());
 }
 
 // public
@@ -80,14 +94,6 @@ SymValue::SymValue() : _kind{Kind::None}, _level{0} {}
  ************************************************************************************************/
 SymValue::SymValue(Kind kind, int level, const Datum& value, TDescPtr type, const TDescPtrVec& params)
 	: _kind{kind}, _level{level}, _value{value}, _type{type}, _params{params}
-{
-}
-
-/********************************************************************************************//**
- * Types have a block/frame level, and of course, a type descriptor.
- ************************************************************************************************/
-SymValue::SymValue(int level, TDescPtr type)
-	: _kind{Kind::Type}, _level{level}, _value{0}, _type{type}
 {
 }
 

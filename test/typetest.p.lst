@@ -16,7 +16,7 @@
 # test/typetest.p, 14: 	a3 : array [0..4] of array [0..4] of Real;
 # test/typetest.p, 15: 
 # test/typetest.p, 16: begin
-    2: enter 42
+    2: enter 41
 # test/typetest.p, 17: 	i := 1; i := i + 1;
     3: pushvar 0, 4
     4: push 1
@@ -30,158 +30,182 @@
 # test/typetest.p, 18: 	r := 1; r := r + 1;
    12: pushvar 0, 6
    13: push 1
-   14: assign
-   15: pushvar 0, 6
-   16: pushvar 0, 6
-   17: eval
-   18: push 1
-   19: add
-   20: assign
+   14: llimit 1
+   15: ulimit 10
+   16: assign
+   17: pushvar 0, 6
+   18: pushvar 0, 6
+   19: eval
+   20: push 1
+   21: add
+   22: llimit 1
+   23: ulimit 10
+   24: assign
 # test/typetest.p, 19: 
 # test/typetest.p, 20: 	i := 1;	{	fill a[] with its index	}
-   21: pushvar 0, 4
-   22: push 1
-   23: assign
+   25: pushvar 0, 4
+   26: push 1
+   27: assign
 # test/typetest.p, 21:  	while i < 11 do begin 
-   24: pushvar 0, 4
-   25: eval
-   26: push 11
-   27: lt
-   28: jneq 45
+   28: pushvar 0, 4
+   29: eval
+   30: push 11
+   31: lt
+   32: jneq 51
 # test/typetest.p, 22: 		a[i] := i;
-   29: pushvar 0, 7
-   30: pushvar 0, 4
-   31: eval
-   32: push 1
-   33: sub
-   34: add
-   35: pushvar 0, 4
-   36: eval
-   37: assign
-# test/typetest.p, 23: 		i := i + 1
-   38: pushvar 0, 4
-   39: pushvar 0, 4
-   40: eval
-   41: push 1
-# test/typetest.p, 24: 	end;
-   42: add
+   33: pushvar 0, 7
+   34: pushvar 0, 4
+   35: eval
+   36: llimit 1
+   37: ulimit 10
+   38: push 1
+   39: sub
+   40: add
+   41: pushvar 0, 4
+   42: eval
    43: assign
-   44: jump 24
+# test/typetest.p, 23: 		i := i + 1
+   44: pushvar 0, 4
+   45: pushvar 0, 4
+   46: eval
+   47: push 1
+# test/typetest.p, 24: 	end;
+   48: add
+   49: assign
+   50: jump 28
 # test/typetest.p, 25: 
 # test/typetest.p, 26: 	r := 1;	{	multiply by 10			}
-   45: pushvar 0, 6
-   46: push 1
-   47: assign
+   51: pushvar 0, 6
+   52: push 1
+   53: llimit 1
+   54: ulimit 10
+   55: assign
 # test/typetest.p, 27: 	repeat begin
 # test/typetest.p, 28: 		a[r] := a[r] * 10;
-   48: pushvar 0, 7
-   49: pushvar 0, 6
-   50: eval
-   51: push 1
-   52: sub
-   53: add
-   54: pushvar 0, 7
-   55: pushvar 0, 6
-   56: eval
-   57: push 1
-   58: sub
-   59: add
-   60: eval
-   61: push 10
-   62: mul
-   63: assign
-# test/typetest.p, 29: 		r := r + 1
-   64: pushvar 0, 6
+   56: pushvar 0, 7
+   57: pushvar 0, 6
+   58: eval
+   59: llimit 1
+   60: ulimit 10
+   61: push 1
+   62: sub
+   63: add
+   64: pushvar 0, 7
    65: pushvar 0, 6
    66: eval
-   67: push 1
+   67: llimit 1
+   68: ulimit 10
+   69: push 1
+   70: sub
+   71: add
+   72: eval
+   73: push 10
+   74: mul
+   75: assign
+# test/typetest.p, 29: 		r := r + 1
+   76: pushvar 0, 6
+   77: pushvar 0, 6
+   78: eval
+   79: push 1
 # test/typetest.p, 30: 	end until r = 11;
-   68: add
-   69: assign
-   70: pushvar 0, 6
-   71: eval
-   72: push 11
-   73: equ
-   74: jneq 48
+   80: add
+   81: llimit 1
+   82: ulimit 10
+   83: assign
+   84: pushvar 0, 6
+   85: eval
+   86: push 11
+   87: equ
+   88: jneq 56
 # test/typetest.p, 31: 
 # test/typetest.p, 32: 	a2[one]	:= 1;
-   75: pushvar 0, 17
-   76: push 0
-   77: add
-   78: push 1
-   79: assign
+   89: pushvar 0, 17
+   90: push 0
+   91: llimit 0
+   92: ulimit 2
+   93: add
+   94: push 1
+   95: assign
 # test/typetest.p, 33: 	a2[two]	:= 2;
-   80: pushvar 0, 17
-   81: push 1
-   82: add
-   83: push 2
-   84: assign
+   96: pushvar 0, 17
+   97: push 1
+   98: llimit 0
+   99: ulimit 2
+  100: add
+  101: push 2
+  102: assign
 # test/typetest.p, 34: 	a2[three] := 3;
-   85: pushvar 0, 17
-   86: push 2
-   87: add
-   88: push 3
-   89: assign
+  103: pushvar 0, 17
+  104: push 2
+  105: llimit 0
+  106: ulimit 2
+  107: add
+  108: push 3
+  109: assign
 # test/typetest.p, 35: 
 # test/typetest.p, 36: 	i := 0;	{	fill a3[] with it's index	}
-   90: pushvar 0, 4
-   91: push 0
-   92: assign
+  110: pushvar 0, 4
+  111: push 0
+  112: assign
 # test/typetest.p, 37: 	while (i < 5) do begin
-   93: pushvar 0, 4
-   94: eval
-   95: push 5
-   96: lt
-   97: jneq 138
+  113: pushvar 0, 4
+  114: eval
+  115: push 5
+  116: lt
+  117: jneq 162
 # test/typetest.p, 38: 		j := 0;
-   98: pushvar 0, 5
-   99: push 0
-  100: assign
-# test/typetest.p, 39: 		while (j < 5) do begin
-  101: pushvar 0, 5
-  102: eval
-  103: push 5
-  104: lt
-  105: jneq 131
-# test/typetest.p, 40: 			a3[i][j] := 1.0 * (i + j);
-  106: pushvar 0, 21
-  107: pushvar 0, 4
-  108: eval
-  109: push 5
-  110: mul
-  111: add
-  112: pushvar 0, 5
-  113: eval
-  114: add
-  115: push 1.000000
-  116: pushvar 0, 4
-  117: eval
   118: pushvar 0, 5
-  119: eval
-  120: add
-  121: itor
-  122: mul
-  123: assign
+  119: push 0
+  120: assign
+# test/typetest.p, 39: 		while (j < 5) do begin
+  121: pushvar 0, 5
+  122: eval
+  123: push 5
+  124: lt
+  125: jneq 155
+# test/typetest.p, 40: 			a3[i][j] := 1.0 * (i + j);
+  126: pushvar 0, 20
+  127: pushvar 0, 4
+  128: eval
+  129: llimit 0
+  130: ulimit 4
+  131: push 5
+  132: mul
+  133: add
+  134: pushvar 0, 5
+  135: eval
+  136: llimit 0
+  137: ulimit 4
+  138: add
+  139: push 1.000000
+  140: pushvar 0, 4
+  141: eval
+  142: pushvar 0, 5
+  143: eval
+  144: add
+  145: itor
+  146: mul
+  147: assign
 # test/typetest.p, 41: 			j := j + 1
-  124: pushvar 0, 5
-  125: pushvar 0, 5
-  126: eval
-  127: push 1
+  148: pushvar 0, 5
+  149: pushvar 0, 5
+  150: eval
+  151: push 1
 # test/typetest.p, 42: 		end;
-  128: add
-  129: assign
-  130: jump 101
+  152: add
+  153: assign
+  154: jump 121
 # test/typetest.p, 43: 		i := i + 1
-  131: pushvar 0, 4
-  132: pushvar 0, 4
-  133: eval
-  134: push 1
+  155: pushvar 0, 4
+  156: pushvar 0, 4
+  157: eval
+  158: push 1
 # test/typetest.p, 44: 	end
-  135: add
-  136: assign
+  159: add
+  160: assign
 # test/typetest.p, 45: end .
-  137: jump 93
-  138: ret
+  161: jump 113
+  162: ret
 
         8:          1
         8:          2
@@ -228,68 +252,4 @@
        19:         90
        10:         10
        20:        100
-       10:         11
-       21:          1
-       22:          2
-       23:          3
-        8:          0
-        9:          0
-       25:   0.000000
-        9:          1
-       26:   1.000000
-        9:          2
-       27:   2.000000
-        9:          3
-       28:   3.000000
-        9:          4
-       29:   4.000000
-        9:          5
-        8:          1
-        9:          0
-       30:   1.000000
-        9:          1
-       31:   2.000000
-        9:          2
-       32:   3.000000
-        9:          3
-       33:   4.000000
-        9:          4
-       34:   5.000000
-        9:          5
-        8:          2
-        9:          0
-       35:   2.000000
-        9:          1
-       36:   3.000000
-        9:          2
-       37:   4.000000
-        9:          3
-       38:   5.000000
-        9:          4
-       39:   6.000000
-        9:          5
-        8:          3
-        9:          0
-       40:   3.000000
-        9:          1
-       41:   4.000000
-        9:          2
-       42:   5.000000
-        9:          3
-       43:   6.000000
-        9:          4
-       44:   7.000000
-        9:          5
-        8:          4
-        9:          0
-       45:   4.000000
-        9:          1
-       46:   5.000000
-        9:          2
-       47:   6.000000
-        9:          3
-       48:   7.000000
-        9:          4
-       49:   8.000000
-        9:          5
-        8:          5
+./pas: runtime error: out-of-range!

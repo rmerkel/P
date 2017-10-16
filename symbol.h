@@ -10,8 +10,6 @@
 #ifndef SYMBOL_H
 #define SYMBOL_H
 
-#include <cstdint>
-#include <iostream>
 #include <map>
 #include <sstream>
 
@@ -19,16 +17,15 @@
 #include "type.h"
 
 /********************************************************************************************//**
- * A Symbol table entry
+ * A Symbol Table Entry
  *
- * Describes a varaible, constant value, procedure or function or an entry in the type system.
- * Every entry has a block/activation frame level, setting the objects scope in the program. In
+ * Describes a single varaible, constant value, procedure, function, or an entry in the type
+ * system. Each has a block/activation frame level, setting the objects scope in the program. In
  * addition:
  * - A Varaible is a location, as an offset from the block/frame, n levels down, and a type.
  * - A Constant is just a Datum value and its type
  * - Subroutines, Functions and Procedures, have an absolute entry point address and a vector of
- *   formal parameter types. In addition, Funcitons have a return type while Procedures are 
- *   untyped.
+ *   formal parameter types. Funcitons have a return type while Procedures are untyped.
  * - A Type is a type descriptor in the type system.
  ************************************************************************************************/
 class SymValue {
@@ -48,20 +45,14 @@ public:
 	static SymValue makeConst(int level, Datum value, TDescPtr type);
 	static SymValue makeVar(int level, int ofset, TDescPtr type);
 	static SymValue makeSbr(Kind kind, int level);
+	static SymValue makeType(int level, TDescPtr);
 
 	SymValue();									///< Default constructor; undefined entry
 	SymValue(Kind kind, int level, const Datum& value, TDescPtr type, const TDescPtrVec& params);
 
-#if 0
-	SymValue(Kind kind, int level);				///< Partially construct Procedure or Function
-#endif
-	SymValue(int level, TDescPtr type);			///< Construct Type
-
-	/// Descructor
-	virtual ~SymValue()							{}
+	virtual ~SymValue()	{}						///< Destructor
 
 	Kind kind() const;							///< Return my kind
-
 	int level() const;							///< Return my activation frame level
 
 	Datum value(Datum value);					///< Set, and return, my value

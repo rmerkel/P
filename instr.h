@@ -1,11 +1,12 @@
-/** @file instr.h
+/********************************************************************************************//**
+ * @file instr.h
  *
  * Pascal-lite machine operation codes, machine instruction format, activation frame format, and
  * associated utilities used by both the compiler (PasComp) and the interpreter (Interp).
  *
  * @author Randy Merkel, Slowly but Surly Software.
  * @copyright  (c) 2017 Slowly but Surly Software. All rights reserved.
- */
+ ************************************************************************************************/
 
 #ifndef	INSTR_H
 #define INSTR_H
@@ -16,10 +17,11 @@
 
 #include "datum.h"
 
-/** Activation Frame layout
+/********************************************************************************************//**
+ * Activation Frame layout
  *
  * Word offsets from the start of a activaction frame, as created by OpCode::Call
- */
+ ************************************************************************************************/
 enum Frame {
 	FrameBase		= 0,				///< Offset to the Activation Frame base (base(n))
 	FrameOldFp		= 1,				///< Offset to the saved frame pointer register
@@ -29,30 +31,31 @@ enum Frame {
 	FrameSize							///< Number of entries in an activaction frame (4)
 };
 
-/// Operation codes; restricted to 256 operations, maximum
+/********************************************************************************************//**
+ * Operation codes; restricted to 256 operations, maximum
+ ************************************************************************************************/
 enum class OpCode : unsigned char {
-	NEG,								///< Unary negation
-	ITOR,								///< Unary convert integer TOS to real
-	ITOR2,								///< Unary convert integer TOS-1 to real
-	RTOI,								///< Unary round real TOS to integer
-	TRUNC,								///< Unary truncate real TOS to integer
-	ABS,								///< Unary replace TOS with abs(TOS)
-	ATAN,								///< Unary replace TOS with atan(TOS)
-	EXP,								///< Unary replace TOS with exp(TOS)
-	LOG,								///< Unary replace TOS with log(TOS)
-	ODD,								///< Unary is TOS an odd number?
-#if	0	// TBD
-	PRED,								///< Unary replace TOS = precedding TOS value
-#endif
-	SIN,								///< Unary replace TOS with sin(TOS)
-	SQR,								///< Unary replace TOS with TOS * TOS
-	SQRT,								///< Unary replace TOS with sqrt(TOS)
-#if	0	// TBD
-	SUCC,								///< Unary replace with succeeding TOS value
-#endif
+	NEG,								///< Negation; TOS = -TOS
+	ITOR,								///< Convert integer to real; TOS = Real(TOS)
+	ITOR2,								///< Convert integer to real; TOS-1 = Real(TOS-1)
+	ROUND,								///< Round real TOS to integer; TOS = Round(TOS)
+	TRUNC,								///< Truncate real TOS to integer; TOS = TRUNC(TOS)
+	ABS,								///< Absolute value; TOS = rabs(TOS)
+	ATAN,								///< Arc tangent; TOS = atan(TOS)
+	EXP,								///< Exponent; TOS = exp(TOS)
+	LOG,								///< Natural logarithm; TOS = log(TOS)
 
-	WRITE,								///< Write on standard output
-	WRITELN,							///< Write newline on standard output
+	DUP,								///< Duplicat; push(TOS)
+	ODD,								///< Is odd? TOS = is TOS an odd number?
+	PRED,								///< Predecessor; limit check, TOS--
+	SUCC,								///< Successor; limit check; TOS++
+
+	SIN,								///< Sine; TOS = sin(TOS)
+	SQR,								///< Square; TOS = TOS * TOS
+	SQRT,								///< Square-root; TOS = sqrt(TOS)
+
+	WRITE,								///< Write expr-list on standard output
+	WRITELN,							///< Write expr-list,  newline on standard output
 
 	ADD,								///< Addition
 	SUB,								///< Subtraction
@@ -71,6 +74,7 @@ enum class OpCode : unsigned char {
 	LAND,								///< Logical and
 	LNOT,								///< Logical not
 	
+	POP,								///< Pop; pop TOS into the bit bucket
 	PUSH,								///< Push a constant integer value
 	PUSHVAR,							///< Push variable address (base(level) + addr)
 	EVAL,								///< Evaluate variable TOS = address, replace with value
@@ -83,13 +87,17 @@ enum class OpCode : unsigned char {
 	JUMP,								///< Jump to a location
 	JNEQ,								///< Condition = pop(); Jump if condition == false (0)
 
-	HALT = 255							///< Halt the machine
+	LLIMIT,								///< Check array index; out-of-range error if TOS <  addr
+	ULIMIT,								///< Check array index; out-of-range error if TOS >  addr
+
+	HALT								///< Halt the machine
 };
 
-/** OpCode Information
+/********************************************************************************************//**
+ * OpCode Information
  *
  * An OpCodes name string, and the number of stack elements it accesses
- */
+ ************************************************************************************************/
 class OpCodeInfo {
 	/// An OpCode to OpCodeInfo mapping
 	typedef std::map<OpCode, OpCodeInfo>	InfoMap;
@@ -118,7 +126,9 @@ public:
 	static const OpCodeInfo& info(OpCode op);	///< Return information about op
 };
 
-/// A PL0C Instruction
+/********************************************************************************************//**
+ * An Instruction
+ ************************************************************************************************/
 struct Instr {
 	Datum			addr;				///< A data value or memory address
 	int8_t			level;				///< Base level: 0..255
@@ -133,10 +143,15 @@ struct Instr {
 		{}
 };
 
-/// A vector of Instr's (instructions)
+/********************************************************************************************//**
+ * A vector of Instr's (instructions)
+ ************************************************************************************************/
 typedef std::vector<Instr>					InstrVector;
 
-/// Disassemble an instruction...
+/********************************************************************************************//**
+ * Disassemble an instruction...
+ ************************************************************************************************/
 unsigned disasm(std::ostream& out, unsigned loc, const Instr& instr, const std::string label = "");
 
 #endif
+

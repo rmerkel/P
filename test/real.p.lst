@@ -14,12 +14,12 @@
 # test/real.p, 7: 	i := 2.0;
     6: pushvar 0, 5
     7: push 2.000000
-    8: rtoi
+    8: round
     9: assign
 # test/real.p, 8: 	f := Round(2.5);
    10: pushvar 0, 4
    11: push 2.500000
-   12: rtoi
+   12: round
    13: itor
    14: assign
 # test/real.p, 9: 	f := 4;

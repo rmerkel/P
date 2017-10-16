@@ -37,4 +37,4 @@
        10:          0
         8:          5
 Attempt to divide by zero @ pc (20)!
-./pas: runtime error: divideByZero!
+./pas: runtime error: divide-by-zero!

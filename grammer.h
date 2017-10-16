@@ -40,9 +40,9 @@
  *       statement-blk = 'begin' statement-lst 'end' ;
  *       statement-lst = 'begin' statement {';' statement } 'end' ;
  *           statement = [  variable '=' expression                                         |
- *                          'if' cond 'then' statement { 'else' statement }                 |
- *                          'while' cond 'do' statement                                     |
- *                          'repeat' statement 'until' cond                                 |
+ *                          'if' expression 'then' statement { 'else' statement }           |
+ *                          'while' expression 'do' statement                               |
+ *                          'repeat' statement 'until' expression                           |
  *                          'for' identifer ':=' expression
  *                                            ( 'to' | 'downto' ) expression 'do' statement | X
  *                          statement-blk ] ;

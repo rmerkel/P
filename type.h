@@ -10,6 +10,7 @@
 #include <iostream>
 #include <string>
 #include <memory>
+#include <utility>
 #include <vector>
 
 class TDesc; 
@@ -28,16 +29,16 @@ typedef std::vector<TDescPtr>	TDescPtrVec;
  * Type Field - record field name and type pairs
  ****************************************************************************/
 class Field {
-	std::string	_name;					///< Name of the field
-	TDescPtr	_type;					///< Fields type
+	std::string	_name;					///< The fields name
+	TDescPtr	_type;					///< The fields type
 
 public:
 	Field() {}							///< Default constructor
 	Field(const std::string& name, TDescPtr type);
 	virtual ~Field() {}					///< Destructor
 
-	const std::string& name() const;	///< Return the fields name
-	TDescPtr type() const;				///< Return the fields type
+	const std::string& name() const;	///< Return the field name
+	TDescPtr type() const;				///< Return the field type
 };
 
 bool operator<(const Field& lhs, const Field& rhs);
@@ -53,48 +54,35 @@ typedef std::vector<Field>	FieldVec;
  * Sub-Range - a contiguoush sub-range of integer values
  ****************************************************************************/
 class SubRange {
-	int		_min;						///< Minimum value
-	int		_max;						///< Maximum value
+	int		_min;						///< The sub-ranges minimum value
+	int		_max;						///< The Sub-ranges maximum value
 
 public:
 	SubRange() : _min{0}, _max{0} {}	///< Default constructor
 	SubRange(int minimum, int maximum);	///< Constructor
 	virtual ~SubRange() {}				///< Destructor
 
-	int minimum() const;				///< Return my minimum value
-	int maximum() const;				///< Return my maximum value
-	size_t span() const;				///< Return my range's span
+	int minimum() const;				///< Return type sub-range minimum value
+	int maximum() const;				///< Return type sub-range maximum value
+	size_t span() const;				///< Return type sub-range's span
 };	
 
-bool operator<(const Field& lhs, const Field& rhs);
-bool operator==(const Field& lhs, const Field& rhs);
+bool operator<(const SubRange& lhs, const SubRange& rhs);
+bool operator==(const SubRange& lhs, const SubRange& rhs);
 std::ostream& operator<<(std::ostream& os, const SubRange& srange);
 
 /************************************************************************//**	
  * Type Descriptor
  *
- * Describes both built-in/pre-defined types and user defined types with in
- * the following type kinds (classes):
+ * Describes ordinals (integers, booleans, characters, enumerations),
+ * sub-ranges of ordinals, reals structured types (arrays and records).
  *
- * | Kind    | Size | Sub-Range | IType | Base | Fields | Ordinal | Elementry
- * | :------ | :--: | :-------: | :---: | :--: | :----: | :-----: | :-------:
- * |  Int	 |	1   | IMIN-IMAX |   -   |   -  |   -    |	Y     |	   Y     
- * |  Real   |	1   |     -     |   -   |   -  |   -    |	N     |	   Y     
- * |  Bool   |	1   |   0 - 1   |   -   |   -  |   -    |	Y     |    Y     
- * |  Char   |	1   |   0 - 127 |   -   |   -  |   -    |	Y     |	   Y     
- * |  Array  |	N   |    1-10   |  T1   |  T2  |   -    |	N     |	   N     
- * |  Int    |	1   |    1-10   |   -   |   -  |   -    |	Y     |	   N	 
- * |  Record |	N   |     -     |   -   |   -  | Fields |   N     |	   N     
- * |  Enum	 |	1   |    X-Y    |   -   |   -  |   -    |	Y     |	   N     
- *
- * Key:
- * - IType - is the sub-range (index) type for arrays
- * - Base - is the base type for arrays, sub-ranges and enumerations
- * - Fields - is a list of name/type pairs to identify record fields
+ * A number of pre-defined types are provided; integers, constant integers,
+ * real, character and boolean.
  ****************************************************************************/
 class TDesc {
 public:
-	/// Type class kinds
+	/// Type kinds (type classes)
 	enum Kind {
 		Integer,				///< Whole number
 		Real,					///< Real number
@@ -105,14 +93,9 @@ public:
 		Enumeration				///< Enumeration of constants
 	};
 
-	/// Create and return a shared pointer to a new TDesc
-	static TDescPtr newTDesc(
-				Kind		kind,
-				unsigned	size,
-		const	SubRange&	range		= SubRange(),
-				TDescPtr	rtype		= TDescPtr(),
-				TDescPtr	base		= TDescPtr(),
-		const	FieldVec&	fields		= FieldVec());
+	// useful constants
+
+	static SubRange	maxRange;			///< Largest possible range
 
 	// pre-defined types
 
@@ -122,6 +105,15 @@ public:
 	static TDescPtr constRealDesc;		///< Constant real type description
 	static TDescPtr charDesc;			///< Character type description
 	static TDescPtr boolDesc;			///< Boolean type descriptor
+
+	/// Create and return a shared pointer to a new TDesc
+	static TDescPtr newTDesc(
+				Kind		kind,
+				unsigned	size,
+		const	SubRange&	range		= SubRange(),
+				TDescPtr	rtype		= TDescPtr(),
+				TDescPtr	base		= TDescPtr(),
+		const	FieldVec&	fields		= FieldVec());
 
 	/// Constructor
 	TDesc(		Kind		kind,
@@ -156,7 +148,6 @@ public:
 	const FieldVec& fields(const FieldVec& flds);
 
 	bool isOrdinal() const;				///< Ordinal type?
-	bool isElmentary() const;			///< Elementary type? 
 
 private:
 	Kind		_kind;					///< My kind, (type class)

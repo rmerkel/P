@@ -4,7 +4,7 @@
  *
  * Started life as the Token and TokenStream classes for the calulator example from The C++
  * Programming Language, 4th Edition, by Stroustrup, modified in an initial port of Wirth's PL/0
- * compilier, and then transformed to use more C/C++ operands yielding the PL/0C scanner.
+ * compilier, and then transformed to use more C/C++ operands yielding the Pascal scanner.
  *
  * @author Randy Merkel, Slowly but Surly Software.
  * @copyright  (c) 2017 Slowly but Surly Software. All rights reserved.
@@ -52,6 +52,9 @@ struct Token {
 		Do,								///< "do"
 		Repeat,							///< "repeat" ... "until"
 		Until,							///< "until"
+		For,							///< "for"
+		To,								///< "to"
+		DownTo,							///< "downto"
 
 		Ellipsis,						///< ".."
 
@@ -60,6 +63,7 @@ struct Token {
 
 		Array,							///< "array"
 		Of,								///< "of"
+		Record,							///< "record ... end"
 
 		LT,								///< Less than
 		LTE,							///< Less than or equal? (<=)
@@ -96,15 +100,13 @@ struct Token {
 		Exp,							///< e to the given power 
 		Log,							///< natural log
 		Odd,							///< Evenly divisable by 2?
-#if 0	// TBD
 		Pred,							///< Previous ordinal of value
-#endif
+
 		Sin,							///< Sine of value
 		Sqr,							///< Square of value
 		Sqrt,							///< Square root of value
-#if	0	// TBD
 		Succ,							///< Next ordinal of value
-#endif
+
 		Writeln,						///< Write on standard output
 
 		Assign,							///< Assignment (:=)

@@ -115,9 +115,9 @@ bool Compilier::oneOf(Token::KindSet set) {
  *
  * Side effect; updates the cross index for the listing.
  *
- * @param	op		The pl0 instruction operation code
- * @param	level	The pl0 instruction block level value. Defaults to zero.
- * @param	addr	The pl0 instructions address/value. Defaults to zero.
+ * @param	op		The instruction operation code
+ * @param	level	The instruction block level value. Defaults to zero.
+ * @param	addr	The instructions address/value. Defaults to zero.
  *
  * @return The address (code[] index) of the new instruction.
  ************************************************************************************************/

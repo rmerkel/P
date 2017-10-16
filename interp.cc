@@ -169,7 +169,7 @@ Interp::Result Interp::step() {
 	switch(ir.op) {
 	case OpCode::ITOR:	stack[sp] = stack[sp].integer() * 1.0;					break;
 	case OpCode::ITOR2:	stack[sp-1] = stack[sp-1].integer() * 1.0;				break;
-	case OpCode::RTOI:	stack[sp] = static_cast<int>(round(stack[sp].real()));	break;
+	case OpCode::ROUND:	stack[sp] = static_cast<int>(round(stack[sp].real()));	break;
 	case OpCode::TRUNC:	stack[sp] = static_cast<int>(stack[sp].real());			break;
 	case OpCode::ABS:
 		if (stack[sp].kind() == Datum::Integer)
@@ -204,10 +204,14 @@ Interp::Result Interp::step() {
 			push(log(rhand.real()));
 		break;
 
+	case OpCode::DUP:	push(stack[sp]);										break;
 	case OpCode::ODD:	stack[sp] = (stack[sp].natural() & 1) == 1;				break;
-#if	0	// TBD
-	case OpCode::PRED:	???														break;
-#endif
+	case OpCode::PRED:
+		if (stack[sp] <= ir.addr.integer())
+			return Result::outOfRange;
+		stack[sp] = stack[sp].integer() - 1;
+		break;
+
 	case OpCode::SIN:
 		if (stack[sp].kind() == Datum::Integer)
 			stack[sp] = sin(stack[sp].integer());
@@ -229,9 +233,13 @@ Interp::Result Interp::step() {
 			stack[sp] = sqrt(stack[sp].real());
 		break;
 
-#if	0	// TBD
-	case OpCode::SUCC:	???														break;
-#endif
+	case OpCode::SUCC:
+		if (stack[sp] >= ir.addr.integer())
+			return Result::outOfRange;
+		stack[sp] = stack[sp].integer() + 1;
+		break;
+
+
 	case OpCode::WRITE: if (!print()) return Result::stackUnderflow;			break;
 			
 	case OpCode::WRITELN:
@@ -276,9 +284,10 @@ Interp::Result Interp::step() {
 	case OpCode::LAND: 	rhand = pop(); push(pop() && rhand); 					break;
 	case OpCode::LNOT:	stack[sp] = !stack[sp];									break;
 
+	case OpCode::POP:	pop();													break;
 	case OpCode::PUSH: 	push(ir.addr);											break;
 	case OpCode::PUSHVAR: push(base(ir.level) + ir.addr.integer());				break;
-	case OpCode::EVAL: { auto ea = pop(); push(stack[ea.natural()]); }			break;
+	case OpCode::EVAL:	{ auto ea = pop(); push(stack[ea.natural()]); }			break;
 	case OpCode::ASSIGN:
 		rhand = pop();					// Save the value
 		lastWrite = pop().natural();	// Save the effective address for dump()...
@@ -293,10 +302,20 @@ Interp::Result Interp::step() {
 	case OpCode::JUMP:	pc = ir.addr.natural();									break;
 	case OpCode::JNEQ:	if (pop().integer() == 0) pc = ir.addr.natural();		break;
 
+	case OpCode::LLIMIT:
+		if (stack[sp] < ir.addr.integer())
+			return Result::outOfRange;
+		break;
+
+	case OpCode::ULIMIT:
+		if (stack[sp] > ir.addr.integer())
+			return Result::outOfRange;
+		break;
+
 	case OpCode::HALT:	return Result::halted;									break;
 
 	default:
-		cerr 	<< "Unknown op code: " << OpCodeInfo::info(ir.op).name()
+		cerr 	<< "Unknown op-code: " << OpCodeInfo::info(ir.op).name()
 				<< " found at pc (" << prevPc << ")!\n" << endl;
 		return Result::unknownInstr;
 	};
@@ -388,13 +407,14 @@ size_t Interp::cycles() const {
  ************************************************************************************************/
 ostream& operator<<(std::ostream& os, const Interp::Result& result) {
 	switch (result) {
-	case Interp::success:			os << "success";		break;
-	case Interp::divideByZero:		os << "divideByZero";	break;
-	case Interp::badFetch:			os << "badFetch";		break;
-	case Interp::unknownInstr:		os << "unknownInstr";	break;
-	case Interp::stackOverflow:		os << "stackOverflow";	break;
-	case Interp::stackUnderflow:	os << "stackUnderflow";	break;
-	case Interp::halted:			os << "halted";			break;
+	case Interp::success:			os << "success";				break;
+	case Interp::divideByZero:		os << "divide-by-zero";			break;
+	case Interp::badFetch:			os << "bad-fetch";				break;
+	case Interp::unknownInstr:		os << "unknown-instruction";	break;
+	case Interp::stackOverflow:		os << "stack overflow";			break;
+	case Interp::stackUnderflow:	os << "stack underflow";		break;
+	case Interp::outOfRange:		os << "out-of-range";			break;
+	case Interp::halted:			os << "halted";					break;
 	default:
 		return os << "undefined result!";
 		assert(false);

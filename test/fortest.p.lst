@@ -1,0 +1,101 @@
+# test/fortest.p, 1: program ForTest;
+# test/fortest.p, 2: var
+    0: call 0, 2
+    1: halt
+# test/fortest.p, 3: 	i : Integer;
+# test/fortest.p, 4: 
+# test/fortest.p, 5: begin
+    2: enter 1
+# test/fortest.p, 6: 	for i := 0 to -1 do Writeln(i);
+    3: pushvar 0, 4
+    4: dup
+    5: push 0
+    6: assign
+    7: dup
+    8: eval
+    9: push 1
+   10: neg
+   11: lte
+   12: jneq 24
+   13: pushvar 0, 4
+   14: eval
+   15: push 1
+   16: Writeln
+   17: dup
+   18: dup
+   19: eval
+   20: push 1
+   21: add
+   22: assign
+   23: jump 7
+   24: pop
+# test/fortest.p, 7: 	for i := 0 to 0 do Writeln(i);
+   25: pushvar 0, 4
+   26: dup
+   27: push 0
+   28: assign
+   29: dup
+   30: eval
+   31: push 0
+   32: lte
+   33: jneq 45
+   34: pushvar 0, 4
+   35: eval
+   36: push 1
+   37: Writeln
+   38: dup
+   39: dup
+   40: eval
+   41: push 1
+   42: add
+   43: assign
+   44: jump 29
+   45: pop
+# test/fortest.p, 8: 	for i := 1 to 9 do Writeln(i)
+   46: pushvar 0, 4
+   47: dup
+   48: push 1
+   49: assign
+   50: dup
+   51: eval
+   52: push 9
+   53: lte
+   54: jneq 66
+   55: pushvar 0, 4
+   56: eval
+# test/fortest.p, 9: end .
+   57: push 1
+   58: Writeln
+   59: dup
+   60: dup
+   61: eval
+   62: push 1
+   63: add
+   64: assign
+   65: jump 50
+   66: pop
+   67: ret
+
+        8:          0
+        8:          0
+0
+        8:          1
+        8:          1
+1
+        8:          2
+2
+        8:          3
+3
+        8:          4
+4
+        8:          5
+5
+        8:          6
+6
+        8:          7
+7
+        8:          8
+8
+        8:          9
+9
+        8:         10

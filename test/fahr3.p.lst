@@ -34,7 +34,7 @@
    17: mul
    18: push 9.000000
    19: div
-   20: rtoi
+   20: round
    21: assign
 # test/fahr3.p, 17: 		fahr := fahr + STEP;
    22: pushvar 0, 4

@@ -213,22 +213,22 @@ TokenStream::KeywordTable	TokenStream::keywords = {
 	{	"Ord",			Token::Ord			},
 	{	"program",		Token::ProgDecl		},
 	{	"procedure",	Token::ProcDecl		},
-#if 0	// TBD
 	{	"Pred",			Token::Pred			},
-#endif
+	{	"record",		Token::Record		},
 	{	"Real",			Token::RealType		},
 	{	"repeat",		Token::Repeat		},
 	{	"Round",		Token::Round		},
 	{	"Sin",			Token::Sin			},
 	{	"Sqr",			Token::Sqr			},
 	{	"Sqrt",			Token::Sqrt			},
-#if 0	// TBD
 	{	"Succ",			Token::Succ			},
-#endif
 	{	"then",			Token::Then			},
 	{	"Trunc",		Token::Trunc		},
 	{	"type",			Token::TypeDecl		},
 	{	"until",		Token::Until		},
+	{	"for",			Token::For			},
+	{	"to",			Token::To			},
+	{	"downto",		Token::DownTo,		},
 	{	"var",			Token::VarDecl		},
 	{	"while",		Token::While		},
 	{	"Writeln",		Token::Writeln		}
@@ -268,6 +268,9 @@ ostream& operator<<(std::ostream& os, const Token::Kind& kind) {
 	case Token::Do:			os << "do";				break;
 	case Token::Repeat:		os << "repeat";			break;
 	case Token::Until:		os << "until";			break;
+	case Token::For:		os << "for";			break;
+	case Token::To:			os << "to";				break;
+	case Token::DownTo:		os << "downto";			break;
 
 	case Token::Ellipsis:	os << "..";				break;
 
@@ -276,6 +279,7 @@ ostream& operator<<(std::ostream& os, const Token::Kind& kind) {
 
 	case Token::Array:		os << "array";			break;
 	case Token::Of:			os << "of";				break;
+	case Token::Record:		os << "record";			break;
 
 	case Token::LT:			os << "<";				break;
 	case Token::LTE:		os << "<=";				break;
@@ -309,15 +313,11 @@ ostream& operator<<(std::ostream& os, const Token::Kind& kind) {
 	case Token::Exp:		os << "Exp";			break;
 	case Token::Log:		os << "Ln";				break;
 	case Token::Odd:		os << "Odd";			break;
-#if 0	// TBD
-	case Token::Prec:		os << "Prec";			break;
-#endif
+	case Token::Pred:		os << "Pred";			break;
 	case Token::Sin:		os << "Sin";			break;
 	case Token::Sqr:		os << "Sqr";			break;
 	case Token::Sqrt:		os << "Sqrt";			break;
-#if 0	// TBD
 	case Token::Succ:		os << "Succ";			break;
-#endif
 	case Token::Writeln:	os << "Writeln";		break;
 
 	case Token::EOS:		os << "EOS";			break;

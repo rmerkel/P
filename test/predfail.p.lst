@@ -1,0 +1,16 @@
+# test/predfail.p, 1: program PredSuccFail ;
+# test/predfail.p, 2: type 
+    0: call 0, 2
+    1: halt
+# test/predfail.p, 3: 	e = (zero, one, two, three, four);
+# test/predfail.p, 4: 
+# test/predfail.p, 5: begin
+# test/predfail.p, 6: 	Writeln(Pred(zero))
+    2: push 0
+    3: pred 0
+# test/predfail.p, 7: end .
+    4: push 1
+    5: Writeln
+    6: ret
+
+./pas: runtime error: out-of-range!

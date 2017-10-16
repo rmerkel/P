@@ -21,12 +21,12 @@
 # test/builtins.p, 15: 	i := Round(2.0);		{ result: 2			}
     6: pushvar 0, 4
     7: push 2.000000
-    8: rtoi
+    8: round
     9: assign
 # test/builtins.p, 16: 	i := Round(2.5);		{ result: 3 		}
    10: pushvar 0, 4
    11: push 2.500000
-   12: rtoi
+   12: round
    13: assign
 # test/builtins.p, 17: 	i := Trunc(4.0);		{ result: 4 		}
    14: pushvar 0, 4

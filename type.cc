@@ -1,7 +1,26 @@
 /****************************************************************************
  * @file type.cc
  *
- * Types, both builtin, and created by programmatically.
+ * Types, both builtin, and created programmatically.
+ *
+ * Describes both built-in/pre-defined types and user defined types with in
+ * the following type kinds (classes):
+ *
+ * | Kind    | Size | Sub-Range | IType | Base | Fields | Ordinal
+ * | :------ | :--: | :-------: | :---: | :--: | :----: | :-----:
+ * |  Int	 |	1   | IMIN-IMAX |   -   |   -  |   -    |	Y    
+ * |  Real   |	1   |     -     |   -   |   -  |   -    |	N    
+ * |  Bool   |	1   |   0 - 1   |   -   |   -  |   -    |	Y    
+ * |  Char   |	1   |   0 - 127 |   -   |   -  |   -    |	Y    
+ * |  Array  |	N   |    1-10   |  T1   |  T2  |   -    |	N    
+ * |  Int    |	1   |    1-10   |   -   |   -  |   -    |	Y    
+ * |  Record |	N   |     -     |   -   |   -  | Fields |   N    
+ * |  Enum	 |	1   |    X-Y    |   -   |   -  |   -    |	Y    
+ *
+ * Key:
+ * - IType - is the sub-range (index) type for arrays
+ * - Base - is the base type for arrays, sub-ranges and enumerations
+ * - Fields - is a list of name/type pairs to identify record fields
  ****************************************************************************/
 
 #include <cassert>
@@ -135,7 +154,7 @@ bool operator<(const SubRange& lhs, const SubRange& rhs) {
  ************************************************************************************************/
 bool operator==(const SubRange& lhs, const SubRange& rhs) {
 	return	lhs.minimum() == rhs.minimum()	&&
-			lhs.maximum() == rhs.minimum();
+			lhs.maximum() == rhs.maximum();
 }
 
 /********************************************************************************************//**
@@ -148,20 +167,27 @@ ostream& operator<<(std::ostream& os, const SubRange& srange) {
 	return os << srange.minimum() << ".." << srange.maximum();
 }
 
-/************************************************************************//**	
+/********************************************************************************************//**
  * Type Descriptor
- ****************************************************************************/
+ ************************************************************************************************/
 
 // public static
 
-/************************************************************************//**
+SubRange TDesc::maxRange(numeric_limits<int>::min(), numeric_limits<int>::max());
+
+TDescPtr TDesc::intDesc		= TDesc::newTDesc(TDesc::Kind::Integer, 1, maxRange);
+TDescPtr TDesc::realDesc	= TDesc::newTDesc(	TDesc::Kind::Real, 1);
+TDescPtr TDesc::charDesc	= TDesc::newTDesc(	TDesc::Kind::Character, 1, SubRange(0, 127));
+TDescPtr TDesc::boolDesc	= TDesc::newTDesc(TDesc::Kind::Boolean, 1, SubRange(0, 1));
+
+/********************************************************************************************//**
  * @param	kind		The type kind 
  * @param	size		Size, in bytes, of a object of this type
  * @param	range		The type sub-range range. Defaults to SubRange().
  * @param	rtype		The type array type. Defaults to TDescPtr().
  * @param	base		The type base type. Defaults to TDescPtr().
  * @param	fields		The type fields. Defaults to FieldVec().
- ****************************************************************************/
+ ************************************************************************************************/
 TDescPtr TDesc::newTDesc(
 			TDesc::Kind	kind,
 			unsigned	size,
@@ -173,31 +199,16 @@ TDescPtr TDesc::newTDesc(
 	return TDescPtr{ new TDesc(kind, size, range, rtype, base, fields) };
 }
 
-TDescPtr TDesc::intDesc		= TDesc::newTDesc(
-									TDesc::Kind::Integer,
-									1,
-									SubRange(	numeric_limits<int>::min(),
-												numeric_limits<int>::max()));
-TDescPtr TDesc::realDesc	= TDesc::newTDesc( TDesc::Kind::Real, 1);
-TDescPtr TDesc::charDesc	= TDesc::newTDesc(
-									TDesc::Kind::Character,
-									1,
-									SubRange(0, 127));
-TDescPtr TDesc::boolDesc	= TDesc::newTDesc(
-									TDesc::Kind::Boolean,
-									1,
-									SubRange(0, 1));
-
 // public
 
-/************************************************************************//**
+/********************************************************************************************//**
  * @param	kind		The type kind 
  * @param	size		Size, in bytes, of a object of this type
  * @param	range		The type sub-range range. Defaults to SubRange().
  * @param	rtype		The type array type. Defaults to TDescPtr().
  * @param	base		The type base type. Defaults to TDescPtr().
  * @param	fields		The type fields. Defaults to FieldVec().
- ****************************************************************************/
+ ************************************************************************************************/
 TDesc::TDesc(
 			TDesc::Kind	kind,
 			unsigned	size,
@@ -210,101 +221,87 @@ TDesc::TDesc(
 {
 }
 
-/************************************************************************//**
+/********************************************************************************************//**
  * @return my kind
- ****************************************************************************/
+ ************************************************************************************************/
 TDesc::Kind TDesc::kind() const			{	return _kind;			}
 
-/************************************************************************//**
+/********************************************************************************************//**
  * @param kind My new kind
  * @return my kind
- ****************************************************************************/
+ ************************************************************************************************/
 TDesc::Kind TDesc::kind(TDesc::Kind kind) {
 	return _kind = kind;
 }
 
-/************************************************************************//**
+/********************************************************************************************//**
  * @return my size, in bytes
- ****************************************************************************/
+ ************************************************************************************************/
 unsigned TDesc::size() const			{	return _size;			}
 
-/************************************************************************//**
+/********************************************************************************************//**
  * @param sz My new size
  * @return my size, in bytes
- ****************************************************************************/
+ ************************************************************************************************/
 unsigned TDesc::size(unsigned sz) 		{	return _size = sz;		}
 
-/************************************************************************//**
+/********************************************************************************************//**
  * @return my sub-range
- ****************************************************************************/
+ ************************************************************************************************/
 const SubRange& TDesc::range() const	{	return _range;			}
 
-/************************************************************************//**
+/********************************************************************************************//**
  * @param rng my new sub-range
  * @return my sub-range
- ****************************************************************************/
+ ************************************************************************************************/
 const SubRange& TDesc::range(const SubRange& rng) {
 	return _range =rng;
 }
 
-/************************************************************************//**
+/********************************************************************************************//**
  * @return my array index type
- ****************************************************************************/
+ ************************************************************************************************/
 TDescPtr TDesc::rtype() const 			{	return _rtype;			}
 
-/************************************************************************//**
+/********************************************************************************************//**
  * @param type my new array index type
  * @return my array index type
- ****************************************************************************/
+ ************************************************************************************************/
 TDescPtr TDesc::rtype(TDescPtr type) 	{	return _rtype = type;	}
 
-/************************************************************************//**
+/********************************************************************************************//**
  * @return my base type
- ****************************************************************************/
+ ************************************************************************************************/
 TDescPtr TDesc::base() const			{	return _base;			}
 
-/************************************************************************//**
+/********************************************************************************************//**
  * @param type my new base type
  * @return my base type
- ****************************************************************************/
+ ************************************************************************************************/
 TDescPtr TDesc::base(TDescPtr type) 	{	return _base = type;	}
 
-/************************************************************************//**
+/********************************************************************************************//**
  * @return my fields
- ****************************************************************************/
+ ************************************************************************************************/
 const FieldVec& TDesc::fields() const	{	return _fields;			}
 
-/************************************************************************//**
+/********************************************************************************************//**
  * @param flds my new fields
  * @return my fields
- ****************************************************************************/
+ ************************************************************************************************/
 const FieldVec& TDesc::fields(const FieldVec& flds) {
 	return _fields = flds;
 }
 
-/************************************************************************//**
+/********************************************************************************************//**
  * @return true if I'm an ordinal type
- ****************************************************************************/
+ ************************************************************************************************/
 bool TDesc::isOrdinal() const {
 	switch(kind()) {
 	case Integer:		return true;
 	case Boolean:		return true;
 	case Character:		return true;
 	case Enumeration:	return true;
-
-	default:			return false;
-	}
-}
-
-/************************************************************************//**
- * @return true if I'm an ordinal type
- ****************************************************************************/
-bool TDesc::isElmentary() const {
-	switch(kind()) {
-	case Integer:		return true;
-	case Real:			return true;
-	case Boolean:		return true;
-	case Character:		return true;
 
 	default:			return false;
 	}
@@ -331,8 +328,6 @@ bool operator<(const TDesc& lhs, const TDesc& rhs) {
 		return true;
 	else if (lhs.isOrdinal() 	< rhs.isOrdinal())
 		return true;
-	else if (lhs.isElmentary()	< rhs.isElmentary())
-		return true;
 	else 
 		return false;
 }
@@ -349,8 +344,7 @@ bool operator==(const TDesc& lhs, const TDesc& rhs) {
 			lhs.range()			== rhs.range()			&&
 			lhs.base()			== rhs.base()			&&
 			lhs.fields()		== rhs.fields()			&&
-			lhs.isOrdinal()		== rhs.isOrdinal()		&&
-			lhs.isElmentary()	== rhs.isElmentary();
+			lhs.isOrdinal()		== rhs.isOrdinal();
 }
 
 /********************************************************************************************//**
@@ -392,8 +386,6 @@ ostream& operator<<(std::ostream& os, const TDesc& type) {
 	for (auto fld : type.fields())
 		os << fld				<< ", ";
 
-	return os
-		<<	type.isOrdinal()	<< ", "
-		<<	type.isElmentary();
+	return os << type.isOrdinal();
 }
 

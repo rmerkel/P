@@ -1,7 +1,7 @@
 /********************************************************************************************//**
  * @file interp.h
  *
- * The PL/0C interpreter.
+ * The Pascal interpreter.
  *
  * @author Randy Merkel, Slowly but Surly Software.
  * @copyright  (c) 2017 Slowly but Surly Software. All rights reserved.
@@ -17,7 +17,7 @@
 #include "instr.h"
 
 /********************************************************************************************//**
- * A PL/0C Machine
+ * A Pascal Machine
  *
  * A interperter that started life as a straight C/C++ port of the PL/0 machine described in
  * Algorithms + Data Structures = Programs, 1st Edition, by Wirth.
@@ -32,6 +32,7 @@ public:
 		unknownInstr,						///< Attempt to execute an undefined instruction
 		stackOverflow,						///< Attempt to access beyound the end of the statck
 		stackUnderflow,						///< Attempt to access an empty stack
+		outOfRange,							///< Attempt to index object with out-of-range index
 		halted								///< Machine has halted
 	};
 
