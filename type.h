@@ -13,12 +13,12 @@
 #include <utility>
 #include <vector>
 
-class TDesc; 
+class iTDesc; 
 
 /************************************************************************//**	
  * Pointer to TDesc
  ****************************************************************************/
-typedef std::shared_ptr<TDesc>	TDescPtr;
+typedef std::shared_ptr<iTDesc>	TDescPtr;
 
 /************************************************************************//**	
  * Vector of TDescPtrs
@@ -72,6 +72,63 @@ bool operator==(const SubRange& lhs, const SubRange& rhs);
 std::ostream& operator<<(std::ostream& os, const SubRange& srange);
 
 /************************************************************************//**	
+ * Type Descriptor interface
+ ****************************************************************************/
+class iTDesc {
+public:
+	/// Type kinds (type classes)
+	enum Kind {
+		Integer,						///< Whole number
+		Real,							///< Real number
+		Boolean,						///< Boolean value
+		Character,						///< Character
+		Array,							///< Array of some type
+		Record,							///< Record of fields
+		Enumeration						///< Enumeration of constants
+	};
+
+	virtual ~iTDesc() {}				///< Destructor
+
+	virtual Kind kind() const = 0;		///< Return my kind...
+	virtual Kind kind(Kind kind) = 0;	///< Set, and then, return my kind
+
+	virtual unsigned size() const = 0;	///< Return my size, in Datums
+
+	/// Set, and return my size, in Datums
+	virtual unsigned size(unsigned sz) = 0;
+
+	/// Return my sub-range
+	virtual const SubRange& range() const = 0;
+
+	/// Set and return my sub-range
+	virtual const SubRange& range(const SubRange& range) = 0;
+
+	virtual TDescPtr rtype() const = 0;	///< Return my array index type
+
+	/// Set, and return my array index type
+	virtual TDescPtr rtype(TDescPtr type) = 0;
+
+	virtual TDescPtr base() const = 0;	///< Return by base type
+
+	/// Set, and return by base type
+	virtual TDescPtr base(TDescPtr type) = 0;
+
+	/// Return my fields
+	virtual const FieldVec& fields() const = 0;
+
+	/// Set and return my fields
+	virtual const FieldVec& fields(const FieldVec& flds) = 0;
+
+	/// Ordinal type?
+	virtual bool isOrdinal() const = 0;
+};
+
+bool operator<(const iTDesc& lhs, const iTDesc& rhs);
+bool operator==(const iTDesc& lhs, const iTDesc& rhs);
+std::ostream& operator<<(std::ostream& os, const iTDesc::Kind& value);
+std::ostream& operator<<(std::ostream& os, const iTDesc& value);
+
+/************************************************************************//**	
  * Type Descriptor
  *
  * Describes ordinals (integers, booleans, characters, enumerations),
@@ -82,16 +139,8 @@ std::ostream& operator<<(std::ostream& os, const SubRange& srange);
  ****************************************************************************/
 class TDesc {
 public:
-	/// Type kinds (type classes)
-	enum Kind {
-		Integer,				///< Whole number
-		Real,					///< Real number
-		Boolean,				///< Boolean value
-		Character,				///< Character
-		Array,					///< Array of some type
-		Record,					///< Record of fields
-		Enumeration				///< Enumeration of constants
-	};
+	/// Type kinds (type classe 
+	typedef iTDesc::Kind	Kind;
 
 	// useful constants
 
@@ -115,53 +164,8 @@ public:
 				TDescPtr	base		= TDescPtr(),
 		const	FieldVec&	fields		= FieldVec());
 
-	/// Constructor
-	TDesc(		Kind		kind,
-				unsigned	size,
-		const	SubRange&	range		= SubRange(),
-				TDescPtr	rtype		= TDescPtr(),
-				TDescPtr	base		= TDescPtr(),
-		const	FieldVec&	fields		= FieldVec());
-
 	virtual ~TDesc() {}					///< Destructor
-
-	Kind kind() const;					///< Return my kind...
-	Kind kind(Kind kind);				///< Set, and then, return my kind
-
-	unsigned size() const;				///< Return my size, in Datums
-	unsigned size(unsigned sz);			///< Set, and return my size, in Datums
-
-	const SubRange& range() const;		///< Return my sub-range
-
-	/// Set and return my sub-range
-	const SubRange& range(const SubRange& range);
-
-	TDescPtr base() const;				///< Return by base type
-	TDescPtr base(TDescPtr type);		///< Set, and return by base type
-
-	TDescPtr rtype() const;				///< Return my array index type
-	TDescPtr rtype(TDescPtr type);		///< Set, and return my array index type
-
-	const FieldVec& fields() const;		///< Return my fields
-
-	/// Set and return my fields
-	const FieldVec& fields(const FieldVec& flds);
-
-	bool isOrdinal() const;				///< Ordinal type?
-
-private:
-	Kind		_kind;					///< My kind, (type class)
-	unsigned	_size;					///< Size of on object of my type, in Datums
-	SubRange	_range;					///< My sub-range. For arrays, the array span
-	TDescPtr	_rtype;					///< Arrays index (sub-range) type
-	TDescPtr	_base;					///< Base type for Elementry, Array, Enumeration
-	FieldVec	_fields;				///< List of fields for Record
 };
-
-bool operator<(const Field& lhs, const Field& rhs);
-bool operator==(const Field& lhs, const Field& rhs);
-std::ostream& operator<<(std::ostream& os, const TDesc::Kind& value);
-std::ostream& operator<<(std::ostream& os, const TDesc& value);
 
 #endif
 

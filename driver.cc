@@ -47,6 +47,7 @@
  * 				   built-in "nouns" and functions. WIP.
  * @version 0.11 - Primitive Write and Writeln, refactoring.
  * @version 0.12 - Limit checks, successor, predecessor. for statement.
+ * @version 0.13 - Refactored TDesc into iTDesc and it's derived classes
  *  
  * @author Randy Merkel, Slowly but Surly Software.
  * @copyright  (c) 2017 Slowly but Surly Software. All rights reserved.
@@ -80,7 +81,7 @@ static void help() {
 
 /// Print the version number as major.minor
 static void printVersion() {
-	cout << progName << ": verson: 0.12\n";		// make sure to update the verison in mainpage!!
+	cout << progName << ": verson: 0.13\n";		// make sure to update the verison in mainpage!!
 }
 
 /** Parse the command line arguments...

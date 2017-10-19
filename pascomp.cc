@@ -31,7 +31,7 @@ using namespace rel_ops;
  * @return  true if type can be treated as an Integer
  ************************************************************************************************/
 bool PasComp::isAnInteger(TDescPtr type) {
-	return type->kind() == TDesc::Integer;
+	return type->kind() == iTDesc::Integer;
 }
 
 /********************************************************************************************//**
@@ -39,9 +39,8 @@ bool PasComp::isAnInteger(TDescPtr type) {
  * @return  true if type can be treated as an Real
  ************************************************************************************************/
 bool PasComp::isAReal(TDescPtr type) {
-	return	type->kind() == TDesc::Real;
+	return	type->kind() == iTDesc::Real;
 }
-
 
 /********************************************************************************************//**
  * Promote binary stack operands as necessary. 
@@ -157,7 +156,7 @@ TDescPtr PasComp::builtInFunc(int level)
 		type = expression(level);
 		expect(Token::CloseParen);	
 
-		if (type->kind() != TDesc::Real) {
+		if (type->kind() != iTDesc::Real) {
 			oss << "expeced real value, got: " << current();
 			error(oss.str());
 
@@ -171,7 +170,7 @@ TDescPtr PasComp::builtInFunc(int level)
 		type = expression(level);
 		expect(Token::CloseParen);	
 
-		if (type->kind() != TDesc::Real) {
+		if (type->kind() != iTDesc::Real) {
 			oss << "expeced real value, got: " << current();
 			error(oss.str());
 
@@ -185,7 +184,7 @@ TDescPtr PasComp::builtInFunc(int level)
 		type = expression(level);
 		expect(Token::CloseParen);	
 
-		if (type->kind() != TDesc::Integer && type->kind() != TDesc::Real)
+		if (type->kind() != iTDesc::Integer && type->kind() != iTDesc::Real)
 			oss << "expeced integer or real value, got: " << current();
 
 		else
@@ -196,9 +195,9 @@ TDescPtr PasComp::builtInFunc(int level)
 		type = expression(level);
 		expect(Token::CloseParen);	
 
-		if (type->kind() == TDesc::Integer)
+		if (type->kind() == iTDesc::Integer)
 			type = TDesc::realDesc;		// Always produces a real
-		else if (type->kind() != TDesc::Real)
+		else if (type->kind() != iTDesc::Real)
 			oss << "expeced integer, or real value, got: " << current();
 		emit(OpCode::ATAN);
 
@@ -207,9 +206,9 @@ TDescPtr PasComp::builtInFunc(int level)
 		type = expression(level);
 		expect(Token::CloseParen);	
 
-		if (type->kind() == TDesc::Integer)
+		if (type->kind() == iTDesc::Integer)
 			type = TDesc::realDesc;		// Always produces a real
-		else if (type->kind() != TDesc::Real)
+		else if (type->kind() != iTDesc::Real)
 			oss << "expeced integer, or real value, got: " << current();
 		emit(OpCode::EXP);
 
@@ -218,9 +217,9 @@ TDescPtr PasComp::builtInFunc(int level)
 		type = expression(level);
 		expect(Token::CloseParen);	
 
-		if (type->kind() == TDesc::Integer)
+		if (type->kind() == iTDesc::Integer)
 			type = TDesc::realDesc;		// Always produces a real
-		else if (type->kind() != TDesc::Real)
+		else if (type->kind() != iTDesc::Real)
 			oss << "expeced integer, or real value, got: " << current();
 		emit(OpCode::LOG);
 
@@ -229,7 +228,7 @@ TDescPtr PasComp::builtInFunc(int level)
 		type = expression(level);
 		expect(Token::CloseParen);	
 
-		if (type->kind() != TDesc::Integer)
+		if (type->kind() != iTDesc::Integer)
 			oss << "expeced integer value, got: " << current();
 		emit(OpCode::ODD);
 
@@ -247,9 +246,9 @@ TDescPtr PasComp::builtInFunc(int level)
 		type = expression(level);
 		expect(Token::CloseParen);	
 
-		if (type->kind() == TDesc::Integer)
+		if (type->kind() == iTDesc::Integer)
 			type = TDesc::realDesc;		// Always produces a real
-		else if (type->kind() != TDesc::Real)
+		else if (type->kind() != iTDesc::Real)
 			oss << "expeced integer, or real value, got: " << current();
 		emit(OpCode::SIN);
 
@@ -258,9 +257,9 @@ TDescPtr PasComp::builtInFunc(int level)
 		type = expression(level);
 		expect(Token::CloseParen);	
 
-		if (type->kind() == TDesc::Integer)
+		if (type->kind() == iTDesc::Integer)
 			type = TDesc::realDesc;		// Always produces a real
-		else if (type->kind() != TDesc::Real)
+		else if (type->kind() != iTDesc::Real)
 			oss << "expeced integer, or real value, got: " << current();
 		emit(OpCode::SQR);
 
@@ -269,9 +268,9 @@ TDescPtr PasComp::builtInFunc(int level)
 		type = expression(level);
 		expect(Token::CloseParen);	
 
-		if (type->kind() == TDesc::Integer)
+		if (type->kind() == iTDesc::Integer)
 			type = TDesc::realDesc;		// Always produces a real
-		else if (type->kind() != TDesc::Real)
+		else if (type->kind() != iTDesc::Real)
 			oss << "expeced integer, or real value, got: " << current();
 		emit(OpCode::SQRT);
 
@@ -717,7 +716,7 @@ TDescPtr PasComp::variable(int level, SymbolTable::iterator it) {
 			auto atype = type;				// The arrays type, e.g, TDesc::Array
 			type = atype->base();			// We'll return the arrays base type...
 
-			if (atype->kind() != TDesc::Array)
+			if (atype->kind() != iTDesc::Array)
 				error("attempt to index into non-array", it->first);
 
 			auto indexes = expressionList(level);
@@ -749,7 +748,7 @@ TDescPtr PasComp::variable(int level, SymbolTable::iterator it) {
 				emit(OpCode::ADD);			// index into the array
 				
 				if (--nindexes) {			// link to next (base) if there's another index
-					auto atype = type;		// The arrays type; kind s/b TDesc::Array
+					auto atype = type;		// The arrays type; kind s/b iTDesc::Array
 					type = atype->base();	// We'll return the arrays base type...
 				}
 			}
@@ -1160,7 +1159,7 @@ TDescPtr PasComp::ordinalType(int level) {
 		expect(Token::CloseParen);
 
 		// Create the type, excluding the fields (enumerations)
-		auto t = TDesc::newTDesc(TDesc::Enumeration, 1, r, TDescPtr(), TDesc::intDesc);
+		auto t = TDesc::newTDesc(iTDesc::Enumeration, 1, r, TDescPtr(), TDesc::intDesc);
 
 		unsigned value = 0;						// Each enumeration gets a value...
 		for (auto id : ids) {
@@ -1203,7 +1202,7 @@ TDescPtr PasComp::ordinalType(int level) {
 
 			SubRange r(minValue.second.integer(), maxValue.second.integer());
 
-			type = TDesc::newTDesc(TDesc::Integer, 1, r);
+			type = TDesc::newTDesc(iTDesc::Integer, 1, r);
 		}
 	}
 
@@ -1227,11 +1226,11 @@ TDescPtr PasComp::structuredType(int level) {
 		for (auto index : indexes) {
 			const SubRange r = index->range();
 			if (tp == 0) {
-				tp = TDesc::newTDesc(TDesc::Array, r.span(), r, index);
+				tp = TDesc::newTDesc(iTDesc::Array, r.span(), r, index);
 				tdesc = tp;						// Remember the first array...
 
 			} else {							// Following indexes...
-				tp->base(TDesc::newTDesc(TDesc::Array, r.span(), r, index));
+				tp->base(TDesc::newTDesc(iTDesc::Array, r.span(), r, index));
 				tp->size(tp->size() * r.span());
 				tp = tp->base();
 			}
@@ -1243,16 +1242,27 @@ TDescPtr PasComp::structuredType(int level) {
 		tp->base(type(level));					// Get the arrays base type
 		tp->size(tp->size() * tp->base()->size());
 
-#if 0	// TBD
 	} else if (accept(Token::Record)) {			// Record
-		do (
-			varaible-decl-list(level)
-		} while(accept(Token::Comma);
+		NameKindVec	fields;
+		do {
+			fieldList(level, fields);
+		} while(accept(Token::Comma));
 		expect(Token::End);
-#endif
 	}
 
 	return tdesc;
+}
+
+/********************************************************************************************//**
+ * var-decl-list
+ *
+ * @param			level	The current block level.
+ * @param[in,out]	fields	Vector of identifer, kind pairs 
+ *
+ * @return  Offset of the next variable/parmeter from the current activicaqtion frame.
+ ************************************************************************************************/
+void PasComp::fieldList(int level, NameKindVec& fields) {
+	varDeclList(level, false, fields);
 }
 
 /********************************************************************************************//**

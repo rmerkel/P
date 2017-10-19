@@ -15,7 +15,7 @@
 #include <utility>
 
 /********************************************************************************************//**
- * A Pascal-lite Data Value
+ * A Data Value
  *  
  * Datums contain a signed or unsigned integer, or a floating point/real value.
  * Signed and unsigned integer values are freely interchangeable, but
@@ -32,8 +32,6 @@ public:
 		Integer,							///< Signed integer
 		Real								///< Floating point
 	};
-
-	typedef std::vector<Kind>	KindVec;	///< Vector of Datum Kind's
 
 	Datum();								///< Default constructor...
 	Datum(bool value);						///< Construct a boolean, as a integer
@@ -70,24 +68,24 @@ typedef	std::vector<Datum>	DatumVector;
 std::ostream& operator<<(std::ostream& os, const Datum::Kind& kind);
 std::ostream& operator<<(std::ostream& os, const Datum& value);
 
-Datum operator+	(const Datum& lhs,	const Datum& rhs);
-Datum operator-	(const Datum& lhs,	const Datum& rhs);
-Datum operator*	(const Datum& lhs,	const Datum& rhs);
-Datum operator/	(const Datum& lhs,	const Datum& rhs);
-Datum operator%	(const Datum& lhs,	const Datum& rhs);
+Datum operator+(const Datum& lhs, const Datum& rhs);
+Datum operator-(const Datum& lhs, const Datum& rhs);
+Datum operator*(const Datum& lhs, const Datum& rhs);
+Datum operator/(const Datum& lhs, const Datum& rhs);
+Datum operator%(const Datum& lhs, const Datum& rhs);
 
-Datum operator&	(const Datum& lhs,	const Datum& rhs);
-Datum operator|	(const Datum& lhs,	const Datum& rhs);
-Datum operator^	(const Datum& lhs,	const Datum& rhs);
-Datum operator<<(const Datum& lhs,	const Datum& rhs);
-Datum operator>>(const Datum& lhs,	const Datum& rhs);
+Datum operator&(const Datum& lhs, const Datum& rhs);
+Datum operator|(const Datum& lhs, const Datum& rhs);
+Datum operator^(const Datum& lhs, const Datum& rhs);
+Datum operator<<(const Datum& lhs, const Datum& rhs);
+Datum operator>>(const Datum& lhs, const Datum& rhs);
 
-bool operator<	(const Datum& lhs,	const Datum& rhs);
-bool operator<=(const Datum& lhs,	const Datum& rhs);
-bool operator==(const Datum& lhs,	const Datum& rhs);
-bool operator>=(const Datum& lhs,	const Datum& rhs);
-bool operator>	(const Datum& lhs,	const Datum& rhs);
-bool operator!=(const Datum& lhs,	const Datum& rhs);
+bool operator<(const Datum& lhs, const Datum& rhs);
+bool operator<=(const Datum& lhs, const Datum& rhs);
+bool operator==(const Datum& lhs, const Datum& rhs);
+bool operator>=(const Datum& lhs, const Datum& rhs);
+bool operator> (const Datum& lhs, const Datum& rhs);
+bool operator!=(const Datum& lhs, const Datum& rhs);
 
 bool operator&&(const Datum& lsh, const Datum& rhs);
 bool operator||(const Datum& lsh, const Datum& rhs);

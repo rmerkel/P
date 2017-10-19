@@ -1,7 +1,7 @@
 /********************************************************************************************//**
  * @file compilier.h
  *
- * A recursive decent compilier base.
+ * A recursive decent compilier framework.
  *
  * @author Randy Merkel, Slowly but Surly Software.
  * @copyright  (c) 2017 Slowly but Surly Software. All rights reserved.
@@ -21,8 +21,6 @@
 
 /********************************************************************************************//**
  * Framework for a recursive decent compilier
- *
- * Language independent utilities for a recursive decent compilier.
  ************************************************************************************************/
 class Compilier {
 public:
@@ -44,7 +42,7 @@ protected:
 	InstrVector*		code;				///< Emitted code
 	SourceIndex			indextbl;			///< Source cross-index for listings
 
-	/// Name, kind pair
+	/// A name, TDescPtr pair
 	struct NameKind {
 		std::string		name;				///< Variable/parameter
 		TDescPtr		type;				///< it's type descriptor

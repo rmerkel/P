@@ -40,7 +40,7 @@ Datum::Datum(unsigned value) : u{value}, k{Kind::Integer}		{}
  * @note	Provided for converstion of STL container sizes to unsigned.
  * @param	value	Unsigned integer value
  ************************************************************************************************/
-Datum::Datum(std::size_t value) : u{static_cast<unsigned> (value)}, k{Kind::Integer}	{
+Datum::Datum(std::size_t value) : u{static_cast<unsigned> (value)}, k{Kind::Integer} {
 	assert(numeric_limits<unsigned>::max() > value);
 }
 

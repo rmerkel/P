@@ -20,7 +20,8 @@
 /********************************************************************************************//**
  * Activation Frame layout
  *
- * Word offsets from the start of a activaction frame, as created by OpCode::Call
+ * Word offsets from the start of a activaction frame, as created by OpCode::Call. Note that
+ * procedures and function have the same sized frame.
  ************************************************************************************************/
 enum Frame {
 	FrameBase		= 0,				///< Offset to the Activation Frame base (base(n))
@@ -32,7 +33,7 @@ enum Frame {
 };
 
 /********************************************************************************************//**
- * Operation codes; restricted to 256 operations, maximum
+ * Machine operation codes
  ************************************************************************************************/
 enum class OpCode : unsigned char {
 	NEG,								///< Negation; TOS = -TOS
@@ -90,7 +91,7 @@ enum class OpCode : unsigned char {
 	LLIMIT,								///< Check array index; out-of-range error if TOS <  addr
 	ULIMIT,								///< Check array index; out-of-range error if TOS >  addr
 
-	HALT								///< Halt the machine
+	HALT = 255							///< Halt the machine
 };
 
 /********************************************************************************************//**
@@ -135,12 +136,10 @@ struct Instr {
 	OpCode			op;					///< Operation code
 
 	/// Default constructor; results in pushConst 0, 0...
-	Instr() : level{0}, op{OpCode::HALT}
-		{}
+	Instr() : level{0}, op{OpCode::HALT} {}
 
 	/// Construct an instruction from it's components...
-	Instr(OpCode o, int8_t l = 0, Datum d = 0) : addr{d}, level{l}, op{o}
-		{}
+	Instr(OpCode o, int8_t l = 0, Datum d = 0) : addr{d}, level{l}, op{o} {}
 };
 
 /********************************************************************************************//**
