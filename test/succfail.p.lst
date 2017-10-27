@@ -8,9 +8,11 @@
 # test/succfail.p, 6: 	Writeln(Succ(four))
     2: push 4
     3: succ 4
+    4: push 0
+    5: push 0
 # test/succfail.p, 7: end .
-    4: push 1
-    5: Writeln
-    6: ret
+    6: push 1
+    7: Writeln
+    8: ret
 
 ./pas: runtime error: out-of-range!

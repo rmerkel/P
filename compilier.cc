@@ -164,7 +164,7 @@ TDescPtr Compilier::emitVarRef(int level, const SymValue& val) {
 	while (addr < indextbl.size()) {
 		while (linenum <= indextbl[addr]) {	// Print lines that lead up to code[addr]...
 			getline(source, line);
-			cout << "# " << name << ", " << linenum++ << ": " << line << "\n" << internal;
+			cout << "# " << name << ", " << linenum++ << ": " << line << "\n";
 		}
 
 		disasm(out, addr, (*code)[addr]);	// Disasmble resulting instructions...
@@ -173,7 +173,7 @@ TDescPtr Compilier::emitVarRef(int level, const SymValue& val) {
 	}
 
 	while (getline(source, line))			// Any lines following '.' ...
-		cout << "# " << name << ", " << linenum++ << ": " << line << "\n" << internal;
+		cout << "# " << name << ", " << linenum++ << ": " << line << "\n";
 
 	out << endl;
 }

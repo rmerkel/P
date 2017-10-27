@@ -152,17 +152,28 @@
 # test/builtins.p, 47: 	Writeln(i, r, pi);
   105: pushvar 0, 4
   106: eval
-  107: pushvar 0, 5
-  108: eval
-  109: push 3.141593
-  110: push 3
-  111: Writeln
-# test/builtins.p, 48: {	Writeln(pi : 7 : 5);	  field specifiers not implemented... yet }
+  107: push 0
+  108: push 0
+  109: pushvar 0, 5
+  110: eval
+  111: push 0
+  112: push 0
+  113: push 3.141593
+  114: push 0
+  115: push 0
+  116: push 3
+  117: Writeln
+# test/builtins.p, 48: 	Writeln(pi : 7 : 5);
+  118: push 3.141593
+  119: push 7
+  120: push 5
+  121: push 1
+  122: Writeln
 # test/builtins.p, 49: 	Writeln
 # test/builtins.p, 50: end .
-  112: push 0
-  113: Writeln
-  114: ret
+  123: push 0
+  124: Writeln
+  125: ret
 # test/builtins.p, 51: 
 
         8:          1
@@ -185,8 +196,9 @@
         9:   0.000000
         8:          0
         8:          1
-        9: - 0.707107
+        9:  -0.707107
         9:        100
         9:   1.414214
-          1    1.414214 3.141593
+1 1.414214e+00 3.141593e+00
+3.14159
 

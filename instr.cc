@@ -121,9 +121,9 @@ const OpCodeInfo& OpCodeInfo::info(OpCode op) {
  * @return 	loc+1
  ************************************************************************************************/
 unsigned disasm(ostream& out, unsigned loc, const Instr& instr, const string label) {
-	const int level = instr.level;		// so we don't display level as a character
+	out << fixed;
 
-	cout << fixed;							// Use fixed format for floating point values;
+	const int level = instr.level;		// so we don't display level as a character
 
 	if (label.size())
 		out << label << ": ";

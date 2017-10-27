@@ -44,7 +44,7 @@
  *                          'while' expression 'do' statement                               |
  *                          'repeat' statement 'until' expression                           |
  *                          'for' identifer ':=' expression
- *                                            ( 'to' | 'downto' ) expression 'do' statement | X
+ *                                            ( 'to' | 'downto' ) expression 'do' statement |
  *                          statement-blk ] ;
  *          const-expr = [ '+' | '-' ] number | identifier ;
  *      expression-lst = expression { ',' expression } ;

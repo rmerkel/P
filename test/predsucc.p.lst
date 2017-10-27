@@ -7,24 +7,32 @@
 # test/predsucc.p, 5: begin
 # test/predsucc.p, 6: 	Writeln(zero);
     2: push 0
-    3: push 1
-    4: Writeln
+    3: push 0
+    4: push 0
+    5: push 1
+    6: Writeln
 # test/predsucc.p, 7: 	Writeln(Pred(two));
-    5: push 2
-    6: pred 0
-    7: push 1
-    8: Writeln
+    7: push 2
+    8: pred 0
+    9: push 0
+   10: push 0
+   11: push 1
+   12: Writeln
 # test/predsucc.p, 8: 	Writeln(two);
-    9: push 2
-   10: push 1
-   11: Writeln
+   13: push 2
+   14: push 0
+   15: push 0
+   16: push 1
+   17: Writeln
 # test/predsucc.p, 9: 	Writeln(Succ(two));
-   12: push 2
-   13: succ 4
-   14: push 1
-   15: Writeln
+   18: push 2
+   19: succ 4
+   20: push 0
+   21: push 0
+   22: push 1
+   23: Writeln
 # test/predsucc.p, 10: end .
-   16: ret
+   24: ret
 
 0
 1

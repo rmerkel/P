@@ -1,10 +1,11 @@
-/** @file interp.cc
+/********************************************************************************************//**
+ * @file interp.cc
  *
  * Pascal-lite interpreter in C++
  *
  * @author Randy Merkel, Slowly but Surly Software.
  * @copyright  (c) 2017 Slowly but Surly Software. All rights reserved.
- */
+ ************************************************************************************************/
 
 #include <algorithm>
 #include <cassert>
@@ -19,35 +20,33 @@ using namespace std;
 
 // private:
 
-/// Dump the current machine state
+/********************************************************************************************//**
+ * Dump the current machine state
+ ************************************************************************************************/
 void Interp::dump() {
-	cout << fixed;							// Use fixed format for floating point values;
-
-	// Dump the last write
-	if (lastWrite.valid())
-		cout
-			<< "    "
-			<< setw(5)	<< lastWrite << ": "
-			<< setw(10) << stack[lastWrite]
-		<< std::endl;
+	if (lastWrite.valid())				// dump the last write..
+		cout << "    "
+			 << setw(5)	<< lastWrite << ": "
+			 << setw(10) << stack[lastWrite]
+			 << std::endl;
 	lastWrite.invalidate();
 
 	if (!verbose) return;
 
 	// Dump the current  activation frame...
 	assert(sp >= fp);
-	cout    << "fp: " 	<< setw(5) 	<< fp << ": "
-			<< right 	<< setw(10) << stack[fp]
+	cout    << "fp: " 	<< setw(5)	<< fp << ": "
+			<< right 	<< setw(10)	<< stack[fp]
 			<< endl;
 
 	for (auto bl = fp+1; bl < sp; ++bl)
 		cout
 			<<	"    "	<< setw(5)	<< bl << ": "
-			<< right << setw(10) 	<< stack[bl]
+			<< right	<< setw(10) << stack[bl]
 			<< endl;
 
 	cout    << "sp: " 	<< setw(5) 	<< sp << ": "
-			<< right << setw(10) 	<< stack[sp]
+			<< right	<< setw(10) << stack[sp]
 			<< endl;
 
 	disasm(cout, pc, code[pc], "pc");
@@ -57,10 +56,10 @@ void Interp::dump() {
 
 // protected:
 
-/**
+/********************************************************************************************//**
  * @param lvl Number of levels down
  * @return The base, lvl's down the stack
- */
+ ************************************************************************************************/
 unsigned Interp::base(unsigned lvl) {
 	auto b = fp;
 	for (; lvl > 0; --lvl)
@@ -69,29 +68,33 @@ unsigned Interp::base(unsigned lvl) {
 	return b;
 }
 
-/**
+/********************************************************************************************//**
  * Make sure that there is room for at least sp+n elements in the stack.
  * @param	n	Maximum number of entries pushed down on the stack, if necessary, to make
  *  		    sufficient room for sp+n entries.
- */
+ ************************************************************************************************/
 void Interp::mkStackSpace(unsigned n) {
 	while (stack.size() <= static_cast<unsigned> (sp + n))
 		stack.push_back(-1);
 }
 
-/// @return the top-of-stack
+/********************************************************************************************//**
+ * @return the top-of-stack
+ ************************************************************************************************/
 Datum Interp::pop()					{	return stack[sp--];		}
 
-/// @param d	Datum to push on to the stack
+/********************************************************************************************//**
+ * @param d	Datum to push on to the stack
+ ************************************************************************************************/
 void Interp::push(Datum d) {
 	mkStackSpace(1);
 	stack[++sp] = d;
 }
 
-/**
+/********************************************************************************************//**
  * @param 	nlevel	Set the subroutines frame base nlevel's down
  * @param 	addr 	The address of the subroutine.
- */
+ ************************************************************************************************/
 void Interp::call(int8_t nlevel, unsigned addr) {
 	mkStackSpace(FrameSize);
 
@@ -110,9 +113,9 @@ void Interp::call(int8_t nlevel, unsigned addr) {
 	pc = addr;
 }
 
-/**
+/********************************************************************************************//**
  * Unlinks the stack frame, setting the return address as the next instruciton.
- */
+ ************************************************************************************************/
 void Interp::ret() {
 	sp = fp - 1; 					// "pop" the activaction frame
 	pc = stack[fp + FrameRetAddr].natural();
@@ -120,7 +123,9 @@ void Interp::ret() {
 	sp -= ir.addr.natural();		// Pop parameters, if any...
 }
 
-/// Unlink the stack frame, set the return address, and then push the function result
+/********************************************************************************************//**
+ * Unlink the stack frame, set the return address, and then push the function result
+ ************************************************************************************************/
 void Interp::retf() {
 	// Save the function result, unlink the stack frame, return the result
 	auto temp = stack[fp + FrameRetVal];
@@ -128,32 +133,63 @@ void Interp::retf() {
 	push(temp);
 }
 
-/**
+/********************************************************************************************//**
+ * expr, width, precision is on the stack.
+ * @param index	index into stack[] for the expr, width [, precision] tuple to print
+ * @return false if width or precision is negative, true otherwise
+ ************************************************************************************************/
+void Interp::write1(unsigned index) {
+	const auto value = stack[index];
+	const auto width = stack[index+1].natural();
+	const auto prec = stack[index+2].natural();
+
+	switch(value.kind()) {
+	case Datum::Real:				// just use defaults for now..
+		if (prec == 0)
+			cout << setw(width) << scientific << setprecision(6) << value;
+		else
+			cout << setw(width) << fixed << setprecision(prec) << value;
+		break;
+
+	case Datum::Integer:			// just use defaults for now..
+		cout << setw(width) << setprecision(prec) << value;
+		break;
+	
+	default:
+		cerr << "unknown datum type: " << static_cast<unsigned>(value.kind()) << endl;
+		assert(false);
+	}
+}
+
+/********************************************************************************************//**
+ * TOS contains the number of elements, followed by that many expr, width, precision tuples.
  * @return false on stack underflow, true otherwise
- */
-bool Interp::print() {
+ ************************************************************************************************/
+bool Interp::write() {
 	// TOS is the number of preceeding entries to print
 	const auto nargs = stack[sp].natural();
+	const unsigned tupleSz = 3;		// each parameter is a 3-tuple
 
 	if (nargs > sp) {
 		cerr << "Stack underflow @ pc " << pc << endl;
 		return false;
 
 	} else if (nargs > 0) {
-		// note: fixed if precesion is specified, scientific otherwise...
-		for (unsigned i = 0; i < nargs-1; i++)
-			cout << setw(11) << setprecision(6) << fixed
-				 << stack[sp - nargs + i] << " ";
-		cout << stack[sp-1]; // last arg
+		for (unsigned i = 0; i < nargs-1; ++i) {
+			write1(sp - (nargs * tupleSz) + (i * tupleSz));
+			cout << ' ';
+		}
+		write1(sp - tupleSz);
 	}
 
-	sp -= nargs + 1;					// consume args & the  arg count
+	sp -= (nargs * tupleSz) + 1;	// consume args & the  arg count
 
-	cout << fixed;
 	return true;
 }
 
-/// @return Result::success or...
+/********************************************************************************************//**
+ * @return Result::success or...
+ ************************************************************************************************/
 Interp::Result Interp::step() {
 	auto prevPc = pc;				// The previous pc
 	ir = code[pc++];				// Fetch next instruction...
@@ -240,10 +276,13 @@ Interp::Result Interp::step() {
 		break;
 
 
-	case OpCode::WRITE: if (!print()) return Result::stackUnderflow;			break;
+	case OpCode::WRITE:
+		if (!write())
+			return Result::stackUnderflow;
+		break;
 			
 	case OpCode::WRITELN:
-		if (!print())
+		if (!write())
 			return Result::stackUnderflow;
 		cout << '\n';
 		break;
@@ -323,9 +362,9 @@ Interp::Result Interp::step() {
 	return Result::success;
 }
 
-/**
+/********************************************************************************************//**
  *  @return	Result::success, or ...
- */
+ ************************************************************************************************/
 Interp::Result Interp::run() {
 	if (verbose)
 		cout << "Reg  Addr Value/Instr\n"
@@ -353,18 +392,18 @@ Interp::Result Interp::run() {
 
 //public
 
-/**
+/********************************************************************************************//**
  *  Initialize the machine into a reset state with verbose == false.
- */
+ ************************************************************************************************/
 Interp::Interp() : stack(FrameSize), verbose(false), ncycles(0)	{
 	reset();
 }
 
-/**
+/********************************************************************************************//**
  *	@param	program	The program to run
  *	@param 	ver		True for verbose/debugging messages
  *  @return	The number of machine cycles run
- */
+ ************************************************************************************************/
 Interp::Result Interp::operator()(const InstrVector& program, bool ver) {
 	verbose = ver;
 
@@ -378,6 +417,8 @@ Interp::Result Interp::operator()(const InstrVector& program, bool ver) {
 	return result;
 }
 
+/********************************************************************************************//**
+ ************************************************************************************************/
 void Interp::reset() {
 	pc = 0;
 
@@ -389,7 +430,9 @@ void Interp::reset() {
 	ncycles = 0;
 }
 
-/// @return number of machien cycles run so far
+/********************************************************************************************//**
+ * @return number of machien cycles run so far
+ ************************************************************************************************/
 size_t Interp::cycles() const {
 	return ncycles;
 }

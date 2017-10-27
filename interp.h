@@ -53,7 +53,8 @@ protected:
 	Datum pop();							///< Pop a Datum from the top of stack...
 	void push(Datum d);						///< Push a Datum onto the stack...
 
-	bool print();							///< Print expressions
+	void write1(unsigned index);			///< Write one expression on standard output
+	bool write();							///< Write expressions on standard output
 
 	/// Call a subroutine...
 	void call(int8_t nlevel, unsigned addr);

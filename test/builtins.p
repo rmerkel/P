@@ -45,7 +45,7 @@ begin
 	r := Sqrt(2);			{ result: 1.41421	}
 
 	Writeln(i, r, pi);
-{	Writeln(pi : 7 : 5);	  field specifiers not implemented... yet }
+	Writeln(pi : 7 : 5);
 	Writeln
 end .
 

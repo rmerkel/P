@@ -13,17 +13,17 @@
 #include <utility>
 #include <vector>
 
-class iTDesc; 
+class TypeDesc; 
 
 /************************************************************************//**	
- * Pointer to TDesc
+ * Pointer to TypeDesc
  ****************************************************************************/
-typedef std::shared_ptr<iTDesc>	TDescPtr;
+typedef std::shared_ptr<TypeDesc>		TDescPtr;
 
 /************************************************************************//**	
  * Vector of TDescPtrs
  ****************************************************************************/
-typedef std::vector<TDescPtr>	TDescPtrVec;
+typedef std::vector<TDescPtr>			TDescPtrVec;
 
 /************************************************************************//**
  * Type Field - record field name and type pairs
@@ -64,7 +64,7 @@ public:
 
 	int minimum() const;				///< Return type sub-range minimum value
 	int maximum() const;				///< Return type sub-range maximum value
-	size_t span() const;				///< Return type sub-range's span
+	unsigned span() const;				///< Return type sub-range's span
 };	
 
 bool operator<(const SubRange& lhs, const SubRange& rhs);
@@ -72,9 +72,9 @@ bool operator==(const SubRange& lhs, const SubRange& rhs);
 std::ostream& operator<<(std::ostream& os, const SubRange& srange);
 
 /************************************************************************//**	
- * Type Descriptor interface
+ * Type Descriptor a type classes size, sub-range and fields
  ****************************************************************************/
-class iTDesc {
+class TypeDesc {
 public:
 	/// Type kinds (type classes)
 	enum Kind {
@@ -87,46 +87,193 @@ public:
 		Enumeration						///< Enumeration of constants
 	};
 
-	virtual ~iTDesc() {}				///< Destructor
+	/// Constructor
+	/**	Construct
+	 * @param	size	Object size, in Datums
+	 * @param	range	Sub-Range, defaults SubRange()
+	 * @param	fields	Fields, defaults FieldVec()
+	 */
+	TypeDesc(	unsigned	size,
+		const	SubRange&	range = SubRange(),
+		const	FieldVec&	fields = FieldVec())
+		: _size{size}, _range{range}, _fields{fields}
+										{}
+
+	virtual ~TypeDesc() {}				///< Destructor
 
 	virtual Kind kind() const = 0;		///< Return my kind...
-	virtual Kind kind(Kind kind) = 0;	///< Set, and then, return my kind
 
-	virtual unsigned size() const = 0;	///< Return my size, in Datums
-
-	/// Set, and return my size, in Datums
-	virtual unsigned size(unsigned sz) = 0;
+	/// Return my size, in Datums
+	virtual unsigned size() const		{	return _size;					}
 
 	/// Return my sub-range
-	virtual const SubRange& range() const = 0;
+	virtual const SubRange& range() const {	return _range;					}
 
-	/// Set and return my sub-range
-	virtual const SubRange& range(const SubRange& range) = 0;
+	/** Return my array sub-rane (index) type. 
+	 * @return TypeDesc()
+	 */
+	virtual TDescPtr rtype() const 		{	return TDescPtr();				}
 
-	virtual TDescPtr rtype() const = 0;	///< Return my array index type
-
-	/// Set, and return my array index type
-	virtual TDescPtr rtype(TDescPtr type) = 0;
-
-	virtual TDescPtr base() const = 0;	///< Return by base type
-
-	/// Set, and return by base type
-	virtual TDescPtr base(TDescPtr type) = 0;
+	/** Return by base type
+	 * @return TDescPtr()
+	 */
+	virtual TDescPtr base() const 		{	return TDescPtr();				}
 
 	/// Return my fields
-	virtual const FieldVec& fields() const = 0;
-
-	/// Set and return my fields
-	virtual const FieldVec& fields(const FieldVec& flds) = 0;
+	virtual const FieldVec& fields() const	{	return _fields;				}
 
 	/// Ordinal type?
-	virtual bool isOrdinal() const = 0;
+	virtual bool isOrdinal() const 		{	return false;					}
+
+protected:
+	unsigned	_size;					///< Size, in Datums
+	SubRange	_range;					///< My sub-range. For arrays, the array's span
+	FieldVec	_fields;				///< My fields (enumeration and record)
 };
 
-bool operator<(const iTDesc& lhs, const iTDesc& rhs);
-bool operator==(const iTDesc& lhs, const iTDesc& rhs);
-std::ostream& operator<<(std::ostream& os, const iTDesc::Kind& value);
-std::ostream& operator<<(std::ostream& os, const iTDesc& value);
+std::ostream& operator<<(std::ostream& os, const TypeDesc::Kind& value);
+
+bool operator<(const TypeDesc& lhs, const TypeDesc& rhs);
+bool operator==(const TypeDesc& lhs, const TypeDesc& rhs);
+std::ostream& operator<<(std::ostream& os, const TypeDesc& value);
+
+#include <cassert>						/// TEMP!
+
+/********************************************************************************************//**
+ * Integer type descriptor
+ * 
+ * Integer and sub-ranges.
+ ************************************************************************************************/
+class IntDesc : public TypeDesc {
+public:
+	typedef	TypeDesc		Base;			///< My base type
+
+	/// Construct an IntDesc from it's sub-range
+	IntDesc(const SubRange& range) : Base(1, range) {}
+
+	Kind kind() const override				{	return TypeDesc::Integer;			}
+	bool isOrdinal() const override			{	return true;						}
+};
+
+/********************************************************************************************//**
+ * Real type descriptor
+ ************************************************************************************************/
+class RealDesc : public TypeDesc {
+public:
+	typedef	TypeDesc		Base;			///< My base type
+
+	RealDesc() : Base(1) {}					/// Construct a RealDesc
+	Kind kind() const override				{	return TypeDesc::Real;				}
+};
+
+/********************************************************************************************//**
+ * Boolean type descriptor
+ ************************************************************************************************/
+class BoolDesc : public TypeDesc {
+public:
+	typedef	TypeDesc		Base;			///< My base type
+
+	BoolDesc() : Base(1) {}					/// Construct a BoolDesc
+
+	Kind kind() const override				{	return TypeDesc::Boolean;			}
+	bool isOrdinal() const override			{	return true;						}
+};
+
+
+/********************************************************************************************//**
+ * Character type descriptor
+ ************************************************************************************************/
+class CharDesc : public TypeDesc {
+public:
+	typedef	TypeDesc		Base;			///< My base type
+
+	/// Construct a CharDes from its sub-range
+	CharDesc(const SubRange& range) : Base{1, range} {}
+
+	Kind kind() const override				{	return TypeDesc::Character;			}
+	bool isOrdinal() const override			{	return true;						}
+};
+
+/********************************************************************************************//**
+ * Array type descriptor
+ ************************************************************************************************/
+class ArrayDesc : public TypeDesc {
+public:
+	typedef	TypeDesc		Base;			///< My base type
+
+	/// Construct an ArrayDesc from it's size, index, type and base type
+	ArrayDesc(unsigned size, const SubRange& index, TDescPtr rtype, TDescPtr base)
+		: Base(size, index), _rtype{rtype}, _base{base} {}
+
+	Kind kind() const override				{	return TypeDesc::Array;				}
+
+	/** Return my size.
+	 * @note Not sure why this override is needed
+	 */
+	virtual unsigned size() const override	{	return Base::size();				}
+
+	/// Set, and then return, my size in Datums
+	unsigned size(unsigned sz) 				{	return _size = sz;					}
+
+	/// Return my range type
+	TDescPtr rtype() const override 		{	return _rtype;						}
+
+	/// Set, and then return, my range type
+	TDescPtr rtype(TDescPtr type) 			{	return _rtype = type;				}
+
+	/// Return my base type
+	TDescPtr base() const override			{	return _base;						} 
+
+	/// Set, and then return, my base type
+	TDescPtr base(TDescPtr type) 			{	return _base = type;				}
+
+	bool isOrdinal() const override			{	return false;						}
+
+private:
+	TDescPtr	_rtype;						///< Arrays index (sub-range) type
+	TDescPtr	_base;						///< Arrays base type
+};
+
+/********************************************************************************************//**
+ * Record type descriptor
+ ************************************************************************************************/
+class RecordDesc : public TypeDesc {
+public:
+	typedef	TypeDesc		Base;			///< My base type
+
+	/// Construct a RecordDesc from it's size ,and fields
+	RecordDesc(unsigned size, const FieldVec& fields)
+		: Base(size, SubRange(), fields) {}
+
+	Kind kind() const override				{	return TypeDesc::Record;			}
+};
+ 
+/********************************************************************************************//**
+ * Enumeration type descptor
+ ************************************************************************************************/
+class EnumDesc : public TypeDesc {
+public:
+	typedef	TypeDesc		Base;			///< My base type
+
+	/// Construct a EnumDesc from it's range and fields
+	EnumDesc(const SubRange& range, const FieldVec& fields)
+		: Base(1, range, fields) 			{}
+
+	Kind kind() const override				{	return TypeDesc::Enumeration;		}
+
+	/** Return my fields
+	 * @note Don't know why this is needed
+	 */
+	const FieldVec& fields() const override	{	return Base::fields();				}
+
+	/// Set, and return, my fields
+	const FieldVec& fields(const FieldVec& fields) {
+		return _fields = fields;
+	}
+
+	bool isOrdinal() const override			{	return true;						}
+};
+
 
 /************************************************************************//**	
  * Type Descriptor
@@ -140,7 +287,7 @@ std::ostream& operator<<(std::ostream& os, const iTDesc& value);
 class TDesc {
 public:
 	/// Type kinds (type classe 
-	typedef iTDesc::Kind	Kind;
+	typedef TypeDesc::Kind	Kind;
 
 	// useful constants
 

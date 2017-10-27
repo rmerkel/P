@@ -52,6 +52,8 @@ Versions
  * 0.10 - Adding built-in functions and constants, refactored types, capitalized built-in "nouns" and functions. WIP.
  * 0.11 - Primitive Write and Writeln, refactoring.
  * 0.12 - Limit checks, successor, predecessor. for statement.
+ * 0.13 - Refactored TDesc into iTDesc and it's derived classes
+ * 0.14 - Write/WriteLn field specifiers.
 
 Author
     Randy Merkel, Slowly but Surly Software.
