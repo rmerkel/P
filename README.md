@@ -38,6 +38,7 @@ Bugs
  * No strings, just signed integers and reals
  * No input instructions, and just elementary Write/Writeln implementation.
  * No interactive mode for debugging; just automatic single stepping (-v)
+ * No pointers or dynamic memory
 
 History
  * 0.1  - Initial fork form pl0c, modified to use =, <> etc.

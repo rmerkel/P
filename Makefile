@@ -16,7 +16,7 @@ CXX = c++
 # Support C++11, enable all, extra warnings, and generate dependency files
 CXXFLAGS +=-std=c++11 -Wall -Wextra -MMD -MP
 
-# Build for debugging by default, or release/optimized
+# Build for debugging (default), or release/optimized
 DEBUG	?= 1
 ifeq	($(DEBUG),1)
 	CXXFLAGS += -O0 -g3 -DDEBUG
