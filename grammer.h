@@ -24,8 +24,8 @@
  *        ordinal-type = '(' identifier-lst ')' | const-expr '..' const-expr                |
  *                       'Boolean' | 'Integer' | 'Char' ;
  *     structured-type = 'array' '[' simple-type-list ']' 'of' type                         |
- *                       'record' field-lst 'end' ;                                           X
- *           field-lst = var-decl-lst ;                                                       X
+ *                       'record' field-lst 'end' ;
+ *           field-lst = var-decl-lst ;
  *        pointer-type = '^' identifier ;                                                     X
  *     simple-type-lst = simple-type { ',' simple-type } ;
  *      identifier-lst = identifier { ',' identifier } ;
@@ -33,10 +33,9 @@
  *           proc-decl = 'procedure' identifier param-lst ';' block-decl ';' ;
  *           func-decl = 'function'  identifier param-lst ':' type ';' block-decl ';' ; 
  *           param-lst = [ '(' var-decl-lst ')' ] ;
- *            variable = identifier [ '[' expression-lst ']' { '[' expression-lst ']' } ] ;
- *            variable = identifier [ composite-var { composit-var } ] ;
- *       composite-var = '[' expression-lst ']'                                             |
- *                       '.' identifier ;                                                     X
+ *            variable = identifier [ composite-desc { composite-desc } ] ;
+ *      composite-desc = '[' expression-lst ']'                                             |
+ *                       '.' identifier ;
  *       statement-blk = 'begin' statement-lst 'end' ;
  *       statement-lst = 'begin' statement {';' statement } 'end' ;
  *           statement = [  variable '=' expression                                         |

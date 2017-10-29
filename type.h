@@ -39,6 +39,11 @@ public:
 
 	const std::string& name() const;	///< Return the field name
 	TDescPtr type() const;				///< Return the field type
+
+	/// Set my name...
+	void name(const std::string& name) {
+		_name = name;
+	}
 };
 
 bool operator<(const Field& lhs, const Field& rhs);

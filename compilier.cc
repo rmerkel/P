@@ -226,23 +226,29 @@ SymbolTable::iterator Compilier::lookup(const string& id) {
  * defined in the current scope (level), and returns the identifer string. Returns "unknown" if
  * the next token is not an identifer.
  *
+ * The prefixed identifier is prefix.identifier if prefix != "", otherwise it's the same as
+ * the identifier. The decorated identifier is what is looked up in the symbol table, but
+ * the undecroated version is returned.
+ *
  * @param 	level	The current block level.
- * @return 	the next identifer in the token stream, "unknown" if the next token wasn't an
- *  		identifier.
+ * @param	prefix	The identifier prefix for identifier decorated.
+ * @return 	the next, undecorated, identifier in the token stream, "unknown" if the next token
+ * 			 wasn't an identifier.
  ************************************************************************************************/
-const std::string Compilier::nameDecl(int level) {
-	const string id = ts.current().string_value;	// Copy the identifer
+const std::string Compilier::nameDecl(int level, const string& prefix) {
+	const string id = ts.current().string_value;	// Copy the identifer before consuming it
+	const string prefixed = prefix.empty()	? id : prefix + string(".") + id;
 
 	if (expect(Token::Identifier)) {				// Consume the identifier
-		auto range = symtbl.equal_range(id);		// Already defined?
+		auto range = symtbl.equal_range(prefixed);	// Already defined?
 		for (auto it = range.first; it != range.second; ++it) {
 			if (it->second.level() == level) {
-				error("previously was defined", id);
+				error("previously was defined", prefixed);
 				break;
 			}
 		}
 
-		return id;
+		return prefixed;
 	}
 
 	return "unknown";

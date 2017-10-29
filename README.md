@@ -3,8 +3,8 @@ Pascal-lite Programming Language
 Yet another small, interpreted, computer language... just for the fun of it!
 
 A compiler/interpreter, inspired by the original PL/0 language and machine
-described in Algorithms + Data Structures = Programs, 1st Edition, by Wirth.
-Currently, the compilier supports a dialect between PL/0 and Pascal.
+described in "Algorithms + Data Structures = Programs," 1st Edition, by Wirth.
+Currently, the compilier supports a dialect somewhere between PL/0 and Pascal.
 
 Like PL/0, pas is a combination compiler and interpreter; it first runs the
 compiler (Comp), and if no errors where encountered, it runs the results in
@@ -14,24 +14,24 @@ standard output.
 The compiler started life as a copy of the C example at
 https://en.wikipedia.org/wiki/Recursive_descent_parser, modified to emit code 
 per Wirth's interpret procedure while using the TokenStream (TokenStream) from 
-The C++ Programming Language, 4th Edition, by Stroustrup, modified to support 
-the PL/0 dialect, and thus Pascal. By default, Comp writes a listing to
-standard output, but the verbose (-v) option will also log tokens found and 
+"The C++ Programming Language," 4th Edition, by Stroustrup, modified to
+support the PL/0 dialect, and thus Pascal. By default, Comp writes a listing
+to standard output, but the verbose (-v) option will also log tokens found and
 code emitted.
 
 The machine/interpreter stated life as a C/C++ port of Wirth's machine
-(procedure interpret), modified to use lest "weird" instruction names, modified
-again to use indirect addressing per HOC, as described in The UNIX Programming
-Environment, by Kernighan and Pike. By default, Interp logs "assigns" on
-standard output, but the verbose (-v) option will run the program in trace
-mode; disassembling and dumping the activation frame for each instruction
-single step the program.
+(interpret procedure), modified to use lest "weird" instruction names,
+modified again to use indirect addressing per HOC, as described in "The UNIX
+Programming Environment," by Kernighan and Pike. By default, Interp logs
+"assigns" on standard output, but the verbose (-v) option will run the program
+in trace mode; disassembling and dumping the activation frame for each
+instruction single step the program.
 
 Release
  * git add .
  * git commit -m "description..."
  * git tag -a vMajor.Minor -m "summary..."
- * git push --tags origin branch-name
+ * git push --tags [ origin branch-name ]
 
 Bugs
  * More pl0c than Pascal at this point
@@ -39,7 +39,7 @@ Bugs
  * No input instructions, and just elementary Write/Writeln implementation.
  * No interactive mode for debugging; just automatic single stepping (-v)
 
-Versions
+History
  * 0.1  - Initial fork form pl0c, modified to use =, <> etc.
  * 0.2  - Program declaraction
  * 0.3  - Removed the C/C++ bit and shift operations
@@ -54,6 +54,7 @@ Versions
  * 0.12 - Limit checks, successor, predecessor. for statement.
  * 0.13 - Refactored TDesc into iTDesc and it's derived classes
  * 0.14 - Write/WriteLn field specifiers.
+ * 0.15 - Records and selectors
 
 Author
     Randy Merkel, Slowly but Surly Software.

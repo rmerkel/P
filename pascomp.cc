@@ -50,7 +50,7 @@ bool PasComp::isAReal(TDescPtr type) {
  *
  * @return	Type type of the promoted type
  ************************************************************************************************/
-TDescPtr PasComp::promote (TDescPtr lhs, TDescPtr rhs) {
+TDescPtr PasComp::promote(TDescPtr lhs, TDescPtr rhs) {
 	TDescPtr type = lhs;					// Assume that lhs and rhs have the same types
 	if (lhs->kind() == rhs->kind())
 		;									// nothing to do
@@ -699,7 +699,8 @@ void PasComp::statementList(int level) {
 }
 
 /********************************************************************************************//**
- * identifier [ '[' expression-list ']' { '[' expression-list /]' } ] 
+ * variable		  = identifier [ composite-desc { composite-desc } ] ;
+ * composite-desc = '[' expression-lst ']' | '.' identifier ;
  *
  * Emits a variable reference, optionally with array indexes.
  *
@@ -711,8 +712,10 @@ TDescPtr PasComp::variable(int level, SymbolTable::iterator it) {
 	auto type = it->second.type();			// Default is the symbol type
 
 	emitVarRef(level, it->second);
-	if (accept(Token::OpenBrkt)) {			// variable is an array, index into it
-		do {
+
+	// process composite-desc's 
+	for (;;) {								// process composite-desc's...
+		if (accept(Token::OpenBrkt)) {		// variable is an array, index into it
 			auto atype = type;				// The arrays type, e.g, TypeDesc::Array
 			type = atype->base();			// We'll return the arrays base type...
 
@@ -752,10 +755,31 @@ TDescPtr PasComp::variable(int level, SymbolTable::iterator it) {
 					type = atype->base();	// We'll return the arrays base type...
 				}
 			}
-
 			expect(Token::CloseBrkt);
 
-		} while (accept(Token::OpenBrkt));
+		} else if (accept(Token::Period)) {		// handle record selector...
+			if (type->kind() != TypeDesc::Record)
+				error("attempt reference into non-record", it->first);
+
+			const string selector = ts.current().string_value;
+			if (expect(Token::Identifier)) {	// consume the selector
+				unsigned offset = 0;
+				for (const auto& fld : type->fields()) {
+					if (fld.name() == selector) {
+						type = fld.type();		// Return the record field's type
+						break;
+					}
+					offset += fld.type()->size();
+				}
+
+				if (offset > 0) {				// Don't bother if it's the 1st field...
+					emit(OpCode::PUSH, 0, offset);
+					emit(OpCode::ADD);
+				}
+			}
+
+		} else
+			break;
 	}
 
 	return type;
@@ -931,7 +955,7 @@ void PasComp::constDeclList(int level) {
 void PasComp::typeDecl(int level) {
 	const auto ident = nameDecl(level);				// Copy the identifier
 	expect(Token::EQU);								// Consume the "="
-	auto tdesc = type(level);
+	auto tdesc = type(level, ident);
 
 	if (verbose)
 		cout << progName << ": type " << ident << " = " << tdesc->kind()	<< "\n";
@@ -991,14 +1015,14 @@ void PasComp::constDecl(int level) {
  * @return  Number of variables allocated before or after the activation frame.
  ************************************************************************************************/
 int PasComp::varDeclBlock(int level) {
-	NameKindVec	idents;							// vector of name/type pairs.
+	FieldVec	idents;							// vector of name/type pairs.
 
 	if (accept(Token::VarDecl))
-		varDeclList(level, false, idents);
+		varDeclList(level, false, "", idents);
 
 	int sum = 0;								// Add up the size of every variable in the block
 	for (const auto& id : idents)
-		sum += id.type->size();
+		sum += id.type()->size();
 
 	return sum;
 }
@@ -1012,11 +1036,12 @@ int PasComp::varDeclBlock(int level) {
  *
  * @param			level	The current block level.
  * @param			params	True if processing formal parameters, false if variable declaractions. 
+ * @param			prefix	The identifier prefix
  * @param[in,out]	idents	Vector of identifer, kind pairs 
  *
  * @return  Offset of the next variable/parmeter from the current activicaqtion frame.
  ************************************************************************************************/
-void PasComp::varDeclList(int level, bool params, NameKindVec& idents) {
+void PasComp::varDeclList(int level, bool params, const string& prefix, FieldVec& idents) {
 	// Stops if the ';' if followd by any of hte following tokens
 	static const Token::KindSet stops {
 		Token::ProcDecl,
@@ -1028,7 +1053,7 @@ void PasComp::varDeclList(int level, bool params, NameKindVec& idents) {
 	do {
 		if (oneOf(stops))
 			break;								// No more variables...
-		varDecl(level, idents);
+		varDecl(level, prefix, idents);
 	} while (accept(Token::SemiColon));
 
 	// Set the offset from the activation frame, parameters have negative offsets in reverse
@@ -1036,21 +1061,21 @@ void PasComp::varDeclList(int level, bool params, NameKindVec& idents) {
 	for (const auto& id : idents) {
 		if (verbose)
 			cout << progName  
-				 << ": var/param " 	<< id.name << ": " 
+				 << ": var/param " 	<< id.name() << ": " 
 				 << level 			<< ", "
 			     << dx	 			<< ", " 
-				 << id.type->kind() << "\n";
+				 << id.type()->kind() << "\n";
 
-		auto range = symtbl.equal_range(id.name);		// Already defined?
+		auto range = symtbl.equal_range(id.name());		// Already defined?
 		for (auto it = range.first; it != range.second; ++it) {
 			if (it->second.level() == level) {
-				error("previously was defined", id.name);
+				error("previously was defined", id.name());
 				continue;
 			}
 		}
 
-		symtbl.insert( { id.name, SymValue::makeVar(level, dx, id.type)	} );
-		dx += id.type->size();
+		symtbl.insert( { id.name(), SymValue::makeVar(level, dx, id.type())	} );
+		dx += id.type()->size();
 	}
 }
 
@@ -1068,12 +1093,13 @@ void PasComp::varDeclList(int level, bool params, NameKindVec& idents) {
  * entry in the symbol table for either.
  *  
  * @param			level	The current block level. 
+ * @param			prefix	The identifer prefix
  * @param[in,out]	idents	Vector of identifer, kind pairs
  ************************************************************************************************/
-void PasComp::varDecl(int level, NameKindVec& idents) {
-	vector<string> ids = identifierList(level);
+void PasComp::varDecl(int level, const string& prefix, FieldVec& idents) {
+	vector<string> ids = identifierList(level, prefix);
 	expect(Token::Colon);
-	const auto desc = type(level);
+	const auto desc = type(level, prefix);
 	for (auto& id : ids)
 		idents.push_back({ id, desc });
 }
@@ -1083,11 +1109,11 @@ void PasComp::varDecl(int level, NameKindVec& idents) {
  * @param			level	The current block level. 
  * @return	List of identifiers in the identifier-lst
  ************************************************************************************************/
-vector<string> PasComp::identifierList(int level) {
+vector<string> PasComp::identifierList(int level, const string& prefix) {
 	vector<string> ids;
 
 	do {
-		ids.push_back(nameDecl(level));
+		ids.push_back(nameDecl(level, prefix));
 	} while (accept(Token::Comma));
 
 	return ids;
@@ -1100,9 +1126,10 @@ vector<string> PasComp::identifierList(int level) {
  * Token::Type, thus we only need to look for new type declaractions, e.g., "array...".
  *
  * @param	level	The current block level. 
+ * @param	prefix	Optional identifier prefix
  * @return the type description
  ************************************************************************************************/
-TDescPtr PasComp::type(int level) {
+TDescPtr PasComp::type(int level, const string& prefix) {
 	auto tdesc = TDesc::intDesc;
 
 	if (accept(Token::Identifier, false)) {		// previously defined type-name
@@ -1115,14 +1142,14 @@ TDescPtr PasComp::type(int level) {
 		else
 			tdesc = it->second.type();
 
-	} else if ((tdesc = structuredType(level)) != 0) {
+	} else if ((tdesc = structuredType(level, prefix)) != 0) {
 		;
 
-	} else if ((tdesc = simpleType(level)))
+	} else if ((tdesc = simpleType(level)) != 0)
 		;
 
 #if 0	// TBD
-	else if ((tdesc = pointerType(level)))
+	else if ((tdesc = pointerType(level)) != 0)
 		;
 #endif
 	else
@@ -1180,7 +1207,7 @@ TDescPtr PasComp::ordinalType(int level) {
 	else if (accept(Token::OpenParen)) {		// Enumeration
 		FieldVec		enums;
 
-		const auto ids = identifierList(level);
+		const auto ids = identifierList(level, "");
 		SubRange r(0, ids.empty() ? 0 : ids.size()-1);
 		expect(Token::CloseParen);
 
@@ -1242,9 +1269,10 @@ TDescPtr PasComp::ordinalType(int level) {
  * 'array' '[' simple-type-list ']' 'of' type | 'record' field-list 'end' ;
  *
  * @param	level	The current block level. 
+ * @param	previx	Optional identifier prefix
  * @return type description if successful, null pointer otherwise
  ************************************************************************************************/
-TDescPtr PasComp::structuredType(int level) {
+TDescPtr PasComp::structuredType(int level, const string& prefix) {
 	TDescPtr tdesc = 0;
 
 	if (accept(Token::Array)) {					// Array
@@ -1269,14 +1297,19 @@ TDescPtr PasComp::structuredType(int level) {
 		expect(Token::CloseBrkt);				// "] of"
 		expect(Token::Of);
 
-		tp->base(type(level));					// Get the arrays base type
+		tp->base(type(level, ""));				// Get the array's base type
 		tp->size(tp->size() * tp->base()->size());
 
 	} else if (accept(Token::Record)) {			// Record
-		NameKindVec	fields;
-		do {
-			fieldList(level, fields);
-		} while(accept(Token::Comma));
+		FieldVec	fields;
+		fieldList(level, prefix, fields);
+
+		unsigned sum = 0;						// Calc the total size of the record
+		for (auto& element : fields)
+			sum += element.type()->size();
+
+		tdesc = TDesc::newTDesc(TypeDesc::Record, sum, SubRange(), TDescPtr(), TDescPtr(), fields);
+
 		expect(Token::End);
 	}
 
@@ -1284,15 +1317,24 @@ TDescPtr PasComp::structuredType(int level) {
 }
 
 /********************************************************************************************//**
- * var-decl-list
+ * var-decl-list 
  *
  * @param			level	The current block level.
- * @param[in,out]	fields	Vector of identifer, kind pairs 
+ * @param			prefix	The identifier prefix
+ * @param[in,out]	fields	Vector of identifer, kind pairs. identifier arn't decorated.
  *
  * @return  Offset of the next variable/parmeter from the current activicaqtion frame.
  ************************************************************************************************/
-void PasComp::fieldList(int level, NameKindVec& fields) {
-	varDeclList(level, false, fields);
+void PasComp::fieldList(int level, const string& prefix, FieldVec& fields) {
+	varDeclList(level, false, prefix, fields);
+
+	for (auto& fld : fields) {					// trim off the prefix '.' from the identifiers
+		size_t n = fld.name().find('.');
+		if (n != string::npos && n < fld.name().size()) {
+			string name = fld.name();
+			fld.name(name.erase(0, n+1));
+		}
+	}
 }
 
 /********************************************************************************************//**
@@ -1331,12 +1373,12 @@ SymValue& PasComp::subPrefixDecl(int level, SymValue::Kind kind) {
 	if (accept(Token::OpenParen)) {
 		// Note that the activation frame level is that of the *following* block!
 
-		NameKindVec	idents;					// vector of name/type pairs.
-		varDeclList(level+1, true, idents);
+		FieldVec	idents;					// vector of name/type pairs.
+		varDeclList(level+1, true, "", idents);
 		expect(Token::CloseParen);
 
 		for (auto id : idents)
-			it->second.params().push_back(id.type);
+			it->second.params().push_back(id.type());
 	}
 
 	return it->second;
@@ -1362,7 +1404,7 @@ void PasComp::procDecl(int level) {
 void PasComp::funcDecl(int level) {
 	auto& val = subPrefixDecl(level, SymValue::Function);
 	expect(Token::Colon);
-	val.type(type(level));
+	val.type(type(level, ""));
 	expect(Token::SemiColon);
 	blockDecl(val, level + 1);
 	expect(Token::SemiColon);	// function declarations end with a ';'!

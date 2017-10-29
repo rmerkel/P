@@ -42,18 +42,6 @@ protected:
 	InstrVector*		code;				///< Emitted code
 	SourceIndex			indextbl;			///< Source cross-index for listings
 
-	/// A name, TDescPtr pair
-	struct NameKind {
-		std::string		name;				///< Variable/parameter
-		TDescPtr		type;				///< it's type descriptor
-
-		/// Construct a name/kind pair
-		NameKind(const std::string n, TDescPtr p) : name{n}, type{p} {}
-	};
-
-	/// A vector of name kind pairs
-	typedef std::vector<NameKind>	NameKindVec;
-
 	void error(const std::string& msg);		///< Write an error message...
 
 	/// Write an error message...
@@ -87,7 +75,8 @@ protected:
 	/// lookup identifier in the symbol table...
 	SymbolTable::iterator lookup(const std::string& id);
 
-	const std::string nameDecl(int level);	///< name (identifier) check...
+	/// name (identifier) check...
+	const std::string nameDecl(int level, const std::string& prefix = "");
 
 	virtual void run() = 0;					///< Compile...
 };
