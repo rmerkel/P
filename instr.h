@@ -57,6 +57,8 @@ enum class OpCode : unsigned char {
 
 	WRITE,								///< Write expr-list on standard output
 	WRITELN,							///< Write expr-list,  newline on standard output
+	NEW,								///< Allocate dynamic store
+	DISPOSE,							///< Dispose of allocated dynamic store
 
 	ADD,								///< Addition
 	SUB,								///< Subtraction

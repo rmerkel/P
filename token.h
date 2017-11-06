@@ -57,6 +57,7 @@ struct Token {
 		DownTo,							///< "downto"
 
 		Ellipsis,						///< ".."
+		Caret,							///< "^"
 
 		IntType,						///< "Integer"
 		RealType,						///< "Real"
@@ -78,8 +79,8 @@ struct Token {
 
 		Add,							///< Addition
 		Subtract,						///< Subtraction
-		Multiply	= '*',				///< Multiplication
-		Divide 		= '/',				///< Division
+		Multiply /*	= '*' */,			///< Multiplication
+		Divide 	/*	= '/' */,			///< Division
 
 		OpenParen,						///< Opening parentheses
 		CloseParen,						///< Closing parentheses
@@ -108,6 +109,8 @@ struct Token {
 		Succ,							///< Next ordinal of value
 
 		Writeln,						///< Write on standard output
+		New,							///< Allocate dynamic store
+		Dispose,						///< Free allocated dynamic store
 
 		Assign,							///< Assignment (:=)
 		Mod,							///< Modulus (remainder)

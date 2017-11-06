@@ -15,6 +15,7 @@
 #include <vector>
 
 #include "instr.h"
+#include "freestore.h"
 
 /********************************************************************************************//**
  * A Pascal Machine
@@ -32,11 +33,12 @@ public:
 		unknownInstr,						///< Attempt to execute an undefined instruction
 		stackOverflow,						///< Attempt to access beyound the end of the statck
 		stackUnderflow,						///< Attempt to access an empty stack
+		freeStoreError,						///< Allocation or free error
 		outOfRange,							///< Attempt to index object with out-of-range index
 		halted								///< Machine has halted
 	};
 
-	Interp();
+	Interp(unsigned stackSz = 1024, unsigned fstoreSz = 3072);
 	virtual ~Interp() {}
 
 	/// Load a applicaton and start the pl/0 machine running...
@@ -47,8 +49,6 @@ public:
 protected:
 	///< Find the activation base 'lvl' levels up the stack...
 	unsigned base(unsigned lvl);
-
-	void mkStackSpace(unsigned n);	///< Make room for more stack entries...
 
 	Datum pop();							///< Pop a Datum from the top of stack...
 	void push(Datum d);						///< Push a Datum onto the stack...
@@ -87,7 +87,8 @@ private:
 	};
 
 	InstrVector		code;					///< Code segment, indexed by pc
-	DatumVector		stack;					///< Data segment (stack), indexed by fp and sp
+	unsigned		stackSize;				///< The stack size, in datums.
+	DatumVector		stack;					///< Data segment (stack + free-store), indexed by fp and sp
 	unsigned		pc;						///< Program counter register; index of *next* instruction in code[]
 	unsigned		fp;						///< Frame pointer register; index of the current mark block/frame in stack[]
 	unsigned		sp;						///< Top of stack register (stack[sp])
@@ -96,6 +97,7 @@ private:
 	EAddr			lastWrite;				///< Last write effective address (to stack[]), if valid
 	bool			verbose;				///< Verbose output if true
 	unsigned  		ncycles;				///< Number of machine cycles run since the last reset
+	FreeStore		heap;					///< Dynamic memory heap
 
 	void dump();
 };

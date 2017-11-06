@@ -31,18 +31,31 @@ private:
 	bool isAReal(TDescPtr type);			///< Is type a Real?
 
 	/// Promote data type if necessary...
-	TDescPtr promote(TDescPtr lhs, TDescPtr rhs);
+	TDescPtr promote(	TDescPtr				lhs,
+						TDescPtr				rhs);
 
 	/// Promote assigned data type if necessary...
-	void assignPromote (TDescPtr lhs, TDescPtr rhs);
+	void assignPromote (TDescPtr				lhs,
+						TDescPtr				rhs);
+
+	/// array index production...
+	TDescPtr varArray(	int						level,
+						SymbolTable::iterator	it,
+						TDescPtr				type);
+
+	/// Record selection production...
+	TDescPtr varSelector(SymbolTable::iterator	it,
+						TDescPtr				type);
 
 	/// variable sub-production...
-	TDescPtr variable(int level, SymbolTable::iterator it);
+	TDescPtr variable(	int						level,
+						SymbolTable::iterator	it);
 
 	TDescPtr builtInFunc(int level);		///< built-in functions
 
 	/// factor-identifier sub-production...
-	TDescPtr identFactor(int level, const std::string& id);
+	TDescPtr identFactor(int				level,
+				const	std::string&		id);
 
 	TDescPtr factor(int level);				///< factor production...
 	TDescPtr term(int level);				///< terminal production...
@@ -53,7 +66,8 @@ private:
 	std::pair<bool,Datum> constExpr();		///< const-expr production...
 
 	/// call-statement production...
-	void callstatement(int level, SymbolTable::iterator it);
+	void callstatement(	int					level,
+						SymbolTable::iterator it);
 
 	void whileStatement(int level);			///< while-statement production...
 	void ifStatement(int level);			///< if-statement production...
@@ -61,59 +75,68 @@ private:
  	void forStatement(int level);			///< for-statement production...
 
 	/// assignment-statement production...
-	void assignStatement(int level, SymbolTable::iterator it, bool dup = false);
+	void assignStatement(int				level,
+						SymbolTable::iterator it,
+						bool				dup = false);
 
 	/// identifier-statement production...
-	void identStatement(int level, const std::string& id);
+	void identStatement(int					level,
+				const	std::string&		id);
 
+	void writeLnStatement(int level);		///< Writeln production..
 	void statement(int level);				///< statement production...
 	void statementList(int level);			///< statement-list-production...
 	void constDeclList(int level);			///< const-declaration-list production...
 	void constDecl(int level);				///< constant-declaration production...
-
 	void typeDecl(int level);				///< type-declaracton production...
 	void typeDeclList(int level);			///< type-declaraction-list production...
-
 	int varDeclBlock(int level);			///< variable-declaration-block production...
 
 	/// variable-declaration-list production...
-	void varDeclList(	int				level,
-						bool			params,
-				const	std::string&	prefix,
-						FieldVec&		idents);
+	void varDeclList(	int					level,
+						bool				params,
+				const	std::string&		prefix,
+						FieldVec&			idents);
 
 	/// variable-declaration production...
-	void varDecl(int level, const std::string& prefix, FieldVec& idents);
+	void varDecl(		int					level,
+				const	std::string&		prefix,
+				FieldVec&					idents);
 
 	/// identifier-lst production...
 	std::vector<std::string> identifierList(
-						int				level,
-				const	std::string&	prefix);
+						int					level,
+				const	std::string&		prefix);
 
 	/// type productions...
-	TDescPtr type(int level, const std::string& prefix);
+	TDescPtr type(		int					level,
+				const	std::string&		prefix = "");
 
 	TDescPtr simpleType(int level);			///< simple-type productions...
 	TDescPtr ordinalType(int level);		///< ordinal type productions...
 
 	/// structued-type productions...
-	TDescPtr structuredType(int level, const std::string& prefix);
+	TDescPtr structuredType(int				level,
+				const	std::string&		prefix);
 
 	/// field-list productions...
-	void fieldList(		int				level,
-				const	std::string&	prefix,
-						FieldVec&		idents);
+	void fieldList(		int					level,
+				const	std::string&		prefix,
+						FieldVec&			idents);
 
 	TDescPtrVec simpleTypeList(int level);	///< simple-type-list productions...
 
 	/// Subroutine-declaration production...
-	SymValue& subPrefixDecl(int level, SymValue::Kind kind);
+	SymValue& subPrefixDecl(int				level,
+							SymValue::Kind	kind);
+
 	void procDecl(int level);				///< procedure-declaration production...
 	void funcDecl(int level);				///< function-declaration production...
 	void subDeclList(int level);			///< function/procedue declaraction productions...
 
 	/// block-declaration production...
-	unsigned blockDecl(SymValue& val, int level);
+	unsigned blockDecl(	SymValue&			val,
+						int					level);
 
 	void run() override;					///< run the compilier...
 };

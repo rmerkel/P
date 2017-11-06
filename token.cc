@@ -65,6 +65,7 @@ Token TokenStream::get() {
 	case ']': return ct.kind = Token::CloseBrkt;	break;
 	case ',': return ct.kind = Token::Comma;		break;
 	case ';': return ct.kind = Token::SemiColon;	break;
+	case '^': return ct.kind = Token::Caret;		break;
 
 	case '>':									// >, or >=?
 		if (!getch(ch))		ct.kind = Token::GT;
@@ -198,6 +199,7 @@ TokenStream::KeywordTable	TokenStream::keywords = {
 	{	"ArcTan",		Token::Atan			},
 	{	"begin",		Token::Begin		},
 	{   "const",		Token::ConsDecl		},
+	{	"Dispose",		Token::Dispose		},
 	{	"do",			Token::Do			},
 	{	"else",			Token::Else			},
 	{	"end",			Token::End			},
@@ -208,6 +210,7 @@ TokenStream::KeywordTable	TokenStream::keywords = {
 	{	"Ln",			Token::Log			},
 	{	"mod",			Token::Mod			},
 	{	"not",			Token::Not			},
+	{	"New",			Token::New			},
 	{	"Odd",			Token::Odd			},
 	{	"of",			Token::Of			},
 	{	"Ord",			Token::Ord			},
@@ -273,6 +276,7 @@ ostream& operator<<(std::ostream& os, const Token::Kind& kind) {
 	case Token::DownTo:		os << "downto";			break;
 
 	case Token::Ellipsis:	os << "..";				break;
+	case Token::Caret:		os << "^";				break;
 
 	case Token::IntType:	os << "Integer";		break;
 	case Token::RealType:	os << "Real";			break;
@@ -319,6 +323,8 @@ ostream& operator<<(std::ostream& os, const Token::Kind& kind) {
 	case Token::Sqrt:		os << "Sqrt";			break;
 	case Token::Succ:		os << "Succ";			break;
 	case Token::Writeln:	os << "Writeln";		break;
+	case Token::New:		os << "New";			break;
+	case Token::Dispose:	os << "Dispose";		break;
 
 	case Token::EOS:		os << "EOS";			break;
 

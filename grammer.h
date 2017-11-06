@@ -26,7 +26,7 @@
  *     structured-type = 'array' '[' simple-type-list ']' 'of' type                         |
  *                       'record' field-lst 'end' ;
  *           field-lst = var-decl-lst ;
- *        pointer-type = '^' identifier ;                                                     X
+ *        pointer-type = '^' identifier ;
  *     simple-type-lst = simple-type { ',' simple-type } ;
  *      identifier-lst = identifier { ',' identifier } ;
  *        sub-decl-lst = func-decl | proc-decl ;
@@ -35,7 +35,8 @@
  *           param-lst = [ '(' var-decl-lst ')' ] ;
  *            variable = identifier [ composite-desc { composite-desc } ] ;
  *      composite-desc = '[' expression-lst ']'                                             |
- *                       '.' identifier ;
+ *                       '.' identifier                                                     |
+ *                       '^' ;
  *       statement-blk = 'begin' statement-lst 'end' ;
  *       statement-lst = 'begin' statement {';' statement } 'end' ;
  *           statement = [  variable '=' expression                                         |
@@ -57,7 +58,6 @@
  *                       '(' expression ')' ;
  *       
  *      EBNF Key:
- *           X   Not implemented
  *           {}  Repeat zero or more times
  *           []  Optional; zero or *one* times
  *           ()  Grouping

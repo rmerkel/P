@@ -16,6 +16,7 @@
  * |  Int    |	1   |    1-10   |   -   |   -  |   -    |	Y    
  * |  Record |	N   |     -     |   -   |   -  | Fields |   N    
  * |  Enum	 |	1   |    X-Y    |   -   |   -  |   -    |	Y    
+ * |  Ptr    |  1   |     -     |   -   |   T  |   -    |   N
  *
  * Key:
  * - IType - is the sub-range (index) type for arrays
@@ -221,12 +222,13 @@ bool operator==(const TypeDesc& lhs, const TypeDesc& rhs) {
 ostream& operator<<(std::ostream& os, const TDesc::Kind& value) {
 	switch (value) {
 	case TypeDesc::Integer:		os << "Integer";		break;
-	case TypeDesc::Real:			os << "Real";			break;
+	case TypeDesc::Real:		os << "Real";			break;
 	case TypeDesc::Boolean:		os << "Boolean";		break;
-	case TypeDesc::Character:		os << "Char";			break;
-	case TypeDesc::Array:			os << "array";			break;
+	case TypeDesc::Character:	os << "Char";			break;
+	case TypeDesc::Array:		os << "array";			break;
 	case TypeDesc::Record:		os << "record";			break;
 	case TypeDesc::Enumeration:	os << "Enumeration";	break;
+	case TypeDesc::Pointer:		os << "Pointer";		break;
 
 	default: 					os << "unknown kind"; assert(false);
 	}
@@ -261,36 +263,71 @@ ostream& operator<<(std::ostream& os, const TypeDesc& type) {
 
 SubRange TDesc::maxRange(numeric_limits<int>::min(), numeric_limits<int>::max());
 
-TDescPtr TDesc::intDesc		= TDesc::newTDesc(TDesc::Kind::Integer, 1, maxRange);
-TDescPtr TDesc::realDesc	= TDesc::newTDesc(TDesc::Kind::Real, 1);
-TDescPtr TDesc::charDesc	= TDesc::newTDesc(TDesc::Kind::Character, 1, SubRange(0, 127));
-TDescPtr TDesc::boolDesc	= TDesc::newTDesc(TDesc::Kind::Boolean, 1, SubRange(0, 1));
+TDescPtr TDesc::intDesc		= TDesc::newIntDesc(maxRange);
+TDescPtr TDesc::realDesc	= TDesc::newRealDesc();
+TDescPtr TDesc::boolDesc	= TDesc::newBoolDesc();
+TDescPtr TDesc::charDesc	= TDesc::newCharDesc(SubRange(0, 127));
 
 /********************************************************************************************//**
- * @param	kind		The type kind 
- * @param	size		Size, in bytes, of a object of this type
  * @param	range		The type sub-range range. Defaults to SubRange().
- * @param	rtype		The type array type. Defaults to TDescPtr().
- * @param	base		The type base type. Defaults to TDescPtr().
- * @param	fields		The type fields. Defaults to FieldVec().
+ * @return TDescPtr to a IntDesc
  ************************************************************************************************/
-TDescPtr TDesc::newTDesc(
-			TDesc::Kind	kind,
-			unsigned	size,
-	const	SubRange&	range,
-			TDescPtr	rtype,
-			TDescPtr	base,
-	const	FieldVec&	fields)
-{
-	switch(kind) {
-	case TypeDesc::Integer:		return TDescPtr( new IntDesc(range)					);	break;
-	case TypeDesc::Real:		return TDescPtr( new RealDesc()						);	break;
-	case TypeDesc::Boolean:		return TDescPtr( new BoolDesc()						);	break;
-	case TypeDesc::Character:	return TDescPtr( new CharDesc(range)				);	break;
-	case TypeDesc::Array:		return TDescPtr( new ArrayDesc(size,range,rtype,base));	break;
-	case TypeDesc::Record:		return TDescPtr( new RecordDesc(size, fields)		);	break;
-	case TypeDesc::Enumeration: return TDescPtr( new EnumDesc(range, fields)		);	break;
-	default:	assert(false);	return TDescPtr();
-	}
+TDescPtr TDesc::newIntDesc(const SubRange& range) {
+	return TDescPtr(new IntDesc(range));
+}
+
+/********************************************************************************************//**
+ * @return TDescPtr to a new RealDesc
+ ************************************************************************************************/
+TDescPtr TDesc::newRealDesc()	{ return TDescPtr(new RealDesc());	}
+
+/********************************************************************************************//**
+ * @return TDescPtr to a new BoolDesc
+ ************************************************************************************************/
+TDescPtr TDesc::newBoolDesc()	{ return TDescPtr(new BoolDesc());	}
+
+/********************************************************************************************//**
+ * @param	range		The type sub-range range. Defaults to SubRange().
+ * @return TDescPtr to a new CharDesc
+ ************************************************************************************************/
+TDescPtr TDesc::newCharDesc(const SubRange& range) {
+	return TDescPtr(new CharDesc(range));
+}
+
+/********************************************************************************************//**
+ * @param	size		Size, in bytes, of a object of this type
+ * @param	range		The type sub-range range.
+ * @param	rtype		The type array type.
+ * @param	base		The type base type. Defaults to TDescPtr().
+ * @return TDescPtr to a new ArrayDesc
+ ************************************************************************************************/
+TDescPtr TDesc::newArrayDesc(unsigned size, const SubRange& range, TDescPtr rtype, TDescPtr base) {
+	return TDescPtr(new ArrayDesc(size, range, rtype, base));
+}
+
+/********************************************************************************************//**
+ * @param	size		Size, in bytes, of a object of this type
+ * @param	fields		The type fields. Defaults to FieldVec().
+ * @return TDescPtr to a new RecordDesc
+ ************************************************************************************************/
+TDescPtr TDesc::newRcrdDesc(unsigned size, const FieldVec& fields) {
+	return TDescPtr(new RecordDesc(size, fields));
+}
+
+/********************************************************************************************//**
+ * @param	range		The type sub-range range.
+ * @param	fields		The type fields. Defaults to FieldVec().
+ * @return TDescPtr to a new EnumDesc
+ ************************************************************************************************/
+TDescPtr TDesc::newEnumDesc(const SubRange& range, const FieldVec& fields) {
+	return TDescPtr(new EnumDesc(range, fields));
+}
+
+/********************************************************************************************//**
+ * @param	base		The type base type. Defaults to TDescPtr().
+ * @return TDescPtr to a new PtrDesc
+ ************************************************************************************************/
+TDescPtr TDesc::newPtrDesc(TDescPtr base) {
+	return TDescPtr(new PtrDesc(base));
 }
 

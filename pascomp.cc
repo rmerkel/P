@@ -699,6 +699,93 @@ void PasComp::statementList(int level) {
 }
 
 /********************************************************************************************//**
+ * Array index expression-lst.
+ *
+ * Process a possibly multi-dimensional,  array index. The opening bracket has already been
+ * consumed, and the caller will consume consume the closing bracket.
+ *
+ * @param	level	The current block level.
+ * @param	it		The arrays's entry into the symbol table
+ * @param	type	The array's type
+ * @return	The arrays base type
+ ************************************************************************************************/
+TDescPtr PasComp::varArray(int level, SymbolTable::iterator it, TDescPtr type) {
+	TDescPtr atype = type;					// The arrays type, e.g, TypeDesc::Array
+	type = atype->base();					// We'll return the arrays base type...
+
+	if (atype->kind() != TypeDesc::Array)
+		error("attempt to index into non-array", it->first);
+
+	auto indexes = expressionList(level);	// expr {, expr }...
+	if (indexes.empty())
+		error("expected expression-list");
+
+	unsigned nindexes = indexes.size();
+	for (auto index : indexes) {			// process each index, in turn
+		emit(OpCode::LLIMIT, 0, atype->range().minimum());
+		emit(OpCode::ULIMIT, 0, atype->range().maximum());
+
+		if (atype->rtype()->kind() != index->kind()) {
+			ostringstream oss;
+			oss	<< "incompatable array index type, expected "
+				<< atype->rtype()->kind() << " got " << index->kind();
+			error(oss.str());
+					
+		} else if (type->size() != 1) {		// scale the index, if necessary
+			emit(OpCode::PUSH, 0, type->size());
+			emit(OpCode::MUL);		// scale the index
+		}
+
+		// offset index for non-zero based arrays
+		if (atype->range().minimum() != 0) {
+			emit(OpCode::PUSH, 0, atype->range().minimum());
+			emit(OpCode::SUB);
+		}
+
+		emit(OpCode::ADD);					// index into the array
+				
+		if (--nindexes) {					// link to next (base) if there's another index
+			auto atype = type;				// The arrays type; kind s/b TypeDesc::Array
+			type = atype->base();			// We'll return the arrays base type...
+		}
+	}
+
+	return type;
+}
+
+/********************************************************************************************//**
+ * Emits a selector reference; the '.' has already been consumed
+ *
+ * @param	it		Variable's entry into the symbol table
+ * @param 	type	The owning record type
+ * @return	The identifier type
+ ************************************************************************************************/
+TDescPtr PasComp::varSelector(SymbolTable::iterator it, TDescPtr type) {
+	if (type->kind() != TypeDesc::Record)
+		error("attempted selector reference into non-record", it->first);
+
+	// Copy, and then consume, the selector identifier...
+	const string selector = ts.current().string_value;
+	if (expect(Token::Identifier)) {
+		unsigned offset = 0;				// Calc the offset into the record...
+		for (const auto& fld : type->fields()) {
+			if (fld.name() == selector) {
+				type = fld.type();			// Return the record field's type
+				break;
+			}
+			offset += fld.type()->size();
+		}
+
+		if (offset > 0) {				// Don't bother if it's the 1st field...
+			emit(OpCode::PUSH, 0, offset);
+			emit(OpCode::ADD);
+		}
+	}
+
+	return type;
+}
+
+/********************************************************************************************//**
  * variable		  = identifier [ composite-desc { composite-desc } ] ;
  * composite-desc = '[' expression-lst ']' | '.' identifier ;
  *
@@ -716,70 +803,24 @@ TDescPtr PasComp::variable(int level, SymbolTable::iterator it) {
 	// process composite-desc's 
 	for (;;) {								// process composite-desc's...
 		if (accept(Token::OpenBrkt)) {		// variable is an array, index into it
-			auto atype = type;				// The arrays type, e.g, TypeDesc::Array
-			type = atype->base();			// We'll return the arrays base type...
-
-			if (atype->kind() != TypeDesc::Array)
-				error("attempt to index into non-array", it->first);
-
-			auto indexes = expressionList(level);
-			if (indexes.empty())
-				error("expected expression-list");
-
-			unsigned nindexes = indexes.size();
-			for (auto index : indexes) {
-				emit(OpCode::LLIMIT, 0, atype->range().minimum());
-				emit(OpCode::ULIMIT, 0, atype->range().maximum());
-
-				if (atype->rtype()->kind() != index->kind()) {
-					ostringstream oss;
-					oss	<< "incompatable array index type, expected "
-						<< atype->rtype()->kind() << " got " << index->kind();
-					error(oss.str());
-					
-				} else if (type->size() != 1) {
-					emit(OpCode::PUSH, 0, type->size());
-					emit(OpCode::MUL);		// scale the index
-				}
-
-				// offset index for non-zero based arrays
-				if (atype->range().minimum() != 0) {
-					emit(OpCode::PUSH, 0, atype->range().minimum());
-					emit(OpCode::SUB);
-				}
-
-				emit(OpCode::ADD);			// index into the array
-				
-				if (--nindexes) {			// link to next (base) if there's another index
-					auto atype = type;		// The arrays type; kind s/b TypeDesc::Array
-					type = atype->base();	// We'll return the arrays base type...
-				}
-			}
+			type = varArray(level, it, type);
 			expect(Token::CloseBrkt);
 
-		} else if (accept(Token::Period)) {		// handle record selector...
-			if (type->kind() != TypeDesc::Record)
-				error("attempt reference into non-record", it->first);
+		} else if (accept(Token::Period))	// handle record selector...
+			type = varSelector(it, type);
 
-			const string selector = ts.current().string_value;
-			if (expect(Token::Identifier)) {	// consume the selector
-				unsigned offset = 0;
-				for (const auto& fld : type->fields()) {
-					if (fld.name() == selector) {
-						type = fld.type();		// Return the record field's type
-						break;
-					}
-					offset += fld.type()->size();
-				}
+		else if (accept(Token::Caret)) {	// Dereference a pointer
+			emit(OpCode::EVAL);	
+			if (type->kind() != TypeDesc::Pointer) {
+				ostringstream oss;
+				oss << "expected a pointer, got " << type->kind();
+				error(oss.str());
+			} else
+				type = type->base();		// Use the pointed to type
+		}
 
-				if (offset > 0) {				// Don't bother if it's the 1st field...
-					emit(OpCode::PUSH, 0, offset);
-					emit(OpCode::ADD);
-				}
-			}
-
-		} else
-			break;
+		else
+			break;							// not a composite-desc
 	}
 
 	return type;
@@ -849,6 +890,50 @@ void PasComp::identStatement(int level, const string& id) {
 }
 
 /********************************************************************************************//**
+ * Writeln [ format-list ]
+ *
+ * @param	level	The current block level.
+ ************************************************************************************************/
+void PasComp::writeLnStatement(int level) {
+	ostringstream oss;
+
+	unsigned nargs = 0;
+	if (accept(Token::OpenParen)) {				// process, and count, each expr-tuple..
+		do {
+			auto expr = expression(level);		// value to write
+
+			if (accept(Token::Colon)) {			// [ ':' width [ ':' precision ]]
+				auto width = expression(level);
+				if (width->kind() != TypeDesc::Integer) {
+					oss << "expeced integer width parameter, got: " << width->kind();
+					error(oss.str());
+				}
+
+				if (accept(Token::Colon)) {		//	[ ':' precision ]
+					auto prec = expression(level);
+					if (prec->kind() != TypeDesc::Integer) {
+						oss << "expeced integer width parameter, got: " << width->kind();
+						error(oss.str());
+					}
+
+				} else
+					emit(OpCode::PUSH, 0, 0);	// push default precision
+						
+			} else {							// push default width & precision
+				emit(OpCode::PUSH, 0, 0);
+				emit(OpCode::PUSH, 0, 0);
+			}
+
+			++nargs;
+		} while (accept(Token::Comma));
+		expect(Token::CloseParen);
+	}
+
+	emit(OpCode::PUSH, 0, nargs);
+	emit(OpCode::WRITELN);
+}
+
+/********************************************************************************************//**
  * [ ident = expr						|
  *   if expr then stmt { else stmt }	|
  *   while expr do stmt					|
@@ -882,41 +967,59 @@ void PasComp::statement(int level) {
 	else if (accept(Token::For))					// 'for' var ':=' expr ( 'to' | 'downto') expr 'do' stmt...
 		forStatement(level);
 
-	else if (accept(Token::Writeln)) {				// Writeln [ '(' expr-tuple { ',' expr-tuple } ')' ]
-		unsigned nargs = 0;
-		if (accept(Token::OpenParen)) {				// process, and count, each expr-tuple..
-			do {
-				auto expr = expression(level);		// value to write
+	// Maybe time for statementProcs()?
 
-				if (accept(Token::Colon)) {			// [ ':' width [ ':' precision ]]
-					auto width = expression(level);
-					if (width->kind() != TypeDesc::Integer) {
-						oss << "expeced integer width parameter, got: " << width->kind();
-						error(oss.str());
-					}
+	else if (accept(Token::Writeln))				// Writeln [ '(' expr-tuple { ',' expr-tuple } ')' ]
+		writeLnStatement(level);
 
-					if (accept(Token::Colon)) {		//	[ ':' precision ]
-						auto prec = expression(level);
-						if (prec->kind() != TypeDesc::Integer) {
-							oss << "expeced integer width parameter, got: " << width->kind();
-							error(oss.str());
-						}
+	else if (accept(Token::New)) {					// 'New (' expr ')'
+		expect(Token::OpenParen);
 
-					} else
-						emit(OpCode::PUSH, 0, 0);	// push default precision
-						
-				} else {							// push default width & precision
-					emit(OpCode::PUSH, 0, 0);
-					emit(OpCode::PUSH, 0, 0);
-				}
-
-				++nargs;
-			} while (accept(Token::Comma));
-			expect(Token::CloseParen);
+#if 0
+		auto tdesc = expression(level);
+		if (tdesc->kind() != TypeDesc::Pointer) {
+			ostringstream oss;
+			oss << "expected a pointer, got " << tdesc->kind();
+			error(oss.str());
 		}
 
-		emit(OpCode::PUSH, 0, nargs);
-		emit(OpCode::WRITELN);
+		emit(OpCode::PUSH, 0, tdesc->size());
+		emit(OpCode::NEW);
+		emit(OpCode::ASSIGN);
+		expect(Token::CloseParen);
+
+#else
+		const string id = ts.current().string_value;
+		if (expect(Token::Identifier)) {
+			auto it = lookup(id);
+			TDescPtr tdesc = TDesc::intDesc;
+			if (it != symtbl.end())
+				tdesc = variable(level, it);
+
+			if (tdesc->kind() != TypeDesc::Pointer) {
+				ostringstream oss;
+				oss << "expected a pointer, got " << tdesc->kind();
+				error(oss.str());
+			}
+
+			emit(OpCode::PUSH, 0, tdesc->size());
+			emit(OpCode::NEW);
+			emit(OpCode::ASSIGN);
+			expect(Token::CloseParen);
+		}
+#endif
+
+	} else if (accept(Token::Dispose)) {			// 'Dispose (' expr ')'
+		expect(Token::OpenParen);
+		auto tdesc = expression(level);
+		if (tdesc->kind() != TypeDesc::Pointer) {
+			ostringstream oss;
+			oss << "expected a pointer, got " << tdesc->kind();
+			error(oss.str());
+		}
+		emit(OpCode::DISPOSE);
+		expect(Token::CloseParen);
+		
 	}
 
 	// else: nothing
@@ -1126,13 +1229,13 @@ vector<string> PasComp::identifierList(int level, const string& prefix) {
  * Token::Type, thus we only need to look for new type declaractions, e.g., "array...".
  *
  * @param	level	The current block level. 
- * @param	prefix	Optional identifier prefix
+ * @param	prefix	Optional identifier prefix. Defaults to "".
  * @return the type description
  ************************************************************************************************/
 TDescPtr PasComp::type(int level, const string& prefix) {
 	auto tdesc = TDesc::intDesc;
 
-	if (accept(Token::Identifier, false)) {		// previously defined type-name
+	if (accept(Token::Identifier, false)) { 	// previously defined type-name
 		const string id = ts.current().string_value;
 		next();
 
@@ -1142,18 +1245,14 @@ TDescPtr PasComp::type(int level, const string& prefix) {
 		else
 			tdesc = it->second.type();
 
-	} else if ((tdesc = structuredType(level, prefix)) != 0) {
+	} else if (accept(Token::Caret)) 			// Pointer type
+		tdesc = TDesc::newPtrDesc(type(level, prefix));
+
+	else if ((tdesc = structuredType(level, prefix)) != 0)
 		;
 
-	} else if ((tdesc = simpleType(level)) != 0)
-		;
-
-#if 0	// TBD
-	else if ((tdesc = pointerType(level)) != 0)
-		;
-#endif
-	else
-		tdesc = TDesc::intDesc;
+	else 
+		tdesc = simpleType(level);
 
 	return tdesc;
 }
@@ -1169,7 +1268,6 @@ TDescPtr PasComp::type(int level, const string& prefix) {
 TDescPtr PasComp::simpleType(int level) {
 	TDescPtr type;
 
-	// Copy if next token is an identifier...
 	if (accept(Token::Identifier, false)) {		// Previously defined type, must be ordinal!
 		const string id = ts.current().string_value;
 		next();
@@ -1212,7 +1310,7 @@ TDescPtr PasComp::ordinalType(int level) {
 		expect(Token::CloseParen);
 
 		// Create the type, excluding the fields (enumerations)
-		type = TDesc::newTDesc(TypeDesc::Enumeration, 1, r, TDescPtr(), TDesc::intDesc);
+		type = TDesc::newEnumDesc(r);
 		EnumDesc* t = dynamic_cast<EnumDesc*>(type.get());
 
 		unsigned value = 0;						// Each enumeration gets a value...
@@ -1225,9 +1323,6 @@ TDescPtr PasComp::ordinalType(int level) {
 		}
 
 		t->fields(enums);
-#if 0
-		type = t;
-#endif
 
 	} else {									// Sub-Range
 		auto minValue = constExpr();
@@ -1257,8 +1352,7 @@ TDescPtr PasComp::ordinalType(int level) {
 			}
 
 			SubRange r(minValue.second.integer(), maxValue.second.integer());
-
-			type = TDesc::newTDesc(TypeDesc::Integer, 1, r);
+			type = TDesc::newIntDesc(r);
 		}
 	}
 
@@ -1282,13 +1376,11 @@ TDescPtr PasComp::structuredType(int level, const string& prefix) {
 		TDescPtrVec indexes = simpleTypeList(level);
 		for (auto index : indexes) {
 			const SubRange r = index->range();
-			if (tp == 0) {
-				// Remember the first array type descriptior...
-				tdesc = TDesc::newTDesc(TypeDesc::Array, r.span(), r, index);
+			tdesc = TDesc::newArrayDesc(r.span(), r, index);
+			if (tp == 0)						// Remember the first array type descriptior...
 				tp = dynamic_cast<ArrayDesc*>(tdesc.get());
 
-			} else {							// Following indexes...
-				tp->base(TDesc::newTDesc(TypeDesc::Array, r.span(), r, index));
+			else {								// Following indexes...
 				tp->size(tp->size() * r.span());
 				tp = dynamic_cast<ArrayDesc*>(tp->base().get());
 			}
@@ -1308,7 +1400,7 @@ TDescPtr PasComp::structuredType(int level, const string& prefix) {
 		for (auto& element : fields)
 			sum += element.type()->size();
 
-		tdesc = TDesc::newTDesc(TypeDesc::Record, sum, SubRange(), TDescPtr(), TDescPtr(), fields);
+		tdesc = TDesc::newRcrdDesc(sum, fields);
 
 		expect(Token::End);
 	}
@@ -1518,6 +1610,7 @@ PasComp::PasComp(const string& pName) : Compilier (pName) {
 
 	// Insert builtin constants into the symbol table
 
-	symtbl.insert( { "MaxInt", SymValue::makeConst(0, TDesc::maxRange.maximum(), TDesc::intDesc) } );
+	symtbl.insert( { "MaxInt",	SymValue::makeConst(0, TDesc::maxRange.maximum(), TDesc::intDesc) } );
+	symtbl.insert( { "nil",		SymValue::makeConst(0, 0, TDesc::newPtrDesc(TDesc::intDesc)) } );
 }
 

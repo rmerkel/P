@@ -52,6 +52,8 @@ const OpCodeInfo::InfoMap OpCodeInfo::opInfoTbl {
 
 	{ OpCode::WRITE,	OpCodeInfo{ "Write",	1			} },
 	{ OpCode::WRITELN,	OpCodeInfo{ "Writeln",	1			} },
+	{ OpCode::NEW,		OpCodeInfo{ "New",		1			} },
+	{ OpCode::DISPOSE,	OpCodeInfo{ "Dispose",	1			} },
 
 	// Binary operations
 

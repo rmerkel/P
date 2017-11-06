@@ -1,0 +1,45 @@
+# test/pointers.p, 1: program PointerTest ;
+# test/pointers.p, 2: var
+    0: call 0, 2
+    1: halt
+# test/pointers.p, 3: 	xp : ^Integer;
+# test/pointers.p, 4: 
+# test/pointers.p, 5: begin
+    2: enter 1
+# test/pointers.p, 6: 	xp := nil;
+    3: pushvar 0, 4
+    4: push 0
+    5: assign
+# test/pointers.p, 7: 	New(xp);
+    6: pushvar 0, 4
+    7: push 1
+    8: New
+    9: assign
+# test/pointers.p, 8: 	if xp = nil then
+   10: pushvar 0, 4
+   11: eval
+   12: push 0
+   13: equ
+   14: jneq 21
+# test/pointers.p, 9: 		Writeln(xp);
+   15: pushvar 0, 4
+   16: eval
+   17: push 0
+   18: push 0
+   19: push 1
+   20: Writeln
+# test/pointers.p, 10: 	xp^ := 0;
+   21: pushvar 0, 4
+   22: eval
+   23: push 0
+   24: assign
+# test/pointers.p, 11: 	Dispose(xp)
+   25: pushvar 0, 4
+   26: eval
+   27: Dispose
+# test/pointers.p, 12: end .
+   28: ret
+
+        8:          0
+        8:       1024
+     1024:          0

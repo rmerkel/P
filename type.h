@@ -89,10 +89,10 @@ public:
 		Character,						///< Character
 		Array,							///< Array of some type
 		Record,							///< Record of fields
-		Enumeration						///< Enumeration of constants
+		Enumeration,					///< Enumeration of constants
+		Pointer							///< Pointer to a type
 	};
 
-	/// Constructor
 	/**	Construct
 	 * @param	size	Object size, in Datums
 	 * @param	range	Sub-Range, defaults SubRange()
@@ -279,8 +279,28 @@ public:
 	bool isOrdinal() const override			{	return true;						}
 };
 
+/********************************************************************************************//**
+ * Pointer type description
+ ************************************************************************************************/
+class PtrDesc : public TypeDesc {
+public:
+	typedef	TypeDesc		Base;			///< My base type
 
-/************************************************************************//**	
+	/// Construct an PtrDesc from base type
+	PtrDesc(TDescPtr base) : Base(1), _base{base} {}
+
+	Kind kind() const override				{	return TypeDesc::Pointer;			}
+
+	/// Return my base type
+	TDescPtr base() const override			{	return _base;						} 
+
+	bool isOrdinal() const override			{	return false;						}
+
+private:
+	TDescPtr	_base;						///< Arrays base type
+};
+
+/********************************************************************************************//**
  * Type Descriptor
  *
  * Describes ordinals (integers, booleans, characters, enumerations),
@@ -288,7 +308,7 @@ public:
  *
  * A number of pre-defined types are provided; integers, constant integers,
  * real, character and boolean.
- ****************************************************************************/
+ ************************************************************************************************/
 class TDesc {
 public:
 	/// Type kinds (type classe 
@@ -307,14 +327,30 @@ public:
 	static TDescPtr charDesc;			///< Character type description
 	static TDescPtr boolDesc;			///< Boolean type descriptor
 
-	/// Create and return a shared pointer to a new TDesc
-	static TDescPtr newTDesc(
-				Kind		kind,
+	/// Create, and return, a TDescPtr to a new IntDesc
+	static TDescPtr newIntDesc(const SubRange& range = SubRange());
+
+	static TDescPtr newRealDesc();		///< Create, and return, a TDescPtr to a new RealDesc
+	static TDescPtr newBoolDesc();		///< Create, and return, a TDescPtr to a BoolDesc
+
+	/// Create, and return, a TDescPtr to a new CharDesc
+	static TDescPtr newCharDesc(const SubRange& range);
+
+	/// Create, and return, a TDescPtr to a new ArrayDesc
+	static TDescPtr newArrayDesc(
 				unsigned	size,
-		const	SubRange&	range		= SubRange(),
-				TDescPtr	rtype		= TDescPtr(),
-				TDescPtr	base		= TDescPtr(),
-		const	FieldVec&	fields		= FieldVec());
+		const	SubRange&	range,
+				TDescPtr	rtype,
+				TDescPtr	base = TDescPtr());
+
+	/// Create, and return, a TDescPtr to a new RecordDesc
+	static TDescPtr newRcrdDesc(unsigned size, const FieldVec& fields = FieldVec());
+
+	/// Create, and return, a TDescPtr to a new EnumDesc
+	static TDescPtr newEnumDesc(const SubRange& range, const FieldVec& fields = FieldVec());
+
+	/// Create, and return, a TDescPtr to a new PtrDesc
+	static TDescPtr newPtrDesc(TDescPtr base);
 
 	virtual ~TDesc() {}					///< Destructor
 };

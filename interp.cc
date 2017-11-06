@@ -24,7 +24,7 @@ using namespace std;
  * Dump the current machine state
  ************************************************************************************************/
 void Interp::dump() {
-	if (lastWrite.valid())				// dump the last write..
+	if (lastWrite.valid())				// dump the last write...
 		cout << "    "
 			 << setw(5)	<< lastWrite << ": "
 			 << setw(10) << stack[lastWrite]
@@ -69,16 +69,6 @@ unsigned Interp::base(unsigned lvl) {
 }
 
 /********************************************************************************************//**
- * Make sure that there is room for at least sp+n elements in the stack.
- * @param	n	Maximum number of entries pushed down on the stack, if necessary, to make
- *  		    sufficient room for sp+n entries.
- ************************************************************************************************/
-void Interp::mkStackSpace(unsigned n) {
-	while (stack.size() <= static_cast<unsigned> (sp + n))
-		stack.push_back(-1);
-}
-
-/********************************************************************************************//**
  * @return the top-of-stack
  ************************************************************************************************/
 Datum Interp::pop()					{	return stack[sp--];		}
@@ -87,7 +77,6 @@ Datum Interp::pop()					{	return stack[sp--];		}
  * @param d	Datum to push on to the stack
  ************************************************************************************************/
 void Interp::push(Datum d) {
-	mkStackSpace(1);
 	stack[++sp] = d;
 }
 
@@ -96,8 +85,6 @@ void Interp::push(Datum d) {
  * @param 	addr 	The address of the subroutine.
  ************************************************************************************************/
 void Interp::call(int8_t nlevel, unsigned addr) {
-	mkStackSpace(FrameSize);
-
 	const auto oldFp = fp;			// Save a copy before we modify it
 
 	// Push a new activation frame block on the stack:
@@ -287,6 +274,22 @@ Interp::Result Interp::step() {
 		cout << '\n';
 		break;
 
+	case OpCode::NEW:
+		push(heap.alloc(pop().natural()));
+		if (verbose)
+			heap.dump(cout);					// Dump the new heap state...
+		break;
+
+	case OpCode::DISPOSE:
+		rhand = pop();
+		if (!heap.free(rhand.natural())) {
+			cerr << "Dispose of " << rhand << " failed!\n";
+			return Result::freeStoreError;
+		}
+		if (verbose)
+			heap.dump(cout);					// Dump the new heap state...
+		break;
+
 	case OpCode::NEG:	stack[sp] = -stack[sp];									break;
 	case OpCode::ADD:	rhand = pop(); push(pop() + rhand);						break;
 	case OpCode::SUB:	rhand = pop(); push(pop() - rhand); 					break;
@@ -337,7 +340,7 @@ Interp::Result Interp::step() {
 	case OpCode::RET:   ret();  												break;
 	case OpCode::RETF: 	retf();													break;
 
-	case OpCode::ENTER: mkStackSpace(ir.addr.natural()); sp+=ir.addr.natural(); break;
+	case OpCode::ENTER: sp+=ir.addr.natural(); break;
 	case OpCode::JUMP:	pc = ir.addr.natural();									break;
 	case OpCode::JNEQ:	if (pop().integer() == 0) pc = ir.addr.natural();		break;
 
@@ -370,14 +373,17 @@ Interp::Result Interp::run() {
 		cout << "Reg  Addr Value/Instr\n"
 			 << "---------------------\n";
 
+	if (verbose)
+		heap.dump(cout);					// Dump the initial heap state...
+
 	Result status = Result::success;
 	do {
 		if (pc >= code.size()) {
 			cerr << "pc (" << pc << ") is out of range: [0.." << code.size() << ")!\n";
 			status = Result::badFetch;
 
-		} else if (sp >= stack.size()) {
-			cerr << "sp (" << sp << ") is out of range [0.." << stack.size() << ")!\n";
+		} else if (sp >= heap.addr()) {
+			cerr << "sp (" << sp << ") is out of range [0.." << heap.addr() << ")!\n";
 			status = Result::stackUnderflow;
 
 		} else {
@@ -393,9 +399,17 @@ Interp::Result Interp::run() {
 //public
 
 /********************************************************************************************//**
- *  Initialize the machine into a reset state with verbose == false.
+ * Initialize the machine into a reset state with verbose == false. 
+ *
+ * @param stackSz	Size of the stack, in datums. Defaults to 1K.
+ * @param fstoreSz	Size of the free store, in datums. Defaults to 3K
  ************************************************************************************************/
-Interp::Interp() : stack(FrameSize), verbose(false), ncycles(0)	{
+Interp::Interp(unsigned stackSz, unsigned fstoreSz)
+	:	stackSize{stackSz},
+		stack(stackSize + fstoreSz, -1),
+		verbose(false), ncycles(0),
+		heap(stackSz, fstoreSz)
+{
 	reset();
 }
 
@@ -425,7 +439,7 @@ void Interp::reset() {
 	fp = 0;									// Setup the initial activacation frame
 	for (sp = 0; sp < FrameSize; ++sp)
 		stack[sp] = 0;
-	sp = stack.size() - 1;
+	sp = FrameSize - 1;
 
 	ncycles = 0;
 }
@@ -456,6 +470,7 @@ ostream& operator<<(std::ostream& os, const Interp::Result& result) {
 	case Interp::unknownInstr:		os << "unknown-instruction";	break;
 	case Interp::stackOverflow:		os << "stack overflow";			break;
 	case Interp::stackUnderflow:	os << "stack underflow";		break;
+	case Interp::freeStoreError:	os << "free-store error";		break;
 	case Interp::outOfRange:		os << "out-of-range";			break;
 	case Interp::halted:			os << "halted";					break;
 	default:
