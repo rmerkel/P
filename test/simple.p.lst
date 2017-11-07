@@ -1,5 +1,5 @@
 # test/simple.p, 1: program simple ;
-# test/simple.p, 2: var x, y : Integer;
+# test/simple.p, 2: var x, y : integer;
     0: call 0, 2
     1: halt
 # test/simple.p, 3: begin

@@ -2,11 +2,11 @@
 # test/fortest.p, 2: var
     0: call 0, 2
     1: halt
-# test/fortest.p, 3: 	i : Integer;
+# test/fortest.p, 3: 	i : integer;
 # test/fortest.p, 4: 
 # test/fortest.p, 5: begin
     2: enter 1
-# test/fortest.p, 6: 	for i := 0 to -1 do Writeln(i);
+# test/fortest.p, 6: 	for i := 0 to -1 do writeln(i);
     3: pushvar 0, 4
     4: dup
     5: push 0
@@ -22,7 +22,7 @@
    15: push 0
    16: push 0
    17: push 1
-   18: Writeln
+   18: writeln
    19: dup
    20: dup
    21: eval
@@ -31,7 +31,7 @@
    24: assign
    25: jump 7
    26: pop
-# test/fortest.p, 7: 	for i := 0 to 0 do Writeln(i);
+# test/fortest.p, 7: 	for i := 0 to 0 do writeln(i);
    27: pushvar 0, 4
    28: dup
    29: push 0
@@ -46,7 +46,7 @@
    38: push 0
    39: push 0
    40: push 1
-   41: Writeln
+   41: writeln
    42: dup
    43: dup
    44: eval
@@ -55,7 +55,7 @@
    47: assign
    48: jump 31
    49: pop
-# test/fortest.p, 8: 	for i := 1 to 9 do Writeln(i)
+# test/fortest.p, 8: 	for i := 1 to 9 do writeln(i)
    50: pushvar 0, 4
    51: dup
    52: push 1
@@ -71,7 +71,7 @@
    62: push 0
 # test/fortest.p, 9: end .
    63: push 1
-   64: Writeln
+   64: writeln
    65: dup
    66: dup
    67: eval

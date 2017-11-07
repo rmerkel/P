@@ -193,40 +193,41 @@ void TokenStream::set_input(std::istream* p) {
 // privite static
 
 TokenStream::KeywordTable	TokenStream::keywords = {
-	{	"Abs",			Token::Abs			},
+	{	"abs",			Token::Abs			},
 	{	"and",			Token::And			},
 	{	"array",		Token::Array		},
-	{	"ArcTan",		Token::Atan			},
+	{	"arctan",		Token::Atan			},
 	{	"begin",		Token::Begin		},
 	{   "const",		Token::ConsDecl		},
-	{	"Dispose",		Token::Dispose		},
+	{	"dispose",		Token::Dispose		},
 	{	"do",			Token::Do			},
 	{	"else",			Token::Else			},
 	{	"end",			Token::End			},
-	{	"Exp",			Token::Exp			},
+	{	"exp",			Token::Exp			},
 	{	"function",		Token::FuncDecl		},
 	{	"if",			Token::If			},
-	{	"Integer",		Token::IntType		},
-	{	"Ln",			Token::Log			},
+	{	"integer",		Token::IntType		},
+	{	"ln",			Token::Log			},
 	{	"mod",			Token::Mod			},
 	{	"not",			Token::Not			},
-	{	"New",			Token::New			},
-	{	"Odd",			Token::Odd			},
+	{	"new",			Token::New			},
+	{	"odd",			Token::Odd			},
 	{	"of",			Token::Of			},
-	{	"Ord",			Token::Ord			},
+	{	"ord",			Token::Ord			},
 	{	"program",		Token::ProgDecl		},
 	{	"procedure",	Token::ProcDecl		},
-	{	"Pred",			Token::Pred			},
+	{	"pred",			Token::Pred			},
 	{	"record",		Token::Record		},
-	{	"Real",			Token::RealType		},
+	{	"real",			Token::RealType		},
+	{	"boolean",		Token::BoolType		},
 	{	"repeat",		Token::Repeat		},
-	{	"Round",		Token::Round		},
-	{	"Sin",			Token::Sin			},
-	{	"Sqr",			Token::Sqr			},
-	{	"Sqrt",			Token::Sqrt			},
-	{	"Succ",			Token::Succ			},
+	{	"round",		Token::Round		},
+	{	"sin",			Token::Sin			},
+	{	"sqr",			Token::Sqr			},
+	{	"sqrt",			Token::Sqrt			},
+	{	"succ",			Token::Succ			},
 	{	"then",			Token::Then			},
-	{	"Trunc",		Token::Trunc		},
+	{	"trunc",		Token::Trunc		},
 	{	"type",			Token::TypeDecl		},
 	{	"until",		Token::Until		},
 	{	"for",			Token::For			},
@@ -234,7 +235,7 @@ TokenStream::KeywordTable	TokenStream::keywords = {
 	{	"downto",		Token::DownTo,		},
 	{	"var",			Token::VarDecl		},
 	{	"while",		Token::While		},
-	{	"Writeln",		Token::Writeln		}
+	{	"writeln",		Token::Writeln		}
 };
 
 // operators
@@ -252,7 +253,7 @@ ostream& operator<<(std::ostream& os, const Token::Kind& kind) {
 	case Token::BadComment:	os << "bad comment";	break;
 
 	case Token::Identifier:	os << "identifier";		break;
-	case Token::IntegerNum:	os << "IntegerNum";		break;
+	case Token::IntegerNum:	os << "integernum";		break;
 	case Token::RealNum:	os << "RealNum";		break;
 
 	case Token::ConsDecl:	os << "const";			break;
@@ -278,8 +279,9 @@ ostream& operator<<(std::ostream& os, const Token::Kind& kind) {
 	case Token::Ellipsis:	os << "..";				break;
 	case Token::Caret:		os << "^";				break;
 
-	case Token::IntType:	os << "Integer";		break;
-	case Token::RealType:	os << "Real";			break;
+	case Token::IntType:	os << "integer";		break;
+	case Token::RealType:	os << "real";			break;
+	case Token::BoolType:	os << "boolean";		break;
 
 	case Token::Array:		os << "array";			break;
 	case Token::Of:			os << "of";				break;
@@ -310,21 +312,21 @@ ostream& operator<<(std::ostream& os, const Token::Kind& kind) {
 	case Token::SemiColon:	os << ";";				break;
 	case Token::Assign:		os << ":=";				break;
 
-	case Token::Round:		os << "Round";			break;
-	case Token::Trunc:		os << "Trunc";			break;
-	case Token::Abs:		os << "Abs";			break;
-	case Token::Atan:		os << "ArcTan";			break;
-	case Token::Exp:		os << "Exp";			break;
-	case Token::Log:		os << "Ln";				break;
-	case Token::Odd:		os << "Odd";			break;
-	case Token::Pred:		os << "Pred";			break;
-	case Token::Sin:		os << "Sin";			break;
-	case Token::Sqr:		os << "Sqr";			break;
-	case Token::Sqrt:		os << "Sqrt";			break;
-	case Token::Succ:		os << "Succ";			break;
-	case Token::Writeln:	os << "Writeln";		break;
-	case Token::New:		os << "New";			break;
-	case Token::Dispose:	os << "Dispose";		break;
+	case Token::Round:		os << "round";			break;
+	case Token::Trunc:		os << "trunc";			break;
+	case Token::Abs:		os << "abs";			break;
+	case Token::Atan:		os << "arctan";			break;
+	case Token::Exp:		os << "exp";			break;
+	case Token::Log:		os << "ln";				break;
+	case Token::Odd:		os << "odd";			break;
+	case Token::Pred:		os << "pred";			break;
+	case Token::Sin:		os << "sin";			break;
+	case Token::Sqr:		os << "sqr";			break;
+	case Token::Sqrt:		os << "sqrt";			break;
+	case Token::Succ:		os << "succ";			break;
+	case Token::Writeln:	os << "writeln";		break;
+	case Token::New:		os << "new";			break;
+	case Token::Dispose:	os << "dispose";		break;
 
 	case Token::EOS:		os << "EOS";			break;
 

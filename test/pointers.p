@@ -1,12 +1,12 @@
 program PointerTest ;
 var
-	xp : ^Integer;
+	xp : ^integer;
 
 begin
 	xp := nil;
-	New(xp);
+	new(xp);
 	if xp = nil then
-		Writeln(xp);
+		writeln(xp);
 	xp^ := 0;
-	Dispose(xp)
+	dispose(xp)
 end .

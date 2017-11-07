@@ -44,16 +44,16 @@ const OpCodeInfo::InfoMap OpCodeInfo::opInfoTbl {
 	{ OpCode::PRED,		OpCodeInfo{ "pred",		1			} },
 	{ OpCode::SUCC,		OpCodeInfo{ "succ",		1			} },
 
-	{ OpCode::SIN,		OpCodeInfo{ "Sin",		1			} },
-	{ OpCode::SQR,		OpCodeInfo{ "Sqr",		1			} },
-	{ OpCode::SQRT,		OpCodeInfo{ "Sqrt",		1			} },
+	{ OpCode::SIN,		OpCodeInfo{ "sin",		1			} },
+	{ OpCode::SQR,		OpCodeInfo{ "sqr",		1			} },
+	{ OpCode::SQRT,		OpCodeInfo{ "sqrt",		1			} },
 
 	// Builtin procedures
 
-	{ OpCode::WRITE,	OpCodeInfo{ "Write",	1			} },
-	{ OpCode::WRITELN,	OpCodeInfo{ "Writeln",	1			} },
-	{ OpCode::NEW,		OpCodeInfo{ "New",		1			} },
-	{ OpCode::DISPOSE,	OpCodeInfo{ "Dispose",	1			} },
+	{ OpCode::WRITE,	OpCodeInfo{ "write",	1			} },
+	{ OpCode::WRITELN,	OpCodeInfo{ "writeln",	1			} },
+	{ OpCode::NEW,		OpCodeInfo{ "new",		1			} },
+	{ OpCode::DISPOSE,	OpCodeInfo{ "dispose",	1			} },
 
 	// Binary operations
 

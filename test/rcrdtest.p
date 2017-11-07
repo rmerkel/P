@@ -2,20 +2,20 @@
 program RecordTests;
 type
 	R = record 
-		i1, i2 : Integer;
-		r : Real
+		i1, i2 : integer;
+		r : real
 	end;
 	R2 = record
-		i1, i2 : Integer;
-		r : Real
+		i1, i2 : integer;
+		r : real
 	end;
 
 var
 	x : R;
 	y : R2;
 	z : record
-		i1, i2 : Integer;
-		r : Real
+		i1, i2 : integer;
+		r : real
 	end;
 
 begin

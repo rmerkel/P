@@ -59,8 +59,9 @@ struct Token {
 		Ellipsis,						///< ".."
 		Caret,							///< "^"
 
-		IntType,						///< "Integer"
-		RealType,						///< "Real"
+		IntType,						///< "integer"
+		RealType,						///< "real"
+		BoolType,						///< "boolean"
 
 		Array,							///< "array"
 		Of,								///< "of"

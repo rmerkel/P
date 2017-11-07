@@ -1,5 +1,5 @@
 # test/divbyzero.p, 1: program divbyzero ;
-# test/divbyzero.p, 2: var x, y, z : Integer;
+# test/divbyzero.p, 2: var x, y, z : integer;
     0: call 0, 2
     1: halt
 # test/divbyzero.p, 3: 

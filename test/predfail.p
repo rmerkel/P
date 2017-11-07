@@ -3,5 +3,5 @@ type
 	e = (zero, one, two, three, four);
 
 begin
-	Writeln(Pred(zero))
+	writeln(pred(zero))
 end .

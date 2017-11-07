@@ -5,32 +5,32 @@
 # test/predsucc.p, 3: 	e = (zero, one, two, three, four);
 # test/predsucc.p, 4: 
 # test/predsucc.p, 5: begin
-# test/predsucc.p, 6: 	Writeln(zero);
+# test/predsucc.p, 6: 	writeln(zero);
     2: push 0
     3: push 0
     4: push 0
     5: push 1
-    6: Writeln
-# test/predsucc.p, 7: 	Writeln(Pred(two));
+    6: writeln
+# test/predsucc.p, 7: 	writeln(pred(two));
     7: push 2
     8: pred 0
     9: push 0
    10: push 0
    11: push 1
-   12: Writeln
-# test/predsucc.p, 8: 	Writeln(two);
+   12: writeln
+# test/predsucc.p, 8: 	writeln(two);
    13: push 2
    14: push 0
    15: push 0
    16: push 1
-   17: Writeln
-# test/predsucc.p, 9: 	Writeln(Succ(two));
+   17: writeln
+# test/predsucc.p, 9: 	writeln(succ(two));
    18: push 2
    19: succ 4
    20: push 0
    21: push 0
    22: push 1
-   23: Writeln
+   23: writeln
 # test/predsucc.p, 10: end .
    24: ret
 

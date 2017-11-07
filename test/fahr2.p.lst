@@ -10,7 +10,7 @@
 # test/fahr2.p, 8: 	STEP  =  20.0;	{	table step size		}
 # test/fahr2.p, 9: 
 # test/fahr2.p, 10: var
-# test/fahr2.p, 11: 	fahr, celsius : Real;
+# test/fahr2.p, 11: 	fahr, celsius : real;
 # test/fahr2.p, 12: 
 # test/fahr2.p, 13: begin
     2: enter 2

@@ -1,11 +1,11 @@
-program testReal ;
+program TestReal ;
 var
-	f : Real; i : Integer;
+	f : real; i : integer;
 
 begin
 	i := 1;
 	i := 2.0;
-	f := Round(2.5);
+	f := round(2.5);
 	f := 4;
 	f := 5.0;
 end .

@@ -38,7 +38,6 @@ Bugs
  * No files, characters, strings, just signed integers and reals
  * No input instructions, and just elementary Write/Writeln implementation.
  * No interactive mode for debugging; just automatic single stepping (-v)
- * No pointers or dynamic memory
 
 History
  * 0.1  Initial fork form pl0c, modified to use =, <> etc.
@@ -57,6 +56,7 @@ History
  * 0.14 Write/WriteLn field specifiers.
  * 0.15 Records and selectors
  * 0.16 Refactored records, selectors and arrays. Added New(), Dispose() and nil
+ * 0.16 Boolean
 
 Author
     Randy Merkel, Slowly but Surly Software.

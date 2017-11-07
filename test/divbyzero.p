@@ -1,5 +1,5 @@
 program divbyzero ;
-var x, y, z : Integer;
+var x, y, z : integer;
 
 begin
 	y := 10;

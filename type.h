@@ -178,7 +178,7 @@ class BoolDesc : public TypeDesc {
 public:
 	typedef	TypeDesc		Base;			///< My base type
 
-	BoolDesc() : Base(1) {}					/// Construct a BoolDesc
+	BoolDesc() : Base(1, SubRange(0, 1)) {}	/// Construct a BoolDesc
 
 	Kind kind() const override				{	return TypeDesc::Boolean;			}
 	bool isOrdinal() const override			{	return true;						}

@@ -1,17 +1,17 @@
 { Test advanced types, fail	}
-program typefail ;
+program Typefail ;
 type
 	rng = 0..9;
 	enum = (	one, two, three	);
 
 var
-	i : Integer;
+	i : integer;
 	r : rng;
-	a : array[rng] of Integer;
-	a2 : array [enum] of Integer;
+	a : array[rng] of integer;
+	a2 : array [enum] of integer;
 
 begin
-	i := one;				{	error: expected Integer, got enum		}
+	i := one;				{	error: expected integer, got enum		}
 
 	r := 0;
 	while r < 10 do begin 	{	*** warning: condition might always be true	}
@@ -23,6 +23,6 @@ begin
 	a[1+9] := 10;			{	*** error: out-of-range/range check error	}
 
 	a2[one] := 1;
-	a2[2] := 2;				{	error: got Integer, expected enum		}
-	a2[two + 1] := 3		{	error: expected enum, got Integer		}
+	a2[2] := 2;				{	error: got integer, expected enum		}
+	a2[two + 1] := 3		{	error: expected enum, got integer		}
 end .

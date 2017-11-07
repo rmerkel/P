@@ -890,7 +890,7 @@ void PasComp::identStatement(int level, const string& id) {
 }
 
 /********************************************************************************************//**
- * Writeln [ format-list ]
+ * writeln [ format-list ]
  *
  * @param	level	The current block level.
  ************************************************************************************************/
@@ -969,7 +969,7 @@ void PasComp::statement(int level) {
 
 	// Maybe time for statementProcs()?
 
-	else if (accept(Token::Writeln))				// Writeln [ '(' expr-tuple { ',' expr-tuple } ')' ]
+	else if (accept(Token::Writeln))				// writeln [ '(' expr-tuple { ',' expr-tuple } ')' ]
 		writeLnStatement(level);
 
 	else if (accept(Token::New)) {					// 'New (' expr ')'
@@ -1302,6 +1302,9 @@ TDescPtr PasComp::ordinalType(int level) {
 	if (accept(Token::IntType))					// Integer
 		return TDesc::intDesc;
 
+	else if (accept(Token::BoolType))			// Boolean
+		return TDesc::boolDesc;
+
 	else if (accept(Token::OpenParen)) {		// Enumeration
 		FieldVec		enums;
 
@@ -1605,12 +1608,15 @@ PasComp::PasComp(const string& pName) : Compilier (pName) {
 
 	// Insert builtin types into the symbol table
 
-	symtbl.insert( { "Integer",	SymValue::makeType(0, TDesc::intDesc)	} );
-	symtbl.insert( { "Real",	SymValue::makeType(0, TDesc::realDesc)	} );
+	symtbl.insert( { "integer",	SymValue::makeType(0, TDesc::intDesc)	} );
+	symtbl.insert( { "real",	SymValue::makeType(0, TDesc::realDesc)	} );
+	symtbl.insert( { "bool",	SymValue::makeType(0, TDesc::boolDesc)	} );
 
-	// Insert builtin constants into the symbol table
+	// Insert built-in constants into the symbol table; id, level (always zero), and value
 
-	symtbl.insert( { "MaxInt",	SymValue::makeConst(0, TDesc::maxRange.maximum(), TDesc::intDesc) } );
-	symtbl.insert( { "nil",		SymValue::makeConst(0, 0, TDesc::newPtrDesc(TDesc::intDesc)) } );
+	symtbl.insert({"maxint", SymValue::makeConst(0, TDesc::maxRange.maximum(), TDesc::intDesc)	});
+	symtbl.insert({"nil",    SymValue::makeConst(0, 0, TDesc::newPtrDesc(TDesc::intDesc))		});
+	symtbl.insert({"true",   SymValue::makeConst(0, 1, TDesc::boolDesc)							});
+	symtbl.insert({"false",  SymValue::makeConst(0, 0, TDesc::boolDesc)							});
 }
 

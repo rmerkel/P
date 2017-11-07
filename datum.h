@@ -29,6 +29,7 @@ class Datum {
 public:
 	/// Datum "kinds"
 	enum Kind {
+		Boolean,							///< Boolean value
 		Integer,							///< Signed integer
 		Real								///< Floating point
 	};
@@ -50,9 +51,11 @@ public:
 	int integer() const;					///< Return my integer value...
 	unsigned natural() const;				///< Return my natual (unsigned) value...
 	double real() const;					///< Return my real value...
+	bool boolean() const;					///< Return my boolean value
 
 private:
 	union {
+		bool		b;						///< k == Boolean
 		int			i;						///< k == Integer
 		unsigned	u;						///< k == Integer, but need unsigned
 		double		r;						///< k == Real

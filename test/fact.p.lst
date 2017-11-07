@@ -13,8 +13,8 @@
 # test/fact.p, 13: const nFacts = 10;
     0: call 0, 25
     1: halt
-# test/fact.p, 14: var p : Integer;
-# test/fact.p, 15: procedure factorial(n : Integer) ; begin
+# test/fact.p, 14: var p : integer;
+# test/fact.p, 15: procedure factorial(n : integer) ; begin
 # test/fact.p, 16:         p := 1;
     2: pushvar 1, 4
     3: push 1

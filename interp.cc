@@ -131,17 +131,21 @@ void Interp::write1(unsigned index) {
 	const auto prec = stack[index+2].natural();
 
 	switch(value.kind()) {
-	case Datum::Real:				// just use defaults for now..
+	case Datum::Real:
 		if (prec == 0)
 			cout << setw(width) << scientific << setprecision(6) << value;
 		else
 			cout << setw(width) << fixed << setprecision(prec) << value;
 		break;
 
-	case Datum::Integer:			// just use defaults for now..
+	case Datum::Integer:
 		cout << setw(width) << setprecision(prec) << value;
 		break;
 	
+	case Datum::Boolean:
+		cout << setw(width) << value;
+		break;
+
 	default:
 		cerr << "unknown datum type: " << static_cast<unsigned>(value.kind()) << endl;
 		assert(false);
@@ -342,7 +346,10 @@ Interp::Result Interp::step() {
 
 	case OpCode::ENTER: sp+=ir.addr.natural(); break;
 	case OpCode::JUMP:	pc = ir.addr.natural();									break;
-	case OpCode::JNEQ:	if (pop().integer() == 0) pc = ir.addr.natural();		break;
+	case OpCode::JNEQ:
+		if (pop().boolean() == false)
+			pc = ir.addr.natural();
+		break;
 
 	case OpCode::LLIMIT:
 		if (stack[sp] < ir.addr.integer())

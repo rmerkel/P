@@ -3,7 +3,7 @@
 # test/comment.p, 3: const nFacts = 10;
     0: call 0, 2
     1: halt
-# test/comment.p, 4: var n, f : Integer;	{ var z; parser doesn't see 'z' }
+# test/comment.p, 4: var n, f : integer;	{ var z; parser doesn't see 'z' }
 # test/comment.p, 5: begin
     2: enter 2
 # test/comment.p, 6:    n := 0;

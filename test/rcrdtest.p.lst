@@ -4,20 +4,20 @@
     0: call 0, 2
     1: halt
 # test/rcrdtest.p, 4: 	R = record 
-# test/rcrdtest.p, 5: 		i1, i2 : Integer;
-# test/rcrdtest.p, 6: 		r : Real
+# test/rcrdtest.p, 5: 		i1, i2 : integer;
+# test/rcrdtest.p, 6: 		r : real
 # test/rcrdtest.p, 7: 	end;
 # test/rcrdtest.p, 8: 	R2 = record
-# test/rcrdtest.p, 9: 		i1, i2 : Integer;
-# test/rcrdtest.p, 10: 		r : Real
+# test/rcrdtest.p, 9: 		i1, i2 : integer;
+# test/rcrdtest.p, 10: 		r : real
 # test/rcrdtest.p, 11: 	end;
 # test/rcrdtest.p, 12: 
 # test/rcrdtest.p, 13: var
 # test/rcrdtest.p, 14: 	x : R;
 # test/rcrdtest.p, 15: 	y : R2;
 # test/rcrdtest.p, 16: 	z : record
-# test/rcrdtest.p, 17: 		i1, i2 : Integer;
-# test/rcrdtest.p, 18: 		r : Real
+# test/rcrdtest.p, 17: 		i1, i2 : integer;
+# test/rcrdtest.p, 18: 		r : real
 # test/rcrdtest.p, 19: 	end;
 # test/rcrdtest.p, 20: 
 # test/rcrdtest.p, 21: begin

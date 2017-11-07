@@ -1,8 +1,8 @@
 ./pas: incompatable binary types near line 14
-./pas: incompatable array index type, expected Enumeration got Integer near line 26
+./pas: incompatable array index type, expected enumeration got integer near line 26
 ./pas: incompatable binary types near line 27
 # test/typefail.p, 1: { Test advanced types, fail	}
-# test/typefail.p, 2: program typefail ;
+# test/typefail.p, 2: program Typefail ;
 # test/typefail.p, 3: type
     0: call 0, 2
     1: halt
@@ -10,14 +10,14 @@
 # test/typefail.p, 5: 	enum = (	one, two, three	);
 # test/typefail.p, 6: 
 # test/typefail.p, 7: var
-# test/typefail.p, 8: 	i : Integer;
+# test/typefail.p, 8: 	i : integer;
 # test/typefail.p, 9: 	r : rng;
-# test/typefail.p, 10: 	a : array[rng] of Integer;
-# test/typefail.p, 11: 	a2 : array [enum] of Integer;
+# test/typefail.p, 10: 	a : array[rng] of integer;
+# test/typefail.p, 11: 	a2 : array [enum] of integer;
 # test/typefail.p, 12: 
 # test/typefail.p, 13: begin
     2: enter 15
-# test/typefail.p, 14: 	i := one;				{	error: expected Integer, got enum		}
+# test/typefail.p, 14: 	i := one;				{	error: expected integer, got enum		}
     3: pushvar 0, 4
     4: push 0
     5: assign
@@ -88,7 +88,7 @@
    59: add
    60: push 1
    61: assign
-# test/typefail.p, 26: 	a2[2] := 2;				{	error: got Integer, expected enum		}
+# test/typefail.p, 26: 	a2[2] := 2;				{	error: got integer, expected enum		}
    62: pushvar 0, 16
    63: push 2
    64: llimit 0
@@ -96,7 +96,7 @@
    66: add
    67: push 2
    68: assign
-# test/typefail.p, 27: 	a2[two + 1] := 3		{	error: expected enum, got Integer		}
+# test/typefail.p, 27: 	a2[two + 1] := 3		{	error: expected enum, got integer		}
    69: pushvar 0, 16
    70: push 1
    71: push 1

@@ -13,9 +13,9 @@
 # test/fact2.p, 13: const nFacts = 10;
     0: call 0, 30
     1: halt
-# test/fact2.p, 14: var result : Integer;
-# test/fact2.p, 15: function factorial(n : Integer) : Integer ;
-# test/fact2.p, 16: 	var p : Integer;
+# test/fact2.p, 14: var result : integer;
+# test/fact2.p, 15: function factorial(n : integer) : integer ;
+# test/fact2.p, 16: 	var p : integer;
 # test/fact2.p, 17: 
 # test/fact2.p, 18: 	begin
     2: enter 1

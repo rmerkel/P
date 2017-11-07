@@ -10,7 +10,7 @@
 {	10	3,628,800	}
 program test ;
 const nFacts = 10;
-var n, f : Integer;	
+var n, f : integer;	
 begin
    n := 0;
    f := 1;

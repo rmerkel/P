@@ -5,14 +5,14 @@
 # test/succfail.p, 3: 	e = (zero, one, two, three, four);
 # test/succfail.p, 4: 
 # test/succfail.p, 5: begin
-# test/succfail.p, 6: 	Writeln(Succ(four))
+# test/succfail.p, 6: 	writeln(succ(four))
     2: push 4
     3: succ 4
     4: push 0
     5: push 0
 # test/succfail.p, 7: end .
     6: push 1
-    7: Writeln
+    7: writeln
     8: ret
 
 ./pas: runtime error: out-of-range!

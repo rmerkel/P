@@ -24,7 +24,7 @@ Datum::Datum() : i{0}, k{Kind::Integer}							{}
 /********************************************************************************************//**
  * @param	value	Boolean value... converted to 0 (false) or 1 (true)
  ************************************************************************************************/
-Datum::Datum(bool value) : i{value? 1 : 0}, k{Kind::Integer}	{}
+Datum::Datum(bool value) : b{value}, k{Kind::Boolean}			{}
 
 /********************************************************************************************//**
  * @param	value	Signed integer value
@@ -108,6 +108,11 @@ unsigned Datum::natural() const		{	return u;	};
  ************************************************************************************************/
 double Datum::real() const			{	return r;	};
 
+/********************************************************************************************//**
+ * @return my Boolean value
+ ************************************************************************************************/
+bool Datum::boolean() const			{	return b;	};
+
 // operators
 
 /********************************************************************************************//**
@@ -123,6 +128,7 @@ ostream& operator<<(std::ostream& os, const Datum::Kind& kind) {
 	switch (kind) {
 	case Datum::Integer:	return os << "Integer";	break;
 	case Datum::Real:		return os << "Real";	break;
+	case Datum::Boolean:	return os << "Boolean";	break;
 	default:
 		assert(false);
 		return os << "Unknown Datum Kind!";
@@ -142,6 +148,7 @@ ostream& operator<<(std::ostream& os, const Datum& value) {
 	switch (value.kind()) {
 	case Datum::Integer:	os << value.integer();	break;
 	case Datum::Real:		os << value.real();		break;
+	case Datum::Boolean:	os << value.boolean();	break;
 	default: assert(false); os << 0;
 	}
 
@@ -161,6 +168,7 @@ Datum operator+(const Datum& lhs, const Datum& rhs) {
 	switch(lhs.kind()) {
 	case Datum::Integer:	return Datum(lhs.integer()	+ rhs.integer());
 	case Datum::Real:		return Datum(lhs.real()		+ rhs.real());
+	case Datum::Boolean:
 	default:
 		assert(false);
 		return Datum(0);
@@ -180,6 +188,7 @@ Datum operator-(const Datum& lhs, const Datum& rhs) {
 	switch(lhs.kind()) {
 	case Datum::Integer:	return Datum(lhs.integer()	- rhs.integer());
 	case Datum::Real:		return Datum(lhs.real()		- rhs.real());
+	case Datum::Boolean:
 	default:
 		assert(false);
 		return Datum(0);
@@ -199,6 +208,7 @@ Datum operator*(const Datum& lhs, const Datum& rhs) {
 	switch(lhs.kind()) {
 	case Datum::Integer:	return Datum(lhs.integer()	* rhs.integer());
 	case Datum::Real:		return Datum(lhs.real()		* rhs.real());
+	case Datum::Boolean:
 	default:
 		assert(false);
 		return Datum(0);
@@ -224,6 +234,7 @@ Datum operator/(const Datum& lhs, const Datum& rhs) {
 		return rhs.real() != 0 ? Datum(lhs.real() / rhs.real()) : Datum(0);
 		break;
 
+	case Datum::Boolean:
 	default:	assert(false);	return Datum(0);
 	}
 }
@@ -247,6 +258,7 @@ Datum operator%(const Datum& lhs, const Datum& rhs) {
 		assert(false);
 		return Datum(0);
 
+	case Datum::Boolean:
 	default:	assert(false);	return Datum(0);
 	}
 }
@@ -309,6 +321,7 @@ bool operator<(const Datum& lhs, const Datum& rhs) {
 	switch(lhs.kind()) {
 	case Datum::Integer:	return lhs.integer()	< rhs.integer();
 	case Datum::Real:		return lhs.real()		< rhs.real();
+	case Datum::Boolean:
 	default:	assert(false);	return false;
 	}
 }
@@ -321,6 +334,7 @@ bool operator<=(const Datum& lhs, const Datum& rhs) {
 	switch(lhs.kind()) {
 	case Datum::Integer:	return lhs.integer()	<= rhs.integer();
 	case Datum::Real:		return lhs.real()		<= rhs.real();
+	case Datum::Boolean:
 	default:	assert(false);	return false;
 	}
 }
@@ -333,6 +347,7 @@ bool operator==(const Datum& lhs, const Datum& rhs) {
 	switch(lhs.kind()) {
 	case Datum::Integer:	return lhs.integer()	== rhs.integer();
 	case Datum::Real:		return lhs.real()		== rhs.real();
+	case Datum::Boolean:	return lhs.boolean() 	== rhs.boolean();
 	default:	assert(false);	return false;
 	}
 }
@@ -345,6 +360,7 @@ bool operator>=(const Datum& lhs, const Datum& rhs) {
 	switch(lhs.kind()) {
 	case Datum::Integer:	return lhs.integer()	>= rhs.integer();
 	case Datum::Real:		return lhs.real() 		>= rhs.real();
+	case Datum::Boolean:
 	default:	assert(false);	return false;
 	}
 }
@@ -357,6 +373,7 @@ bool operator>(const Datum& lhs, const Datum& rhs) {
 	switch(lhs.kind()) {
 	case Datum::Integer:	return lhs.integer()	> rhs.integer();
 	case Datum::Real:		return lhs.real()		> rhs.real();
+	case Datum::Boolean:
 	default:	assert(false);	return false;
 	}
 }
@@ -381,6 +398,7 @@ bool operator&&(const Datum& lhs, const Datum& rhs) {
 	switch(lhs.kind()) {
 	case Datum::Integer:	return lhs.integer()	&& rhs.integer();
 	case Datum::Real:		return lhs.real() 		&& rhs.real();
+	case Datum::Boolean:	return lhs.boolean()	&& rhs.boolean();
 	default:	assert(false);	return false;
 	}
 }
@@ -393,6 +411,7 @@ bool operator||(const Datum& lhs, const Datum& rhs) {
 	switch(lhs.kind()) {
 	case Datum::Integer:	return lhs.integer()	|| rhs.integer();
 	case Datum::Real:		return lhs.real()		|| rhs.real();
+	case Datum::Boolean:	return lhs.boolean()	|| rhs.boolean();
 	default:	assert(false);	return false;
 	}
 }

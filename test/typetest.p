@@ -1,17 +1,17 @@
 { Test advanced types	}
 program typetest;
 type
-	int = Integer;
+	int = integer;
 	rng = 1..10;
 	enum = (	one, two, three	);
 
 var
 	i : int;
-	j : Integer;
+	j : integer;
 	r : rng;
-	a : array[rng] of Integer;
+	a : array[rng] of integer;
 	a2 : array [enum] of int;
-	a3 : array [0..4] of array [0..4] of Real;
+	a3 : array [0..4] of array [0..4] of real;
 
 begin
 	i := 1; i := i + 1;

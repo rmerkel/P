@@ -8,12 +8,12 @@ const
 	STEP  =  20.0;	{	table step size		}
 
 var
-	fahr : Real ; celsius : Integer;
+	fahr : real ; celsius : integer;
 
 begin
 	fahr := LOWER;
 	while fahr <= UPPER do begin
-		celsius := Round(5.0 * (fahr-32.0) / 9.0);
+		celsius := round(5.0 * (fahr-32.0) / 9.0);
 		fahr := fahr + STEP;
 	end;
  end.

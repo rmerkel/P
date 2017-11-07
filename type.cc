@@ -221,14 +221,14 @@ bool operator==(const TypeDesc& lhs, const TypeDesc& rhs) {
  ************************************************************************************************/
 ostream& operator<<(std::ostream& os, const TDesc::Kind& value) {
 	switch (value) {
-	case TypeDesc::Integer:		os << "Integer";		break;
-	case TypeDesc::Real:		os << "Real";			break;
-	case TypeDesc::Boolean:		os << "Boolean";		break;
-	case TypeDesc::Character:	os << "Char";			break;
+	case TypeDesc::Integer:		os << "integer";		break;
+	case TypeDesc::Real:		os << "real";			break;
+	case TypeDesc::Boolean:		os << "boolean";		break;
+	case TypeDesc::Character:	os << "char";			break;
 	case TypeDesc::Array:		os << "array";			break;
 	case TypeDesc::Record:		os << "record";			break;
-	case TypeDesc::Enumeration:	os << "Enumeration";	break;
-	case TypeDesc::Pointer:		os << "Pointer";		break;
+	case TypeDesc::Enumeration:	os << "enumeration";	break;
+	case TypeDesc::Pointer:		os << "pointer";		break;
 
 	default: 					os << "unknown kind"; assert(false);
 	}

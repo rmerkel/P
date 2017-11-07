@@ -3,17 +3,17 @@
 # test/typetest.p, 3: type
     0: call 0, 2
     1: halt
-# test/typetest.p, 4: 	int = Integer;
+# test/typetest.p, 4: 	int = integer;
 # test/typetest.p, 5: 	rng = 1..10;
 # test/typetest.p, 6: 	enum = (	one, two, three	);
 # test/typetest.p, 7: 
 # test/typetest.p, 8: var
 # test/typetest.p, 9: 	i : int;
-# test/typetest.p, 10: 	j : Integer;
+# test/typetest.p, 10: 	j : integer;
 # test/typetest.p, 11: 	r : rng;
-# test/typetest.p, 12: 	a : array[rng] of Integer;
+# test/typetest.p, 12: 	a : array[rng] of integer;
 # test/typetest.p, 13: 	a2 : array [enum] of int;
-# test/typetest.p, 14: 	a3 : array [0..4] of array [0..4] of Real;
+# test/typetest.p, 14: 	a3 : array [0..4] of array [0..4] of real;
 # test/typetest.p, 15: 
 # test/typetest.p, 16: begin
     2: enter 41

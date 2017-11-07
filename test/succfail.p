@@ -3,5 +3,5 @@ type
 	e = (zero, one, two, three, four);
 
 begin
-	Writeln(Succ(four))
+	writeln(succ(four))
 end .

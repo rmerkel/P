@@ -1,5 +1,5 @@
 program testif ;
-var x, y, z : Integer;
+var x, y, z : integer;
 begin
 	x := 1;
 	y := 2;
