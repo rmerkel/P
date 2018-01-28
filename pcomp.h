@@ -1,30 +1,30 @@
 /********************************************************************************************//**
- * @file pascomp.h
+ * @file pcomp.h
  *
- * The Pascal-lite compilier.
+ * The P compilier.
  *
  * @author Randy Merkel, Slowly but Surly Software.
  * @copyright  (c) 2017 Slowly but Surly Software. All rights reserved.
  ************************************************************************************************/
 
-#ifndef	COMP_H
-#define	COMP_H
+#ifndef	PCOMP_H
+#define	PCOMP_H
 
 #include "compilier.h"
 
 /********************************************************************************************//**
- * A Pascal-lite Compilier
+ * A P Compilier
  *
- * Productions for the Pascal-lite recursive decent compilier.
+ * Productions for the P laugnuage recursive decent compilier.
  *
  * Evolved from https://en.wikipedia.org/wiki/Recursive_descent_parser#C_implementation.
  * Construction binds a program name with the instance, used in error messages. The compilier is
  * run via the call operator, specifing the input stream, the location of the emitted code, and
  * wheather to emit a travlelog (verbose messages).
  ************************************************************************************************/
-class PasComp : public Compilier {
+class PComp : public Compilier {
 public:
-	PasComp(const std::string& pName);		///< Constructor; use pName for error messages
+	PComp(const std::string& pName);		///< Constructor; use pName for error messages
 
 private:
 	bool isAnInteger(TDescPtr type);		///< Is type an integer?
@@ -66,7 +66,7 @@ private:
 	std::pair<bool,Datum> constExpr();		///< const-expr production...
 
 	/// call-statement production...
-	void callstatement(	int					level,
+	void callStatement(	int					level,
 						SymbolTable::iterator it);
 
 	void whileStatement(int level);			///< while-statement production...
@@ -83,9 +83,14 @@ private:
 	void identStatement(int					level,
 				const	std::string&		id);
 
+	void writeStmt(int level);				///< write/writeLn production..
+	void writeStatement(int level);			///< write production..
 	void writeLnStatement(int level);		///< writeln production..
+	void statementNew(int level);			///< New statement production...
+	void statementProcs(int level);			///< Built-in procedures productions...
 	void statement(int level);				///< statement production...
 	void statementList(int level);			///< statement-list-production...
+
 	void constDeclList(int level);			///< const-declaration-list production...
 	void constDecl(int level);				///< constant-declaration production...
 	void typeDecl(int level);				///< type-declaracton production...
@@ -137,6 +142,8 @@ private:
 	/// block-declaration production...
 	unsigned blockDecl(	SymValue&			val,
 						int					level);
+
+	void progDecl(int level);				///< program-declaration production...
 
 	void run() override;					///< run the compilier...
 };

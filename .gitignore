@@ -18,7 +18,7 @@ RemoteSystemsTempFiles
 docs
 Debug
 Release
-pas
+p
 *.o
 *.d
 *.lst

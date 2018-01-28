@@ -9,35 +9,35 @@
 # test/comment.p, 6:    n := 0;
     3: pushvar 0, 4
     4: push 0
-    5: assign
+    5: assign 1
 # test/comment.p, 7:    f := 1;
     6: pushvar 0, 5
     7: push 1
-    8: assign
+    8: assign 1
 # test/comment.p, 8:    {	calculate factor (n)
 # test/comment.p, 9: 		comment continued on this line... }
 # test/comment.p, 10:    while n < nFacts do begin
     9: pushvar 0, 4
-   10: eval
+   10: eval 1
    11: push 10
    12: lt
    13: jneq 28
 # test/comment.p, 11:       n := n + 1;
    14: pushvar 0, 4
    15: pushvar 0, 4
-   16: eval
+   16: eval 1
    17: push 1
    18: add
-   19: assign
+   19: assign 1
 # test/comment.p, 12:       f := f * n
    20: pushvar 0, 5
    21: pushvar 0, 5
-   22: eval
+   22: eval 1
 # test/comment.p, 13:    end
    23: pushvar 0, 4
-   24: eval
+   24: eval 1
    25: mul
-   26: assign
+   26: assign 1
 # test/comment.p, 14: end.
    27: jump 9
    28: ret

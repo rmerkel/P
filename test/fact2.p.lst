@@ -22,35 +22,35 @@
 # test/fact2.p, 19: 		p := 1;
     3: pushvar 0, 4
     4: push 1
-    5: assign
+    5: assign 1
 # test/fact2.p, 20: 		while n > 0 do begin
     6: pushvar 0, -1
-    7: eval
+    7: eval 1
     8: push 0
     9: gt
    10: jneq 25
 # test/fact2.p, 21: 			p := p * n;
    11: pushvar 0, 4
    12: pushvar 0, 4
-   13: eval
+   13: eval 1
    14: pushvar 0, -1
-   15: eval
+   15: eval 1
    16: mul
-   17: assign
+   17: assign 1
 # test/fact2.p, 22: 			n := n - 1
    18: pushvar 0, -1
    19: pushvar 0, -1
-   20: eval
+   20: eval 1
    21: push 1
 # test/fact2.p, 23: 		end;
    22: sub
-   23: assign
+   23: assign 1
    24: jump 6
 # test/fact2.p, 24: 		factorial := p;
    25: pushvar 0, 3
    26: pushvar 0, 4
-   27: eval
-   28: assign
+   27: eval 1
+   28: assign 1
 # test/fact2.p, 25: 	end;
    29: retf
 # test/fact2.p, 26: 
@@ -62,7 +62,7 @@
    32: push 10
 # test/fact2.p, 30: end.
    33: call 0, 2
-   34: assign
+   34: assign 1
    35: ret
 
        15:          1

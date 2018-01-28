@@ -1,7 +1,7 @@
 /********************************************************************************************//**
  * @file	symbol.h
  *
- * The Pascal-lite Compilier Symbol table
+ * The P Compilier Symbol table
  *
  * @author Randy Merkel, Slowly but Surly Software.
  * @copyright  (c) 2017 Slowly but Surly Software. All rights reserved.

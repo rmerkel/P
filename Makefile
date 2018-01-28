@@ -1,7 +1,7 @@
 ################################################################################
 # @file makefile
 #
-# @brief makefile for Pascal-lite complier & interperter
+# @brief makefile for P language complier & interperter
 ################################################################################
 
 ################################################################################
@@ -29,10 +29,10 @@ endif
 ################################################################################
 
 SRCS	= $(wildcard *.cc)
-ALLSRCS	= $(SRCS) $(wildcard *.h)
+ALLSRCS	= $(SRCS) $(wildcard *.h) README.md
 OBJS	= $(SRCS:.cc=.o)
 DEPS	= $(SRCS:.cc=.d)
-EXE		= pas
+EXE		= p
 
 LSTINGS = $(wildcard *p.lst)
 
@@ -45,7 +45,7 @@ LSTINGS = $(wildcard *p.lst)
 all:	$(EXE) docs
 
 ################################################################################
-# pas
+# p
 ################################################################################
 
 $(EXE): $(OBJS)
@@ -95,7 +95,7 @@ help:
 	@echo "    cleanll - to delete all targets and intermediates."
 	@echo "    docs    - to generate documentation."
 	@echo "    help    - prints this message."
-	@echo "    pas     - to build the compiler."
+	@echo "    p       - to build the compiler."
 	@echo "    pr      - prepare source for printing"
 	@echo "    test    - to bring calc upto date and run tests."
 	@echo ""
@@ -113,5 +113,5 @@ pr:
 ################################################################################
 
 test: all
-	./xpas.sh
+	./xp.sh
 

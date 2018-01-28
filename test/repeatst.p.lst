@@ -18,32 +18,32 @@
 # test/repeatst.p, 15: 	n := 0;
     3: pushvar 0, 4
     4: push 0
-    5: assign
+    5: assign 1
 # test/repeatst.p, 16: 	f := 1;
     6: pushvar 0, 5
     7: push 1
-    8: assign
+    8: assign 1
 # test/repeatst.p, 17: 	repeat
 # test/repeatst.p, 18: 		begin
 # test/repeatst.p, 19: 			n := n + 1;
     9: pushvar 0, 4
    10: pushvar 0, 4
-   11: eval
+   11: eval 1
    12: push 1
    13: add
-   14: assign
+   14: assign 1
 # test/repeatst.p, 20: 			f := f * n
    15: pushvar 0, 5
    16: pushvar 0, 5
-   17: eval
+   17: eval 1
 # test/repeatst.p, 21: 		end
    18: pushvar 0, 4
-   19: eval
+   19: eval 1
    20: mul
-   21: assign
+   21: assign 1
 # test/repeatst.p, 22: 	until n >= 10
    22: pushvar 0, 4
-   23: eval
+   23: eval 1
    24: push 10
 # test/repeatst.p, 23: end.
    25: gte

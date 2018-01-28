@@ -1,6 +1,6 @@
 /**	@file	token.h
  *
- *  The Pascal-lite scanner.
+ *  The P Language scanner.
  *
  * Started life as the Token and TokenStream classes for the calulator example from The C++
  * Programming Language, 4th Edition, by Stroustrup, modified in an initial port of Wirth's PL/0
@@ -33,6 +33,7 @@ struct Token {
 		BadComment,						///< Unterminated comment, started at line # (integer_value)
 
 		Identifier,	  		  			///< An identifier (string_value)
+		String,							///< A string (string_value)
 		IntegerNum,						///< Integer literal number (integer_value)
 		RealNum,						///< Real literal number (real_value)
 
@@ -59,9 +60,10 @@ struct Token {
 		Ellipsis,						///< ".."
 		Caret,							///< "^"
 
+		BoolType,						///< "boolean"
+		CharType,						///< "char"
 		IntType,						///< "integer"
 		RealType,						///< "real"
-		BoolType,						///< "boolean"
 
 		Array,							///< "array"
 		Of,								///< "of"
@@ -109,7 +111,8 @@ struct Token {
 		Sqrt,							///< Square root of value
 		Succ,							///< Next ordinal of value
 
-		Writeln,						///< Write on standard output
+		Write,							///< Write on standard output
+		Writeln,						///< Write on standard output, plus newline
 		New,							///< Allocate dynamic store
 		Dispose,						///< Free allocated dynamic store
 

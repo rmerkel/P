@@ -17,66 +17,66 @@
 # test/builtins.p, 14: 	i := 1;					{ result: 1			}
     3: pushvar 0, 4
     4: push 1
-    5: assign
+    5: assign 1
 # test/builtins.p, 15: 	i := round(2.0);		{ result: 2			}
     6: pushvar 0, 4
     7: push 2.000000
     8: round
-    9: assign
+    9: assign 1
 # test/builtins.p, 16: 	i := round(2.5);		{ result: 3 		}
    10: pushvar 0, 4
    11: push 2.500000
    12: round
-   13: assign
+   13: assign 1
 # test/builtins.p, 17: 	i := trunc(4.0);		{ result: 4 		}
    14: pushvar 0, 4
    15: push 4.000000
    16: trunc
-   17: assign
+   17: assign 1
 # test/builtins.p, 18: 	i := trunc(5.9);		{ result: 5 		}
    18: pushvar 0, 4
    19: push 5.900000
    20: trunc
-   21: assign
-# test/builtins.p, 19: 	i := maxint;			{ result 2**32		}
+   21: assign 1
+# test/builtins.p, 19: 	i := maxint;			{ result  2,147,483,647	}
    22: pushvar 0, 4
    23: push 2147483647
-   24: assign
+   24: assign 1
 # test/builtins.p, 20: 	
 # test/builtins.p, 21: 	i := abs(1);			{ result: 1			}
    25: pushvar 0, 4
    26: push 1
    27: abs
-   28: assign
+   28: assign 1
 # test/builtins.p, 22: 	i := abs(-1);			{ result: 1			}
    29: pushvar 0, 4
    30: push 1
    31: neg
    32: abs
-   33: assign
+   33: assign 1
 # test/builtins.p, 23: 	r := abs(1.5);			{ result 1.5		}
    34: pushvar 0, 5
    35: push 1.500000
    36: abs
-   37: assign
+   37: assign 1
 # test/builtins.p, 24: 	r := abs(-1.5);			{ result 1.5		}
    38: pushvar 0, 5
    39: push 1.500000
    40: neg
    41: abs
-   42: assign
+   42: assign 1
 # test/builtins.p, 25: 
 # test/builtins.p, 26: 	i := ord(three);		{ result: 3			}
    43: pushvar 0, 4
    44: push 3
-   45: assign
+   45: assign 1
 # test/builtins.p, 27: 	i := ord(i-1);			{ result: 2			}
    46: pushvar 0, 4
    47: pushvar 0, 4
-   48: eval
+   48: eval 1
    49: push 1
    50: sub
-   51: assign
+   51: assign 1
 # test/builtins.p, 28: 
 # test/builtins.p, 29: {	i := ord(1.2)			error: ordinal value expected	}
 # test/builtins.p, 30: 
@@ -84,47 +84,47 @@
    52: pushvar 0, 5
    53: push 1
    54: atan
-   55: assign
+   55: assign 1
 # test/builtins.p, 32: 	r := arctan(1.0);		{ result:  0.785398	}
    56: pushvar 0, 5
    57: push 1.000000
    58: atan
-   59: assign
+   59: assign 1
 # test/builtins.p, 33: 
 # test/builtins.p, 34: 	r := exp(1);			{ result: 2.718282	}
    60: pushvar 0, 5
    61: push 1
    62: exp
-   63: assign
+   63: assign 1
 # test/builtins.p, 35: 	r := exp(1.0);			{ result: 2.718282	}
    64: pushvar 0, 5
    65: push 1.000000
    66: exp
-   67: assign
+   67: assign 1
 # test/builtins.p, 36: 
 # test/builtins.p, 37: 	r := ln(1);				{ result: 0.0		}
    68: pushvar 0, 5
    69: push 1
    70: log
-   71: assign
+   71: assign 1
 # test/builtins.p, 38: 	r := ln(1.0);			{ result: 0.0		}
    72: pushvar 0, 5
    73: push 1.000000
    74: log
-   75: assign
+   75: assign 1
 # test/builtins.p, 39: 
 # test/builtins.p, 40: 	i := odd(10);			{ result: 0			}
    76: pushvar 0, 4
    77: push 10
    78: Odd
-   79: assign
+   79: assign 1
 # test/builtins.p, 41: 	i := odd(10+1);			{ result: 1			}
    80: pushvar 0, 4
    81: push 10
    82: push 1
    83: add
    84: Odd
-   85: assign
+   85: assign 1
 # test/builtins.p, 42: 
 # test/builtins.p, 43: 	r := sin(-3*pi/4);		{ result: -0.707107	}
    86: pushvar 0, 5
@@ -137,25 +137,25 @@
    93: div
    94: neg
    95: sin
-   96: assign
+   96: assign 1
 # test/builtins.p, 44: 	r := sqr(10);			{ result: 100		}
    97: pushvar 0, 5
    98: push 10
    99: sqr
-  100: assign
+  100: assign 1
 # test/builtins.p, 45: 	r := sqrt(2);			{ result: 1.41421	}
   101: pushvar 0, 5
   102: push 2
   103: sqrt
-  104: assign
+  104: assign 1
 # test/builtins.p, 46: 
 # test/builtins.p, 47: 	writeln(i, r, pi);
   105: pushvar 0, 4
-  106: eval
+  106: eval 1
   107: push 0
   108: push 0
   109: pushvar 0, 5
-  110: eval
+  110: eval 1
   111: push 0
   112: push 0
   113: push 3.141593

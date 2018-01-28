@@ -1,0 +1,35 @@
+# test/str.p, 1: program StringTest ;
+# test/str.p, 2: type
+    0: call 0, 2
+    1: halt
+# test/str.p, 3: 	A = array [0..9] of char;
+# test/str.p, 4: 
+# test/str.p, 5: var
+# test/str.p, 6:  	a1 : A;
+# test/str.p, 7:  	a2 : A;
+# test/str.p, 8: 
+# test/str.p, 9: begin
+    2: enter 20
+# test/str.p, 10: 	a1 := 'abcdefghij';		{	fill a1 with 'abcd...'			}
+    3: pushvar 0, 4
+    4: push 'a'
+    5: push 'b'
+    6: push 'c'
+    7: push 'd'
+    8: push 'e'
+    9: push 'f'
+   10: push 'g'
+   11: push 'h'
+   12: push 'i'
+   13: push 'j'
+   14: assign 10
+# test/str.p, 11: 	a2 := a1 				{	copies the contents of a1 to a2	}
+   15: pushvar 0, 14
+# test/str.p, 12: end .
+   16: pushvar 0, 4
+   17: eval 10
+   18: assign 10
+   19: ret
+
+       17:          'j'
+       27:          'j'

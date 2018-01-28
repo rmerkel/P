@@ -27,8 +27,12 @@ public:
 	Compilier(const std::string& pName);	///< Constructor; use pName for error messages
 	virtual ~Compilier() {}					///< Destructor
 
-	/// Run the compiler
-	unsigned operator()(const std::string& inFile, InstrVector& prog, bool verb = false);
+	/// Compile a P source file
+	unsigned operator()(
+		const	std::string&	fName,
+				InstrVector&	instructions,
+				DatumVector&	iDatums,
+				bool			verbMode = false);
 
 protected:
 	/// A table, indexed by instruction address, yeilding source line numbers
@@ -40,6 +44,7 @@ protected:
 	TokenStream			ts;					///< The input token stream (the source)
 	SymbolTable			symtbl;				///< Symbol table
 	InstrVector*		code;				///< Emitted code
+	DatumVector*		data;				///< Emitted initialized data
 	SourceIndex			indextbl;			///< Source cross-index for listings
 
 	void error(const std::string& msg);		///< Write an error message...
@@ -62,6 +67,8 @@ protected:
 
 	/// Emit an instruction...
 	size_t emit(const OpCode op, int8_t level = 0, Datum addr = 0);
+
+	size_t emitConst(const Datum& data);	///< Emit a constant Datum
 
 	/// Emit a variable reference, e.g., an absolute address...
 	TDescPtr emitVarRef(int level, const SymValue& val);

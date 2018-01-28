@@ -1,0 +1,90 @@
+# test/fib.p, 1: program Fibonacci ;
+# test/fib.p, 2: 	function fib(a, b, limit : integer) : integer ;
+    0: call 0, 36
+    1: halt
+# test/fib.p, 3: 	begin
+# test/fib.p, 4: 		writeln(b);
+    2: pushvar 0, -2
+    3: eval 1
+    4: push 0
+    5: push 0
+    6: push 1
+    7: writeln
+# test/fib.p, 5: 		if limit > 0 then
+    8: pushvar 0, -1
+    9: eval 1
+   10: push 0
+   11: gt
+   12: jneq 28
+# test/fib.p, 6: 			fib := fib(b, a+b, limit - 1)
+   13: pushvar 0, 3
+   14: pushvar 0, -2
+   15: eval 1
+   16: pushvar 0, -3
+   17: eval 1
+   18: pushvar 0, -2
+   19: eval 1
+   20: add
+   21: pushvar 0, -1
+   22: eval 1
+   23: push 1
+   24: sub
+# test/fib.p, 7: 		else
+   25: call 1, 2
+   26: assign 1
+# test/fib.p, 8: 			fib := a + b
+   27: jump 35
+   28: pushvar 0, 3
+   29: pushvar 0, -3
+   30: eval 1
+# test/fib.p, 9: 	end ;
+   31: pushvar 0, -2
+   32: eval 1
+   33: add
+   34: assign 1
+   35: retf
+# test/fib.p, 10: 
+# test/fib.p, 11: begin
+# test/fib.p, 12: 	writeln(0);
+   36: push 0
+   37: push 0
+   38: push 0
+   39: push 1
+   40: writeln
+# test/fib.p, 13: 	writeln(fib(0, 1, 10))
+   41: push 0
+   42: push 1
+   43: push 10
+   44: call 0, 2
+   45: push 0
+   46: push 0
+# test/fib.p, 14: end .
+   47: push 1
+   48: writeln
+   49: ret
+# test/fib.p, 15: 
+
+0
+1
+1
+2
+3
+5
+8
+13
+21
+34
+55
+89
+       94:        144
+       86:        144
+       78:        144
+       70:        144
+       62:        144
+       54:        144
+       46:        144
+       38:        144
+       30:        144
+       22:        144
+       14:        144
+144

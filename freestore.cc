@@ -57,9 +57,9 @@ unsigned FreeStore::alloc(size_t size) {
    	for (FreeStoreMap::iterator i = freeStore.begin(); i != freeStore.end(); ++i) {
        	if (i->second >= size) {           	// big enough?
            	if (ri == freeStore.end())
-               	ri = i;                 // 1st match
+               	ri = i;                 	// 1st match
            	else if (i->second - size < ri->second - size)
-               	ri = i;                 // better match
+               	ri = i;                 	// better match
        	}
    	}
 
@@ -69,7 +69,7 @@ unsigned FreeStore::alloc(size_t size) {
        	freeStore.erase(ri);            // Remove the block from free-store        
 
        	// split the block?
-       	if (result.addr != 0 && result.size  != size) {
+       	if (result.addr != 0 && result.size != size) {
            	Block fragment(result.addr + size, result.size - size);
            	result.size = size;
            	auto j = freeStore.insert({ fragment.addr, fragment.size });

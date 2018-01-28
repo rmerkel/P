@@ -1,7 +1,7 @@
 #!/bin/bash
 for i in $( ls test/*.p ); do
 	s=$(basename $i)
-	./pas $i &> $s.lst
+	./p $i &> $s.lst
 	cmp $s.lst $i.lst
 	if [ "$?" != "0" ]; then
 		diff $s.lst $i.lst

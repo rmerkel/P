@@ -16,7 +16,7 @@ begin
 	i := round(2.5);		{ result: 3 		}
 	i := trunc(4.0);		{ result: 4 		}
 	i := trunc(5.9);		{ result: 5 		}
-	i := maxint;			{ result 2**32		}
+	i := maxint;			{ result  2,147,483,647	}
 	
 	i := abs(1);			{ result: 1			}
 	i := abs(-1);			{ result: 1			}

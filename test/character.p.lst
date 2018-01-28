@@ -1,0 +1,272 @@
+# test/character.p, 1: program CharTest ;
+# test/character.p, 2: type
+    0: call 0, 34
+    1: halt
+# test/character.p, 3: 	A = array [0..9] of char;
+# test/character.p, 4: 
+# test/character.p, 5: var i : integer;
+# test/character.p, 6: 	c : char;
+# test/character.p, 7:  	a1 : A;
+# test/character.p, 8:  	a2 : A;
+# test/character.p, 9: 
+# test/character.p, 10: 	procedure print(a : A) ;
+# test/character.p, 11: 	var i : integer;
+# test/character.p, 12: 	begin
+    2: enter 1
+# test/character.p, 13: { 		writeln(a);			writeln doesn't support arrays... yet!	}
+# test/character.p, 14: 
+# test/character.p, 15: 		for i := 0 to 9 do
+    3: pushvar 0, 4
+    4: dup
+    5: push 0
+    6: assign 1
+    7: dup
+    8: eval 1
+    9: push 9
+   10: lte
+   11: jneq 30
+# test/character.p, 16: 			write(a[i]);
+   12: pushvar 0, -10
+   13: pushvar 0, 4
+   14: eval 1
+   15: llimit 0
+   16: ulimit 9
+   17: add
+   18: eval 1
+   19: push 0
+   20: push 0
+   21: push 1
+   22: write
+   23: dup
+   24: dup
+   25: eval 1
+   26: push 1
+   27: add
+   28: assign 1
+   29: jump 7
+   30: pop
+# test/character.p, 17: 		writeln;
+   31: push 0
+   32: writeln
+# test/character.p, 18: 	end ;
+   33: ret
+# test/character.p, 19: 
+# test/character.p, 20: begin
+   34: enter 22
+# test/character.p, 21: 	c := 'x';
+   35: pushvar 0, 5
+   36: push 'x'
+   37: llimit 0
+   38: ulimit 127
+   39: assign 1
+# test/character.p, 22: 	writeln(c);	
+   40: pushvar 0, 5
+   41: eval 1
+   42: push 0
+   43: push 0
+   44: push 1
+   45: writeln
+# test/character.p, 23: 
+# test/character.p, 24: 	a1 := 'abcdefghij';		{	fill a1 with 'abcd...'			}
+   46: pushvar 0, 6
+   47: push 'a'
+   48: push 'b'
+   49: push 'c'
+   50: push 'd'
+   51: push 'e'
+   52: push 'f'
+   53: push 'g'
+   54: push 'h'
+   55: push 'i'
+   56: push 'j'
+   57: assign 10
+# test/character.p, 25: { 	writeln(a1);				writeln doesn't support arrays... yet!	}
+# test/character.p, 26: {	for i := 0 to 9 do
+# test/character.p, 27: 		write(a1[i]);
+# test/character.p, 28: 	writeln;													}
+# test/character.p, 29: 	print(a1);
+   58: pushvar 0, 6
+   59: eval 10
+   60: call 0, 2
+# test/character.p, 30: 
+# test/character.p, 31: 
+# test/character.p, 32: 	a2 := a1;				{	copies the contents of a1 to a2	}
+   61: pushvar 0, 16
+   62: pushvar 0, 6
+   63: eval 10
+   64: assign 10
+# test/character.p, 33: {	writeln(a2);				writeln doesn't support arrays... yet!	}
+# test/character.p, 34: 	for i := 0 to 9 do
+   65: pushvar 0, 4
+   66: dup
+   67: push 0
+   68: assign 1
+   69: dup
+   70: eval 1
+   71: push 9
+   72: lte
+   73: jneq 92
+# test/character.p, 35: 		write(a2[i]);
+   74: pushvar 0, 16
+   75: pushvar 0, 4
+   76: eval 1
+   77: llimit 0
+   78: ulimit 9
+   79: add
+   80: eval 1
+   81: push 0
+   82: push 0
+   83: push 1
+   84: write
+   85: dup
+   86: dup
+   87: eval 1
+   88: push 1
+   89: add
+   90: assign 1
+   91: jump 69
+   92: pop
+# test/character.p, 36: 	writeln;
+   93: push 0
+   94: writeln
+# test/character.p, 37: 
+# test/character.p, 38: 	a1 := '0123456788';		{	fill a1 with '0123...'			}
+   95: pushvar 0, 6
+   96: push '0'
+   97: push '1'
+   98: push '2'
+   99: push '3'
+  100: push '4'
+  101: push '5'
+  102: push '6'
+  103: push '7'
+  104: push '8'
+  105: push '8'
+  106: assign 10
+# test/character.p, 39: 							{	while a1 has changed...			}
+# test/character.p, 40: {	writeln(a1);				writeln doesn't support arrays... yet!	}
+# test/character.p, 41: 	for i := 0 to 9 do
+  107: pushvar 0, 4
+  108: dup
+  109: push 0
+  110: assign 1
+  111: dup
+  112: eval 1
+  113: push 9
+  114: lte
+  115: jneq 134
+# test/character.p, 42: 		write(a1[i]);
+  116: pushvar 0, 6
+  117: pushvar 0, 4
+  118: eval 1
+  119: llimit 0
+  120: ulimit 9
+  121: add
+  122: eval 1
+  123: push 0
+  124: push 0
+  125: push 1
+  126: write
+  127: dup
+  128: dup
+  129: eval 1
+  130: push 1
+  131: add
+  132: assign 1
+  133: jump 111
+  134: pop
+# test/character.p, 43: 	writeln;
+  135: push 0
+  136: writeln
+# test/character.p, 44: 
+# test/character.p, 45: 							{	... a2 has not!					}
+# test/character.p, 46: {	writeln(a2)					writeln doesn't support arrays!	}
+# test/character.p, 47: 	for i := 0 to 9 do
+  137: pushvar 0, 4
+  138: dup
+  139: push 0
+  140: assign 1
+  141: dup
+  142: eval 1
+  143: push 9
+  144: lte
+  145: jneq 164
+# test/character.p, 48: 		write(a2[i]);
+  146: pushvar 0, 16
+  147: pushvar 0, 4
+  148: eval 1
+  149: llimit 0
+  150: ulimit 9
+  151: add
+  152: eval 1
+  153: push 0
+  154: push 0
+  155: push 1
+  156: write
+  157: dup
+  158: dup
+  159: eval 1
+  160: push 1
+  161: add
+  162: assign 1
+  163: jump 141
+  164: pop
+# test/character.p, 49: 	writeln;
+  165: push 0
+  166: writeln
+# test/character.p, 50: end .
+  167: ret
+
+        9:          'x'
+'x'
+       19:          'j'
+       44:          0
+'a'       44:          1
+'b'       44:          2
+'c'       44:          3
+'d'       44:          4
+'e'       44:          5
+'f'       44:          6
+'g'       44:          7
+'h'       44:          8
+'i'       44:          9
+'j'       44:         10
+
+       29:          'j'
+        8:          0
+'a'        8:          1
+'b'        8:          2
+'c'        8:          3
+'d'        8:          4
+'e'        8:          5
+'f'        8:          6
+'g'        8:          7
+'h'        8:          8
+'i'        8:          9
+'j'        8:         10
+
+       19:          '8'
+        8:          0
+'0'        8:          1
+'1'        8:          2
+'2'        8:          3
+'3'        8:          4
+'4'        8:          5
+'5'        8:          6
+'6'        8:          7
+'7'        8:          8
+'8'        8:          9
+'8'        8:         10
+
+        8:          0
+'a'        8:          1
+'b'        8:          2
+'c'        8:          3
+'d'        8:          4
+'e'        8:          5
+'f'        8:          6
+'g'        8:          7
+'h'        8:          8
+'i'        8:          9
+'j'        8:         10
+

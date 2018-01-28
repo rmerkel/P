@@ -18,10 +18,10 @@
     3: pushvar 0, 4
     4: push 0
     5: itor
-    6: assign
+    6: assign 1
 # test/fahr.p, 15: 	while fahr <= UPPER do begin
     7: pushvar 0, 4
-    8: eval
+    8: eval 1
     9: push 300
    10: itor
    11: lte
@@ -30,21 +30,21 @@
    13: pushvar 0, 5
    14: push 5.000000
    15: pushvar 0, 4
-   16: eval
+   16: eval 1
    17: push 32.000000
    18: sub
    19: mul
    20: push 9.000000
    21: div
-   22: assign
+   22: assign 1
 # test/fahr.p, 17: 		fahr := fahr + STEP;
    23: pushvar 0, 4
    24: pushvar 0, 4
-   25: eval
+   25: eval 1
    26: push 20
    27: itor
    28: add
-   29: assign
+   29: assign 1
 # test/fahr.p, 18: 	end;
    30: jump 7
 # test/fahr.p, 19:  end.

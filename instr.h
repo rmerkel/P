@@ -1,8 +1,8 @@
 /********************************************************************************************//**
  * @file instr.h
  *
- * Pascal-lite machine operation codes, machine instruction format, activation frame format, and
- * associated utilities used by both the compiler (PasComp) and the interpreter (Interp).
+ * P machine operation codes, machine instruction format, activation frame format, and
+ * associated utilities used by both the compiler (PComp) and the interpreter (PInterp).
  *
  * @author Randy Merkel, Slowly but Surly Software.
  * @copyright  (c) 2017 Slowly but Surly Software. All rights reserved.
@@ -34,66 +34,69 @@ enum Frame {
 
 /********************************************************************************************//**
  * Machine operation codes
+ *
+ * OP level, addr - description; definition: error
  ************************************************************************************************/
 enum class OpCode : unsigned char {
-	NEG,								///< Negation; TOS = -TOS
-	ITOR,								///< Convert integer to real; TOS = Real(TOS)
-	ITOR2,								///< Convert integer to real; TOS-1 = Real(TOS-1)
-	ROUND,								///< Round real TOS to integer; TOS = Round(TOS)
-	TRUNC,								///< Truncate real TOS to integer; TOS = TRUNC(TOS)
-	ABS,								///< Absolute value; TOS = rabs(TOS)
-	ATAN,								///< Arc tangent; TOS = atan(TOS)
-	EXP,								///< Exponent; TOS = exp(TOS)
-	LOG,								///< Natural logarithm; TOS = log(TOS)
+	NEG,		///< NEG - Negate; push(pop() * -1)
+	ITOR,		///< ITOR - Convert integer to real; push(Real(pop()))
+	ITOR2,		///< ITOR2 - Convert integer to real; push(Real(pop()))
+	ROUND,		///< ROUND - Round real to nearest integer; push(Round(pop()))
+	TRUNC,		///< TRUNC - Truncate real to integer; push(Truncate(pop()))
+	ABS,		///< ABS - Absolute value; push(Abs(pop()))
+	ATAN,		///< ATAN - Arc tangent; push(ATan(pop()))
+	EXP,		///< EXP - Exponent; push(Exp(pop()))
+	LOG,		///< LOG - Natural logarithm; push(Log(pop()))
 
-	DUP,								///< Duplicat; push(TOS)
-	ODD,								///< Is odd? TOS = is TOS an odd number?
-	PRED,								///< Predecessor; limit check, TOS--
-	SUCC,								///< Successor; limit check; TOS++
+	DUP,		///< DUP - Duplicate; Push(stack[sp])
+	ODD,		///< ODD - Is odd?; Push(IsOdd(pop()))
+	PRED,		///< PRED ,limit - Predecessor; push(pop() - 1); OutOfRange if TOS was <= limit
+	SUCC,		///< SUCC ,limit - Successor; push(pop() + 1); OutOfRange if TOS was >= limit
 
-	SIN,								///< Sine; TOS = sin(TOS)
-	SQR,								///< Square; TOS = TOS * TOS
-	SQRT,								///< Square-root; TOS = sqrt(TOS)
+	SIN,		///< SIN   - Sine; push(Sin(pop()))
+	SQR,		///< SQR   - Square; push(stack[sp] * pop())
+	SQRT,		///< SQRT  - Square-root; push(Sqrt(pop()))
 
-	WRITE,								///< Write expr-list on standard output
-	WRITELN,							///< Write expr-list,  newline on standard output
-	NEW,								///< Allocate dynamic store
-	DISPOSE,							///< Dispose of allocated dynamic store
+	WRITE,		///< WRITE - Write values on standard output; for n=pop(); n>0; --n write pop()
+	WRITELN,	///< WRITELN - Write values followed by newline on standard output
+	NEW,		///< NEW   - Allocate dynamic store; n=pop(); allocate n dataums, push(addr) or zero if insufficient space
+	DISPOSE,	///< DISPOSE - Dispose of allocated dynamic store; free pop()
 
-	ADD,								///< Addition
-	SUB,								///< Subtraction
-	MUL,								///< Multiplication
-	DIV,								///< Division
-	REM,								///< Remainder
+	ADD,		///< ADD - Addition; push(pop() + pop())
+	SUB,		///< SUB - Subtraction; r = pop(); push(pop - r)
+	MUL,		///< MUL - Multiplication; push(pop() * pop())
+	DIV,		///< DIV - Division; r = pop(); push(pop() * r)
+	REM,		///< REM - Remainder; r = pop(); push(pop() % r)
 
-	LT,									///< Less than
-	LTE,								///< Less then or equal
-	EQU,								///< Is equal to
-	GTE,								///< Greater than or equal
-	GT,									///< Greater than
-	NEQU,								///< Does not equal
+	LT,			///< LT - Less than; r = pop(); push(pop() < r)
+	LTE,		///< LTE - Less then or equal; push(pop() > pop()
+	EQU,		///< EQU - Is equal to; push(pop() == pop())
+	GTE,		///< GTE - Greater than or equal; push(pop() < pop()
+	GT,			///< GT - Greater than; push(pop() <= pop()
+	NEQU,		///< NEQU - Does not equal; push(pop() != pop())
 
-	LOR,								///< Logical or
-	LAND,								///< Logical and
-	LNOT,								///< Logical not
+	LOR,		///< LOR - Logical or; push(pop() || pop())
+	LAND,		///< LAND - Logical and; push(pop() && pop())
+	LNOT,		///< LNOT - Logical not; push(!pop())
 	
-	POP,								///< Pop; pop TOS into the bit bucket
-	PUSH,								///< Push a constant integer value
-	PUSHVAR,							///< Push variable address (base(level) + addr)
-	EVAL,								///< Evaluate variable TOS = address, replace with value
-	ASSIGN,								///< Assign; TOS-1 = variable address, TOS = value
+	POP,		///< POP ,n - Pop Datums into the bit bucket; for i = 0; i < addr; ++i, pop()
+	PUSH,		///< PUSH , const - Push a constant integer value; push(const)
+	PUSHVAR,	///< PUSHVAR level,offset - Push variable address; push(base(level) + offset)
+	EVAL,		///< EVAL ,n - Evaluate variable; variable address is TOS, variable size is n Datums
+	ASSIGN,		///< ASSIGN ,n - Assign stack(TOS-n,TOS) to stack[addr,addr+n), POP ,n
+	COPY,		///< COPY ,n - Copy Datums; dest=pop(); src=pop(); copy n Datums from src to dest
 
-	CALL,								///< Call a procedure, pushing a new acrivation Frame
-	ENTER,								///< Allocate locals on the stack
-	RET,								///< Return from procedure; unlink Frame
-	RETF,								///< Return from function; push result
-	JUMP,								///< Jump to a location
-	JNEQ,								///< Condition = pop(); Jump if condition == false (0)
+	CALL,		///< CALL level,addr - Call a procedure, pushing a new acrivation Frame
+	ENTER,		///< ENTER ,n - Allocate n locals on the stack
+	RET,		///< Return from procedure; unlink Frame
+	RETF,		///< Return from function; push result
+	JUMP,		///< Jump to a location
+	JNEQ,		///< Condition = pop(); Jump if condition == false (0)
 
-	LLIMIT,								///< Check array index; out-of-range error if TOS <  addr
-	ULIMIT,								///< Check array index; out-of-range error if TOS >  addr
+	LLIMIT,		///< Check array index; out-of-range error if TOS <  addr
+	ULIMIT,		///< Check array index; out-of-range error if TOS >  addr
 
-	HALT = 255							///< Halt the machine
+	HALT = 255	///< Halt the machine
 };
 
 /********************************************************************************************//**

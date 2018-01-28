@@ -1,7 +1,7 @@
 /********************************************************************************************//**
  * @file	symbol.cc
  *
- * The Pascal-lite Symbol table implementation
+ * The P language Symbol table implementation
  *
  * @author Randy Merkel, Slowly but Surly Software.
  * @copyright  (c) 2017 Slowly but Surly Software. All rights reserved.

@@ -2,7 +2,7 @@
  *
  * TokenStream implementation. Started life as the Token and TokenStream classes from The C++
  * Programming Language, 4th Edition, by Stroustrup, and then modified to work on the integer based
- * Pascal-lite machine.
+ * P machine.
  *
  * @author Randy Merkel, Slowly but Surly Software.
  * @copyright  (c) 2017 Slowly but Surly Software. All rights reserved.
@@ -138,6 +138,15 @@ Token TokenStream::get() {
 			iss >> ct.integer_value;
 		return ct;
 	}
+	case '\'':									// ' c'  or ' string '
+		ct.string_value = "";
+		while (getch(ch) && ch != '\'')
+			ct.string_value += ch;
+		if (ch != '\'')
+			ct.kind = Token::Unknown;
+		else
+			ct.kind = Token::String;
+		return ct;
 
 	default:							// ident, ident = or error
 		if (isalpha(ch)) {
@@ -198,6 +207,8 @@ TokenStream::KeywordTable	TokenStream::keywords = {
 	{	"array",		Token::Array		},
 	{	"arctan",		Token::Atan			},
 	{	"begin",		Token::Begin		},
+	{	"boolean",		Token::BoolType		},
+	{	"char",			Token::CharType		},
 	{   "const",		Token::ConsDecl		},
 	{	"dispose",		Token::Dispose		},
 	{	"do",			Token::Do			},
@@ -219,7 +230,6 @@ TokenStream::KeywordTable	TokenStream::keywords = {
 	{	"pred",			Token::Pred			},
 	{	"record",		Token::Record		},
 	{	"real",			Token::RealType		},
-	{	"boolean",		Token::BoolType		},
 	{	"repeat",		Token::Repeat		},
 	{	"round",		Token::Round		},
 	{	"sin",			Token::Sin			},
@@ -235,6 +245,7 @@ TokenStream::KeywordTable	TokenStream::keywords = {
 	{	"downto",		Token::DownTo,		},
 	{	"var",			Token::VarDecl		},
 	{	"while",		Token::While		},
+	{	"write",		Token::Write		},
 	{	"writeln",		Token::Writeln		}
 };
 
@@ -253,6 +264,7 @@ ostream& operator<<(std::ostream& os, const Token::Kind& kind) {
 	case Token::BadComment:	os << "bad comment";	break;
 
 	case Token::Identifier:	os << "identifier";		break;
+	case Token::String:		os << "string";			break;
 	case Token::IntegerNum:	os << "integernum";		break;
 	case Token::RealNum:	os << "RealNum";		break;
 
@@ -279,9 +291,10 @@ ostream& operator<<(std::ostream& os, const Token::Kind& kind) {
 	case Token::Ellipsis:	os << "..";				break;
 	case Token::Caret:		os << "^";				break;
 
+	case Token::BoolType:	os << "boolean";		break;
+	case Token::CharType:	os << "char";			break;
 	case Token::IntType:	os << "integer";		break;
 	case Token::RealType:	os << "real";			break;
-	case Token::BoolType:	os << "boolean";		break;
 
 	case Token::Array:		os << "array";			break;
 	case Token::Of:			os << "of";				break;
@@ -324,6 +337,7 @@ ostream& operator<<(std::ostream& os, const Token::Kind& kind) {
 	case Token::Sqr:		os << "sqr";			break;
 	case Token::Sqrt:		os << "sqrt";			break;
 	case Token::Succ:		os << "succ";			break;
+	case Token::Write:		os << "write";			break;
 	case Token::Writeln:	os << "writeln";		break;
 	case Token::New:		os << "new";			break;
 	case Token::Dispose:	os << "dispose";		break;

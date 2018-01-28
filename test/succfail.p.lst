@@ -15,4 +15,4 @@
     7: writeln
     8: ret
 
-./pas: runtime error: out-of-range!
+./p: runtime error: out-of-range!

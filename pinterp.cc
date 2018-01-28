@@ -1,7 +1,7 @@
 /********************************************************************************************//**
- * @file interp.cc
+ * @file pinterp.cc
  *
- * Pascal-lite interpreter in C++
+ * The P machine; a P language interpreter in C++
  *
  * @author Randy Merkel, Slowly but Surly Software.
  * @copyright  (c) 2017 Slowly but Surly Software. All rights reserved.
@@ -14,7 +14,7 @@
 #include <iostream>
 #include <vector>
 
-#include "interp.h"
+#include "pinterp.h"
 
 using namespace std;
 
@@ -23,7 +23,7 @@ using namespace std;
 /********************************************************************************************//**
  * Dump the current machine state
  ************************************************************************************************/
-void Interp::dump() {
+void PInterp::dump() {
 	if (lastWrite.valid())				// dump the last write...
 		cout << "    "
 			 << setw(5)	<< lastWrite << ": "
@@ -54,13 +54,35 @@ void Interp::dump() {
 	cout << endl;
 }
 
+/********************************************************************************************//**
+ * Checks to see if any part of the specified memory range is invalid, i.e.,  between the top of
+ * the stack and the start of the heap.
+ *
+ * @param	begin	Start of the memory range
+ * @param 	end		One past the end of the memory range
+ ************************************************************************************************/
+bool PInterp::rangeCheck(size_t begin, size_t end) {
+	assert (begin <= end);
+
+	const size_t stackEnd = sp + 1;			// one past the top-of-stack
+	const size_t heapBegin = heap.addr();
+	const size_t heapEnd = heapBegin + heap.size();
+
+	if (begin < stackEnd && end <= stackEnd)
+		return true;						// Range is in the stack
+	else if (begin >= heapBegin && begin < heapEnd && end >= heapBegin && end <= heapEnd)
+		return true;						// Range is in the heap
+	else
+		return false;
+}
+
 // protected:
 
 /********************************************************************************************//**
  * @param lvl Number of levels down
  * @return The base, lvl's down the stack
  ************************************************************************************************/
-unsigned Interp::base(unsigned lvl) {
+unsigned PInterp::base(unsigned lvl) {
 	auto b = fp;
 	for (; lvl > 0; --lvl)
 		b = stack[b].natural();
@@ -71,20 +93,38 @@ unsigned Interp::base(unsigned lvl) {
 /********************************************************************************************//**
  * @return the top-of-stack
  ************************************************************************************************/
-Datum Interp::pop()					{	return stack[sp--];		}
+Datum PInterp::pop()	{
+	if (sp == 0)
+		throw Error(stackUnderflow, "stack underflow error");
+	else
+		return stack[sp--];
+}
+
+/********************************************************************************************//**
+ * @param n	number of datums to pop off the stack
+ ************************************************************************************************/
+void PInterp::pop(unsigned n)	{
+	if (sp < n)
+		throw Error(stackUnderflow, "stack underflow error");
+	else
+		sp -= n;
+}
 
 /********************************************************************************************//**
  * @param d	Datum to push on to the stack
  ************************************************************************************************/
-void Interp::push(Datum d) {
-	stack[++sp] = d;
+void PInterp::push(Datum d) {
+	if (sp >= heap.addr())
+		throw Error(stackOverflow, "stack overflow error");
+	else
+		stack[++sp] = d;
 }
 
 /********************************************************************************************//**
  * @param 	nlevel	Set the subroutines frame base nlevel's down
  * @param 	addr 	The address of the subroutine.
  ************************************************************************************************/
-void Interp::call(int8_t nlevel, unsigned addr) {
+void PInterp::call(int8_t nlevel, unsigned addr) {
 	const auto oldFp = fp;			// Save a copy before we modify it
 
 	// Push a new activation frame block on the stack:
@@ -103,7 +143,7 @@ void Interp::call(int8_t nlevel, unsigned addr) {
 /********************************************************************************************//**
  * Unlinks the stack frame, setting the return address as the next instruciton.
  ************************************************************************************************/
-void Interp::ret() {
+void PInterp::ret() {
 	sp = fp - 1; 					// "pop" the activaction frame
 	pc = stack[fp + FrameRetAddr].natural();
 	fp = stack[fp + FrameOldFp].natural();
@@ -113,7 +153,7 @@ void Interp::ret() {
 /********************************************************************************************//**
  * Unlink the stack frame, set the return address, and then push the function result
  ************************************************************************************************/
-void Interp::retf() {
+void PInterp::retf() {
 	// Save the function result, unlink the stack frame, return the result
 	auto temp = stack[fp + FrameRetVal];
 	ret();
@@ -125,12 +165,21 @@ void Interp::retf() {
  * @param index	index into stack[] for the expr, width [, precision] tuple to print
  * @return false if width or precision is negative, true otherwise
  ************************************************************************************************/
-void Interp::write1(unsigned index) {
+void PInterp::write1(unsigned index) {
 	const auto value = stack[index];
 	const auto width = stack[index+1].natural();
 	const auto prec = stack[index+2].natural();
 
 	switch(value.kind()) {
+	case Datum::Boolean:
+	case Datum::Character:
+		cout << setw(width) << value;
+		break;
+
+	case Datum::Integer:
+		cout << setw(width) << setprecision(prec) << value;
+		break;
+	
 	case Datum::Real:
 		if (prec == 0)
 			cout << setw(width) << scientific << setprecision(6) << value;
@@ -138,13 +187,6 @@ void Interp::write1(unsigned index) {
 			cout << setw(width) << fixed << setprecision(prec) << value;
 		break;
 
-	case Datum::Integer:
-		cout << setw(width) << setprecision(prec) << value;
-		break;
-	
-	case Datum::Boolean:
-		cout << setw(width) << value;
-		break;
 
 	default:
 		cerr << "unknown datum type: " << static_cast<unsigned>(value.kind()) << endl;
@@ -156,7 +198,7 @@ void Interp::write1(unsigned index) {
  * TOS contains the number of elements, followed by that many expr, width, precision tuples.
  * @return false on stack underflow, true otherwise
  ************************************************************************************************/
-bool Interp::write() {
+bool PInterp::write() {
 	// TOS is the number of preceeding entries to print
 	const auto nargs = stack[sp].natural();
 	const unsigned tupleSz = 3;		// each parameter is a 3-tuple
@@ -173,15 +215,111 @@ bool Interp::write() {
 		write1(sp - tupleSz);
 	}
 
-	sp -= (nargs * tupleSz) + 1;	// consume args & the  arg count
+	sp -= (nargs * tupleSz) + 1;	// consume args & the arg count
 
 	return true;
 }
 
 /********************************************************************************************//**
+ * Assigns N Datums, where N is ir.addr, off the stack.  Stack layout before;
+ *
+ * stack  | contants
+ * ------ | -------------------------------
+ * sp-N   | dst - start destination address
+ * ------ | -------------------------------
+ * sp-N-1 | value 1
+ * ------ | -------------------------------
+ * sp-N-2 | value 2
+ * ------ | -------------------------------
+ * ... 	  | ...
+ * ------ | -------------------------------
+ * sp+1   | value N-1
+ * ------ | -------------------------------
+ * sp     | value N
+ *
+ * Copies value 1..N to stack[dest, dest+N), then pops N Datums off of the stack.
+ *
+ * @param	n	Number of Datums to assign.
+ ************************************************************************************************/
+void PInterp::assign(unsigned n) {
+	if (sp < n)
+		throw Error(stackUnderflow, "stack underflow error");
+
+	size_t dst = stack[sp - ir.addr.natural()].natural();
+#if 1
+	if (!rangeCheck(dst, dst + n))
+#else
+	if (sp < dst + n)
+#endif
+		throw Error(stackUnderflow, "stack underflow error");
+
+	lastWrite = dst + n - 1;
+
+	size_t src = sp - n + 1;
+	for (size_t i = 0; i < n; ++i)
+		stack[dst++] = stack[src++];
+
+	sp -= n + 1;				// 'pop' the stack, including dest addr
+}
+
+/********************************************************************************************//**
+ * Evaluate N Datums, whose starting address is on the stop of the stack. Replaces the address
+ * with the values.
+ *
+ * @param	n	Number of Datums to assign.
+ ************************************************************************************************/
+void PInterp::eval(unsigned n) {
+	if (sp < n)
+		throw Error(stackUnderflow, "stack underflow error");
+
+	unsigned dst = pop().natural();
+#if 1
+	if (!rangeCheck(dst, dst + n))
+#else
+	if (sp < dst + n - 1)
+#endif
+		throw Error(stackUnderflow, "stack underflow error");
+
+	for (unsigned i = 0; i < n; ++i)
+		push(stack[dst++]);
+}
+
+/********************************************************************************************//**
+ * Copy N Datums. Stack before;
+ *
+ * stack  | contants
+ * ------ | ----------------------------------
+ * sp+1   | dst - destination starting address
+ * ------ | ----------------------------------
+ * sp     | src - source starting address
+ *
+ ************************************************************************************************/
+void PInterp::copy(unsigned n) {
+	unsigned src  = pop().natural();
+#if 1
+	if (!rangeCheck(src, src + n))
+#else
+	if (sp < src + n)
+#endif
+		throw Error(stackUnderflow, "stack underflow error");
+
+	unsigned dst = pop().natural();
+#if 1
+	if (!rangeCheck(dst, dst + n))
+#else
+	if (sp < dst + n)
+#endif
+		throw Error(stackUnderflow, "stack underflow error");
+
+	lastWrite = dst + n;
+	for (unsigned i = 0; i < ir.addr.natural(); ++i)
+		stack[dst++] = stack[src++];
+}
+
+/********************************************************************************************//**
  * @return Result::success or...
  ************************************************************************************************/
-Interp::Result Interp::step() {
+PInterp::Result PInterp::step() {
 	auto prevPc = pc;				// The previous pc
 	ir = code[pc++];				// Fetch next instruction...
 	++ncycles;
@@ -330,15 +468,16 @@ Interp::Result Interp::step() {
 	case OpCode::LAND: 	rhand = pop(); push(pop() && rhand); 					break;
 	case OpCode::LNOT:	stack[sp] = !stack[sp];									break;
 
-	case OpCode::POP:	pop();													break;
+	case OpCode::POP:
+		for (unsigned i = 0; i < ir.addr.natural(); ++i)
+			pop();
+		break;
+
 	case OpCode::PUSH: 	push(ir.addr);											break;
 	case OpCode::PUSHVAR: push(base(ir.level) + ir.addr.integer());				break;
-	case OpCode::EVAL:	{ auto ea = pop(); push(stack[ea.natural()]); }			break;
-	case OpCode::ASSIGN:
-		rhand = pop();					// Save the value
-		lastWrite = pop().natural();	// Save the effective address for dump()...
-		stack[lastWrite] = rhand;
-		break;
+	case OpCode::EVAL:	eval(ir.addr.natural());								break;
+	case OpCode::ASSIGN: assign(ir.addr.natural());								break;
+	case OpCode::COPY:	copy(ir.addr.natural());								break;
 
 	case OpCode::CALL: 	call(ir.level, ir.addr.natural());						break;
 	case OpCode::RET:   ret();  												break;
@@ -375,7 +514,7 @@ Interp::Result Interp::step() {
 /********************************************************************************************//**
  *  @return	Result::success, or ...
  ************************************************************************************************/
-Interp::Result Interp::run() {
+PInterp::Result PInterp::run() {
 	if (verbose)
 		cout << "Reg  Addr Value/Instr\n"
 			 << "---------------------\n";
@@ -384,21 +523,22 @@ Interp::Result Interp::run() {
 		heap.dump(cout);					// Dump the initial heap state...
 
 	Result status = Result::success;
-	do {
-		if (pc >= code.size()) {
-			cerr << "pc (" << pc << ") is out of range: [0.." << code.size() << ")!\n";
-			status = Result::badFetch;
+	try {
+		do {
+			if (pc >= code.size()) {
+				cerr << "pc (" << pc << ") is out of range: [0.." << code.size() << ")!\n";
+				status = Result::badFetch;
 
-		} else if (sp >= heap.addr()) {
-			cerr << "sp (" << sp << ") is out of range [0.." << heap.addr() << ")!\n";
-			status = Result::stackUnderflow;
+			} else {
+				dump();							// Dump state and disasm the next instruction
+				status = step();
+			}
+		} while (Result::success == status);
 
-		} else {
-			dump();							// Dump state and disasm the next instruction
-			status = step();
-		}
-
-	} while (Result::success == status);
+	} catch (Error& exp) {
+		cerr << "runtime error @pc " << pc << ", sp " << sp << ": " << exp.what() << endl;
+		return exp.result();
+	}
 
 	return status;
 }
@@ -408,27 +548,40 @@ Interp::Result Interp::run() {
 /********************************************************************************************//**
  * Initialize the machine into a reset state with verbose == false. 
  *
- * @param stackSz	Size of the stack, in datums. Defaults to 1K.
- * @param fstoreSz	Size of the free store, in datums. Defaults to 3K
+ * @param stackSz	Size of the evaluation & call stack, in Datums.
+ * @param fstoreSz	Size of the free store, in Datums.
  ************************************************************************************************/
-Interp::Interp(unsigned stackSz, unsigned fstoreSz)
-	:	stackSize{stackSz},
+PInterp::PInterp(unsigned stackSz, unsigned fstoreSz)
+	:	constSize{0},
+		stackSize{stackSz},
 		stack(stackSize + fstoreSz, -1),
-		verbose(false), ncycles(0),
-		heap(stackSz, fstoreSz)
+		heap(stackSz, fstoreSz),
+		verbose(false),
+		ncycles(0)
 {
 	reset();
 }
 
 /********************************************************************************************//**
- *	@param	program	The program to run
+ *	@param	prog	The program to run
+ * 	@param	consts	The programs initialized data
  *	@param 	ver		True for verbose/debugging messages
+ * 
  *  @return	The number of machine cycles run
  ************************************************************************************************/
-Interp::Result Interp::operator()(const InstrVector& program, bool ver) {
+PInterp::Result PInterp::operator()(
+	const	InstrVector&	prog,
+	const	DatumVector&	consts,
+			bool 			ver)
+{
 	verbose = ver;
+	code = prog;
+	constSize = consts.size();
 
-	code = program;
+	stack.resize(stack.size() + constSize, -1);
+	sp = 0;
+	for (auto& d : consts)					// Push initialized data onto the stack
+		stack[sp++] = d;
 	reset();
 
 	auto result = run();
@@ -440,13 +593,13 @@ Interp::Result Interp::operator()(const InstrVector& program, bool ver) {
 
 /********************************************************************************************//**
  ************************************************************************************************/
-void Interp::reset() {
+void PInterp::reset() {
 	pc = 0;
 
-	fp = 0;									// Setup the initial activacation frame
-	for (sp = 0; sp < FrameSize; ++sp)
+	fp = constSize;									// Setup the initial activacation frame
+	for (sp = fp; sp < FrameSize; ++sp)
 		stack[sp] = 0;
-	sp = FrameSize - 1;
+	sp = fp + FrameSize - 1;
 
 	ncycles = 0;
 }
@@ -454,14 +607,14 @@ void Interp::reset() {
 /********************************************************************************************//**
  * @return number of machien cycles run so far
  ************************************************************************************************/
-size_t Interp::cycles() const {
+size_t PInterp::cycles() const {
 	return ncycles;
 }
 
 // operators
 
 /********************************************************************************************//**
- * @brief Interp::Result stream put operator
+ * @brief PInterp::Result stream put operator
  *
  * Puts Result value on os
  *
@@ -469,17 +622,17 @@ size_t Interp::cycles() const {
  * @param	result	The value to write 
  * @return	os 
  ************************************************************************************************/
-ostream& operator<<(std::ostream& os, const Interp::Result& result) {
+ostream& operator<<(std::ostream& os, const PInterp::Result& result) {
 	switch (result) {
-	case Interp::success:			os << "success";				break;
-	case Interp::divideByZero:		os << "divide-by-zero";			break;
-	case Interp::badFetch:			os << "bad-fetch";				break;
-	case Interp::unknownInstr:		os << "unknown-instruction";	break;
-	case Interp::stackOverflow:		os << "stack overflow";			break;
-	case Interp::stackUnderflow:	os << "stack underflow";		break;
-	case Interp::freeStoreError:	os << "free-store error";		break;
-	case Interp::outOfRange:		os << "out-of-range";			break;
-	case Interp::halted:			os << "halted";					break;
+	case PInterp::success:			os << "success";				break;
+	case PInterp::divideByZero:		os << "divide-by-zero";			break;
+	case PInterp::badFetch:			os << "bad-fetch";				break;
+	case PInterp::unknownInstr:		os << "unknown-instruction";	break;
+	case PInterp::stackOverflow:	os << "stack overflow";			break;
+	case PInterp::stackUnderflow:	os << "stack underflow";		break;
+	case PInterp::freeStoreError:	os << "free-store error";		break;
+	case PInterp::outOfRange:		os << "out-of-range";			break;
+	case PInterp::halted:			os << "halted";					break;
 	default:
 		return os << "undefined result!";
 		assert(false);

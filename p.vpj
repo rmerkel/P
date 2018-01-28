@@ -62,7 +62,7 @@
 				CaptureOutputWith="ProcessBuffer"
 				Deletable="0"
 				SaveOption="SaveNone">
-				<Exec CmdLine='vsdebugio -prog "%o"'/>
+				<Exec CmdLine='"%(VSLICKBIN1)vsdebugio" -port 8001 -prog /home/rmerkel/pascal/p/p'/>
 			</Target>
 			<Target
 				Name="Execute"
@@ -72,7 +72,7 @@
 				CaptureOutputWith="ProcessBuffer"
 				Deletable="0"
 				SaveOption="SaveWorkspaceFiles">
-				<Exec CmdLine='"%o"'/>
+				<Exec CmdLine="/home/rmerkel/pascal/p/p"/>
 			</Target>
 			<Target
 				Name="dash"
@@ -186,7 +186,7 @@
 				CaptureOutputWith="ProcessBuffer"
 				Deletable="0"
 				SaveOption="SaveNone">
-				<Exec CmdLine='vsdebugio -prog "%o"'/>
+				<Exec CmdLine='"%(VSLICKBIN1)vsdebugio" -port 8001 -prog /home/rmerkel/pascal/p/p'/>
 			</Target>
 			<Target
 				Name="Execute"
@@ -196,7 +196,7 @@
 				CaptureOutputWith="ProcessBuffer"
 				Deletable="0"
 				SaveOption="SaveWorkspaceFiles">
-				<Exec CmdLine='"%o"'/>
+				<Exec CmdLine="/home/rmerkel/pascal/p/p"/>
 			</Target>
 			<Target
 				Name="dash"
@@ -262,8 +262,8 @@
 			<F N="datum.cc"/>
 			<F N="driver.cc"/>
 			<F N="instr.cc"/>
-			<F N="interp.cc"/>
 			<F N="pascomp.cc"/>
+			<F N="pinterp.cc"/>
 			<F N="symbol.cc"/>
 			<F N="token.cc"/>
 			<F N="type.cc"/>
@@ -278,6 +278,7 @@
 			<F N="instr.h"/>
 			<F N="interp.h"/>
 			<F N="pascomp.h"/>
+			<F N="pinterp.h"/>
 			<F N="symbol.h"/>
 			<F N="token.h"/>
 			<F N="type.h"/>

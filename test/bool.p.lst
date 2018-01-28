@@ -10,19 +10,19 @@
     4: push 1
     5: llimit 0
     6: ulimit 1
-    7: assign
+    7: assign 1
 # test/bool.p, 6: 	if (b) then b := false;
     8: pushvar 0, 4
-    9: eval
+    9: eval 1
    10: jneq 16
    11: pushvar 0, 4
    12: push 0
    13: llimit 0
    14: ulimit 1
-   15: assign
+   15: assign 1
 # test/bool.p, 7: 	writeln(b)
    16: pushvar 0, 4
-   17: eval
+   17: eval 1
    18: push 0
    19: push 0
 # test/bool.p, 8: end .

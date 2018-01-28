@@ -1,7 +1,7 @@
 /********************************************************************************************//**
  * @file instr.cc
  *
- * Pascal-lite Opcodes and instruction format
+ * P machine Opcodes and instruction format
  *
  * @author Randy Merkel, Slowly but Surly Software.
  * @copyright  (c) 2017 Slowly but Surly Software. All rights reserved.
@@ -79,8 +79,9 @@ const OpCodeInfo::InfoMap OpCodeInfo::opInfoTbl {
 	{ OpCode::POP,		OpCodeInfo{ "pop",		1			} },
 	{ OpCode::PUSH,		OpCodeInfo{ "push",		1			} },
 	{ OpCode::PUSHVAR,	OpCodeInfo{ "pushvar",	1			} },
-	{ OpCode::EVAL,		OpCodeInfo{ "eval",		2			} },
+	{ OpCode::EVAL,		OpCodeInfo{ "eval",		1			} },
 	{ OpCode::ASSIGN,	OpCodeInfo{ "assign",	2			} },
+	{ OpCode::COPY,		OpCodeInfo{	"copy",		2			} },
 
 	// Call/return/jump...
 
@@ -133,7 +134,10 @@ unsigned disasm(ostream& out, unsigned loc, const Instr& instr, const string lab
 	out << setw(5) << loc << ": " << OpCodeInfo::info(instr.op).name();
 
 	switch(instr.op) {
+	case OpCode::ASSIGN:
+	case OpCode::COPY:
 	case OpCode::ENTER:
+	case OpCode::EVAL:
 	case OpCode::JUMP:
 	case OpCode::JNEQ:
 	case OpCode::LLIMIT:

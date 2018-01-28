@@ -8,7 +8,7 @@
  ************************************************************************************************/
 
 #include "compilier.h"
-#include "interp.h"
+#include "pinterp.h"
 
 #include <cassert>
 #include <iomanip>
@@ -111,7 +111,7 @@ bool Compilier::oneOf(Token::KindSet set) {
 
 /********************************************************************************************//**
  * Assembles op, level, addr into a new instruction, and then appends the instruciton on
- * the end of code[], returning it's address/index in code[].
+ * the end of code[], returning it's address/index.
  *
  * Side effect; updates the cross index for the listing.
  *
@@ -135,6 +135,24 @@ size_t Compilier::emit(const OpCode op, int8_t level, Datum addr) {
 }
 
 /********************************************************************************************//**
+ * Appends a datum on the end of data[], returning it's address/index.
+ *
+ * Side effect; updates the cross index for the listing.
+ *
+ * @param	datum	The Datum to emit
+ *
+ * @return The address (data[] index) of the new datum.
+ ************************************************************************************************/
+size_t Compilier::emitConst(const Datum& datum) {
+	if (verbose)
+		cout << progName << ": emitting data " << data->size() << ": " << datum << '\n';
+	data->push_back(datum);
+	indextbl.push_back(ts.lineNum);			// update the cross index
+
+	return data->size() - 1;				// so it's the address of the just emitted datum
+}
+
+/********************************************************************************************//**
  * Local variables have an offset from the *end* of the current stack frame
  * (bp), while parameters have a negative offset from the *start* of the frame
  *  -- offset locals by the size of the activation frame.
@@ -144,7 +162,10 @@ size_t Compilier::emit(const OpCode op, int8_t level, Datum addr) {
  *  @return			Data type
  ************************************************************************************************/
 TDescPtr Compilier::emitVarRef(int level, const SymValue& val) {
-	const auto offset = val.value().integer() >= 0 ? val.value().integer() + FrameSize : val.value().integer();
+	const auto offset = val.value().integer() >= 0			?
+						val.value().integer() + FrameSize	:	// local
+						val.value().integer();					// parameter
+
 	emit(OpCode::PUSHVAR, level - val.level(), offset);
 	return val.type();
 }
@@ -157,22 +178,25 @@ TDescPtr Compilier::emitVarRef(int level, const SymValue& val) {
  * @param out		The listing file stream
  ************************************************************************************************/
  void Compilier::listing(const string& name, istream& source, ostream& out) {
-	string 		line;   				// Current source line
-	unsigned 	linenum = 1;			// source line number
-	unsigned	addr = 0;				// code address (index)
+	string 		line;   						// Current source line
+	unsigned 	linenum = 1;					// source line number
+	unsigned	addr = 0;						// code address (index)
 
-	while (addr < indextbl.size()) {
-		while (linenum <= indextbl[addr]) {	// Print lines that lead up to code[addr]...
+	for (unsigned i = 0; i < data->size(); ++i)	// dump constant data, if any...
+		cout << setw(5) << i << ": " << (*data)[i] << '\n';
+
+	while (addr < indextbl.size()) {			// dump instructions, if any...
+		while (linenum <= indextbl[addr]) {		// Print lines that lead up to code[addr]...
 			getline(source, line);
 			cout << "# " << name << ", " << linenum++ << ": " << line << "\n";
 		}
 
-		disasm(out, addr, (*code)[addr]);	// Disasmble resulting instructions...
+		disasm(out, addr, (*code)[addr]);		// Disasmble resulting instructions...
 		while (linenum-1 == indextbl[++addr])
 			disasm(out, addr, (*code)[addr]);
 	}
 
-	while (getline(source, line))			// Any lines following '.' ...
+	while (getline(source, line))				// Any lines following '.' ...
 		cout << "# " << name << ", " << linenum++ << ": " << line << "\n";
 
 	out << endl;
@@ -261,23 +285,33 @@ const std::string Compilier::nameDecl(int level, const string& prefix) {
 /********************************************************************************************//**
  * Construct a new compilier with the token stream initially bound to std::cin.
  *
- * @param	pName	The prefix string used by error and verbose/diagnostic messages.
+ * @param	pName	The compilier program name.
  ************************************************************************************************/
-Compilier::Compilier(const string& pName) : progName {pName}, nErrors{0}, verbose {false}, ts{cin}
-{
-}
+Compilier::Compilier( const	string&	pName)
+	:	progName {pName}, nErrors{0}, verbose {false}, ts{cin}
+{}
 
 /********************************************************************************************//**
- * @param	inFile	The source file name, where "-" means the standard input stream
- * @param	prog	The generated machine code is appended here
- * @param	verb	Output verbose messages if true
+ * Compile the contents of fName, generating code in prog, and global data in globals.
+ *
+ * @param	fName			The source file name, where "-" means the standard input stream
+ * @param	instructions	The generated machine code is appended here
+ * @param	iDatums			The generated global data is appended here
+ * @param	verbMode		Run in verbose mode if true
+ *
  * @return	The number of errors encountered
  ************************************************************************************************/
-unsigned Compilier::operator()(const string& inFile, InstrVector& prog, bool verb) {
-	code = &prog;
-	verbose = verb;
+unsigned Compilier::operator()(
+	const	string&			fName,
+			InstrVector&	instructions,
+			DatumVector&	iDatums,
+			bool			verbMode)
+{
+	code = &instructions;
+	data = &iDatums;
+	verbose = verbMode;
 
-	if ("-" == inFile)  {						// "-" means standard input
+	if ("-" == fName)  {					// "-" means standard input
 		ts.set_input(cin);
 		run();
 
@@ -286,20 +320,19 @@ unsigned Compilier::operator()(const string& inFile, InstrVector& prog, bool ver
 			disasm(cout, loc, (*code)[loc]);
 
 	} else {
-		ifstream ifile(inFile);
+		ifstream ifile(fName);
 		if (!ifile.is_open())
-			error("error opening source file", inFile);
+			error("error opening source file", fName);
 
 		else {
 			ts.set_input(ifile);
 			run();
 
-			ifile.close();						// Rewind the source (seekg(0) isn't working!)...
-			ifile.open(inFile);
-			listing(inFile, ifile, cout);		// 	create a listing...
+			ifile.close();					// Rewind the source (seekg(0) isn't working!)...
+			ifile.open(fName);
+			listing(fName, ifile, cout);	// 	create a listing...
 		}
 	}
-	code = 0;
 
 	return nErrors;
 }

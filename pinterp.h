@@ -1,5 +1,5 @@
 /********************************************************************************************//**
- * @file interp.h
+ * @file pinterp.h
  *
  * The Pascal interpreter.
  *
@@ -7,23 +7,37 @@
  * @copyright  (c) 2017 Slowly but Surly Software. All rights reserved.
  ********************************************************************************************//**/
 
-#ifndef	INTERP_H
-#define INTERP_H
+#ifndef	PINTERP_H
+#define PINTERP_H
 
 #include <iostream>
 #include <cstdint>
+#include <stdexcept>
 #include <vector>
 
 #include "instr.h"
 #include "freestore.h"
 
 /********************************************************************************************//**
- * A Pascal Machine
+ * A Machine for the P languange
  *
  * A interperter that started life as a straight C/C++ port of the PL/0 machine described in
  * Algorithms + Data Structures = Programs, 1st Edition, by Wirth.
+ *
+ * @section Memory-map
+ *
+ * Code and data each exist in their own namespaces. The data namespace is divided into three
+ * fixed length segments; the the constants segment, followed by the evaluation/call stack
+ * (originized by call activation frames [blocks]), followed by the heap (free store). The size of
+ *  each are set at construction, and reset by operator()();
+ *
+ * Address range            | Region    | Notes
+ * ------------------------ | --------- | ------------------------------
+ * stackSze..heap.size()-1  | Heap      | Maintained by heap(stackSz, fstoreSz)
+ * constSize..stackSize-1   | Stack     | Evaluation and call stack
+ * 0.. constSize-1          | Constants | Global constants
  ********************************************************************************************//**/
-class Interp {
+class PInterp {
 public:
 	/// Interpeter results
 	enum Result {
@@ -38,19 +52,35 @@ public:
 		halted								///< Machine has halted
 	};
 
-	Interp(unsigned stackSz = 1024, unsigned fstoreSz = 3072);
-	virtual ~Interp() {}
+	/// Runtime exception
+	class Error : public std::runtime_error {
+		Result	rcode;						///< The result code
+	public:
+		/// Construct with results code and description
+		explicit Error(Result code, const std::string& what) : runtime_error(what), rcode(code) {}
+		/// Return my results code
+		Result result() const {	return rcode;	}
+	};
+
+	PInterp(unsigned stackSz = 1024, unsigned fstoreSz = 3*1024);
+	virtual ~PInterp() {}
 
 	/// Load a applicaton and start the pl/0 machine running...
-	Result operator()(const InstrVector& program, bool v = false);
+	Result operator()(
+		const	InstrVector&	prog,
+		const	DatumVector&	consts,
+				bool			v = false);
 	void reset();							///< Reset the machine back to it's initial state.
 	size_t cycles() const;					///< Return number of machine cycles run so far
 
 protected:
-	///< Find the activation base 'lvl' levels up the stack...
-	unsigned base(unsigned lvl);
+	/// Return true if the specified memory range is valid
+	bool rangeCheck(size_t begin, size_t end);
+
+	unsigned base(unsigned lvl);			///< Find the activation base 'lvl' levels up the stack...
 
 	Datum pop();							///< Pop a Datum from the top of stack...
+	void pop(unsigned n);					///< Pop and discard n Datums from the top of stack...
 	void push(Datum d);						///< Push a Datum onto the stack...
 
 	void write1(unsigned index);			///< Write one expression on standard output
@@ -60,6 +90,10 @@ protected:
 	void call(int8_t nlevel, unsigned addr);
 	void ret();								///< Return from procedure...
 	void retf();							///< Return from a function...
+
+	void assign(unsigned n);				///< Assign N Datums...
+	void eval(unsigned n);					///< Evaluate N Datums...
+	void copy(unsigned n);					///< Copy N Datums...
 
 	Result step();							///< Single step the machine...
 	Result run();							///< Run the machine...
@@ -87,8 +121,10 @@ private:
 	};
 
 	InstrVector		code;					///< Code segment, indexed by pc
-	unsigned		stackSize;				///< The stack size, in datums.
+	unsigned		constSize;				///< The size of the constant segment, in Datums
+	unsigned		stackSize;				///< The size of the stack segment, in Datums.
 	DatumVector		stack;					///< Data segment (stack + free-store), indexed by fp and sp
+	FreeStore		heap;					///< Dynamic memory heap
 	unsigned		pc;						///< Program counter register; index of *next* instruction in code[]
 	unsigned		fp;						///< Frame pointer register; index of the current mark block/frame in stack[]
 	unsigned		sp;						///< Top of stack register (stack[sp])
@@ -97,11 +133,10 @@ private:
 	EAddr			lastWrite;				///< Last write effective address (to stack[]), if valid
 	bool			verbose;				///< Verbose output if true
 	unsigned  		ncycles;				///< Number of machine cycles run since the last reset
-	FreeStore		heap;					///< Dynamic memory heap
 
 	void dump();
 };
 
-std::ostream& operator<<(std::ostream& os, const Interp::Result& result);
+std::ostream& operator<<(std::ostream& os, const PInterp::Result& result);
 
 #endif

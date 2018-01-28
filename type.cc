@@ -1,27 +1,7 @@
 /****************************************************************************
  * @file type.cc
  *
- * Types, both builtin, and created programmatically.
- *
- * Describes both built-in/pre-defined types and user defined types with in
- * the following type kinds (classes):
- *
- * | Kind    | Size | Sub-Range | IType | Base | Fields | Ordinal
- * | :------ | :--: | :-------: | :---: | :--: | :----: | :-----:
- * |  Int	 |	1   | IMIN-IMAX |   -   |   -  |   -    |	Y    
- * |  Real   |	1   |     -     |   -   |   -  |   -    |	N    
- * |  Bool   |	1   |   0 - 1   |   -   |   -  |   -    |	Y    
- * |  Char   |	1   |   0 - 127 |   -   |   -  |   -    |	Y    
- * |  Array  |	N   |    1-10   |  T1   |  T2  |   -    |	N    
- * |  Int    |	1   |    1-10   |   -   |   -  |   -    |	Y    
- * |  Record |	N   |     -     |   -   |   -  | Fields |   N    
- * |  Enum	 |	1   |    X-Y    |   -   |   -  |   -    |	Y    
- * |  Ptr    |  1   |     -     |   -   |   T  |   -    |   N
- *
- * Key:
- * - IType - is the sub-range (index) type for arrays
- * - Base - is the base type for arrays, sub-ranges and enumerations
- * - Fields - is a list of name/type pairs to identify record fields
+ * Type system.
  ****************************************************************************/
 
 #include <cassert>
@@ -42,8 +22,7 @@ using namespace std;
  * @param	type	The fields type, e.g., "Integer" or "T"
  ****************************************************************************/
 Field::Field(const std::string& name, TDescPtr type)
-	: _name{name}, _type{type}
-{
+	: _name{name}, _type{type} {
 }
 
 /********************************************************************************************//**
@@ -95,7 +74,7 @@ bool operator==(const Field& lhs, const Field& rhs) {
  * @return	os 
  ************************************************************************************************/
 ostream& operator<<(std::ostream& os, const Field& field) {
-	return os << field.name() << ", " << field.type()->kind();
+	return os << field.name() << ", " << field.type()->tclass();
 }
 
 /****************************************************************************
@@ -109,8 +88,7 @@ ostream& operator<<(std::ostream& os, const Field& field) {
  * @param	maximum	The maximum value in the range
  ****************************************************************************/
 SubRange::SubRange(int minimum, int maximum)
-	: _min{minimum}, _max{maximum}
-{
+	: _min{minimum}, _max{maximum} {
 }
 
 /********************************************************************************************//**
@@ -168,9 +146,190 @@ ostream& operator<<(std::ostream& os, const SubRange& srange) {
 	return os << srange.minimum() << ".." << srange.maximum();
 }
 
-/************************************************************************************************
- * class TypeDesc
+/********************************************************************************************//**
+ * TypeDesc
  ************************************************************************************************/
+
+// protected:
+
+/**	Construct
+ * @param	tclass	My type class
+ * @param	size	Object size, in Datums. Defaults to 1.
+ * @param	range	Sub-Range, defaults SubRange()
+ * @param	itype	Index type. Defaults to TDescPtr()
+ * @param	fields	Fields. Defaults to FieldVec()
+ * @param	base	Base type. Defaults to TDescPtr().
+ * @param	ordinal	True if is an ordinal type.
+ */
+TypeDesc::TypeDesc(
+			TypeClass	tclass,
+			unsigned	size,
+	const	SubRange&	range,
+			TDescPtr	itype,
+	const	FieldVec&	fields,
+			TDescPtr	base,
+			bool		ordinal)
+
+	: _tclass{tclass},
+	  _size{size},
+	  _range{range},
+	  _itype{itype},
+	  _fields{fields},
+	  _base{base},
+	  _ordinal{ordinal}
+{}
+
+// public static
+
+SubRange TypeDesc::maxRange(numeric_limits<int>::min(), numeric_limits<int>::max());
+
+TDescPtr TypeDesc::intDesc	= TypeDesc::newIntDesc(maxRange);
+TDescPtr TypeDesc::realDesc	= TypeDesc::newRealDesc();
+TDescPtr TypeDesc::boolDesc	= TypeDesc::newBoolDesc();
+TDescPtr TypeDesc::charDesc	= TypeDesc::newCharDesc(SubRange(0, 127));
+
+/********************************************************************************************//**
+ * @param	range		The type sub-range range. Defaults to SubRange().
+ * @return TDescPtr to a IntDesc
+ ************************************************************************************************/
+TDescPtr TypeDesc::newIntDesc(const SubRange& range) {
+	return TDescPtr(new TypeDesc(Integer, 1, range, TDescPtr(), FieldVec(), TDescPtr(), true));
+}
+
+/********************************************************************************************//**
+ * @return TDescPtr to a new RealDesc
+ ************************************************************************************************/
+TDescPtr TypeDesc::newRealDesc() {
+	return TDescPtr(new TypeDesc(Real, 1, SubRange(), TDescPtr(), FieldVec(), TDescPtr(), false));
+}
+
+/********************************************************************************************//**
+ * @return TDescPtr to a new BoolDesc
+ ************************************************************************************************/
+TDescPtr TypeDesc::newBoolDesc() {
+	return TDescPtr(new TypeDesc(Boolean,
+								1,
+								SubRange(0, 1),
+								TDescPtr(),
+								FieldVec(),
+								TDescPtr(),
+								true));
+}
+
+/********************************************************************************************//**
+ * @param	range		The type sub-range range. Defaults to SubRange().
+ * @return TDescPtr to a new CharDesc
+ ************************************************************************************************/
+TDescPtr TypeDesc::newCharDesc(const SubRange& range) {
+	return TDescPtr(new TypeDesc(Character, 1, range, TDescPtr(), FieldVec(), TDescPtr(), true));
+}
+
+/********************************************************************************************//**
+ * @param	size		Size, in bytes, of a object of this type
+ * @param	range		The type sub-range range.
+ * @param	itype		The type array type.
+ * @param	base		The type base type. Defaults to TDescPtr().
+ * @return TDescPtr to a new ArrayDesc
+ ************************************************************************************************/
+TDescPtr TypeDesc::newArrayDesc(
+			unsigned	size,
+	const	SubRange&	range,
+			TDescPtr	itype,
+			TDescPtr	base)
+{
+	return TDescPtr(new TypeDesc(Array, size, range, itype, FieldVec(), base, false));
+}
+
+/********************************************************************************************//**
+ * @param	size		Size, in bytes, of a object of this type
+ * @param	fields		The type fields. Defaults to FieldVec().
+ * @return TDescPtr to a new RecordDesc
+ ************************************************************************************************/
+TDescPtr TypeDesc::newRcrdDesc(unsigned size, const FieldVec& fields) {
+	return TDescPtr(new TypeDesc(Record,
+								size,
+								SubRange(),
+								TDescPtr(),
+								fields,
+								TDescPtr(),
+								false));
+}
+
+/********************************************************************************************//**
+ * @param	range		The type sub-range range.
+ * @param	fields		The type fields. Defaults to FieldVec().
+ * @return TDescPtr to a new EnumDesc
+ ************************************************************************************************/
+TDescPtr TypeDesc::newEnumDesc(const SubRange& range, const FieldVec& fields) {
+	return TDescPtr(new TypeDesc(Enumeration, 1, range, TDescPtr(), fields, TDescPtr(), true));
+}
+
+/********************************************************************************************//**
+ * @param	base		The type base type. Defaults to TDescPtr().
+ * @return TDescPtr to a new PtrDesc
+ ************************************************************************************************/
+TDescPtr TypeDesc::newPointerDesc(TDescPtr base) {
+	return TDescPtr(new TypeDesc(Pointer, 1, SubRange(), TDescPtr(), FieldVec(), base, false));
+}
+
+// public
+
+/********************************************************************************************//**
+ * @return my type class
+ ************************************************************************************************/
+TypeDesc::TypeClass TypeDesc::tclass() const	{	return _tclass;					}
+
+/********************************************************************************************//**
+ * @return my size, in Datums
+ ************************************************************************************************/
+unsigned TypeDesc::size() const					{	return _size;					}
+
+/********************************************************************************************//**
+ * @return my size, in Datums
+ ************************************************************************************************/
+unsigned TypeDesc::size(unsigned sz) 			{	return _size = sz;				}
+
+/********************************************************************************************//**
+ * @return my sub-range
+ ************************************************************************************************/
+const SubRange& TypeDesc::range() const 		{	return _range;					}
+
+/********************************************************************************************//**
+ * @return my index type
+ ************************************************************************************************/
+TDescPtr TypeDesc::itype() const 				{	return _itype;					}
+
+/********************************************************************************************//**
+ * @return my index type
+ ************************************************************************************************/
+TDescPtr TypeDesc::itype(TDescPtr type) 		{	return _itype = type;			}
+
+/********************************************************************************************//**
+ * @return my fields
+ ************************************************************************************************/
+const FieldVec& TypeDesc::fields() const		{	return _fields;					}
+
+/********************************************************************************************//**
+ * @return my fields
+ ************************************************************************************************/
+const FieldVec& TypeDesc::fields(const FieldVec& fields) {
+	return _fields = fields;
+}
+
+/********************************************************************************************//**
+ * @return by base type
+ ************************************************************************************************/
+TDescPtr TypeDesc::base() const 				{	return _base;					}
+
+/********************************************************************************************//**
+ * @return by base type
+ ************************************************************************************************/
+TDescPtr TypeDesc::base(TDescPtr type)			{	return _base = type;			}
+
+/********************************************************************************************//**
+ * @return true if my type is ordinal
+ ************************************************************************************************/
+bool TypeDesc::isOrdinal() const 				{	return _ordinal;				}
 
 // operators
 
@@ -181,7 +340,7 @@ ostream& operator<<(std::ostream& os, const SubRange& srange) {
  * @return true if lhs == rhs
  ************************************************************************************************/
 bool operator<(const TypeDesc& lhs, const TypeDesc& rhs) {
-	if (lhs.kind() < rhs.kind())
+	if (lhs.tclass()			< rhs.tclass())
 		return true;
 	else if (lhs.size()			< rhs.size())
 		return true;
@@ -191,7 +350,7 @@ bool operator<(const TypeDesc& lhs, const TypeDesc& rhs) {
 		return true;
 	else if (lhs.fields()		< rhs.fields())
 		return true;
-	else if (lhs.isOrdinal() 	< rhs.isOrdinal())
+	else if (lhs.isOrdinal()	< rhs.isOrdinal())
 		return true;
 	else 
 		return false;
@@ -204,130 +363,56 @@ bool operator<(const TypeDesc& lhs, const TypeDesc& rhs) {
  * @return true if lhs == rhs
  ************************************************************************************************/
 bool operator==(const TypeDesc& lhs, const TypeDesc& rhs) {
-	return	lhs.kind()			== rhs.kind()			&&
-			lhs.size()			== rhs.size()			&&
-			lhs.range()			== rhs.range()			&&
-			lhs.base()			== rhs.base()			&&
-			lhs.fields()		== rhs.fields()			&&
+	return	lhs.tclass()		== rhs.tclass()		&&
+			lhs.size()			== rhs.size()		&&
+			lhs.range()			== rhs.range()		&&
+			lhs.base()			== rhs.base()		&&
+			lhs.fields()		== rhs.fields()		&&
 			lhs.isOrdinal()		== rhs.isOrdinal();
 }
 
 /********************************************************************************************//**
- * @brief TDesc::Kind stream put operator
+ * @brief TypeClass put operator
  *
- * @param	os		Stream to write value on
- * @param	value	Value to write  on os
- * @return	os 
+ * @param	os		The stream to write type class value on
+ * @param	tclass	Value to write 
+ * @return	os
  ************************************************************************************************/
-ostream& operator<<(std::ostream& os, const TDesc::Kind& value) {
-	switch (value) {
-	case TypeDesc::Integer:		os << "integer";		break;
-	case TypeDesc::Real:		os << "real";			break;
-	case TypeDesc::Boolean:		os << "boolean";		break;
-	case TypeDesc::Character:	os << "char";			break;
-	case TypeDesc::Array:		os << "array";			break;
-	case TypeDesc::Record:		os << "record";			break;
-	case TypeDesc::Enumeration:	os << "enumeration";	break;
-	case TypeDesc::Pointer:		os << "pointer";		break;
+std::ostream& operator<<(std::ostream& os, TypeDesc::TypeClass tclass) {
+	switch(tclass) {
+	case TypeDesc::Array:		return os << "array";
+	case TypeDesc::Boolean:		return os << "boolean";
+	case TypeDesc::Character:	return os << "character";
+	case TypeDesc::Enumeration:	return os << "enumeration";
+	case TypeDesc::Integer:		return os << "integer";
+	case TypeDesc::Pointer:		return os << "pointer";
+	case TypeDesc::Real:		return os << "real";
+	case TypeDesc::Record:		return os << "record";
+	case TypeDesc::Set:			return os << "set";
 
-	default: 					os << "unknown kind"; assert(false);
+	default:
+		os << "unknown (" << static_cast<unsigned>(tclass) << ")";
+		assert(false);
 	}
-
-	return os;
 }
 
 /********************************************************************************************//**
  * @brief TDesc put operator
  *
  * @param	os		The stream to write field's value on
- * @param	type	Value to write 
+ * @param	tdesc	Value to write 
  * @return	os
  ************************************************************************************************/
-ostream& operator<<(std::ostream& os, const TypeDesc& type) {
-	os 	<<	type.kind()			<< ", "
-		<<	type.size()			<< ", "
-		<<	type.range()		<< ", "
-		<<	type.base()			<< ", ";
+ostream& operator<<(std::ostream& os, const TypeDesc& tdesc) {
+	os 	<<	tdesc.tclass()	<< ", "
+		<<	tdesc.size()	<< ", "
+		<<	tdesc.range()	<< ", "
+		<<  tdesc.itype()	<< ", "
+		<<	tdesc.base()	<< ", ";
 
-	for (auto fld : type.fields())
-		os << fld				<< ", ";
+	for (auto fld : tdesc.fields())
+		os << fld			<< ", ";
 
-	return os << type.isOrdinal();
+	return os 				<< tdesc.isOrdinal();
 };
-
-/************************************************************************************************
- * class TDesc
- ************************************************************************************************/
-
-// public static
-
-SubRange TDesc::maxRange(numeric_limits<int>::min(), numeric_limits<int>::max());
-
-TDescPtr TDesc::intDesc		= TDesc::newIntDesc(maxRange);
-TDescPtr TDesc::realDesc	= TDesc::newRealDesc();
-TDescPtr TDesc::boolDesc	= TDesc::newBoolDesc();
-TDescPtr TDesc::charDesc	= TDesc::newCharDesc(SubRange(0, 127));
-
-/********************************************************************************************//**
- * @param	range		The type sub-range range. Defaults to SubRange().
- * @return TDescPtr to a IntDesc
- ************************************************************************************************/
-TDescPtr TDesc::newIntDesc(const SubRange& range) {
-	return TDescPtr(new IntDesc(range));
-}
-
-/********************************************************************************************//**
- * @return TDescPtr to a new RealDesc
- ************************************************************************************************/
-TDescPtr TDesc::newRealDesc()	{ return TDescPtr(new RealDesc());	}
-
-/********************************************************************************************//**
- * @return TDescPtr to a new BoolDesc
- ************************************************************************************************/
-TDescPtr TDesc::newBoolDesc()	{ return TDescPtr(new BoolDesc());	}
-
-/********************************************************************************************//**
- * @param	range		The type sub-range range. Defaults to SubRange().
- * @return TDescPtr to a new CharDesc
- ************************************************************************************************/
-TDescPtr TDesc::newCharDesc(const SubRange& range) {
-	return TDescPtr(new CharDesc(range));
-}
-
-/********************************************************************************************//**
- * @param	size		Size, in bytes, of a object of this type
- * @param	range		The type sub-range range.
- * @param	rtype		The type array type.
- * @param	base		The type base type. Defaults to TDescPtr().
- * @return TDescPtr to a new ArrayDesc
- ************************************************************************************************/
-TDescPtr TDesc::newArrayDesc(unsigned size, const SubRange& range, TDescPtr rtype, TDescPtr base) {
-	return TDescPtr(new ArrayDesc(size, range, rtype, base));
-}
-
-/********************************************************************************************//**
- * @param	size		Size, in bytes, of a object of this type
- * @param	fields		The type fields. Defaults to FieldVec().
- * @return TDescPtr to a new RecordDesc
- ************************************************************************************************/
-TDescPtr TDesc::newRcrdDesc(unsigned size, const FieldVec& fields) {
-	return TDescPtr(new RecordDesc(size, fields));
-}
-
-/********************************************************************************************//**
- * @param	range		The type sub-range range.
- * @param	fields		The type fields. Defaults to FieldVec().
- * @return TDescPtr to a new EnumDesc
- ************************************************************************************************/
-TDescPtr TDesc::newEnumDesc(const SubRange& range, const FieldVec& fields) {
-	return TDescPtr(new EnumDesc(range, fields));
-}
-
-/********************************************************************************************//**
- * @param	base		The type base type. Defaults to TDescPtr().
- * @return TDescPtr to a new PtrDesc
- ************************************************************************************************/
-TDescPtr TDesc::newPtrDesc(TDescPtr base) {
-	return TDescPtr(new PtrDesc(base));
-}
 

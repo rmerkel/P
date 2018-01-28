@@ -7,12 +7,12 @@
 # test/simple.p, 4: 	x := 0;
     3: pushvar 0, 4
     4: push 0
-    5: assign
+    5: assign 1
 # test/simple.p, 5: 	y := 1
     6: pushvar 0, 5
     7: push 1
 # test/simple.p, 6: end.
-    8: assign
+    8: assign 1
     9: ret
 
         8:          0

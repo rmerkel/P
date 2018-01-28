@@ -9,33 +9,33 @@
 # test/pointers.p, 6: 	xp := nil;
     3: pushvar 0, 4
     4: push 0
-    5: assign
+    5: assign 1
 # test/pointers.p, 7: 	new(xp);
     6: pushvar 0, 4
     7: push 1
     8: new
-    9: assign
+    9: assign 1
 # test/pointers.p, 8: 	if xp = nil then
    10: pushvar 0, 4
-   11: eval
+   11: eval 1
    12: push 0
    13: equ
    14: jneq 21
 # test/pointers.p, 9: 		writeln(xp);
    15: pushvar 0, 4
-   16: eval
+   16: eval 1
    17: push 0
    18: push 0
    19: push 1
    20: writeln
 # test/pointers.p, 10: 	xp^ := 0;
    21: pushvar 0, 4
-   22: eval
+   22: eval 1
    23: push 0
-   24: assign
+   24: assign 1
 # test/pointers.p, 11: 	dispose(xp)
    25: pushvar 0, 4
-   26: eval
+   26: eval 1
    27: dispose
 # test/pointers.p, 12: end .
    28: ret

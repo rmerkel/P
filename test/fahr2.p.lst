@@ -17,10 +17,10 @@
 # test/fahr2.p, 14: 	fahr := LOWER;
     3: pushvar 0, 4
     4: push 0.000000
-    5: assign
+    5: assign 1
 # test/fahr2.p, 15: 	while fahr <= UPPER do begin
     6: pushvar 0, 4
-    7: eval
+    7: eval 1
     8: push 300.000000
     9: lte
    10: jneq 28
@@ -28,20 +28,20 @@
    11: pushvar 0, 5
    12: push 5.000000
    13: pushvar 0, 4
-   14: eval
+   14: eval 1
    15: push 32.000000
    16: sub
    17: mul
    18: push 9.000000
    19: div
-   20: assign
+   20: assign 1
 # test/fahr2.p, 17: 		fahr := fahr + STEP;
    21: pushvar 0, 4
    22: pushvar 0, 4
-   23: eval
+   23: eval 1
    24: push 20.000000
    25: add
-   26: assign
+   26: assign 1
 # test/fahr2.p, 18: 	end;
    27: jump 6
 # test/fahr2.p, 19:  end.
