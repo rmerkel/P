@@ -1685,7 +1685,7 @@ PComp::PComp(const string& pName) : Compilier (pName) {
 
 	symtbl.insert({"maxint", 	SymValue::makeConst(0, TypeDesc::maxRange.maximum(), TypeDesc::intDesc)	});
 	symtbl.insert({"nil",    	SymValue::makeConst(0, 0, TypeDesc::newPointerDesc(TypeDesc::intDesc))	});
-	symtbl.insert({"true",   	SymValue::makeConst(0, 1, TypeDesc::boolDesc)							});
-	symtbl.insert({"false",  	SymValue::makeConst(0, 0, TypeDesc::boolDesc)							});
+	symtbl.insert({"true",   	SymValue::makeConst(0, true, TypeDesc::boolDesc)						});
+	symtbl.insert({"false",  	SymValue::makeConst(0, false, TypeDesc::boolDesc)						});
 }
 
