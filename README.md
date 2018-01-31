@@ -70,7 +70,7 @@ Version | Description
  0.16   | Refactored records, selectors and arrays. Added New(), Dispose() and nil
  0.16   | Boolean
  0.17	| Arrays are now passed by value correctly.
- 0.18	|
+ 0.18	| Writeln now prints "true" "false" for booleans.
  0.19   | Clean up. Removed unused global data/constants. Maybe add string functions? Pass by reference??
 
 ## Author

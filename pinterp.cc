@@ -171,7 +171,7 @@ void PInterp::write1(unsigned index) {
 	const auto prec = stack[index+2].natural();
 
 	switch(value.kind()) {
-	case Datum::Boolean:	cout << << (value == 0 ? "false" : "true");			break;
+	case Datum::Boolean:	cout << boolalpha << value;							break;
 	case Datum::Character:	cout << setw(width) << value;						break;
 	case Datum::Integer:	cout << setw(width) << setprecision(prec) << value;	break;
 	case Datum::Real:
