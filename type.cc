@@ -380,20 +380,21 @@ bool operator==(const TypeDesc& lhs, const TypeDesc& rhs) {
  ************************************************************************************************/
 std::ostream& operator<<(std::ostream& os, TypeDesc::TypeClass tclass) {
 	switch(tclass) {
-	case TypeDesc::Array:		return os << "array";
-	case TypeDesc::Boolean:		return os << "boolean";
-	case TypeDesc::Character:	return os << "character";
-	case TypeDesc::Enumeration:	return os << "enumeration";
-	case TypeDesc::Integer:		return os << "integer";
-	case TypeDesc::Pointer:		return os << "pointer";
-	case TypeDesc::Real:		return os << "real";
-	case TypeDesc::Record:		return os << "record";
-	case TypeDesc::Set:			return os << "set";
-
+	case TypeDesc::Array:		os << "array";			break;
+	case TypeDesc::Boolean:		os << "boolean";		break;
+	case TypeDesc::Character:	os << "character";		break;
+	case TypeDesc::Enumeration:	os << "enumeration";	break;
+	case TypeDesc::Integer:		os << "integer";		break;
+	case TypeDesc::Pointer:		os << "pointer";		break;
+	case TypeDesc::Real:		os << "real";			break;
+	case TypeDesc::Record:		os << "record";			break;
+	case TypeDesc::Set:			os << "set";			break;
 	default:
 		os << "unknown (" << static_cast<unsigned>(tclass) << ")";
 		assert(false);
 	}
+
+	return os;
 }
 
 /********************************************************************************************//**

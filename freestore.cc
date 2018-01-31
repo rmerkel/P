@@ -19,8 +19,8 @@ using namespace std;
 FreeStore::Block::Block() : addr{ 0 }, size{ 0 } {}
 
 /********************************************************************************************//**
- * @param	addr	Starting address of the free list
- * @param	size	Lenght of the free list, in daumes
+ * @param	_addr	Starting address of the free list
+ * @param	_size	Lenght of the free list, in daumes
  ************************************************************************************************/
 FreeStore::Block::Block(size_t _addr, size_t _size) : addr{_addr}, size{_size} {}
 

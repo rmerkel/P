@@ -350,15 +350,9 @@ TDescPtr PComp::factor(int level) {
 			emit(OpCode::PUSH, 0, s[0]);
 			type = TypeDesc::charDesc;
 
-		} else {
-#if	1
+		} else {								// push each character...
 			for (char c : s)
 				emit(OpCode::PUSH, 0, c);
-#else
-			emit(OpCode::PUSH, 0, data->size());
-			for (char c : s)
-				emitConst(c);
-#endif
 			type = TypeDesc::newArrayDesc(s.size(), SubRange(0, s.size() - 1), TypeDesc::intDesc, TypeDesc::charDesc);
 
 		}
@@ -411,7 +405,7 @@ TDescPtr PComp::term(int level) {
  * @return	Data type 
  ************************************************************************************************/
 TDescPtr PComp::unary(int level) {
-	auto type = TypeDesc::intDesc;				// Default factor data type
+	auto type = TypeDesc::intDesc;			// Default factor data type
 
 	if (accept(Token::Add)) 
 		type = term(level);					// ignore unary + 
@@ -849,8 +843,8 @@ TDescPtr PComp::variable(int level, SymbolTable::iterator it) {
 /********************************************************************************************//**
  * variable := expression 
  *
- * @param	id		The variable, or function, identifier
  * @param	level	The current block level.
+ * @param	it		The variable, or function, identifier
  * @param	dup		Duplicate reference to the variable if true
  *
  * @return	Reference to the variable reference
@@ -885,8 +879,8 @@ void PComp::assignStatement(int level, SymbolTable::iterator it, bool dup) {
  *
  * Emits code for an assignment statement, or a procedure call...
  *
- * @param	id		The variable or prodecure identifier
  * @param	level	The current block level.
+ * @param	id		The variable or prodecure identifier
  ************************************************************************************************/
 void PComp::identStatement(int level, const string& id) {
 	auto lhs = lookup(id);
@@ -1198,7 +1192,7 @@ int PComp::varDeclBlock(int level) {
  * @param			prefix	The identifier prefix
  * @param[in,out]	idents	Vector of identifer, kind pairs 
  *
- * @return  Offset of the next variable/parmeter from the current activicaqtion frame.
+ * @return  Offset of the next variable/parmeter from the current activation frame.
  ************************************************************************************************/
 void PComp::varDeclList(int level, bool params, const string& prefix, FieldVec& idents) {
 	// Stops if the ';' if followd by any of hte following tokens
@@ -1215,16 +1209,17 @@ void PComp::varDeclList(int level, bool params, const string& prefix, FieldVec& 
 		varDecl(level, prefix, idents);
 	} while (accept(Token::SemiColon));
 
-	// Set the offset from the activation frame, parameters have negative offsets in reverse
-#if	1
+	/*
+	 * Set the starting offset from the activation frame. Locals have positive offsets, while
+	 * parameters have negative offsets in reverse. 
+	 */
+
 	int dx = 0;
 	if (params)
 		for (const auto& id : idents)
 			dx -= id.type()->size();
-#else
-	int dx = params ? 0 - idents.size() : 0;
-#endif
-	for (const auto& id : idents) {
+
+	for (const auto& id : idents) {				// install the results in the symbol table...
 		if (verbose)
 			cout << progName  
 				 << ": var/param " 	<< id.name() << ": " 
@@ -1232,13 +1227,10 @@ void PComp::varDeclList(int level, bool params, const string& prefix, FieldVec& 
 			     << dx	 			<< ", " 
 				 << id.type()->tclass() << "\n";
 
-		auto range = symtbl.equal_range(id.name());		// Already defined?
-		for (auto it = range.first; it != range.second; ++it) {
-			if (it->second.level() == level) {
-				error("previously was defined", id.name());
-				continue;
-			}
-		}
+		auto range = symtbl.equal_range(id.name());	// Already defined?
+		for (auto it = range.first; it != range.second; ++it)
+			if (it->second.level() == level)
+				error("previously defined", id.name());
 
 		symtbl.insert( { id.name(), SymValue::makeVar(level, dx, id.type())	} );
 		dx += id.type()->size();

@@ -135,24 +135,6 @@ size_t Compilier::emit(const OpCode op, int8_t level, Datum addr) {
 }
 
 /********************************************************************************************//**
- * Appends a datum on the end of data[], returning it's address/index.
- *
- * Side effect; updates the cross index for the listing.
- *
- * @param	datum	The Datum to emit
- *
- * @return The address (data[] index) of the new datum.
- ************************************************************************************************/
-size_t Compilier::emitConst(const Datum& datum) {
-	if (verbose)
-		cout << progName << ": emitting data " << data->size() << ": " << datum << '\n';
-	data->push_back(datum);
-	indextbl.push_back(ts.lineNum);			// update the cross index
-
-	return data->size() - 1;				// so it's the address of the just emitted datum
-}
-
-/********************************************************************************************//**
  * Local variables have an offset from the *end* of the current stack frame
  * (bp), while parameters have a negative offset from the *start* of the frame
  *  -- offset locals by the size of the activation frame.
@@ -181,9 +163,6 @@ TDescPtr Compilier::emitVarRef(int level, const SymValue& val) {
 	string 		line;   						// Current source line
 	unsigned 	linenum = 1;					// source line number
 	unsigned	addr = 0;						// code address (index)
-
-	for (unsigned i = 0; i < data->size(); ++i)	// dump constant data, if any...
-		cout << setw(5) << i << ": " << (*data)[i] << '\n';
 
 	while (addr < indextbl.size()) {			// dump instructions, if any...
 		while (linenum <= indextbl[addr]) {		// Print lines that lead up to code[addr]...
@@ -292,11 +271,10 @@ Compilier::Compilier( const	string&	pName)
 {}
 
 /********************************************************************************************//**
- * Compile the contents of fName, generating code in prog, and global data in globals.
+ * Compile the contents of fName, generating code in prog.
  *
  * @param	fName			The source file name, where "-" means the standard input stream
  * @param	instructions	The generated machine code is appended here
- * @param	iDatums			The generated global data is appended here
  * @param	verbMode		Run in verbose mode if true
  *
  * @return	The number of errors encountered
@@ -304,11 +282,9 @@ Compilier::Compilier( const	string&	pName)
 unsigned Compilier::operator()(
 	const	string&			fName,
 			InstrVector&	instructions,
-			DatumVector&	iDatums,
 			bool			verbMode)
 {
 	code = &instructions;
-	data = &iDatums;
 	verbose = verbMode;
 
 	if ("-" == fName)  {					// "-" means standard input

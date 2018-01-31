@@ -34,8 +34,7 @@
  * Address range            | Region    | Notes
  * ------------------------ | --------- | ------------------------------
  * stackSze..heap.size()-1  | Heap      | Maintained by heap(stackSz, fstoreSz)
- * constSize..stackSize-1   | Stack     | Evaluation and call stack
- * 0.. constSize-1          | Constants | Global constants
+ * 0..stackSize-1   		| Stack     | Evaluation and call stack
  ********************************************************************************************//**/
 class PInterp {
 public:
@@ -66,10 +65,7 @@ public:
 	virtual ~PInterp() {}
 
 	/// Load a applicaton and start the pl/0 machine running...
-	Result operator()(
-		const	InstrVector&	prog,
-		const	DatumVector&	consts,
-				bool			v = false);
+	Result operator()(const InstrVector& prog, bool v = false);
 	void reset();							///< Reset the machine back to it's initial state.
 	size_t cycles() const;					///< Return number of machine cycles run so far
 
@@ -121,7 +117,6 @@ private:
 	};
 
 	InstrVector		code;					///< Code segment, indexed by pc
-	unsigned		constSize;				///< The size of the constant segment, in Datums
 	unsigned		stackSize;				///< The size of the stack segment, in Datums.
 	DatumVector		stack;					///< Data segment (stack + free-store), indexed by fp and sp
 	FreeStore		heap;					///< Dynamic memory heap

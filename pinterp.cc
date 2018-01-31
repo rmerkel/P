@@ -171,22 +171,15 @@ void PInterp::write1(unsigned index) {
 	const auto prec = stack[index+2].natural();
 
 	switch(value.kind()) {
-	case Datum::Boolean:
-	case Datum::Character:
-		cout << setw(width) << value;
-		break;
-
-	case Datum::Integer:
-		cout << setw(width) << setprecision(prec) << value;
-		break;
-	
+	case Datum::Boolean:	cout << << (value == 0 ? "false" : "true");			break;
+	case Datum::Character:	cout << setw(width) << value;						break;
+	case Datum::Integer:	cout << setw(width) << setprecision(prec) << value;	break;
 	case Datum::Real:
 		if (prec == 0)
 			cout << setw(width) << scientific << setprecision(6) << value;
 		else
 			cout << setw(width) << fixed << setprecision(prec) << value;
 		break;
-
 
 	default:
 		cerr << "unknown datum type: " << static_cast<unsigned>(value.kind()) << endl;
@@ -246,11 +239,7 @@ void PInterp::assign(unsigned n) {
 		throw Error(stackUnderflow, "stack underflow error");
 
 	size_t dst = stack[sp - ir.addr.natural()].natural();
-#if 1
 	if (!rangeCheck(dst, dst + n))
-#else
-	if (sp < dst + n)
-#endif
 		throw Error(stackUnderflow, "stack underflow error");
 
 	lastWrite = dst + n - 1;
@@ -273,11 +262,7 @@ void PInterp::eval(unsigned n) {
 		throw Error(stackUnderflow, "stack underflow error");
 
 	unsigned dst = pop().natural();
-#if 1
 	if (!rangeCheck(dst, dst + n))
-#else
-	if (sp < dst + n - 1)
-#endif
 		throw Error(stackUnderflow, "stack underflow error");
 
 	for (unsigned i = 0; i < n; ++i)
@@ -296,19 +281,11 @@ void PInterp::eval(unsigned n) {
  ************************************************************************************************/
 void PInterp::copy(unsigned n) {
 	unsigned src  = pop().natural();
-#if 1
 	if (!rangeCheck(src, src + n))
-#else
-	if (sp < src + n)
-#endif
 		throw Error(stackUnderflow, "stack underflow error");
 
 	unsigned dst = pop().natural();
-#if 1
 	if (!rangeCheck(dst, dst + n))
-#else
-	if (sp < dst + n)
-#endif
 		throw Error(stackUnderflow, "stack underflow error");
 
 	lastWrite = dst + n;
@@ -552,8 +529,7 @@ PInterp::Result PInterp::run() {
  * @param fstoreSz	Size of the free store, in Datums.
  ************************************************************************************************/
 PInterp::PInterp(unsigned stackSz, unsigned fstoreSz)
-	:	constSize{0},
-		stackSize{stackSz},
+	:	stackSize{stackSz},
 		stack(stackSize + fstoreSz, -1),
 		heap(stackSz, fstoreSz),
 		verbose(false),
@@ -564,24 +540,14 @@ PInterp::PInterp(unsigned stackSz, unsigned fstoreSz)
 
 /********************************************************************************************//**
  *	@param	prog	The program to run
- * 	@param	consts	The programs initialized data
  *	@param 	ver		True for verbose/debugging messages
  * 
  *  @return	The number of machine cycles run
  ************************************************************************************************/
-PInterp::Result PInterp::operator()(
-	const	InstrVector&	prog,
-	const	DatumVector&	consts,
-			bool 			ver)
-{
+PInterp::Result PInterp::operator()(const InstrVector& prog, bool ver) {
 	verbose = ver;
 	code = prog;
-	constSize = consts.size();
 
-	stack.resize(stack.size() + constSize, -1);
-	sp = 0;
-	for (auto& d : consts)					// Push initialized data onto the stack
-		stack[sp++] = d;
 	reset();
 
 	auto result = run();
@@ -596,7 +562,7 @@ PInterp::Result PInterp::operator()(
 void PInterp::reset() {
 	pc = 0;
 
-	fp = constSize;									// Setup the initial activacation frame
+	fp = 0;											// Setup the initial activacation frame
 	for (sp = fp; sp < FrameSize; ++sp)
 		stack[sp] = 0;
 	sp = fp + FrameSize - 1;

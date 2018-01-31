@@ -1,7 +1,8 @@
 /********************************************************************************************//**
  * @file p.cc
  *
- * The front-end for the P Programming Language compilier and interpeter.
+ * The front-end for the P Programming Language compilier and interpeter. main() runs the
+ * compilier, and if no errors where encountered, passed the results to the interpreter.
  ************************************************************************************************/
 
 #include "pcomp.h"
@@ -19,7 +20,6 @@ static 	bool	verbose = false;				///< Verbose messages if true
 /********************************************************************************************//** 
  * Print a usage message on standard error output 
  ************************************************************************************************/
-
 static void help() {
 	cerr << "Usage: " << progName << ": [options[ [filename]\n"
 		 << "Where options is zero or more of the following:\n"
@@ -34,10 +34,10 @@ static void help() {
 }
 
 /********************************************************************************************//**
+ * Print the version number as major.minor
  ************************************************************************************************/
-/// Print the version number as major.minor
 static void printVersion() {
-	cout << progName << ": verson: 0.17\n";		// make sure to update the verison in mainpage!!
+	cout << progName << ": verson: 0.18\n";		// make sure to update the verison in mainpage!!
 }
 
 /********************************************************************************************//** 
@@ -108,17 +108,16 @@ int main(int argc, char* argv[]) {
 	PComp		comp{progName};					// The compiler...
 	PInterp 	machine;						// The machine...
 	InstrVector	code;							// Machine instructions...
-	DatumVector	consts;							// Global constants (temporaries)
 	unsigned 	nErrors = 0;
 
-	vector<string> args;						// Parse the command line arguments...
+	vector<string> args;						// Parse command line arguments...
 	for (int argn = 1; argn < argc; ++argn)
 		args.push_back(argv[argn]);
 
 	if (!parseCommandline(args))
 		++nErrors;
 												// Compile the source, run if no errors
-	else if (0 == (nErrors = comp(inputFile, code, consts, verbose))) {
+	else if (0 == (nErrors = comp(inputFile, code, verbose))) {
 		if (verbose) {
 			if (inputFile == "-")
 				cout << progName << ": loading program from standard input, and starting P...\n";
@@ -126,7 +125,7 @@ int main(int argc, char* argv[]) {
 				cout << progName << ": loading program '" << inputFile << "', and starting P...\n";
 		}
 
-		const PInterp::Result r = machine(code, consts, verbose);
+		const PInterp::Result r = machine(code, verbose);
 		if (PInterp::success != r)
 			cerr << progName << ": runtime error: " << r << "!\n";
 
