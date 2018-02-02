@@ -1,4 +1,4 @@
-./p: rounding lhs to fit in an integer near line 7
+test/real.p: rounding real to fit in an integer near line 7
 # test/real.p, 1: program TestReal ;
 # test/real.p, 2: var
     0: call 0, 2

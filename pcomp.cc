@@ -86,14 +86,14 @@ void PComp::assignPromote (TDescPtr lhs, TDescPtr rhs) {
 		;				// nothing to do, again
 
 	else if (isAnInteger(lhs) && isAReal(rhs)) {
-		error("rounding lhs to fit in an integer");
+		error("rounding real to fit in an integer");
 		emit(OpCode::ROUND);				// promote rhs to a integer	 
 
 	} else if (isAReal(lhs) && isAnInteger(rhs))
 		emit(OpCode::ITOR);                 // promote rhs to a real
 
 	else
-		error("incompatable binary types");
+		error("incompatable assignment types");
 
 	// Emit limit checks, unless range is impossible to exceed
 	if (lhs->isOrdinal() && lhs->range() != TypeDesc::maxRange) {
@@ -566,7 +566,7 @@ void PComp::callStatement(int level, SymbolTable::iterator it) {
 			do {								// collect actual parameters
 				const auto kind = expression(level);
 				if (params.size() > nParams)
-					promote(kind, params[nParams]);
+					assignPromote(params[nParams], kind);
 				++nParams;
 
 			} while (accept (Token::Comma));
@@ -1662,9 +1662,8 @@ void PComp::run()								{	progDecl(0);	}
 
 /********************************************************************************************//**
  * Construct a new compilier with the token stream initially bound to std::cin.
- * @param	pName	The prefix string used by error and verbose/diagnostic messages.
  ************************************************************************************************/
-PComp::PComp(const string& pName) : Compilier (pName) {
+PComp::PComp() : Compilier () {
 
 	// Insert builtin types into the symbol table
 

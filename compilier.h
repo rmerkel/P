@@ -24,14 +24,14 @@
  ************************************************************************************************/
 class Compilier {
 public:
-	Compilier(const std::string& pName);	///< Constructor; use pName for error messages
+	Compilier();							///< Constructor
 	virtual ~Compilier() {}					///< Destructor
 
 	/// Compile a P source file
 	unsigned operator()(
 		const	std::string&	fName,
 				InstrVector&	instructions,
-				bool			verbMode = false);
+				bool			verbMode);
 
 protected:
 	/// A table, indexed by instruction address, yeilding source line numbers
@@ -70,7 +70,7 @@ protected:
 	TDescPtr emitVarRef(int level, const SymValue& val);
 
 	/// Create a listing...
-	void listing(const std::string& name, std::istream& source, std::ostream& out);
+	void listing(std::istream& source, std::ostream& out);
 
 	/// Purge symtbl of entries from a given block level
 	void purge(int level);

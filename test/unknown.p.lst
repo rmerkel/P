@@ -1,7 +1,7 @@
-./p: Unknown token: '#', (0x23) near line 4
-./p: expected ':=' got 'integernum' near line 4
-./p: expected 'end' got 'bad comment' near line 6
-./p: expected '.' got 'bad comment' near line 6
+test/unknown.p: Unknown token: '#', (0x23) near line 4
+test/unknown.p: expected ':=' got 'integernum' near line 4
+test/unknown.p: expected 'end' got 'bad comment' near line 6
+test/unknown.p: expected '.' got 'bad comment' near line 6
 # test/unknown.p, 1: program unknown ;
 # test/unknown.p, 2: var x : integer;
     0: call 0, 2

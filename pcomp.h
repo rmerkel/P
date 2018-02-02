@@ -24,7 +24,7 @@
  ************************************************************************************************/
 class PComp : public Compilier {
 public:
-	PComp(const std::string& pName);		///< Constructor; use pName for error messages
+	PComp();								///< Constructor
 
 private:
 	bool isAnInteger(TDescPtr type);		///< Is type an integer?

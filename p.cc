@@ -37,7 +37,7 @@ static void help() {
  * Print the version number as major.minor
  ************************************************************************************************/
 static void printVersion() {
-	cout << progName << ": verson: 0.18\n";		// make sure to update the verison in mainpage!!
+	cout << progName << ": verson: 0.19\n";		// make sure to update the verison in mainpage!!
 }
 
 /********************************************************************************************//** 
@@ -103,12 +103,12 @@ static bool parseCommandline(const vector<string>& args) {
  * @return The number of compiler/interpreter errors.
  ************************************************************************************************/
 int main(int argc, char* argv[]) {
-	progName = argv[0];
-
-	PComp		comp{progName};					// The compiler...
+	PComp		comp;							// The compiler...
 	PInterp 	machine;						// The machine...
 	InstrVector	code;							// Machine instructions...
 	unsigned 	nErrors = 0;
+
+	progName = argv[0];
 
 	vector<string> args;						// Parse command line arguments...
 	for (int argn = 1; argn < argc; ++argn)

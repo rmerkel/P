@@ -71,7 +71,7 @@ Version | Description
  0.16   | Boolean
  0.17	| Arrays are now passed by value correctly.
  0.18	| Writeln now prints "true" "false" for booleans.
- 0.19   | Clean up. Removed unused global data/constants. Maybe add string functions? Pass by reference??
+ 0.19   | Clean up, removed unused global data/constants, use input filename in messages
 
 ## Author
     Randy Merkel, Slowly but Surly Software.

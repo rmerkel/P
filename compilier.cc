@@ -155,11 +155,10 @@ TDescPtr Compilier::emitVarRef(int level, const SymValue& val) {
 /********************************************************************************************//**
  * Uses the cross index to write a listing on the output stream
  *
- * @param name		Name of the source file
  * @param source 	The source file stream
  * @param out		The listing file stream
  ************************************************************************************************/
- void Compilier::listing(const string& name, istream& source, ostream& out) {
+ void Compilier::listing(istream& source, ostream& out) {
 	string 		line;   						// Current source line
 	unsigned 	linenum = 1;					// source line number
 	unsigned	addr = 0;						// code address (index)
@@ -167,7 +166,7 @@ TDescPtr Compilier::emitVarRef(int level, const SymValue& val) {
 	while (addr < indextbl.size()) {			// dump instructions, if any...
 		while (linenum <= indextbl[addr]) {		// Print lines that lead up to code[addr]...
 			getline(source, line);
-			cout << "# " << name << ", " << linenum++ << ": " << line << "\n";
+			cout << "# " << progName << ", " << linenum++ << ": " << line << "\n";
 		}
 
 		disasm(out, addr, (*code)[addr]);		// Disasmble resulting instructions...
@@ -176,7 +175,7 @@ TDescPtr Compilier::emitVarRef(int level, const SymValue& val) {
 	}
 
 	while (getline(source, line))				// Any lines following '.' ...
-		cout << "# " << name << ", " << linenum++ << ": " << line << "\n";
+		cout << "# " << progName << ", " << linenum++ << ": " << line << "\n";
 
 	out << endl;
 }
@@ -263,12 +262,8 @@ const std::string Compilier::nameDecl(int level, const string& prefix) {
 
 /********************************************************************************************//**
  * Construct a new compilier with the token stream initially bound to std::cin.
- *
- * @param	pName	The compilier program name.
  ************************************************************************************************/
-Compilier::Compilier( const	string&	pName)
-	:	progName {pName}, nErrors{0}, verbose {false}, ts{cin}
-{}
+Compilier::Compilier() : nErrors{0}, verbose {false}, ts{cin} {}
 
 /********************************************************************************************//**
  * Compile the contents of fName, generating code in prog.
@@ -284,6 +279,7 @@ unsigned Compilier::operator()(
 			InstrVector&	instructions,
 			bool			verbMode)
 {
+	progName = fName;
 	code = &instructions;
 	verbose = verbMode;
 
@@ -306,7 +302,7 @@ unsigned Compilier::operator()(
 
 			ifile.close();					// Rewind the source (seekg(0) isn't working!)...
 			ifile.open(fName);
-			listing(fName, ifile, cout);	// 	create a listing...
+			listing(ifile, cout);	// 	create a listing...
 		}
 	}
 

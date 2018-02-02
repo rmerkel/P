@@ -1,4 +1,4 @@
-./p: passing 2 parameters, where 1 expected near line 30
+test/fact3.p: passing 2 parameters, where 1 expected near line 30
 # test/fact3.p, 1: { Calculate 11 (0..10) factorials
 # test/fact3.p, 2: {	 n		    n!	}
 # test/fact3.p, 3: {  ---  ---------	}
