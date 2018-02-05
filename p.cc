@@ -37,7 +37,7 @@ static void help() {
  * Print the version number as major.minor
  ************************************************************************************************/
 static void printVersion() {
-	cout << progName << ": verson: 0.19\n";		// make sure to update the verison in mainpage!!
+	cout << progName << ": verson: 0.20\n";		// make sure to update the verison in mainpage!!
 }
 
 /********************************************************************************************//** 
@@ -127,7 +127,7 @@ int main(int argc, char* argv[]) {
 
 		const PInterp::Result r = machine(code, verbose);
 		if (PInterp::success != r)
-			cerr << progName << ": runtime error: " << r << "!\n";
+			nErrors = static_cast<int> (r);		// Return error code 
 
 		if (verbose) cout << progName << ": Ending P after " << machine.cycles() << " machine cycles\n";
 	}

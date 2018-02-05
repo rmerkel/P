@@ -72,6 +72,7 @@ Version | Description
  0.17	| Arrays are now passed by value correctly.
  0.18	| Writeln now prints "true" "false" for booleans.
  0.19   | Clean up, removed unused global data/constants, use input filename in messages
+ 0.20	| Refactored the interpreter step routine, adding more run-time tests.
 
 ## Author
     Randy Merkel, Slowly but Surly Software.

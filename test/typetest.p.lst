@@ -252,4 +252,4 @@
        19:         90
        10:         10
        20:        100
-./p: runtime error: out-of-range!
+runtime error @pc 82, sp: 50: out-of-range

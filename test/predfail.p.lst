@@ -15,4 +15,4 @@
     7: writeln
     8: ret
 
-./p: runtime error: out-of-range!
+runtime error @pc 3, sp: 8: out-of-range

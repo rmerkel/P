@@ -31,7 +31,7 @@ const OpCodeInfo::InfoMap OpCodeInfo::opInfoTbl {
 	{ OpCode::NEG,		OpCodeInfo{ "neg",		1			} },
 
 	{ OpCode::ITOR,		OpCodeInfo{ "itor",		1			} },
-	{ OpCode::ITOR2,	OpCodeInfo{ "itor2",	1			} },
+	{ OpCode::ITOR2,	OpCodeInfo{ "itor2",	2			} },
 	{ OpCode::ROUND,	OpCodeInfo{ "round",	1			} },
 	{ OpCode::TRUNC,	OpCodeInfo{ "trunc",	1			} },
 	{ OpCode::ABS,		OpCodeInfo{	"abs",		1			} },

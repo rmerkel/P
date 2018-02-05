@@ -37,4 +37,4 @@
        10:          0
         8:          5
 Attempt to divide by zero @ pc (20)!
-./p: runtime error: divide-by-zero!
+runtime error @pc 20, sp: 12: divide-by-zero

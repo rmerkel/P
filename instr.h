@@ -24,12 +24,12 @@
  * procedures and function have the same sized frame.
  ************************************************************************************************/
 enum Frame {
-	FrameBase		= 0,				///< Offset to the Activation Frame base (base(n))
-	FrameOldFp		= 1,				///< Offset to the saved frame pointer register
-	FrameRetAddr	= 2,	  			///< Offset to the return address
-	FrameRetVal		= 3,				///< Offset to the function return value
+	FrameBase		= 0,					///< Offset to the Activation Frame base (base(n))
+	FrameOldFp		= 1,					///< Offset to the saved frame pointer register
+	FrameRetAddr	= 2,	  				///< Offset to the return address
+	FrameRetVal		= 3,					///< Offset to the function return value
 
-	FrameSize							///< Number of entries in an activaction frame (4)
+	FrameSize								///< Number of entries in an activaction frame (4)
 };
 
 /********************************************************************************************//**
@@ -38,15 +38,15 @@ enum Frame {
  * OP level, addr - description; definition: error
  ************************************************************************************************/
 enum class OpCode : unsigned char {
-	NEG,		///< NEG - Negate; push(pop() * -1)
-	ITOR,		///< ITOR - Convert integer to real; push(Real(pop()))
-	ITOR2,		///< ITOR2 - Convert integer to real; push(Real(pop()))
-	ROUND,		///< ROUND - Round real to nearest integer; push(Round(pop()))
-	TRUNC,		///< TRUNC - Truncate real to integer; push(Truncate(pop()))
-	ABS,		///< ABS - Absolute value; push(Abs(pop()))
-	ATAN,		///< ATAN - Arc tangent; push(ATan(pop()))
-	EXP,		///< EXP - Exponent; push(Exp(pop()))
-	LOG,		///< LOG - Natural logarithm; push(Log(pop()))
+	NEG,									///< NEG - Negate TOS
+	ITOR,									///< ITOR - Convert TOS to real
+	ITOR2,									///< ITOR2 - Convert TOS-1 to real
+	ROUND,									///< ROUND - Round TOS to nearest integer
+	TRUNC,									///< TRUNC - Truncate TOS to integer
+	ABS,									///< ABS - Replace TOS with its absolute value
+	ATAN,									///< ATAN - Replace TOS with its arc tangent
+	EXP,									///< EXP - Replacse TOS with its base-e exponential
+	LOG,									///< LOG - Replace TOS with its natural logarithm
 
 	DUP,		///< DUP - Duplicate; Push(stack[sp])
 	ODD,		///< ODD - Is odd?; Push(IsOdd(pop()))
