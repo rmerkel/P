@@ -10,36 +10,59 @@
     3: pushvar 0, 4
     4: push 0
     5: assign 1
-# test/pointers.p, 7: 	new(xp);
+# test/pointers.p, 7: 	writeln(xp);
     6: pushvar 0, 4
-    7: push 1
-    8: new
-    9: assign 1
-# test/pointers.p, 8: 	if xp = nil then
-   10: pushvar 0, 4
-   11: eval 1
-   12: push 0
-   13: equ
-   14: jneq 21
-# test/pointers.p, 9: 		writeln(xp);
-   15: pushvar 0, 4
-   16: eval 1
-   17: push 0
+    7: eval 1
+    8: push 0
+    9: push 0
+   10: push 1
+   11: writeln
+# test/pointers.p, 8: 
+# test/pointers.p, 9: 	new(xp);
+   12: pushvar 0, 4
+   13: push 1
+   14: new
+   15: assign 1
+# test/pointers.p, 10: 	writeln(xp);
+   16: pushvar 0, 4
+   17: eval 1
    18: push 0
-   19: push 1
-   20: writeln
-# test/pointers.p, 10: 	xp^ := 0;
-   21: pushvar 0, 4
-   22: eval 1
-   23: push 0
-   24: assign 1
-# test/pointers.p, 11: 	dispose(xp)
-   25: pushvar 0, 4
-   26: eval 1
-   27: dispose
-# test/pointers.p, 12: end .
-   28: ret
+   19: push 0
+   20: push 1
+   21: writeln
+# test/pointers.p, 11: 	if xp <> nil then begin
+   22: pushvar 0, 4
+   23: eval 1
+   24: push 0
+   25: neq
+   26: jneq 38
+# test/pointers.p, 12: 		xp^ := 2048;
+   27: pushvar 0, 4
+   28: eval 1
+   29: push 2048
+   30: assign 1
+# test/pointers.p, 13: 		writeln(xp^)
+   31: pushvar 0, 4
+   32: eval 1
+   33: eval 1
+   34: push 0
+   35: push 0
+# test/pointers.p, 14: 	end;
+   36: push 1
+   37: writeln
+# test/pointers.p, 15: 
+# test/pointers.p, 16: 	xp^ := 0;
+   38: pushvar 0, 4
+   39: eval 1
+   40: push 0
+   41: assign 1
+# test/pointers.p, 17: 	dispose(xp)
+   42: pushvar 0, 4
+   43: eval 1
+   44: dispose
+# test/pointers.p, 18: end .
+   45: ret
 
-        8:          0
-        8:       1024
-     1024:          0
+0
+1024
+2048

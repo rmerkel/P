@@ -33,8 +33,5 @@
    22: ret
 # test/divbyzero.p, 11: 
 
-        9:         10
-       10:          0
-        8:          5
 Attempt to divide by zero @ pc (20)!
 runtime error @pc 20, sp: 12: divide-by-zero

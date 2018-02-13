@@ -16,6 +16,7 @@ using namespace std;
 static	string	progName;						///< This programs name
 static 	string	inputFile {"-"};				///< Source file name, or - for standard input
 static 	bool	verbose = false;				///< Verbose messages if true
+static	bool	trace = false;					///< Trace run if true
 
 /********************************************************************************************//** 
  * Print a usage message on standard error output 
@@ -25,7 +26,9 @@ static void help() {
 		 << "Where options is zero or more of the following:\n"
 		 << "-?        Print this message and exit.\n"
 		 << "-help     Same as -?\n"
-		 << "-verbose  Set verbose mode.\n"
+		 << "-trace    Set trace mode.\n"
+		 << "-t        Same as -t.\n"
+		 << "-verbose  Set compilier verbose mode.\n"
 		 << "-v        Same as -verbose.\n"
  		 << "-version  Print the program version.\n"
 		 << "-V        Same as -version.\n"
@@ -57,7 +60,10 @@ static bool parseCommandline(const vector<string>& args) {
 			help();
 			return false;
 
-		} else if ("-verbose" == arg)
+		} else if ("-trace" == arg)
+			trace = true;						// Trace...
+
+		else if ("-verbose" == arg)
 			verbose = true;						// annoy the user with lots-o-messages...
 
 		else if ("-version" == arg)
@@ -69,6 +75,10 @@ static bool parseCommandline(const vector<string>& args) {
 				case '?':
 					help();
 					return false;
+					break;
+
+				case 't':
+					trace = true;
 					break;
 
 				case 'v':
@@ -125,7 +135,7 @@ int main(int argc, char* argv[]) {
 				cout << progName << ": loading program '" << inputFile << "', and starting P...\n";
 		}
 
-		const PInterp::Result r = machine(code, verbose);
+		const PInterp::Result r = machine(code, trace);
 		if (PInterp::success != r)
 			nErrors = static_cast<int> (r);		// Return error code 
 

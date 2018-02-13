@@ -15,5 +15,6 @@ begin
 	while fahr <= UPPER do begin
 		celsius := 5.0 * (fahr-32.0) / 9.0;
 		fahr := fahr + STEP;
-	end;
+		writeln(fahr : 6 : 1, celsius : 6 : 1);
+	end
  end.

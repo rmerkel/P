@@ -6,7 +6,10 @@ begin
 	z := 3;
 	{ set x to 2	}
 	if x = 1 then x := y else x := z;
+	writeln(x);
+
 	{ set x to  3	}
-	if x = y then x := z else x := y
+	if x = y then x := z else x := y;
+	writeln(x)
 end.
 

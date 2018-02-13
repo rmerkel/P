@@ -17,7 +17,8 @@ begin
 	repeat
 		begin
 			n := n + 1;
-			f := f * n
+			f := f * n;
+			writeln(f : 8 : 6)
 		end
 	until n >= 10
 end.

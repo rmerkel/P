@@ -10,7 +10,8 @@ begin
    while n < nFacts do begin
       n := n + 1;
       f := f * n
-   end
+   end;
+   writeln(f);
 end.
 
 {	unterminated comment, but we don't care as it follows the period!

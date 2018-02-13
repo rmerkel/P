@@ -73,11 +73,11 @@ enum class OpCode : unsigned char {
 	EQU,		///< EQU - Is equal to; push(pop() == pop())
 	GTE,		///< GTE - Greater than or equal; push(pop() < pop()
 	GT,			///< GT - Greater than; push(pop() <= pop()
-	NEQU,		///< NEQU - Does not equal; push(pop() != pop())
+	NEQ,		///< NEQU - Does not equal; push(pop() != pop())
 
-	LOR,		///< LOR - Logical or; push(pop() || pop())
-	LAND,		///< LAND - Logical and; push(pop() && pop())
-	LNOT,		///< LNOT - Logical not; push(!pop())
+	OR,			///< OR - Logical or; push(pop() || pop())
+	AND,		///< AND - Logical and; push(pop() && pop())
+	NOT,		///< NOT - Logical not; push(!pop())
 	
 	POP,		///< POP ,n - Pop Datums into the bit bucket; for i = 0; i < addr; ++i, pop()
 	PUSH,		///< PUSH , const - Push a constant integer value; push(const)

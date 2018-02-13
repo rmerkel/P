@@ -73,9 +73,10 @@ Token TokenStream::get() {
 		else {	unget();	ct.kind = Token::GT;	}
 		return ct;
 
-	case '<':									// <, or <=?
+	case '<':									// <, <=, or <>?
 		if (!getch(ch))		ct.kind = Token::LT;
 		else if ('=' == ch)	ct.kind = Token::LTE;
+		else if ('>' == ch) ct.kind = Token::NEQ;
 		else {	unget();	ct.kind = Token::LT;	}
 		return ct;
 

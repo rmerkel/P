@@ -33,36 +33,22 @@
    20: pushvar 0, 5
    21: pushvar 0, 5
    22: eval 1
-# test/comment.p, 13:    end
+# test/comment.p, 13:    end;
    23: pushvar 0, 4
    24: eval 1
    25: mul
    26: assign 1
-# test/comment.p, 14: end.
    27: jump 9
-   28: ret
-# test/comment.p, 15: 
-# test/comment.p, 16: {	unterminated comment, but we don't care as it follows the period!
+# test/comment.p, 14:    writeln(f);
+   28: pushvar 0, 5
+   29: eval 1
+   30: push 0
+   31: push 0
+   32: push 1
+   33: writeln
+# test/comment.p, 15: end.
+   34: ret
+# test/comment.p, 16: 
+# test/comment.p, 17: {	unterminated comment, but we don't care as it follows the period!
 
-        8:          0
-        9:          1
-        8:          1
-        9:          1
-        8:          2
-        9:          2
-        8:          3
-        9:          6
-        8:          4
-        9:         24
-        8:          5
-        9:        120
-        8:          6
-        9:        720
-        8:          7
-        9:       5040
-        8:          8
-        9:      40320
-        8:          9
-        9:     362880
-        8:         10
-        9:    3628800
+3628800

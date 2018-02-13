@@ -14,7 +14,6 @@ const nFacts = 10;
 var result : integer;
 function factorial(n : integer) : integer ;
 	var p : integer;
-
 	begin
 		p := 1;
 		while n > 0 do begin
@@ -26,5 +25,6 @@ function factorial(n : integer) : integer ;
 
 begin
 	{ call with wrong number of parameters! }
-    result := factorial(nFacts, nFacts)
+    result := factorial(nFacts, nFacts);
+	writeln(result)
 end.

@@ -66,7 +66,7 @@ public:
 	virtual ~PInterp() {}
 
 	/// Load a applicaton and start the pl/0 machine running...
-	Result operator()(const InstrVector& prog, bool v = false);
+	Result operator()(const InstrVector& prog, bool t = false);
 	void reset();							///< Reset the machine back to it's initial state.
 	size_t cycles() const;					///< Return number of machine cycles run so far
 
@@ -81,49 +81,57 @@ protected:
 	Datum pop();							///< Pop a Datum from the top of stack...
 	void pop(unsigned n);					///< Pop and discard n Datums from the top of stack...
 	void push(Datum d);						///< Push a Datum onto the stack...
-	Result write1(unsigned index);			///< Write one expression on standard output
+	Result write1(unsigned index);			///< Write one expression on standard output...
 
-	Result ITOR(DatumVecIter tos);			///< Convert to real
-	Result ROUND(DatumVecIter tos);			///< Round to the nearest integer
-	Result TRUNC(DatumVecIter tos);			///< Truncate to integer
-	Result ABS(DatumVecIter tos);			///< Calculate absolute value
-	Result ATAN(DatumVecIter tos);			///< Calculate arc tangent
-	Result EXP(DatumVecIter tos);			///< Calculate base-e exponential 
-	Result LOG(DatumVecIter tos); 			///< Calculate natural logarithm
-	Result ODD(DatumVecIter tos);			///< Is value an odd number?
-	Result PRED(DatumVecIter tos);			///< Replace value wiih predicesor
-	Result SIN(DatumVecIter tos);			///< Calculate sine
-	Result SQR(DatumVecIter tos);			///< Calulate square
-	Result SQRT(DatumVecIter tos);			///< Calulate square-root
-	Result SUCC(DatumVecIter tos);			///< Replace value with successor
-	Result WRITE(DatumVecIter tos);			///< Write expression(s) on standard output
-	Result WRITELN(DatumVecIter tos);		///< Write expression(s), terminated by newline, on standard output
-	Result NEW(DatumVecIter tos);			///< Allocate space on the heap
-	Result DISPOSE(DatumVecIter tos);		///< Free allocated space
-	Result NEG(DatumVecIter tos);			///< Unary negation
-	Result ADD();							///< Addition
-	Result SUB();							///< Subtraction
-	Result MUL();							///< Multiplication
-	Result DIV();							///< Division
-	Result REM();							///< Remander
+	Result ITOR(DatumVecIter TOS);			///< Convert to real
+	Result ITOR2(DatumVecIter TOS);			///< Convert to real
+	Result ROUND(DatumVecIter TOS);			///< Convert to integer by rounding 
+	Result TRUNC(DatumVecIter TOS);			///< Convert to interger by truncation
+	Result ABS(DatumVecIter TOS);			///< Absolute value
+	Result ATAN(DatumVecIter TOS);			///< Arc tangent
+	Result EXP(DatumVecIter TOS);			///< Base-e exponential 
+	Result DUP(DatumVecIter TOS); 			///< Duplicate
+	Result LOG(DatumVecIter TOS); 			///< Natural logarithm
+	Result ODD(DatumVecIter TOS);			///< Is an odd number?
+	Result PRED(DatumVecIter TOS);			///< Predicesor
+	Result SIN(DatumVecIter TOS);			///< Sine
+	Result SQR(DatumVecIter TOS);			///< Square
+	Result SQRT(DatumVecIter TOS);			///< Square-root
+	Result SUCC(DatumVecIter TOS);			///< Successor
+	Result WRITE(DatumVecIter TOS);			///< Write on standard output
+	Result WRITELN(DatumVecIter TOS);		///< Write on standard output
+	Result NEW(DatumVecIter TOS);			///< Allocate space
+	Result DISPOSE(DatumVecIter TOS);		///< Free space
+	Result NEG(DatumVecIter TOS);			///< Negative
+	Result ADD();							///< Replace the top two values on the stack with their sum
+	Result SUB();							///< Replace the top two vlaues on the stack with their difference
+	Result MUL();							///< Replace the top two values on the stack with their product
+	Result DIV();							///< Replace the top two values on the stack with their quotient
+	Result REM();							///< Reminder
 	Result LT();							///< Less than?
 	Result LTE();							///< Less than, or equal?
 	Result EQU();							///< Equal?
 	Result GTE();							///< Greater than, or equal?
 	Result GT();							///< Greater than?
-	Result NEQU();							///< Not equal?
-	Result LOR();							///< Logical or
-	Result LAND();							///< Logical and
+	Result NEQ();							///< Not equal?
+	Result OR();							///< Logical or
+	Result AND();							///< Logical and
+	Result NOT(DatumVecIter TOS);			///< Logical not
 	Result POP();							///< Pop datum(s) off the stack
-	void EVAL(unsigned n);					///< Evaluate N Datums...
-	void ASSIGN(unsigned n);				///< Assign N Datums...
-	void COPY(unsigned n);					///< Copy N Datums...
-	void CALL(int8_t nlevel, unsigned addr); ///< Call a subroutine...
-	void RET();								///< Return from procedure...
-	void RETF();							///< Return from a function...
-	Result JNEQ(DatumVecIter tos);			///< Jump if false
-	Result LLIMIT(DatumVecIter tos);		///< Check lower limit
-	Result ULIMIT(DatumVecIter tos);		///< Check upper limit
+	Result PUSH();							///< Push constant on the stack
+	Result PUSHVAR();						///< Push variable offset on the stack
+	Result EVAL();							///< Evaluate Datum(s)...
+	Result ASSIGN();						///< Assign N Datums...
+	Result COPY();							///< Copy N Datums...
+	Result CALL(); 							///< Call a subroutine...
+	Result RET();							///< Return from procedure...
+	Result RETF();							///< Return from a function...
+	Result ENTER();							///< Enter sub-routine, allocate space for locals
+	Result JUMP();							///< Jump
+	Result JNEQ(DatumVecIter TOS);			///< Jump if false
+	Result LLIMIT(DatumVecIter TOS);		///< Check lower limit
+	Result ULIMIT(DatumVecIter TOS);		///< Check upper limit
+	Result HALT();							///< Stop the machine
 
 	Result step();							///< Single step the machine...
 	Result run();							///< Run the machine...
@@ -161,7 +169,7 @@ private:
 	Instr			ir;						///< *Current* instruction register (code[pc-1])
 
 	EAddr			lastWrite;				///< Last write effective address (to stack[]), if valid
-	bool			verbose;				///< Verbose output if true
+	bool			trace;					///< Trace run if true
 	unsigned  		ncycles;				///< Number of machine cycles run since the last reset
 
 	void dump();

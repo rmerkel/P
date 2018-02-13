@@ -16,7 +16,8 @@ begin
    f := 1;
    while n < nFacts do begin
       n := n + 1;
-      f := f * n
+      f := f * n;
+	  writeln(f : 8 : 6)
    end
 end.
 

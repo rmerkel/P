@@ -68,11 +68,11 @@ const OpCodeInfo::InfoMap OpCodeInfo::opInfoTbl {
 	{ OpCode::EQU,		OpCodeInfo{ "equ",		2			} },
 	{ OpCode::GTE,		OpCodeInfo{ "gte",		2			} },
 	{ OpCode::GT,		OpCodeInfo{ "gt",		2			} },
-	{ OpCode::NEQU,		OpCodeInfo{ "neq",		2			} },
+	{ OpCode::NEQ,		OpCodeInfo{ "neq",		2			} },
 
-	{ OpCode::LOR,		OpCodeInfo{ "lor",		2			} },
-	{ OpCode::LAND,		OpCodeInfo{ "land",		2			} },
-	{ OpCode::LNOT,		OpCodeInfo{ "lnot",		2			} },
+	{ OpCode::OR,		OpCodeInfo{ "or",		2			} },
+	{ OpCode::AND,		OpCodeInfo{ "and",		2			} },
+	{ OpCode::NOT,		OpCodeInfo{ "not",		2			} },
 
 	// Push/pop
 

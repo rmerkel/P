@@ -28,7 +28,7 @@
    10: eval 1
    11: push 10
    12: lt
-   13: jneq 28
+   13: jneq 34
 # test/test.p, 18:       n := n + 1;
    14: pushvar 0, 4
    15: pushvar 0, 4
@@ -36,39 +36,34 @@
    17: push 1
    18: add
    19: assign 1
-# test/test.p, 19:       f := f * n
+# test/test.p, 19:       f := f * n;
    20: pushvar 0, 5
    21: pushvar 0, 5
    22: eval 1
-# test/test.p, 20:    end
    23: pushvar 0, 4
    24: eval 1
    25: mul
    26: assign 1
-# test/test.p, 21: end.
-   27: jump 9
-   28: ret
-# test/test.p, 22: 
+# test/test.p, 20: 	  writeln(f : 8 : 6)
+   27: pushvar 0, 5
+   28: eval 1
+   29: push 8
+   30: push 6
+# test/test.p, 21:    end
+   31: push 1
+   32: writeln
+# test/test.p, 22: end.
+   33: jump 9
+   34: ret
+# test/test.p, 23: 
 
-        8:          0
-        9:          1
-        8:          1
-        9:          1
-        8:          2
-        9:          2
-        8:          3
-        9:          6
-        8:          4
-        9:         24
-        8:          5
-        9:        120
-        8:          6
-        9:        720
-        8:          7
-        9:       5040
-        8:          8
-        9:      40320
-        8:          9
-        9:     362880
-        8:         10
-        9:    3628800
+       1
+       2
+       6
+      24
+     120
+     720
+    5040
+   40320
+  362880
+ 3628800

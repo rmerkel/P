@@ -6,45 +6,41 @@ const
 type
 	e = (zero, one, two, three);
 
-var
-	i : integer; 
-	r : real;
-
 begin
-	i := 1;					{ result: 1			}
-	i := round(2.0);		{ result: 2			}
-	i := round(2.5);		{ result: 3 		}
-	i := trunc(4.0);		{ result: 4 		}
-	i := trunc(5.9);		{ result: 5 		}
-	i := maxint;			{ result  2,147,483,647	}
+	writeln(1);				{ 1			}
+	writeln(round(2.0));	{ 2			}
+	writeln(round(2.5));	{ 3 		}
+	writeln(trunc(4.0));	{ 4 		}
+	writeln(trunc(5.9));	{ 5 		}
+	writeln(maxint);		{ 2,147,483,647	}
 	
-	i := abs(1);			{ result: 1			}
-	i := abs(-1);			{ result: 1			}
-	r := abs(1.5);			{ result 1.5		}
-	r := abs(-1.5);			{ result 1.5		}
+	writeln(abs(1));		{ 1			}
+	writeln(abs(-1));		{ 1			}
+	writeln(abs(1.5));		{ 1.5		}
+	writeln(abs(-1.5));		{ 1.5		}
 
-	i := ord(three);		{ result: 3			}
-	i := ord(i-1);			{ result: 2			}
+	writeln(ord(three));	{ 3			}
+	writeln(ord(3-1));		{ 2			}
 
-{	i := ord(1.2)			error: ordinal value expected	}
+{	writeln(ord(1.2));		error: ordinal value expected	}
 
-	r := arctan(1);			{ result:  0.785398	}
-	r := arctan(1.0);		{ result:  0.785398	}
+	writeln(arctan(1));		{ 0.785398	}
+	writeln(arctan(1.0));	{ 0.785398	}
 
-	r := exp(1);			{ result: 2.718282	}
-	r := exp(1.0);			{ result: 2.718282	}
+	writeln(exp(1));		{ 2.718282	}
+	writeln(exp(1.0));		{ 2.718282	}
 
-	r := ln(1);				{ result: 0.0		}
-	r := ln(1.0);			{ result: 0.0		}
+	writeln(ln(1));			{ 0.0		}
+	writeln(ln(1.0));		{ 0.0		}
 
-	i := odd(10);			{ result: 0			}
-	i := odd(10+1);			{ result: 1			}
+	writeln(odd(10));		{ false		}
+	writeln(odd(10+1));		{ true		}
 
-	r := sin(-3*pi/4);		{ result: -0.707107	}
-	r := sqr(10);			{ result: 100		}
-	r := sqrt(2);			{ result: 1.41421	}
+	writeln(sin(-3*pi/4));	{ -0.707107	}
+	writeln(sqr(10));		{ 100		}
+	writeln(sqrt(2));		{ 1.41421	}
 
-	writeln(i, r, pi);
+	writeln(100, 1.41421, pi);
 	writeln(pi : 7 : 5);
 	writeln
 end .

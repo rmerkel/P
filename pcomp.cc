@@ -339,7 +339,7 @@ TDescPtr PComp::factor(int level) {
 		expect(Token::CloseParen);
 
 	} else if (accept(Token::Not)) {
-		emit(OpCode::LNOT);
+		emit(OpCode::NOT);
 		type = factor(level);
 
 	} else if (accept(Token::String, false)) {	// TBD: type = stringLiteral()
@@ -388,7 +388,7 @@ TDescPtr PComp::term(int level) {
 
 		} else if (accept(Token::And)) {
 			lhs = promote(lhs, factor(level));
-			emit(OpCode::LAND);
+			emit(OpCode::AND);
 
 		} else
 			break;
@@ -441,7 +441,7 @@ TDescPtr PComp::simpleExpr(int level) {
 
 		} else if (accept(Token::Or)) {
 			lhs = promote(lhs, unary(level));
-			emit(OpCode::LOR);
+			emit(OpCode::OR);
 
 		} else
 			break;
@@ -483,7 +483,7 @@ TDescPtr PComp::expression(int level) {
 
 		} else if (accept(Token::NEQ)) {
 			lhs = promote(lhs, simpleExpr(level));
-			emit(OpCode::NEQU);
+			emit(OpCode::NEQ);
 
 		} else
 			break;

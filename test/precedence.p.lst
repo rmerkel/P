@@ -1,21 +1,20 @@
 # test/precedence.p, 1: program precedence ;
-# test/precedence.p, 2: var x : integer;
+# test/precedence.p, 2: begin
     0: call 0, 2
     1: halt
-# test/precedence.p, 3: begin
-    2: enter 1
-# test/precedence.p, 4: 	x := 1 + 2 * 3 - 4;	{	s/b 3	}
-    3: pushvar 0, 4
-    4: push 1
-    5: push 2
-    6: push 3
-    7: mul
-    8: add
-    9: push 4
-   10: sub
-   11: assign 1
-# test/precedence.p, 5: 	x := -1 + 2 * 3 - 4	{	s/b 1	}
-   12: pushvar 0, 4
+# test/precedence.p, 3: 	writeln( 1 + 2 * 3 - 4);	{	s/b 3	}
+    2: push 1
+    3: push 2
+    4: push 3
+    5: mul
+    6: add
+    7: push 4
+    8: sub
+    9: push 0
+   10: push 0
+   11: push 1
+   12: writeln
+# test/precedence.p, 4: 	writeln(-1 + 2 * 3 - 4)		{	s/b 1	}
    13: push 1
    14: neg
    15: push 2
@@ -23,10 +22,13 @@
    17: mul
    18: add
    19: push 4
-# test/precedence.p, 6: end .
    20: sub
-   21: assign 1
-   22: ret
+   21: push 0
+   22: push 0
+# test/precedence.p, 5: end .
+   23: push 1
+   24: writeln
+   25: ret
 
-        8:          3
-        8:          1
+3
+1

@@ -8,12 +8,22 @@
     3: pushvar 0, 4
     4: push 0
     5: assign 1
-# test/simple.p, 5: 	y := 1
+# test/simple.p, 5: 	y := 1;
     6: pushvar 0, 5
     7: push 1
-# test/simple.p, 6: end.
     8: assign 1
-    9: ret
+# test/simple.p, 6: 	writeln(x, y)
+    9: pushvar 0, 4
+   10: eval 1
+   11: push 0
+   12: push 0
+   13: pushvar 0, 5
+   14: eval 1
+   15: push 0
+   16: push 0
+# test/simple.p, 7: end.
+   17: push 2
+   18: writeln
+   19: ret
 
-        8:          0
-        9:          1
+0 1

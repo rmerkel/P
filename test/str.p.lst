@@ -7,10 +7,11 @@
 # test/str.p, 5: var
 # test/str.p, 6:  	a1 : A;
 # test/str.p, 7:  	a2 : A;
-# test/str.p, 8: 
-# test/str.p, 9: begin
-    2: enter 20
-# test/str.p, 10: 	a1 := 'abcdefghij';		{	fill a1 with 'abcd...'			}
+# test/str.p, 8: 	i : integer;
+# test/str.p, 9: 
+# test/str.p, 10: begin
+    2: enter 21
+# test/str.p, 11: 	a1 := 'abcdefghij';		{	fill a1 with 'abcd...'			}
     3: pushvar 0, 4
     4: push 'a'
     5: push 'b'
@@ -23,13 +24,50 @@
    12: push 'i'
    13: push 'j'
    14: assign 10
-# test/str.p, 11: 	a2 := a1 				{	copies the contents of a1 to a2	}
+# test/str.p, 12: 	a2 := a1; 				{	copies the contents of a1 to a2	}
    15: pushvar 0, 14
-# test/str.p, 12: end .
    16: pushvar 0, 4
    17: eval 10
    18: assign 10
-   19: ret
+# test/str.p, 13: 	for i := 0 to 9 do writeln(a2[i])
+   19: pushvar 0, 24
+   20: dup
+   21: push 0
+   22: assign 1
+   23: dup
+   24: eval 1
+   25: push 9
+   26: lte
+   27: jneq 46
+   28: pushvar 0, 14
+   29: pushvar 0, 24
+   30: eval 1
+   31: llimit 0
+   32: ulimit 9
+   33: add
+   34: eval 1
+   35: push 0
+   36: push 0
+# test/str.p, 14: end .
+   37: push 1
+   38: writeln
+   39: dup
+   40: dup
+   41: eval 1
+   42: push 1
+   43: add
+   44: assign 1
+   45: jump 23
+   46: pop
+   47: ret
 
-       17:          'j'
-       27:          'j'
+'a'
+'b'
+'c'
+'d'
+'e'
+'f'
+'g'
+'h'
+'i'
+'j'
