@@ -26,8 +26,8 @@ static void help() {
 		 << "Where options is zero or more of the following:\n"
 		 << "-?        Print this message and exit.\n"
 		 << "-help     Same as -?\n"
-		 << "-trace    Set trace mode.\n"
-		 << "-t        Same as -t.\n"
+		 << "-trace    Set interpreter trace mode.\n"
+		 << "-t        Same as -trace.\n"
 		 << "-verbose  Set compilier verbose mode.\n"
 		 << "-v        Same as -verbose.\n"
  		 << "-version  Print the program version.\n"
@@ -40,7 +40,7 @@ static void help() {
  * Print the version number as major.minor
  ************************************************************************************************/
 static void printVersion() {
-	cout << progName << ": verson: 0.20\n";		// make sure to update the verison in mainpage!!
+	cout << progName << ": verson: 0.21\n";		// make sure to update the verison in mainpage!!
 }
 
 /********************************************************************************************//** 

@@ -42,7 +42,7 @@ public:
 
 	typedef std::vector<Kind> KindVec;			///< Vector of Kinds
 	
-	static SymValue makeConst(int level, Datum value, TDescPtr type);
+	static SymValue makeConst(int level, const Datum& value, TDescPtr type);
 	static SymValue makeVar(int level, int ofset, TDescPtr type);
 	static SymValue makeSbr(Kind kind, int level);
 	static SymValue makeType(int level, TDescPtr);

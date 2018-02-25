@@ -140,8 +140,8 @@ private:
 	void subDeclList(int level);			///< function/procedue declaraction productions...
 
 	/// block-declaration production...
-	unsigned blockDecl(	SymValue&			val,
-						int					level);
+	size_t blockDecl(SymValue&				val,
+					int						level);
 
 	void progDecl(int level);				///< program-declaration production...
 

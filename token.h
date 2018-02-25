@@ -133,7 +133,7 @@ struct Token {
 	double			real_value;			///< Kind == RealNum
 
 	/// Construct a token of type k, stirng value "", number value 0.
-	Token(Kind k) : kind{k}, integer_value{0} {}
+	Token(Kind k) : kind{k}, integer_value{0}, real_value{0.0} {}
 	virtual ~Token() {}					///< Destructor
 };
 

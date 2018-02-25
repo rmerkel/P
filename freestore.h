@@ -18,8 +18,7 @@
  ************************************************************************************************/
 class FreeStore {
 	/// A block range; its starting address and number of Datums
-	class Block {
-	public:
+	struct Block {
     	size_t  addr;						///< Address of the block
     	size_t  size;						///< Length of the block in datums
 
@@ -43,7 +42,7 @@ public:
 	size_t addr() const;					///< Return the base address of the arena
 	size_t size() const;					///< Return the size of the arena, in Datum's
 	
-	unsigned alloc(size_t size);			///< Allocate a block of Datum's from the free list
+	size_t alloc(size_t size);			///< Allocate a block of Datum's from the free list
 	bool free(unsigned addr);				///< Return a previously allocated block to free list
 
 	void dump(std::ostream& os) const;		///< Write a free/allocated list resport

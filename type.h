@@ -138,13 +138,13 @@ public:
 
 	/// Create, and return, a TDescPtr to a new ArrayDesc
 	static TDescPtr newArrayDesc(
-				unsigned	size,
+				size_t		size,
 		const	SubRange&	range,
 				TDescPtr	rtype,
 				TDescPtr	base = TDescPtr());
 
 	/// Create, and return, a TDescPtr to a new RecordDesc
-	static TDescPtr newRcrdDesc(unsigned size, const FieldVec& fields = FieldVec());
+	static TDescPtr newRcrdDesc(size_t size, const FieldVec& fields = FieldVec());
 
 	/// Create, and return, a TDescPtr to a new EnumDesc
 	static TDescPtr newEnumDesc(const SubRange& range, const FieldVec& fields = FieldVec());
@@ -155,8 +155,8 @@ public:
 	virtual ~TypeDesc() {}				///< Destructor
 
 	TypeClass tclass() const;			///< Return my type class
-	unsigned size() const;				///< Return my size, in Datums
-	unsigned size(unsigned sz); 		///< Set, and then return, my size in Datums
+	size_t size() const;				///< Return my size, in Datums
+	size_t size(size_t sz); 			///< Set, and then return, my size in Datums
 	const SubRange& range() const;		///< Return my sub-range
 	TDescPtr itype() const;				///< Return my array sub-rane (index) type. 
 	TDescPtr itype(TDescPtr type);		///< Set, and then return, my range type
@@ -177,7 +177,7 @@ protected:
 	 * @param	fields	Fields, defaults FieldVec()
 	 */
 	TypeDesc(	TypeClass	tclass,
-				unsigned	size,
+				size_t		size,
 		const	SubRange&	range	= SubRange(),
 				TDescPtr	itype	= TDescPtr(),
 		const	FieldVec&	fields	= FieldVec(),
@@ -186,7 +186,7 @@ protected:
 
 private:
 	TypeClass	_tclass;					///< Type class
-	unsigned	_size;						///< Size, in Datums
+	size_t		_size;						///< Size, in Datums
 	SubRange	_range;						///< My sub-range. For arrays, the array's span
 	TDescPtr	_itype;						///< Arrays index (sub-range) type
 	FieldVec	_fields;					///< My fields (enumeration and record)

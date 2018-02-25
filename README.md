@@ -73,6 +73,16 @@ Version | Description
  0.18	| Writeln now prints "true" "false" for booleans.
  0.19   | Clean up, removed unused global data/constants, use input filename in messages
  0.20	| Refactored the interpreter step routine, adding more run-time tests and -t option
+ 0.21   | Write and writeln nolonger quote character values. Major refactor of Datum.
+ 0.22   | Future: add array support to WRITE[LN]?
+
+## Design and implementation notes
+
+* write[ln] string parameters aren't currently supported. ISO Pascal defines
+  s:w parameters for strings, where w <= the max length of the string (s), to
+  print, but s:w:f is disallowed. P could internally use s:w:l, where l is the
+  actual length of the string... or more generally array.
+* Need to make "()" manditory for subroutine declaractions and calls.
 
 ## Author
     Randy Merkel, Slowly but Surly Software.

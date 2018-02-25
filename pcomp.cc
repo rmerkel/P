@@ -14,6 +14,7 @@
 #include <iomanip>
 #include <iostream>
 #include <fstream>
+#include <limits>
 #include <sstream>
 #include <vector>
 
@@ -125,6 +126,10 @@ TDescPtr PComp::identFactor(int level, const string& id) {
 
 		case SymValue::Variable:
 			type = variable(level, it);
+			assert(type.get() != 0);
+			assert(type->base().get() != 0);
+			type = type->base();
+			assert(type.get() != 0);
 			emit(OpCode::EVAL, 0, type->size());
 			break;
 
@@ -539,7 +544,7 @@ pair<bool,Datum> PComp::constExpr() {
 		auto it = lookup(id);
 		if (it != symtbl.end()) {
 			if (it->second.kind() == SymValue::Constant)
-				value.second = sign * it->second.value();
+				value.second = Datum(sign) * it->second.value();
 			else
 				error("Identifier is not a constant, variable or function", it->first);
 		}
@@ -596,7 +601,7 @@ void PComp::whileStatement(int level) {
 	expression(level);
 
 	// jump if expr is false...
-	const auto jmp_pc = emit(OpCode::JNEQ, 0, 0);
+	const auto jmp_pc = emit(OpCode::JNEQ);
 	expect(Token::Do);					// consume "do"
 	statement(level);
 
@@ -616,14 +621,14 @@ void PComp::ifStatement(int level) {
 	expression(level);
 
 	// Jump if conditon is false
-	const size_t jmp_pc = emit(OpCode::JNEQ, 0, 0);
+	const size_t jmp_pc = emit(OpCode::JNEQ);
 	expect(Token::Then);							// Consume "then"
 	statement(level);
 
 	// Jump over else statement, but only if there is an else
 	const bool Else = accept(Token::Else);
 	size_t else_pc = 0;
-	if (Else) else_pc = emit(OpCode::JUMP, 0, 0);
+	if (Else) else_pc = emit(OpCode::JUMP);
 
 	if (verbose)
 		cout << progName << ": patching address at " << jmp_pc << " to " << code->size() << "\n";
@@ -680,7 +685,7 @@ void PComp::forStatement(int level) {
 	emit(OpCode::LTE);					// 											addr, cond?
 
 	// jump if expr is false...
-	const auto jmp_pc = emit(OpCode::JNEQ, 0, 0);								//	addr
+	const auto jmp_pc = emit(OpCode::JNEQ);										//	addr
 
 	expect(Token::Do);					// "do statement"
 	statement(level);
@@ -782,7 +787,7 @@ TDescPtr PComp::varSelector(SymbolTable::iterator it, TDescPtr type) {
 	// Copy, and then consume, the selector identifier...
 	const string selector = ts.current().string_value;
 	if (expect(Token::Identifier)) {
-		unsigned offset = 0;				// Calc the offset into the record...
+		size_t offset = 0;					// Calc the offset into the record...
 		for (const auto& fld : type->fields()) {
 			if (fld.name() == selector) {
 				type = fld.type();			// Return the record field's type
@@ -811,27 +816,21 @@ TDescPtr PComp::varSelector(SymbolTable::iterator it, TDescPtr type) {
  * @return	The identifier type
  ************************************************************************************************/
 TDescPtr PComp::variable(int level, SymbolTable::iterator it) {
-	auto type = it->second.type();			// Default is the symbol's type
+	TDescPtr type = emitVarRef(level, it->second);
 
-	emitVarRef(level, it->second);
-
-	// process composite-desc's...
+	// process composite-desc's, if any...
 	for (;;) {
 		if (accept(Token::OpenBrkt)) {		// variable is an array, index into it
-			type = varArray(level, it, type);
+			type = TypeDesc::newPointerDesc(varArray(level, it, type->base()));
 			expect(Token::CloseBrkt);
 
-		} else if (accept(Token::Period))	// handle record selector...
-			type = varSelector(it, type);
+		} else if (accept(Token::Period)) {	// handle record selector...
+			type = TypeDesc::newPointerDesc(varSelector(it, type->base()));
 
-		else if (accept(Token::Caret)) {	// Dereference a pointer
-			emit(OpCode::EVAL, 0, type->size());	
-			if (type->tclass() != TypeDesc::Pointer) {
-				ostringstream oss;
-				oss << "expected a pointer, got " << type->tclass();
-				error(oss.str());
-			} else
-				type = type->base();		// Use the pointed to type
+		} else if (accept(Token::Caret)) {	// Dereference pointer
+			emit(OpCode::EVAL, 0, type->base()->size());	
+			assert(type->base().get() != 0);
+			type = type->base();			// Use the pointed to type
 
 		} else
 			break;							// no more composite-desc(s)
@@ -850,13 +849,14 @@ TDescPtr PComp::variable(int level, SymbolTable::iterator it) {
  * @return	Reference to the variable reference
  ************************************************************************************************/
 void PComp::assignStatement(int level, SymbolTable::iterator it, bool dup) {
-	auto type = it->second.type();		// Emit the lvalue...
+	auto type = it->second.type();		// Start with the lvalue type
 
 	// Emit the l-value, a variable or a function reference...
-	if (it->second.kind() == SymValue::Function)
+	if (it->second.kind() == SymValue::Function) {
 		emit(OpCode::PUSHVAR, 0, FrameRetVal);
+		type = TypeDesc::newPointerDesc(type);
 
-	else if (it->second.kind() == SymValue::Variable)
+	} else if (it->second.kind() == SymValue::Variable)
 		type = variable(level, it);
 
 	else
@@ -870,8 +870,8 @@ void PComp::assignStatement(int level, SymbolTable::iterator it, bool dup) {
 	// Emit the r-value and assignment...
 
 	auto rtype = expression(level);
-	assignPromote(type, rtype);
-	emit(OpCode::ASSIGN, 0, type->size());
+	assignPromote(type->base(), rtype);
+	emit(OpCode::ASSIGN, 0, type->base()->size());
 }
 
 /********************************************************************************************//**
@@ -911,15 +911,18 @@ void PComp::identStatement(int level, const string& id) {
  *
  * Process write and writeln parameters, up to, but not including, emitteing the final op-code.
  *
- * @note	Does not handle arrays, as that would require some sort of tagged reference, which
- *			Datum lacks.
+ * @note	Write argument count must be a signed int, otherwise it will be interpeted as an 
+ *          address!
  *
  * @param	level	The current block level.
+ *
+ * @bug	Does not handle arrays, as that would require some sort of tagged reference, which Datum
+ *		lacks.
  ************************************************************************************************/
 void PComp::writeStmt(int level) {
 	ostringstream oss;
 
-	unsigned nargs = 0;
+	int nargs = 0;								// Count arguments, as an integer!
 	if (accept(Token::OpenParen)) {				// process, and count, each expr-tuple..
 		do {
 			auto expr = expression(level);		// value to write
@@ -947,6 +950,7 @@ void PComp::writeStmt(int level) {
 			}
 
 			++nargs;
+
 		} while (accept(Token::Comma));
 
 		expect(Token::CloseParen);
@@ -998,7 +1002,13 @@ void PComp::statementNew(int level) {
 			error(oss.str());
 		}
 
-		emit(OpCode::PUSH, 0, tdesc->size());	// push the size of the id
+		// The object size must be a signed integer, else it will be interperted as an address
+		assert(tdesc->size() < numeric_limits<int>::max());
+		if (tdesc->size() > numeric_limits<int>::max())
+			error("size of object exceeds MaxInt!");
+		int n = static_cast<int>(tdesc->size());
+
+		emit(OpCode::PUSH, 0, n);		// push the size of the id
 		emit(OpCode::NEW);
 		emit(OpCode::ASSIGN, 0, 1);
 
@@ -1373,7 +1383,7 @@ TDescPtr PComp::ordinalType(int level) {
 		// Create the type, excluding the fields (enumerations)
 		type = TypeDesc::newEnumDesc(r);
 
-		unsigned value = 0;						// Each enumeration gets a value...
+		int value = 0;							// Each enumeration gets a value...
 		for (auto id : ids) {
 			enums.push_back( { id, TypeDesc::intDesc } );
 			symtbl.insert(	{ id, SymValue::makeConst(level, Datum(value), type) }	);
@@ -1597,7 +1607,7 @@ void PComp::subDeclList(int level) {
  * @param	level	The current block level.
  * @return 	Entry point address
  ************************************************************************************************/
-unsigned PComp::blockDecl(SymValue& val, int level) {
+size_t PComp::blockDecl(SymValue& val, int level) {
 	constDeclList(level);						// declaractions...
 	typeDeclList(level);
 	auto dx = varDeclBlock(level);
@@ -1609,8 +1619,8 @@ unsigned PComp::blockDecl(SymValue& val, int level) {
 	 * if dx == 0 (the subroutine has zero locals.
 	 */
 
-	const auto addr = dx > 0 ? emit(OpCode::ENTER, 0, dx) : code->size();
-	val.value(addr);
+	const size_t addr = dx > 0 ? emit(OpCode::ENTER, 0, dx) : code->size();
+	val.value(Datum(addr));
 
 	if (expect(Token::Begin)) {					// "begin" statements... "end"
 		statementList(level);
@@ -1643,7 +1653,7 @@ void PComp::progDecl(int level) {
 	const auto call_pc = emit(OpCode::CALL, level, 0);
 	emit(OpCode::HALT);
 
-	const auto addr = blockDecl(val, level);	// emit the first block 
+	const size_t addr = blockDecl(val, level);	// emit the first block 
 	if (verbose)
 		cout << progName << ": patching call to program at " << call_pc << " to " << addr  << "\n";
 
@@ -1667,16 +1677,28 @@ PComp::PComp() : Compilier () {
 
 	// Insert builtin types into the symbol table
 
-	symtbl.insert( { "bool",	SymValue::makeType(0, TypeDesc::boolDesc)	} );
-	symtbl.insert( { "char",	SymValue::makeType(0, TypeDesc::charDesc)	} );
-	symtbl.insert( { "integer",	SymValue::makeType(0, TypeDesc::intDesc)	} );
-	symtbl.insert( { "real",	SymValue::makeType(0, TypeDesc::realDesc)	} );
+	symtbl.insert( { "bool",	SymValue::makeType(0, TypeDesc::boolDesc)			} );
+	symtbl.insert( { "char",	SymValue::makeType(0, TypeDesc::charDesc)			} );
+	symtbl.insert( { "integer",	SymValue::makeType(0, TypeDesc::intDesc)			} );
+	symtbl.insert( { "real",	SymValue::makeType(0, TypeDesc::realDesc)			} );
 
 	// Insert built-in constants into the symbol table; id, level (always zero), and value
 
-	symtbl.insert({"maxint", 	SymValue::makeConst(0, TypeDesc::maxRange.maximum(), TypeDesc::intDesc)	});
-	symtbl.insert({"nil",    	SymValue::makeConst(0, 0, TypeDesc::newPointerDesc(TypeDesc::intDesc))	});
-	symtbl.insert({"true",   	SymValue::makeConst(0, true, TypeDesc::boolDesc)						});
-	symtbl.insert({"false",  	SymValue::makeConst(0, false, TypeDesc::boolDesc)						});
+	symtbl.insert({"maxint", 	SymValue::makeConst(
+									0,
+									Datum(TypeDesc::maxRange.maximum()),
+									TypeDesc::intDesc)								});
+	symtbl.insert({"nil",    	SymValue::makeConst(
+									0,
+									Datum(0),
+									TypeDesc::newPointerDesc(TypeDesc::intDesc))	});
+	symtbl.insert({"true",   	SymValue::makeConst(
+									0,
+									Datum(true),
+									TypeDesc::boolDesc)								});
+	symtbl.insert({"false",  	SymValue::makeConst(
+									0,
+									Datum(false),
+									TypeDesc::boolDesc)								});
 }
 

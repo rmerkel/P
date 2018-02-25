@@ -163,7 +163,7 @@ ostream& operator<<(std::ostream& os, const SubRange& srange) {
  */
 TypeDesc::TypeDesc(
 			TypeClass	tclass,
-			unsigned	size,
+			size_t		size,
 	const	SubRange&	range,
 			TDescPtr	itype,
 	const	FieldVec&	fields,
@@ -232,7 +232,7 @@ TDescPtr TypeDesc::newCharDesc(const SubRange& range) {
  * @return TDescPtr to a new ArrayDesc
  ************************************************************************************************/
 TDescPtr TypeDesc::newArrayDesc(
-			unsigned	size,
+			size_t		size,
 	const	SubRange&	range,
 			TDescPtr	itype,
 			TDescPtr	base)
@@ -245,7 +245,7 @@ TDescPtr TypeDesc::newArrayDesc(
  * @param	fields		The type fields. Defaults to FieldVec().
  * @return TDescPtr to a new RecordDesc
  ************************************************************************************************/
-TDescPtr TypeDesc::newRcrdDesc(unsigned size, const FieldVec& fields) {
+TDescPtr TypeDesc::newRcrdDesc(size_t size, const FieldVec& fields) {
 	return TDescPtr(new TypeDesc(Record,
 								size,
 								SubRange(),
@@ -282,12 +282,12 @@ TypeDesc::TypeClass TypeDesc::tclass() const	{	return _tclass;					}
 /********************************************************************************************//**
  * @return my size, in Datums
  ************************************************************************************************/
-unsigned TypeDesc::size() const					{	return _size;					}
+size_t TypeDesc::size() const					{	return _size;					}
 
 /********************************************************************************************//**
  * @return my size, in Datums
  ************************************************************************************************/
-unsigned TypeDesc::size(unsigned sz) 			{	return _size = sz;				}
+size_t TypeDesc::size(size_t sz) 				{	return _size = sz;				}
 
 /********************************************************************************************//**
  * @return my sub-range

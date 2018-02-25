@@ -26,7 +26,7 @@ using namespace std;
  *
  * @return a constant symbol value
  ************************************************************************************************/
-SymValue SymValue::makeConst(int level, Datum value, TDescPtr type) {
+SymValue SymValue::makeConst(int level, const Datum& value, TDescPtr type) {
 	return SymValue(SymValue::Constant, level, value, type, TDescPtrVec());
 }
 
@@ -42,7 +42,7 @@ SymValue SymValue::makeConst(int level, Datum value, TDescPtr type) {
  * @return a variable symbol value
  ************************************************************************************************/
 SymValue SymValue::makeVar(int level, int offset, TDescPtr type) {
-	return SymValue(SymValue::Variable, level, offset, type, TDescPtrVec());
+	return SymValue(SymValue::Variable, level, Datum(offset), type, TDescPtrVec());
 }
 
 /********************************************************************************************//**
@@ -59,7 +59,7 @@ SymValue SymValue::makeVar(int level, int offset, TDescPtr type) {
  ************************************************************************************************/
 SymValue SymValue::makeSbr(Kind kind, int level) {
 	assert(SymValue::Procedure == kind || SymValue::Function == kind);
-	return SymValue(kind, level, 0, TDescPtr(), TDescPtrVec());
+	return SymValue(kind, level, Datum(0), TDescPtr(), TDescPtrVec());
 }
 
 /********************************************************************************************//**
@@ -73,7 +73,7 @@ SymValue SymValue::makeSbr(Kind kind, int level) {
  * @return a type symbol value
  ************************************************************************************************/
 SymValue SymValue::makeType(int level, TDescPtr type) {
-	return SymValue(Kind::Type, level, 0, type, TDescPtrVec());
+	return SymValue(Kind::Type, level, Datum(0), type, TDescPtrVec());
 }
 
 // public

@@ -77,10 +77,12 @@ protected:
 	/// Return true if the specified memory range is valid
 	bool rangeCheck(size_t begin, size_t end);
 
-	unsigned base(unsigned lvl);			///< Find the activation base 'lvl' levels up the stack...
+	size_t base(size_t lvl);				///< Find the activation base 'lvl' levels up the stack...
 	Datum pop();							///< Pop a Datum from the top of stack...
-	void pop(unsigned n);					///< Pop and discard n Datums from the top of stack...
-	void push(Datum d);						///< Push a Datum onto the stack...
+	void pop(size_t n);						///< Pop and discard n Datums from the top of stack...
+
+	/// Push value onto the stack
+	template<class T> void push(const T& value);
 	Result write1(unsigned index);			///< Write one expression on standard output...
 
 	Result ITOR(DatumVecIter TOS);			///< Convert to real
@@ -158,23 +160,35 @@ private:
 		void invalidate() 					{	val = false;	}
 	};
 
-	InstrVector		code;					///< Code segment, indexed by pc
-	unsigned		stackSize;				///< The size of the stack segment, in Datums.
-	DatumVector		stack;					///< Data segment (stack + free-store), indexed by fp and sp
-	FreeStore		heap;					///< Dynamic memory heap
-	unsigned		pc;						///< Program counter register; index of *next* instruction in code[]
-	unsigned		prevPc;					///< Previous PC register; index of the *current* instruction in code
-	unsigned		fp;						///< Frame pointer register; index of the current mark block/frame in stack[]
-	unsigned		sp;						///< Top of stack register (stack[sp])
-	Instr			ir;						///< *Current* instruction register (code[pc-1])
-
-	EAddr			lastWrite;				///< Last write effective address (to stack[]), if valid
-	bool			trace;					///< Trace run if true
-	unsigned  		ncycles;				///< Number of machine cycles run since the last reset
+	InstrVector	code;						///< Code segment, indexed by pc
+	unsigned	stackSize;					///< The size of the stack segment, in Datums.
+	DatumVector	stack;						///< Data segment (stack + free-store), indexed by fp and sp
+	FreeStore	heap;						///< Dynamic memory heap
+	size_t		pc;							///< Program counter register; index of *next* instruction in code[]
+	size_t		prevPc;						///< Previous PC register; index of the *current* instruction in code
+	size_t		fp;							///< Frame pointer register; index of the current mark block/frame in stack[]
+	size_t		sp;							///< Top of stack register (stack[sp])
+	Instr		ir;							///< *Current* instruction register (code[pc-1])
+	EAddr		lastWrite;					///< Last write effective address (to stack[]), if valid
+	bool		trace;						///< Trace run if true
+	unsigned  	ncycles;					///< Number of machine cycles run since the last reset
 
 	void dump();
 };
 
+/********************************************************************************************//**
+ * @param value	Datum to push on to the stack
+ ************************************************************************************************/
+template <class T> void PInterp::push(const T& value) {
+	if (sp >= heap.addr())
+		throw Error(stackOverflow, "stack overflow error");
+	else
+		stack[++sp] = Datum(value);
+}
+
+/********************************************************************************************//**
+ * PInterp::Result stream put operator
+ ************************************************************************************************/
 std::ostream& operator<<(std::ostream& os, const PInterp::Result& result);
 
 #endif

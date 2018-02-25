@@ -63,8 +63,10 @@ protected:
 
 	bool oneOf(Token::KindSet set);			///< Is the current token one of the given set?
 
+	size_t emit(const OpCode op);			///< Emit an instruction
+
 	/// Emit an instruction...
-	size_t emit(const OpCode op, int8_t level = 0, Datum addr = 0);
+	template <class T> size_t emit(const OpCode op, int8_t level, const T& addr);
 
 	/// Emit a variable reference, e.g., an absolute address...
 	TDescPtr emitVarRef(int level, const SymValue& val);
@@ -83,5 +85,31 @@ protected:
 
 	virtual void run() = 0;					///< Compile...
 };
+
+/********************************************************************************************//**
+ * Assembles op, level, addr into a new instruction, and then appends the instruciton on
+ * the end of code[], returning it's address/index.
+ *
+ * Side effect; updates the cross index for the listing.
+ *
+ * @param	op		The instruction operation code
+ * @param	level	The instruction block level value. Defaults to zero.
+ * @param	addr	The instructions address/value. Defaults to zero.
+ *
+ * @return The address (code[] index) of the new instruction.
+ ************************************************************************************************/
+template <class T> size_t Compilier::emit(const OpCode op, int8_t level, const T& addr) {
+	const int lvl = static_cast<int>(level);
+	if (verbose)
+		std::cout
+			<< progName << ": emitting " << code->size() << ": "
+			<< OpCodeInfo::info(op).name() << " " << lvl << ", "
+			<< addr << "\n";
+
+	code->push_back({op, level, Datum(addr)});
+	indextbl.push_back(ts.lineNum);			// update the cross index
+
+	return code->size() - 1;				// so it's the address of just emitted instruction
+}
 
 #endif

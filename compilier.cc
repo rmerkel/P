@@ -110,28 +110,17 @@ bool Compilier::oneOf(Token::KindSet set) {
 }
 
 /********************************************************************************************//**
- * Assembles op, level, addr into a new instruction, and then appends the instruciton on
+ * Assembles op, 0, 0 into a new instruction, and then appends the instruciton on
  * the end of code[], returning it's address/index.
  *
  * Side effect; updates the cross index for the listing.
  *
  * @param	op		The instruction operation code
- * @param	level	The instruction block level value. Defaults to zero.
- * @param	addr	The instructions address/value. Defaults to zero.
  *
  * @return The address (code[] index) of the new instruction.
  ************************************************************************************************/
-size_t Compilier::emit(const OpCode op, int8_t level, Datum addr) {
-	const int lvl = static_cast<int>(level);
-	if (verbose)
-		cout	<< progName << ": emitting " << code->size() << ": "
-				<< OpCodeInfo::info(op).name() << " " << lvl << ", "
-				<< addr.integer() << "\n";
-
-	code->push_back({op, level, addr});
-	indextbl.push_back(ts.lineNum);			// update the cross index
-
-	return code->size() - 1;				// so it's the address of just emitted instruction
+size_t Compilier::emit(const OpCode op) {
+	return emit(op, 0, Datum(0));
 }
 
 /********************************************************************************************//**
@@ -141,7 +130,7 @@ size_t Compilier::emit(const OpCode op, int8_t level, Datum addr) {
  *
  *  @param	level	The current block level
  *  @param	val		The variable symbol table entry
- *  @return			Data type
+ *  @return			Data type reference
  ************************************************************************************************/
 TDescPtr Compilier::emitVarRef(int level, const SymValue& val) {
 	const auto offset = val.value().integer() >= 0			?
@@ -149,7 +138,7 @@ TDescPtr Compilier::emitVarRef(int level, const SymValue& val) {
 						val.value().integer();					// parameter
 
 	emit(OpCode::PUSHVAR, level - val.level(), offset);
-	return val.type();
+	return TypeDesc::newPointerDesc(val.type());
 }
 
 /********************************************************************************************//**
@@ -191,7 +180,7 @@ void Compilier::purge(int level) {
 					 << i->first << ": "
 					 << i->second.kind() << ", "
 					 << static_cast<int>(i->second.level()) << ", "
-					 << i->second.value().integer()
+					 << i->second.value()
 					 << " from the symbol table\n";
 			i = symtbl.erase(i);
 
@@ -230,10 +219,11 @@ SymbolTable::iterator Compilier::lookup(const string& id) {
  *
  * The prefixed identifier is prefix.identifier if prefix != "", otherwise it's the same as
  * the identifier. The decorated identifier is what is looked up in the symbol table, but
- * the undecroated version is returned.
+ * the undecroated version is returned. Prefixed identifiers are for record elements, so they
+ * can't collide with variable, type or procedure names.
  *
  * @param 	level	The current block level.
- * @param	prefix	The identifier prefix for identifier decorated.
+ * @param	prefix	The identifier prefix.
  * @return 	the next, undecorated, identifier in the token stream, "unknown" if the next token
  * 			 wasn't an identifier.
  ************************************************************************************************/

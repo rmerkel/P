@@ -144,7 +144,7 @@ struct Instr {
 	Instr() : level{0}, op{OpCode::HALT} {}
 
 	/// Construct an instruction from it's components...
-	Instr(OpCode o, int8_t l = 0, Datum d = 0) : addr{d}, level{l}, op{o} {}
+	Instr(OpCode o, int8_t l = 0, Datum d = Datum(0)) : addr{d}, level{l}, op{o} {}
 };
 
 /********************************************************************************************//**

@@ -50,7 +50,7 @@ size_t FreeStore::size() const					{	return initSize;	}
  * @param	size	Number of Datums's to allocate
  * @return The starting address of the allocated block, or zero if insufficient free-space.
  ************************************************************************************************/
-unsigned FreeStore::alloc(size_t size) {
+size_t FreeStore::alloc(size_t size) {
    	Block result(0, 0);
 
    	FreeStoreMap::iterator ri = freeStore.end();

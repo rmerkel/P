@@ -29,7 +29,7 @@ endif
 ################################################################################
 
 SRCS	= $(wildcard *.cc)
-ALLSRCS	= $(SRCS) $(wildcard *.h) README.md
+ALLSRCS	= $(SRCS) $(wildcard *.h)
 OBJS	= $(SRCS:.cc=.o)
 DEPS	= $(SRCS:.cc=.d)
 EXE		= p
@@ -77,7 +77,7 @@ cleanall: clean
 
 docs:	docs/html/index.html
 
-docs/html/index.html:	Doxyfile $(ALLSRCS)
+docs/html/index.html:	Doxyfile $(ALLSRCS) README.md
 	doxygen
 
 ################################################################################
@@ -91,6 +91,7 @@ help:
 	@echo ""
 	@echo "Targets:"
 	@echo "    all     - to build the compilier  and generate documentation (default)."
+	@echo "    check   - to run static checker."
 	@echo "    clean   - to delete intermediates."
 	@echo "    cleanll - to delete all targets and intermediates."
 	@echo "    docs    - to generate documentation."
@@ -105,7 +106,7 @@ help:
 ################################################################################
 
 pr:
-	@pr --expand-tabs=4 $(ALLSRCS) Makefile
+	@pr --expand-tabs=4 $(ALLSRCS) Makefile README.md
 
 ################################################################################
 		assert(false);
