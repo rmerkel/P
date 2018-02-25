@@ -64,11 +64,12 @@
 # test/fact2.p, 29: 	writeln(result)
    35: pushvar 0, 4
    36: eval 1
-   37: push 0
+   37: push 1
    38: push 0
+   39: push 0
 # test/fact2.p, 30: end.
-   39: push 1
-   40: writeln
-   41: ret
+   40: push 1
+   41: writeln
+   42: ret
 
 3628800

@@ -43,19 +43,20 @@
 # test/repeatst.p, 21: 			writeln(f : 8 : 6)
    22: pushvar 0, 5
    23: eval 1
-   24: push 8
-   25: push 6
+   24: push 1
+   25: push 8
+   26: push 6
 # test/repeatst.p, 22: 		end
-   26: push 1
-   27: writeln
+   27: push 1
+   28: writeln
 # test/repeatst.p, 23: 	until n >= 10
-   28: pushvar 0, 4
-   29: eval 1
-   30: push 10
+   29: pushvar 0, 4
+   30: eval 1
+   31: push 10
 # test/repeatst.p, 24: end.
-   31: gte
-   32: jneq 9
-   33: ret
+   32: gte
+   33: jneq 9
+   34: ret
 
        1
        2

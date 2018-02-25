@@ -38,7 +38,7 @@
    24: eval 1
    25: push 9
    26: lte
-   27: jneq 46
+   27: jneq 47
    28: pushvar 0, 14
    29: pushvar 0, 24
    30: eval 1
@@ -46,20 +46,21 @@
    32: ulimit 9
    33: add
    34: eval 1
-   35: push 0
+   35: push 1
    36: push 0
+   37: push 0
 # test/str.p, 14: end .
-   37: push 1
-   38: writeln
-   39: dup
+   38: push 1
+   39: writeln
    40: dup
-   41: eval 1
-   42: push 1
-   43: add
-   44: assign 1
-   45: jump 23
-   46: pop
-   47: ret
+   41: dup
+   42: eval 1
+   43: push 1
+   44: add
+   45: assign 1
+   46: jump 23
+   47: pop
+   48: ret
 
 a
 b

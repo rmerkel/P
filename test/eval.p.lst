@@ -20,11 +20,12 @@
 # test/eval.p, 8: 	writeln(r)
    12: pushvar 0, 4
    13: eval 1
-   14: push 0
+   14: push 1
    15: push 0
+   16: push 0
 # test/eval.p, 9: end .
-   16: push 1
-   17: writeln
-   18: ret
+   17: push 1
+   18: writeln
+   19: ret
 
 3.100000e+01

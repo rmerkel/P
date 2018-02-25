@@ -35,37 +35,39 @@
 # test/testif.p, 9: 	writeln(x);
    26: pushvar 0, 4
    27: eval 1
-   28: push 0
+   28: push 1
    29: push 0
-   30: push 1
-   31: writeln
+   30: push 0
+   31: push 1
+   32: writeln
 # test/testif.p, 10: 
 # test/testif.p, 11: 	{ set x to  3	}
 # test/testif.p, 12: 	if x = y then x := z else x := y;
-   32: pushvar 0, 4
-   33: eval 1
-   34: pushvar 0, 5
-   35: eval 1
-   36: equ
-   37: jneq 43
-   38: pushvar 0, 4
-   39: pushvar 0, 6
-   40: eval 1
-   41: assign 1
-   42: jump 47
-   43: pushvar 0, 4
-   44: pushvar 0, 5
-   45: eval 1
-   46: assign 1
+   33: pushvar 0, 4
+   34: eval 1
+   35: pushvar 0, 5
+   36: eval 1
+   37: equ
+   38: jneq 44
+   39: pushvar 0, 4
+   40: pushvar 0, 6
+   41: eval 1
+   42: assign 1
+   43: jump 48
+   44: pushvar 0, 4
+   45: pushvar 0, 5
+   46: eval 1
+   47: assign 1
 # test/testif.p, 13: 	writeln(x)
-   47: pushvar 0, 4
-   48: eval 1
-   49: push 0
-   50: push 0
+   48: pushvar 0, 4
+   49: eval 1
+   50: push 1
+   51: push 0
+   52: push 0
 # test/testif.p, 14: end.
-   51: push 1
-   52: writeln
-   53: ret
+   53: push 1
+   54: writeln
+   55: ret
 # test/testif.p, 15: 
 
 2

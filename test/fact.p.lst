@@ -11,7 +11,7 @@
 # test/fact.p, 11: 
 # test/fact.p, 12: program fact ;
 # test/fact.p, 13: const nFacts = 10;
-    0: call 0, 37
+    0: call 0, 39
     1: halt
 # test/fact.p, 14: var p : integer;
 # test/fact.p, 15: procedure factorial(n : integer) ; begin
@@ -22,50 +22,52 @@
 # test/fact.p, 17: 		writeln(p);
     5: pushvar 1, 4
     6: eval 1
-    7: push 0
+    7: push 1
     8: push 0
-    9: push 1
-   10: writeln
+    9: push 0
+   10: push 1
+   11: writeln
 # test/fact.p, 18:         while n > 0 do begin
-   11: pushvar 0, -1
-   12: eval 1
-   13: push 0
-   14: gt
-   15: jneq 36
+   12: pushvar 0, -1
+   13: eval 1
+   14: push 0
+   15: gt
+   16: jneq 38
 # test/fact.p, 19:             p := p * n;
-   16: pushvar 1, 4
    17: pushvar 1, 4
-   18: eval 1
-   19: pushvar 0, -1
-   20: eval 1
-   21: mul
-   22: assign 1
+   18: pushvar 1, 4
+   19: eval 1
+   20: pushvar 0, -1
+   21: eval 1
+   22: mul
+   23: assign 1
 # test/fact.p, 20:             n := n - 1;
-   23: pushvar 0, -1
    24: pushvar 0, -1
-   25: eval 1
-   26: push 1
-   27: sub
-   28: assign 1
+   25: pushvar 0, -1
+   26: eval 1
+   27: push 1
+   28: sub
+   29: assign 1
 # test/fact.p, 21: 			writeln(p)
-   29: pushvar 1, 4
-   30: eval 1
-   31: push 0
-   32: push 0
+   30: pushvar 1, 4
+   31: eval 1
+   32: push 1
+   33: push 0
+   34: push 0
 # test/fact.p, 22:         end
-   33: push 1
-   34: writeln
+   35: push 1
+   36: writeln
 # test/fact.p, 23:     end;
-   35: jump 11
-   36: ret
+   37: jump 12
+   38: ret
 # test/fact.p, 24: 
 # test/fact.p, 25: begin
-   37: enter 1
+   39: enter 1
 # test/fact.p, 26:     factorial(nFacts)
-   38: push 10
+   40: push 10
 # test/fact.p, 27: end.
-   39: call 0, 2
-   40: ret
+   41: call 0, 2
+   42: ret
 
 1
 10

@@ -5,8 +5,8 @@
  * compilier, and if no errors where encountered, passed the results to the interpreter.
  ************************************************************************************************/
 
-#include "pcomp.h"
-#include "pinterp.h"
+#include "comp.h"
+#include "interp.h"
 
 #include <iostream>
 #include <vector>
@@ -40,7 +40,7 @@ static void help() {
  * Print the version number as major.minor
  ************************************************************************************************/
 static void printVersion() {
-	cout << progName << ": verson: 0.21\n";		// make sure to update the verison in mainpage!!
+	cout << progName << ": verson: 0.22\n";		// make sure to update verison history in REAME.md!
 }
 
 /********************************************************************************************//** 

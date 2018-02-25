@@ -8,7 +8,7 @@
  ************************************************************************************************/
 
 #include "compilier.h"
-#include "pinterp.h"
+#include "interp.h"
 
 #include <cassert>
 #include <iomanip>

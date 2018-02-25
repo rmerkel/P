@@ -66,10 +66,11 @@ test/fact3.p: passing 2 parameters, where 1 expected near line 28
 # test/fact3.p, 29: 	writeln(result)
    36: pushvar 0, 4
    37: eval 1
-   38: push 0
+   38: push 1
    39: push 0
+   40: push 0
 # test/fact3.p, 30: end.
-   40: push 1
-   41: writeln
-   42: ret
+   41: push 1
+   42: writeln
+   43: ret
 

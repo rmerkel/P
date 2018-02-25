@@ -7,32 +7,36 @@
 # test/predsucc.p, 5: begin
 # test/predsucc.p, 6: 	writeln(zero);
     2: push 0
-    3: push 0
+    3: push 1
     4: push 0
-    5: push 1
-    6: writeln
+    5: push 0
+    6: push 1
+    7: writeln
 # test/predsucc.p, 7: 	writeln(pred(two));
-    7: push 2
-    8: pred 0
-    9: push 0
-   10: push 0
-   11: push 1
-   12: writeln
+    8: push 2
+    9: pred 0
+   10: push 1
+   11: push 0
+   12: push 0
+   13: push 1
+   14: writeln
 # test/predsucc.p, 8: 	writeln(two);
-   13: push 2
-   14: push 0
-   15: push 0
+   15: push 2
    16: push 1
-   17: writeln
+   17: push 0
+   18: push 0
+   19: push 1
+   20: writeln
 # test/predsucc.p, 9: 	writeln(succ(two));
-   18: push 2
-   19: succ 4
-   20: push 0
-   21: push 0
-   22: push 1
-   23: writeln
+   21: push 2
+   22: succ 4
+   23: push 1
+   24: push 0
+   25: push 0
+   26: push 1
+   27: writeln
 # test/predsucc.p, 10: end .
-   24: ret
+   28: ret
 
 0
 1

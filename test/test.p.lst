@@ -28,7 +28,7 @@
    10: eval 1
    11: push 10
    12: lt
-   13: jneq 34
+   13: jneq 35
 # test/test.p, 18:       n := n + 1;
    14: pushvar 0, 4
    15: pushvar 0, 4
@@ -47,14 +47,15 @@
 # test/test.p, 20: 	  writeln(f : 8 : 6)
    27: pushvar 0, 5
    28: eval 1
-   29: push 8
-   30: push 6
+   29: push 1
+   30: push 8
+   31: push 6
 # test/test.p, 21:    end
-   31: push 1
-   32: writeln
+   32: push 1
+   33: writeln
 # test/test.p, 22: end.
-   33: jump 9
-   34: ret
+   34: jump 9
+   35: ret
 # test/test.p, 23: 
 
        1

@@ -15,15 +15,17 @@
 # test/simple.p, 6: 	writeln(x, y)
     9: pushvar 0, 4
    10: eval 1
-   11: push 0
+   11: push 1
    12: push 0
-   13: pushvar 0, 5
-   14: eval 1
-   15: push 0
-   16: push 0
+   13: push 0
+   14: pushvar 0, 5
+   15: eval 1
+   16: push 1
+   17: push 0
+   18: push 0
 # test/simple.p, 7: end.
-   17: push 2
-   18: writeln
-   19: ret
+   19: push 2
+   20: writeln
+   21: ret
 
 0 1

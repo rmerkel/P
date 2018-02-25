@@ -8,11 +8,12 @@
 # test/predfail.p, 6: 	writeln(pred(zero))
     2: push 0
     3: pred 0
-    4: push 0
+    4: push 1
     5: push 0
+    6: push 0
 # test/predfail.p, 7: end .
-    6: push 1
-    7: writeln
-    8: ret
+    7: push 1
+    8: writeln
+    9: ret
 
 runtime error @pc 3, sp: 8: out-of-range

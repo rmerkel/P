@@ -39,7 +39,9 @@ instruction single step the program.
  * git add .
  * git commit -m "description..."
  * git tag -a vMajor.Minor -m "summary..."
- * git push --tags [ origin branch-name ]
+ * git push origin branch-name
+
+Note that global push.followTags has been set true, so --tags *should not* be necessary.
 
 ## Bugs
  * No files and only partial support for arrays and strings, e.g.,
@@ -74,15 +76,19 @@ Version | Description
  0.19   | Clean up, removed unused global data/constants, use input filename in messages
  0.20	| Refactored the interpreter step routine, adding more run-time tests and -t option
  0.21   | Write and writeln nolonger quote character values. Major refactor of Datum.
- 0.22   | Future: add array support to WRITE[LN]?
+ 0.22   | Write[ln] now supports arrays and strings.
 
 ## Design and implementation notes
 
-* write[ln] string parameters aren't currently supported. ISO Pascal defines
-  s:w parameters for strings, where w <= the max length of the string (s), to
-  print, but s:w:f is disallowed. P could internally use s:w:l, where l is the
-  actual length of the string... or more generally array.
+xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+* write[ln] string, or more generally, array parameters aren't currently
+  supported. At issue is that arrays don't start with a descriptor, just their 
+  initial value, as in C. Thus, writeln can't tell if it's been passed a single
+  T object, or a T[]. One possible solution is to push the element count after
+  each paramter, so that writeln can tell if it's been passed a scalar value,
+  or an array.
 * Need to make "()" manditory for subroutine declaractions and calls.
+* Need to add "var" subroutine parameter types.
 
 ## Author
     Randy Merkel, Slowly but Surly Software.

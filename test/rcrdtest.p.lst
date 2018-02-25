@@ -41,96 +41,105 @@
 # test/rcrdtest.p, 25: 	writeln(x.i1, x.i2, x.r : 8 : 6);
    16: pushvar 0, 4
    17: eval 1
-   18: push 0
+   18: push 1
    19: push 0
-   20: pushvar 0, 4
-   21: push 1
-   22: add
-   23: eval 1
-   24: push 0
-   25: push 0
-   26: pushvar 0, 4
-   27: push 2
-   28: add
-   29: eval 1
-   30: push 8
-   31: push 6
-   32: push 3
-   33: writeln
+   20: push 0
+   21: pushvar 0, 4
+   22: push 1
+   23: add
+   24: eval 1
+   25: push 1
+   26: push 0
+   27: push 0
+   28: pushvar 0, 4
+   29: push 2
+   30: add
+   31: eval 1
+   32: push 1
+   33: push 8
+   34: push 6
+   35: push 3
+   36: writeln
 # test/rcrdtest.p, 26: 
 # test/rcrdtest.p, 27: 	y.i1 := 4;
-   34: pushvar 0, 7
-   35: push 4
-   36: assign 1
-# test/rcrdtest.p, 28: 	y.i2 := 5;
    37: pushvar 0, 7
-   38: push 1
-   39: add
-   40: push 5
-   41: assign 1
+   38: push 4
+   39: assign 1
+# test/rcrdtest.p, 28: 	y.i2 := 5;
+   40: pushvar 0, 7
+   41: push 1
+   42: add
+   43: push 5
+   44: assign 1
 # test/rcrdtest.p, 29: 	y.r := 6.0;
-   42: pushvar 0, 7
-   43: push 2
-   44: add
-   45: push 6.000000
-   46: assign 1
+   45: pushvar 0, 7
+   46: push 2
+   47: add
+   48: push 6.000000
+   49: assign 1
 # test/rcrdtest.p, 30: 	writeln(x.i1, x.i2, x.r : 8 : 6);
-   47: pushvar 0, 4
-   48: eval 1
-   49: push 0
-   50: push 0
-   51: pushvar 0, 4
+   50: pushvar 0, 4
+   51: eval 1
    52: push 1
-   53: add
-   54: eval 1
-   55: push 0
-   56: push 0
-   57: pushvar 0, 4
-   58: push 2
-   59: add
-   60: eval 1
-   61: push 8
-   62: push 6
-   63: push 3
-   64: writeln
+   53: push 0
+   54: push 0
+   55: pushvar 0, 4
+   56: push 1
+   57: add
+   58: eval 1
+   59: push 1
+   60: push 0
+   61: push 0
+   62: pushvar 0, 4
+   63: push 2
+   64: add
+   65: eval 1
+   66: push 1
+   67: push 8
+   68: push 6
+   69: push 3
+   70: writeln
 # test/rcrdtest.p, 31: 
 # test/rcrdtest.p, 32: 	z.i1 := 7;
-   65: pushvar 0, 10
-   66: push 7
-   67: assign 1
+   71: pushvar 0, 10
+   72: push 7
+   73: assign 1
 # test/rcrdtest.p, 33: 	z.i2 := 8;
-   68: pushvar 0, 10
-   69: push 1
-   70: add
-   71: push 8
-   72: assign 1
+   74: pushvar 0, 10
+   75: push 1
+   76: add
+   77: push 8
+   78: assign 1
 # test/rcrdtest.p, 34: 	z.r := 9.0;
-   73: pushvar 0, 10
-   74: push 2
-   75: add
-   76: push 9.000000
-   77: assign 1
+   79: pushvar 0, 10
+   80: push 2
+   81: add
+   82: push 9.000000
+   83: assign 1
 # test/rcrdtest.p, 35: 	writeln(x.i1, x.i2, x.r : 8 : 6)
-   78: pushvar 0, 4
-   79: eval 1
-   80: push 0
-   81: push 0
-   82: pushvar 0, 4
-   83: push 1
-   84: add
+   84: pushvar 0, 4
    85: eval 1
-   86: push 0
+   86: push 1
    87: push 0
-   88: pushvar 0, 4
-   89: push 2
-   90: add
-   91: eval 1
-   92: push 8
-   93: push 6
+   88: push 0
+   89: pushvar 0, 4
+   90: push 1
+   91: add
+   92: eval 1
+   93: push 1
+   94: push 0
+   95: push 0
+   96: pushvar 0, 4
+   97: push 2
+   98: add
+   99: eval 1
+  100: push 1
+  101: push 8
+  102: push 6
 # test/rcrdtest.p, 36: end .
-   94: push 3
-   95: writeln
-   96: ret
+  103: push 3
+  104: writeln
+  105: ret
 
 1 2 3.000000
 1 2 3.000000

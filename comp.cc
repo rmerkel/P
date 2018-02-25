@@ -1,5 +1,5 @@
 /********************************************************************************************//**
- * @file pcomp.cc
+ * @file comp.cc
  *
  * P Language Compiler implementation
  *
@@ -7,8 +7,8 @@
  * @copyright  (c) 2017 Slowly but Surly Software. All rights reserved.
  ************************************************************************************************/
 
-#include "pcomp.h"
-#include "pinterp.h"
+#include "comp.h"
+#include "interp.h"
 
 #include <cassert>
 #include <iomanip>
@@ -925,7 +925,8 @@ void PComp::writeStmt(int level) {
 	int nargs = 0;								// Count arguments, as an integer!
 	if (accept(Token::OpenParen)) {				// process, and count, each expr-tuple..
 		do {
-			auto expr = expression(level);		// value to write
+			auto expr = expression(level);		// value(s) to write
+			emit(OpCode::PUSH, 0, expr->size());
 
 			if (accept(Token::Colon)) {			// [ ':' width [ ':' precision ]]
 				auto width = expression(level);

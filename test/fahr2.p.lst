@@ -23,7 +23,7 @@
     7: eval 1
     8: push 300.000000
     9: lte
-   10: jneq 38
+   10: jneq 40
 # test/fahr2.p, 16: 		celsius := 5.0 * (fahr-32.0) / 9.0;
    11: pushvar 0, 5
    12: push 5.000000
@@ -45,18 +45,20 @@
 # test/fahr2.p, 18: 		writeln(fahr : 6 : 1, celsius : 6 : 1);
    27: pushvar 0, 4
    28: eval 1
-   29: push 6
-   30: push 1
-   31: pushvar 0, 5
-   32: eval 1
-   33: push 6
+   29: push 1
+   30: push 6
+   31: push 1
+   32: pushvar 0, 5
+   33: eval 1
    34: push 1
-   35: push 2
-   36: writeln
+   35: push 6
+   36: push 1
+   37: push 2
+   38: writeln
 # test/fahr2.p, 19: 	end
 # test/fahr2.p, 20:  end.
-   37: jump 6
-   38: ret
+   39: jump 6
+   40: ret
 
   20.0  -17.8
   40.0   -6.7
