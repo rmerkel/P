@@ -80,7 +80,6 @@ Version | Description
 
 ## Design and implementation notes
 
-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 * write[ln] string, or more generally, array parameters aren't currently
   supported. At issue is that arrays don't start with a descriptor, just their 
   initial value, as in C. Thus, writeln can't tell if it's been passed a single
