@@ -201,4 +201,3 @@ std::ostream& operator<<(std::ostream& os, TypeDesc::TypeClass);
 std::ostream& operator<<(std::ostream& os, const TypeDesc& value);
 
 #endif
-

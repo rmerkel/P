@@ -1,19 +1,21 @@
 # test/predfail.p, 1: program PredSuccFail ;
 # test/predfail.p, 2: type 
-    0: call 0, 2
-    1: halt
+    0: push 0
+    1: push 4
+    2: call
+    3: halt
 # test/predfail.p, 3: 	e = (zero, one, two, three, four);
 # test/predfail.p, 4: 
 # test/predfail.p, 5: begin
 # test/predfail.p, 6: 	writeln(pred(zero))
-    2: push 0
-    3: pred 0
-    4: push 1
-    5: push 0
-    6: push 0
+    4: push 0
+    5: pred 0
+    6: push 1
+    7: push 0
+    8: push 0
 # test/predfail.p, 7: end .
-    7: push 1
-    8: writeln
-    9: ret
+    9: push 1
+   10: writeln
+   11: ret
 
-runtime error @pc 3, sp: 8: out-of-range
+runtime error @pc 5, sp: 8: out-of-range

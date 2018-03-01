@@ -86,12 +86,12 @@ enum class OpCode : unsigned char {
 	ASSIGN,		///< ASSIGN ,n - Assign stack(TOS-n,TOS) to stack[addr,addr+n), POP ,n
 	COPY,		///< COPY ,n - Copy Datums; dest=pop(); src=pop(); copy n Datums from src to dest
 
-	CALL,		///< CALL level,addr - Call a procedure, pushing a new acrivation Frame
+	CALL,		///< CALL TOS-1,TOS - Call a procedure, pushing a new acrivation Frame
 	ENTER,		///< ENTER ,n - Allocate n locals on the stack
 	RET,		///< Return from procedure; unlink Frame
 	RETF,		///< Return from function; push result
 	JUMP,		///< Jump to a location
-	JNEQ,		///< Condition = pop(); Jump if condition == false (0)
+	JNEQ,		///< Jump if condition is false
 
 	LLIMIT,		///< Check array index; out-of-range error if TOS <  addr
 	ULIMIT,		///< Check array index; out-of-range error if TOS >  addr
@@ -136,7 +136,7 @@ public:
  * An Instruction
  ************************************************************************************************/
 struct Instr {
-	Datum			addr;				///< A data value or memory address
+	Datum			value;				///< A data value
 	int8_t			level;				///< Base level: 0..255
 	OpCode			op;					///< Operation code
 
@@ -144,7 +144,7 @@ struct Instr {
 	Instr() : level{0}, op{OpCode::HALT} {}
 
 	/// Construct an instruction from it's components...
-	Instr(OpCode o, int8_t l = 0, Datum d = Datum(0)) : addr{d}, level{l}, op{o} {}
+	Instr(OpCode o, int8_t l = 0, Datum d = Datum(0)) : value{d}, level{l}, op{o} {}
 };
 
 /********************************************************************************************//**
@@ -158,4 +158,3 @@ typedef std::vector<Instr>					InstrVector;
 unsigned disasm(std::ostream& out, unsigned loc, const Instr& instr, const std::string label = "");
 
 #endif
-

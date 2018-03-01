@@ -3,8 +3,10 @@
 # test/fahr2.p, 3: 
 # test/fahr2.p, 4: program fact2 ;
 # test/fahr2.p, 5: const
-    0: call 0, 2
-    1: halt
+    0: push 0
+    1: push 4
+    2: call
+    3: halt
 # test/fahr2.p, 6: 	LOWER =   0.0;	{	lower table limit	}
 # test/fahr2.p, 7: 	UPPER = 300.0;	{	upper table limit	}
 # test/fahr2.p, 8: 	STEP  =  20.0;	{	table step size		}
@@ -13,52 +15,54 @@
 # test/fahr2.p, 11: 	fahr, celsius : real;
 # test/fahr2.p, 12: 
 # test/fahr2.p, 13: begin
-    2: enter 2
+    4: enter 2
 # test/fahr2.p, 14: 	fahr := LOWER;
-    3: pushvar 0, 4
-    4: push 0.000000
-    5: assign 1
+    5: pushvar 0, 4
+    6: push 0.000000
+    7: assign 1
 # test/fahr2.p, 15: 	while fahr <= UPPER do begin
-    6: pushvar 0, 4
-    7: eval 1
-    8: push 300.000000
-    9: lte
-   10: jneq 40
+    8: pushvar 0, 4
+    9: eval 1
+   10: push 300.000000
+   11: lte
+   12: push 44
+   13: jneq
 # test/fahr2.p, 16: 		celsius := 5.0 * (fahr-32.0) / 9.0;
-   11: pushvar 0, 5
-   12: push 5.000000
-   13: pushvar 0, 4
-   14: eval 1
-   15: push 32.000000
-   16: sub
-   17: mul
-   18: push 9.000000
-   19: div
-   20: assign 1
+   14: pushvar 0, 5
+   15: push 5.000000
+   16: pushvar 0, 4
+   17: eval 1
+   18: push 32.000000
+   19: sub
+   20: mul
+   21: push 9.000000
+   22: div
+   23: assign 1
 # test/fahr2.p, 17: 		fahr := fahr + STEP;
-   21: pushvar 0, 4
-   22: pushvar 0, 4
-   23: eval 1
-   24: push 20.000000
-   25: add
-   26: assign 1
+   24: pushvar 0, 4
+   25: pushvar 0, 4
+   26: eval 1
+   27: push 20.000000
+   28: add
+   29: assign 1
 # test/fahr2.p, 18: 		writeln(fahr : 6 : 1, celsius : 6 : 1);
-   27: pushvar 0, 4
-   28: eval 1
-   29: push 1
-   30: push 6
-   31: push 1
-   32: pushvar 0, 5
-   33: eval 1
+   30: pushvar 0, 4
+   31: eval 1
+   32: push 1
+   33: push 6
    34: push 1
-   35: push 6
-   36: push 1
-   37: push 2
-   38: writeln
+   35: pushvar 0, 5
+   36: eval 1
+   37: push 1
+   38: push 6
+   39: push 1
+   40: push 2
+   41: writeln
 # test/fahr2.p, 19: 	end
 # test/fahr2.p, 20:  end.
-   39: jump 6
-   40: ret
+   42: push 8
+   43: jump
+   44: ret
 
   20.0  -17.8
   40.0   -6.7

@@ -77,6 +77,7 @@ Version | Description
  0.20	| Refactored the interpreter step routine, adding more run-time tests and -t option
  0.21   | Write and writeln nolonger quote character values. Major refactor of Datum.
  0.22   | Write[ln] now supports arrays and strings.
+ 0.23   | Call and jump indirection; target address is on the stack
 
 ## Design and implementation notes
 

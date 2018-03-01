@@ -44,6 +44,39 @@ bool PComp::isAReal(TDescPtr type) {
 }
 
 /********************************************************************************************//**
+ * @param	where	The jump to address, if known
+ * @return  address	of the jump to address instruction, for patching when know
+ ************************************************************************************************/
+size_t PComp::emitJump(size_t where) {
+	const size_t addr = emit(OpCode::PUSH, 0, where);
+	emit(OpCode::JUMP);
+	return addr;
+}
+
+/********************************************************************************************//**
+ * @param	where	The jump to address, if known
+ * @return  address	of the jump to address instruction, for patching when know
+ ************************************************************************************************/
+size_t PComp::emitJNEQ(size_t where) {
+	const size_t addr = emit(OpCode::PUSH, 0, where);
+	emit(OpCode::JNEQ);
+	return addr;
+}
+
+/********************************************************************************************//**
+ * @param	level	The call level
+ * @param	where	The subroutine entry point, if known
+ * @return  address	of the call address instruction, for patching when know
+ ************************************************************************************************/
+size_t PComp::emitCall(int8_t level, size_t where) {
+	emit(OpCode::PUSH, 0, level);
+	const size_t addr = emit(OpCode::PUSH, 0, where);
+	emit(OpCode::CALL);
+
+	return addr;
+}
+
+/********************************************************************************************//**
  * Promote binary stack operands as necessary. 
  *
  * @param	lhs	The type of the left-hand-side
@@ -588,7 +621,11 @@ void PComp::callStatement(int level, SymbolTable::iterator it) {
 	if (SymValue::Procedure != it->second.kind() && SymValue::Function != it->second.kind())
 		error("Identifier is not a function or procedure", it->first);
 
+#if 1
+	emitCall(level - it->second.level(), it->second.value().address());
+#else
 	emit(OpCode::CALL, level - it->second.level(), it->second.value());
+#endif
 }
 
 /********************************************************************************************//**
@@ -601,15 +638,15 @@ void PComp::whileStatement(int level) {
 	expression(level);
 
 	// jump if expr is false...
-	const auto jmp_pc = emit(OpCode::JNEQ);
+	const auto jmp_pc = emitJNEQ();
 	expect(Token::Do);					// consume "do"
 	statement(level);
 
-	emit(OpCode::JUMP, 0, cond_pc);		// Jump back to expr test...
+	emitJump(cond_pc);					// Jump back to expr test...
 
 	if (verbose)
 		cout << progName << ": patching address at " << jmp_pc << " to " << code->size() << "\n";
-	(*code)[jmp_pc].addr = code->size(); 
+	(*code)[jmp_pc].value = code->size(); 
 }
 
 /********************************************************************************************//**
@@ -621,25 +658,26 @@ void PComp::ifStatement(int level) {
 	expression(level);
 
 	// Jump if conditon is false
-	const size_t jmp_pc = emit(OpCode::JNEQ);
+	const size_t jmp_pc = emitJNEQ();
 	expect(Token::Then);							// Consume "then"
 	statement(level);
 
 	// Jump over else statement, but only if there is an else
 	const bool Else = accept(Token::Else);
 	size_t else_pc = 0;
-	if (Else) else_pc = emit(OpCode::JUMP);
+	if (Else)
+		else_pc = emitJump();
 
 	if (verbose)
 		cout << progName << ": patching address at " << jmp_pc << " to " << code->size() << "\n";
-	(*code)[jmp_pc].addr = code->size();
+	(*code)[jmp_pc].value = code->size();
 
 	if (Else) {
 		statement(level);
 
 		if (verbose)
 			cout << progName << ": patching address at " << else_pc << " to " << code->size() << "\n";
-		(*code)[else_pc].addr = code->size();
+		(*code)[else_pc].value = code->size();
 	}
 }
 
@@ -653,7 +691,7 @@ void PComp::repeateStatement(int level) {
 	 statement(level);
 	 expect(Token::Until);
 	 expression(level);
-	 emit(OpCode::JNEQ, 0, loop_pc);
+	emitJNEQ(loop_pc);
 }
 
 /********************************************************************************************//**
@@ -685,7 +723,7 @@ void PComp::forStatement(int level) {
 	emit(OpCode::LTE);					// 											addr, cond?
 
 	// jump if expr is false...
-	const auto jmp_pc = emit(OpCode::JNEQ);										//	addr
+	const auto jmp_pc = emitJNEQ();
 
 	expect(Token::Do);					// "do statement"
 	statement(level);
@@ -696,14 +734,13 @@ void PComp::forStatement(int level) {
 	emit(OpCode::PUSH, 0, inc);													//	addr, addr, value, 1
 	emit(OpCode::ADD);															//	addr, addr, new_value
 	emit(OpCode::ASSIGN, 0, 1);													//	addr
-
-	emit(OpCode::JUMP, 0, cond_pc);
+	emitJump(cond_pc);
 
 	const auto pop_pc = emit(OpCode::POP, 0, 1);
 
 	if (verbose)
 		cout << progName << ": patching address at " << pop_pc << " to " << code->size() << "\n";
-	(*code)[jmp_pc].addr = pop_pc;
+	(*code)[jmp_pc].value = pop_pc;
 }
 
 /********************************************************************************************//**
@@ -1651,14 +1688,18 @@ void PComp::progDecl(int level) {
 	expect(Token::SemiColon);
 
 	// Emit a call to the main procedure, followed by a halt
+#if 1
+	const auto call_pc = emitCall(level, 0);
+#else
 	const auto call_pc = emit(OpCode::CALL, level, 0);
+#endif
 	emit(OpCode::HALT);
 
 	const size_t addr = blockDecl(val, level);	// emit the first block 
 	if (verbose)
 		cout << progName << ": patching call to program at " << call_pc << " to " << addr  << "\n";
 
-	(*code)[call_pc].addr = addr;
+	(*code)[call_pc].value = addr;
 
 	expect(Token::Period);
 }

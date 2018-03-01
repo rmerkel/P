@@ -29,7 +29,7 @@ begin
 		a[r] := a[r] * 10;
 		writeln(a[r]);
 		r := r + 1
-	end until r = 11;
+	end until r = 10;
 
 	a2[one]	:= 1;
 	a2[two]	:= 2;
@@ -41,7 +41,7 @@ begin
 		j := 0;
 		while (j < 5) do begin
 			a3[i][j] := 1.0 * (i + j);
-			write(a3[i][j]);
+			write(a3[i][j] : 7 : 4);
 			j := j + 1
 		end;
 		writeln;

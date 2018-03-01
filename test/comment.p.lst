@@ -1,54 +1,58 @@
 # test/comment.p, 1: { "main" starts here... }
 # test/comment.p, 2: program comment ;
 # test/comment.p, 3: const nFacts = 10;
-    0: call 0, 2
-    1: halt
+    0: push 0
+    1: push 4
+    2: call
+    3: halt
 # test/comment.p, 4: var n, f : integer;	{ var z; parser doesn't see 'z' }
 # test/comment.p, 5: begin
-    2: enter 2
+    4: enter 2
 # test/comment.p, 6:    n := 0;
-    3: pushvar 0, 4
-    4: push 0
-    5: assign 1
+    5: pushvar 0, 4
+    6: push 0
+    7: assign 1
 # test/comment.p, 7:    f := 1;
-    6: pushvar 0, 5
-    7: push 1
-    8: assign 1
+    8: pushvar 0, 5
+    9: push 1
+   10: assign 1
 # test/comment.p, 8:    {	calculate factor (n)
 # test/comment.p, 9: 		comment continued on this line... }
 # test/comment.p, 10:    while n < nFacts do begin
-    9: pushvar 0, 4
-   10: eval 1
-   11: push 10
-   12: lt
-   13: jneq 28
+   11: pushvar 0, 4
+   12: eval 1
+   13: push 10
+   14: lt
+   15: push 32
+   16: jneq
 # test/comment.p, 11:       n := n + 1;
-   14: pushvar 0, 4
-   15: pushvar 0, 4
-   16: eval 1
-   17: push 1
-   18: add
-   19: assign 1
+   17: pushvar 0, 4
+   18: pushvar 0, 4
+   19: eval 1
+   20: push 1
+   21: add
+   22: assign 1
 # test/comment.p, 12:       f := f * n
-   20: pushvar 0, 5
-   21: pushvar 0, 5
-   22: eval 1
+   23: pushvar 0, 5
+   24: pushvar 0, 5
+   25: eval 1
 # test/comment.p, 13:    end;
-   23: pushvar 0, 4
-   24: eval 1
-   25: mul
-   26: assign 1
-   27: jump 9
+   26: pushvar 0, 4
+   27: eval 1
+   28: mul
+   29: assign 1
+   30: push 11
+   31: jump
 # test/comment.p, 14:    writeln(f);
-   28: pushvar 0, 5
-   29: eval 1
-   30: push 1
-   31: push 0
-   32: push 0
-   33: push 1
-   34: writeln
+   32: pushvar 0, 5
+   33: eval 1
+   34: push 1
+   35: push 0
+   36: push 0
+   37: push 1
+   38: writeln
 # test/comment.p, 15: end.
-   35: ret
+   39: ret
 # test/comment.p, 16: 
 # test/comment.p, 17: {	unterminated comment, but we don't care as it follows the period!
 

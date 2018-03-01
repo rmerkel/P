@@ -138,20 +138,26 @@ unsigned disasm(ostream& out, unsigned loc, const Instr& instr, const string lab
 	case OpCode::COPY:
 	case OpCode::ENTER:
 	case OpCode::EVAL:
-	case OpCode::JUMP:
-	case OpCode::JNEQ:
 	case OpCode::LLIMIT:
 	case OpCode::ULIMIT:
 	case OpCode::PRED:
 	case OpCode::PUSH:
 	case OpCode::SUCC:
-		out << " " << instr.addr;
+		out << " " << instr.value;
 		break;
 
 	case OpCode::PUSHVAR:
+#if 0
 	case OpCode::CALL:
-		out << " "	<< level << ", " << instr.addr;
+#endif
+		out << " "	<< level << ", " << instr.value;
 		break;
+
+#if 0
+	case OpCode::CALL:
+		out << " "	<< level;
+		break;
+#endif
 
 	default:								// The rest don't use level, address or value
 		break;

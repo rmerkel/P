@@ -3,8 +3,10 @@
 # test/fahr.p, 3: 
 # test/fahr.p, 4: program fahrtest ;
 # test/fahr.p, 5: const
-    0: call 0, 2
-    1: halt
+    0: push 0
+    1: push 4
+    2: call
+    3: halt
 # test/fahr.p, 6: 	LOWER =   0;	{	lower table limit	}
 # test/fahr.p, 7: 	UPPER = 300;	{	upper table limit	}
 # test/fahr.p, 8: 	STEP  =  20;	{	table step size		}
@@ -13,55 +15,57 @@
 # test/fahr.p, 11: 	fahr, celsius : real;
 # test/fahr.p, 12: 
 # test/fahr.p, 13: begin
-    2: enter 2
+    4: enter 2
 # test/fahr.p, 14: 	fahr := LOWER;
-    3: pushvar 0, 4
-    4: push 0
-    5: itor
-    6: assign 1
+    5: pushvar 0, 4
+    6: push 0
+    7: itor
+    8: assign 1
 # test/fahr.p, 15: 	while fahr <= UPPER do begin
-    7: pushvar 0, 4
-    8: eval 1
-    9: push 300
-   10: itor
-   11: lte
-   12: jneq 43
+    9: pushvar 0, 4
+   10: eval 1
+   11: push 300
+   12: itor
+   13: lte
+   14: push 47
+   15: jneq
 # test/fahr.p, 16: 		celsius := 5.0 * (fahr-32.0) / 9.0;
-   13: pushvar 0, 5
-   14: push 5.000000
-   15: pushvar 0, 4
-   16: eval 1
-   17: push 32.000000
-   18: sub
-   19: mul
-   20: push 9.000000
-   21: div
-   22: assign 1
+   16: pushvar 0, 5
+   17: push 5.000000
+   18: pushvar 0, 4
+   19: eval 1
+   20: push 32.000000
+   21: sub
+   22: mul
+   23: push 9.000000
+   24: div
+   25: assign 1
 # test/fahr.p, 17: 		fahr := fahr + STEP;
-   23: pushvar 0, 4
-   24: pushvar 0, 4
-   25: eval 1
-   26: push 20
-   27: itor
-   28: add
-   29: assign 1
+   26: pushvar 0, 4
+   27: pushvar 0, 4
+   28: eval 1
+   29: push 20
+   30: itor
+   31: add
+   32: assign 1
 # test/fahr.p, 18: 		writeln(fahr : 6 : 1, celsius : 6 : 1);
-   30: pushvar 0, 4
-   31: eval 1
-   32: push 1
-   33: push 6
-   34: push 1
-   35: pushvar 0, 5
-   36: eval 1
+   33: pushvar 0, 4
+   34: eval 1
+   35: push 1
+   36: push 6
    37: push 1
-   38: push 6
-   39: push 1
-   40: push 2
-   41: writeln
+   38: pushvar 0, 5
+   39: eval 1
+   40: push 1
+   41: push 6
+   42: push 1
+   43: push 2
+   44: writeln
 # test/fahr.p, 19: 	end
 # test/fahr.p, 20:  end.
-   42: jump 7
-   43: ret
+   45: push 9
+   46: jump
+   47: ret
 
   20.0  -17.8
   40.0   -6.7

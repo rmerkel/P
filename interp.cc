@@ -377,7 +377,7 @@ PInterp::Result PInterp::PRED(PInterp::DatumVecIter TOS) {
 	if (!TOS->numeric())
 		r = Result::badDataType;
 
-	else if (*TOS <= ir.addr)
+	else if (*TOS <= ir.value)
 		r =  Result::outOfRange;
 
 	--(*TOS);
@@ -447,7 +447,7 @@ PInterp::Result PInterp::SQRT(PInterp::DatumVecIter TOS) {
 PInterp::Result PInterp::SUCC(PInterp::DatumVecIter TOS) {
 	Result r = Result::success;
 
-	if (*TOS >= ir.addr)
+	if (*TOS >= ir.value)
 		r =  Result::outOfRange;
 	++(*TOS);
 
@@ -958,15 +958,15 @@ PInterp::Result PInterp::NOT(DatumVecIter TOS) {
 }
 
 /********************************************************************************************//**
- * Pops ir.addr items off of the stack
+ * Pops ir.value items off of the stack
  *
  * @return	stackUnderflow if the stack underflowed.
  ************************************************************************************************/
 PInterp::Result PInterp::POP() {
-	if (ir.addr.integer() < 0)
+	if (ir.value < Datum(0))
 		return Result::stackUnderflow;
 
-	const size_t n = ir.addr.address();		// Accually, just unsigned value
+	const size_t n = ir.value.address();		// Accually, just an unsigned value
 	if (sp < n)
 		return Result::stackUnderflow;
 
@@ -976,33 +976,33 @@ PInterp::Result PInterp::POP() {
 }
 
 /********************************************************************************************//**
- * Push a constant value (ir.addr) onto the stack.
+ * Push a constant value (ir.value) onto the stack.
  *
  * @return	success
  ************************************************************************************************/
 PInterp::Result PInterp::PUSH() {
-	push(ir.addr);
+	push(ir.value);
 	return Result::success;
 }
 
 /********************************************************************************************//**
- * Push a variable reference (base(ir.level) + ir.addr, onto the stack.
+ * Push a variable reference (base(ir.level) + ir.value, onto the stack.
  *
  * @return	success
  ************************************************************************************************/
 PInterp::Result PInterp::PUSHVAR() {
-	push(base(ir.level) + ir.addr.integer());
+	push(base(ir.level) + ir.value.integer());
 	return Result::success;
 }
 
 /********************************************************************************************//**
- * Evaluates ir.addr Datums, whose starting address is on the stop of the stack. Replaces the
+ * Evaluates ir.value Datums, whose starting address is on the stop of the stack. Replaces the
  * address with the values.
  *
  * @return	stackUnderflow if the stack underflowed, 
  ************************************************************************************************/
 PInterp::Result PInterp::EVAL() {
-	const	size_t	n = ir.addr.address();
+	const	size_t	n = ir.value.address();	// acually, an unsigned integer
 			Result	r = Result::success;
 
 	if (sp < n) {
@@ -1023,7 +1023,7 @@ PInterp::Result PInterp::EVAL() {
 }
 
 /********************************************************************************************//**
- * Copies N (ir.addr) Datam values from the stack to the starting address that follows the
+ * Copies N (ir.value) Datam values from the stack to the starting address that follows the
  * values. The values and destination address are consumed.
  *
  * Stack layout before;
@@ -1047,13 +1047,13 @@ PInterp::Result PInterp::EVAL() {
  * @return	stackUnderflow if the stack underflowed, 
  ************************************************************************************************/
 PInterp::Result PInterp::ASSIGN() {
-	const	size_t	n = ir.addr.address();	// Accually, just unsigned
+	const	size_t	n = ir.value.address();	// Accually, just unsigned
 			Result	r = Result::success;
 
 	if (sp < n)
 		r = Result::stackUnderflow;
 
-	size_t dst = stack[sp - ir.addr.address()].address();
+	size_t dst = stack[sp - ir.value.address()].address();
 	if (!rangeCheck(dst, dst + n))
 		r = Result::stackUnderflow;
 
@@ -1069,12 +1069,12 @@ PInterp::Result PInterp::ASSIGN() {
 }
 
 /********************************************************************************************//**
- * Copy N Datums, where N is ir.addr, and the source starting address is TOS, and the destination 
+ * Copy N Datums, where N is ir.value, and the source starting address is TOS, and the destination 
  * starting address is TOS-1. The source and destination addresses are consumed.
  * @return	stackUnderflow if the stack underflowed.
  ************************************************************************************************/
 PInterp::Result PInterp::COPY() {
-	const	size_t	n = ir.addr.address();	// Accually, just unsinged value
+	const	size_t	n = ir.value.address();	// Accually, just unsinged value
 			Result	r = Result::success;
 
 	size_t src  = pop().address();
@@ -1093,12 +1093,17 @@ PInterp::Result PInterp::COPY() {
 }
 
 /********************************************************************************************//**
- * Call a subroutine whose level is ir.level and whose entry point is ir.addr.
+ * Call a subroutine whose level is ir.level and whose entry point is ir.value.
  * @return	success.
  ************************************************************************************************/
 PInterp::Result PInterp::CALL() {
+#if 1
+	const	size_t	addr = pop().address();
+	const	int8_t	nlevel = pop().integer();
+#else
 	const	int8_t	nlevel = ir.level;
-	const	size_t	addr = ir.addr.address();
+	const	size_t	addr = ir.value.address();
+#endif
 	const	size_t	oldFp = fp;			// Save a copy before we modify it
 
 	// Push a new activation frame block on the stack:
@@ -1124,7 +1129,7 @@ PInterp::Result PInterp::RET() {
 	sp = fp - 1; 					// "pop" the activaction frame
 	pc = stack[fp + FrameRetAddr].address();
 	fp = stack[fp + FrameOldFp].address();
-	sp -= ir.addr.address();		// Pop parameters, if any...
+	sp -= ir.value.address();		// Pop n parameters, if any...
 
 	return Result::success;
 }
@@ -1143,38 +1148,39 @@ PInterp::Result PInterp::RETF() {
 }
 
 /********************************************************************************************//**
- * Allocates ir.addr Datums for local variables on the stack.
+ * Allocates ir.value Datums for local variables on the stack.
  * @return	success.
  ************************************************************************************************/
 PInterp::Result PInterp::ENTER() {
-	sp += ir.addr.integer();
+	sp += ir.value.integer();
 
 	return Result::success;
 }
 
 /********************************************************************************************//**
- * Jumps to ir.addr.
+ * Jumps to TOS
  * @return	success.
  ************************************************************************************************/
-PInterp::Result PInterp::JUMP() {
-	pc = ir.addr.address();
+PInterp::Result PInterp::JUMP(PInterp::DatumVecIter TOS) {
+	pc = TOS->address();
+	pop();
 
 	return Result::success;
 }
 
 /********************************************************************************************//**
- * Jump to ir.addr if TOS == false.
- * @param	TOS	Boolean value to test
+ * Jump to TOS if TOS-1 == false.
  * @return	badDataType if TOS isn't a Boolean.
  ************************************************************************************************/
-PInterp::Result PInterp::JNEQ(PInterp::DatumVecIter TOS) {
-	if (TOS->kind() != Datum::Boolean)
+PInterp::Result PInterp::JNEQ() {
+	const uint32_t addr = pop().address();
+	const Datum value = pop();
+
+	if (value.kind() != Datum::Boolean)
 		return Result::badDataType;
 
-	if (TOS->boolean() == false)
-		pc = ir.addr.address();
-
-	pop();
+	if (value.boolean() == false)
+		pc = addr;
 
 	return Result::success;
 }
@@ -1190,14 +1196,14 @@ PInterp::Result PInterp::LLIMIT(PInterp::DatumVecIter TOS) {
 
 	else if (TOS->kind() == Datum::Boolean) {
 		const Datum i(TOS->boolean() ? 1 : 0);
-		return i < ir.addr ? Result::outOfRange : Result::success;
+		return i < ir.value ? Result::outOfRange : Result::success;
 
 	} else if (TOS->kind() == Datum::Character) {
 		const Datum i(static_cast<size_t>(TOS->character()));
-		return i < ir.addr ? Result::outOfRange : Result::success;
+		return i < ir.value ? Result::outOfRange : Result::success;
 
 	} else 
-		return *TOS < ir.addr ? Result::outOfRange : Result::success;
+		return *TOS < ir.value ? Result::outOfRange : Result::success;
 }
 
 /********************************************************************************************//**
@@ -1211,14 +1217,14 @@ PInterp::Result PInterp::ULIMIT(PInterp::DatumVecIter TOS) {
 
 	else if (TOS->kind() == Datum::Boolean) {
 		const Datum i(TOS->boolean() ? 1 : 0);
-		return i > ir.addr ? Result::outOfRange : Result::success;
+		return i > ir.value ? Result::outOfRange : Result::success;
 
 	} else if (TOS->kind() == Datum::Character) {
 		const Datum i(static_cast<size_t>(TOS->character()));
-		return i > ir.addr ? Result::outOfRange : Result::success;
+		return i > ir.value ? Result::outOfRange : Result::success;
 
 	} else
-		return *TOS > ir.addr ? Result::outOfRange : Result::success;
+		return *TOS > ir.value ? Result::outOfRange : Result::success;
 }
 
 /********************************************************************************************//**
@@ -1291,8 +1297,8 @@ PInterp::Result PInterp::step() {
 	case OpCode::RET:   	r = RET();  		break;
 	case OpCode::RETF: 		r = RETF();			break;
 	case OpCode::ENTER:		r = ENTER();		break;
-	case OpCode::JUMP:		r = JUMP();			break;
-	case OpCode::JNEQ:		r = JNEQ(TOS);		break;
+	case OpCode::JUMP:		r = JUMP(TOS);		break;
+	case OpCode::JNEQ:		r = JNEQ();			break;
 	case OpCode::LLIMIT:	r = LLIMIT(TOS);	break;
 	case OpCode::ULIMIT: 	r = ULIMIT(TOS);	break;
 	case OpCode::HALT:		r = HALT();			break;

@@ -1,89 +1,97 @@
 # test/fortest.p, 1: program ForTest;
 # test/fortest.p, 2: var
-    0: call 0, 2
-    1: halt
+    0: push 0
+    1: push 4
+    2: call
+    3: halt
 # test/fortest.p, 3: 	i : integer;
 # test/fortest.p, 4: 
 # test/fortest.p, 5: begin
-    2: enter 1
+    4: enter 1
 # test/fortest.p, 6: 	for i := 0 to -1 do writeln(i);
-    3: pushvar 0, 4
-    4: dup
-    5: push 0
-    6: assign 1
-    7: dup
-    8: eval 1
-    9: push 1
-   10: neg
-   11: lte
-   12: jneq 27
-   13: pushvar 0, 4
-   14: eval 1
-   15: push 1
-   16: push 0
-   17: push 0
+    5: pushvar 0, 4
+    6: dup
+    7: push 0
+    8: assign 1
+    9: dup
+   10: eval 1
+   11: push 1
+   12: neg
+   13: lte
+   14: push 31
+   15: jneq
+   16: pushvar 0, 4
+   17: eval 1
    18: push 1
-   19: writeln
-   20: dup
-   21: dup
-   22: eval 1
-   23: push 1
-   24: add
-   25: assign 1
-   26: jump 7
-   27: pop
+   19: push 0
+   20: push 0
+   21: push 1
+   22: writeln
+   23: dup
+   24: dup
+   25: eval 1
+   26: push 1
+   27: add
+   28: assign 1
+   29: push 9
+   30: jump
+   31: pop
 # test/fortest.p, 7: 	for i := 0 to 0 do writeln(i);
-   28: pushvar 0, 4
-   29: dup
-   30: push 0
-   31: assign 1
-   32: dup
-   33: eval 1
+   32: pushvar 0, 4
+   33: dup
    34: push 0
-   35: lte
-   36: jneq 51
-   37: pushvar 0, 4
-   38: eval 1
-   39: push 1
-   40: push 0
-   41: push 0
-   42: push 1
-   43: writeln
-   44: dup
-   45: dup
-   46: eval 1
+   35: assign 1
+   36: dup
+   37: eval 1
+   38: push 0
+   39: lte
+   40: push 57
+   41: jneq
+   42: pushvar 0, 4
+   43: eval 1
+   44: push 1
+   45: push 0
+   46: push 0
    47: push 1
-   48: add
-   49: assign 1
-   50: jump 32
-   51: pop
+   48: writeln
+   49: dup
+   50: dup
+   51: eval 1
+   52: push 1
+   53: add
+   54: assign 1
+   55: push 36
+   56: jump
+   57: pop
 # test/fortest.p, 8: 	for i := 1 to 9 do writeln(i)
-   52: pushvar 0, 4
-   53: dup
-   54: push 1
-   55: assign 1
-   56: dup
-   57: eval 1
-   58: push 9
-   59: lte
-   60: jneq 75
-   61: pushvar 0, 4
-   62: eval 1
-   63: push 1
-   64: push 0
-   65: push 0
+   58: pushvar 0, 4
+   59: dup
+   60: push 1
+   61: assign 1
+   62: dup
+   63: eval 1
+   64: push 9
+   65: lte
+   66: push 83
+   67: jneq
+   68: pushvar 0, 4
+   69: eval 1
+   70: push 1
+   71: push 0
+   72: push 0
 # test/fortest.p, 9: end .
-   66: push 1
-   67: writeln
-   68: dup
-   69: dup
-   70: eval 1
-   71: push 1
-   72: add
-   73: assign 1
-   74: jump 56
-   75: pop
-   76: ret
+   73: push 1
+   74: writeln
+   75: dup
+   76: dup
+   77: eval 1
+   78: push 1
+   79: add
+   80: assign 1
+   81: push 62
+   82: jump
+   83: pop
+   84: ret
 
 0
 1

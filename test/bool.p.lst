@@ -1,34 +1,37 @@
 # test/bool.p, 1: program BoolTest ;
 # test/bool.p, 2: var
-    0: call 0, 2
-    1: halt
+    0: push 0
+    1: push 4
+    2: call
+    3: halt
 # test/bool.p, 3: 	b : boolean;
 # test/bool.p, 4: begin
-    2: enter 1
+    4: enter 1
 # test/bool.p, 5: 	b := true;
-    3: pushvar 0, 4
-    4: push 1
-    5: llimit 0
-    6: ulimit 1
-    7: assign 1
+    5: pushvar 0, 4
+    6: push 1
+    7: llimit 0
+    8: ulimit 1
+    9: assign 1
 # test/bool.p, 6: 	if (b) then b := false;
-    8: pushvar 0, 4
-    9: eval 1
-   10: jneq 16
-   11: pushvar 0, 4
-   12: push 0
-   13: llimit 0
-   14: ulimit 1
-   15: assign 1
+   10: pushvar 0, 4
+   11: eval 1
+   12: push 19
+   13: jneq
+   14: pushvar 0, 4
+   15: push 0
+   16: llimit 0
+   17: ulimit 1
+   18: assign 1
 # test/bool.p, 7: 	writeln(b)
-   16: pushvar 0, 4
-   17: eval 1
-   18: push 1
-   19: push 0
-   20: push 0
-# test/bool.p, 8: end .
+   19: pushvar 0, 4
+   20: eval 1
    21: push 1
-   22: writeln
-   23: ret
+   22: push 0
+   23: push 0
+# test/bool.p, 8: end .
+   24: push 1
+   25: writeln
+   26: ret
 
 false

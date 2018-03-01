@@ -129,8 +129,8 @@ protected:
 	Result RET();							///< Return from procedure...
 	Result RETF();							///< Return from a function...
 	Result ENTER();							///< Enter sub-routine, allocate space for locals
-	Result JUMP();							///< Jump
-	Result JNEQ(DatumVecIter TOS);			///< Jump if false
+	Result JUMP(PInterp::DatumVecIter TOS);	///< Jump
+	Result JNEQ();							///< Jump if condition is false
 	Result LLIMIT(DatumVecIter TOS);		///< Check lower limit
 	Result ULIMIT(DatumVecIter TOS);		///< Check upper limit
 	Result HALT();							///< Stop the machine

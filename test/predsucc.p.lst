@@ -1,42 +1,44 @@
 # test/predsucc.p, 1: program PredSucc ;
 # test/predsucc.p, 2: type 
-    0: call 0, 2
-    1: halt
+    0: push 0
+    1: push 4
+    2: call
+    3: halt
 # test/predsucc.p, 3: 	e = (zero, one, two, three, four);
 # test/predsucc.p, 4: 
 # test/predsucc.p, 5: begin
 # test/predsucc.p, 6: 	writeln(zero);
-    2: push 0
-    3: push 1
     4: push 0
-    5: push 0
-    6: push 1
-    7: writeln
+    5: push 1
+    6: push 0
+    7: push 0
+    8: push 1
+    9: writeln
 # test/predsucc.p, 7: 	writeln(pred(two));
-    8: push 2
-    9: pred 0
-   10: push 1
-   11: push 0
-   12: push 0
-   13: push 1
-   14: writeln
+   10: push 2
+   11: pred 0
+   12: push 1
+   13: push 0
+   14: push 0
+   15: push 1
+   16: writeln
 # test/predsucc.p, 8: 	writeln(two);
-   15: push 2
-   16: push 1
-   17: push 0
-   18: push 0
-   19: push 1
-   20: writeln
+   17: push 2
+   18: push 1
+   19: push 0
+   20: push 0
+   21: push 1
+   22: writeln
 # test/predsucc.p, 9: 	writeln(succ(two));
-   21: push 2
-   22: succ 4
-   23: push 1
-   24: push 0
-   25: push 0
-   26: push 1
-   27: writeln
+   23: push 2
+   24: succ 4
+   25: push 1
+   26: push 0
+   27: push 0
+   28: push 1
+   29: writeln
 # test/predsucc.p, 10: end .
-   28: ret
+   30: ret
 
 0
 1

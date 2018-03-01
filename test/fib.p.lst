@@ -1,70 +1,78 @@
 # test/fib.p, 1: program Fibonacci ;
 # test/fib.p, 2: 	function fib(a, b, limit : integer) : integer ;
-    0: call 0, 37
-    1: halt
+    0: push 0
+    1: push 43
+    2: call
+    3: halt
 # test/fib.p, 3: 	begin
 # test/fib.p, 4: 		writeln(b);
-    2: pushvar 0, -2
-    3: eval 1
-    4: push 1
-    5: push 0
-    6: push 0
-    7: push 1
-    8: writeln
+    4: pushvar 0, -2
+    5: eval 1
+    6: push 1
+    7: push 0
+    8: push 0
+    9: push 1
+   10: writeln
 # test/fib.p, 5: 		if limit > 0 then
-    9: pushvar 0, -1
-   10: eval 1
-   11: push 0
-   12: gt
-   13: jneq 29
+   11: pushvar 0, -1
+   12: eval 1
+   13: push 0
+   14: gt
+   15: push 35
+   16: jneq
 # test/fib.p, 6: 			fib := fib(b, a+b, limit - 1)
-   14: pushvar 0, 3
-   15: pushvar 0, -2
-   16: eval 1
-   17: pushvar 0, -3
-   18: eval 1
-   19: pushvar 0, -2
-   20: eval 1
-   21: add
-   22: pushvar 0, -1
+   17: pushvar 0, 3
+   18: pushvar 0, -2
+   19: eval 1
+   20: pushvar 0, -3
+   21: eval 1
+   22: pushvar 0, -2
    23: eval 1
-   24: push 1
-   25: sub
+   24: add
+   25: pushvar 0, -1
+   26: eval 1
+   27: push 1
+   28: sub
 # test/fib.p, 7: 		else
-   26: call 1, 2
-   27: assign 1
+   29: push 1
+   30: push 4
+   31: call
+   32: assign 1
 # test/fib.p, 8: 			fib := a + b
-   28: jump 36
-   29: pushvar 0, 3
-   30: pushvar 0, -3
-   31: eval 1
+   33: push 42
+   34: jump
+   35: pushvar 0, 3
+   36: pushvar 0, -3
+   37: eval 1
 # test/fib.p, 9: 	end ;
-   32: pushvar 0, -2
-   33: eval 1
-   34: add
-   35: assign 1
-   36: retf
+   38: pushvar 0, -2
+   39: eval 1
+   40: add
+   41: assign 1
+   42: retf
 # test/fib.p, 10: 
 # test/fib.p, 11: begin
 # test/fib.p, 12: 	writeln(0);
-   37: push 0
-   38: push 1
-   39: push 0
-   40: push 0
-   41: push 1
-   42: writeln
-# test/fib.p, 13: 	writeln(fib(0, 1, 10))
    43: push 0
    44: push 1
-   45: push 10
-   46: call 0, 2
+   45: push 0
+   46: push 0
    47: push 1
-   48: push 0
+   48: writeln
+# test/fib.p, 13: 	writeln(fib(0, 1, 10))
    49: push 0
-# test/fib.p, 14: end .
    50: push 1
-   51: writeln
-   52: ret
+   51: push 10
+   52: push 0
+   53: push 4
+   54: call
+   55: push 1
+   56: push 0
+   57: push 0
+# test/fib.p, 14: end .
+   58: push 1
+   59: writeln
+   60: ret
 # test/fib.p, 15: 
 
 0

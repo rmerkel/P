@@ -1,37 +1,39 @@
 # test/divbyzero.p, 1: program divbyzero ;
 # test/divbyzero.p, 2: var x, y, z : integer;
-    0: call 0, 2
-    1: halt
+    0: push 0
+    1: push 4
+    2: call
+    3: halt
 # test/divbyzero.p, 3: 
 # test/divbyzero.p, 4: begin
-    2: enter 3
+    4: enter 3
 # test/divbyzero.p, 5: 	y := 10;
-    3: pushvar 0, 5
-    4: push 10
-    5: assign 1
+    5: pushvar 0, 5
+    6: push 10
+    7: assign 1
 # test/divbyzero.p, 6: 	z := 0;
-    6: pushvar 0, 6
-    7: push 0
-    8: assign 1
+    8: pushvar 0, 6
+    9: push 0
+   10: assign 1
 # test/divbyzero.p, 7: 
 # test/divbyzero.p, 8: 	x := y / 2;
-    9: pushvar 0, 4
-   10: pushvar 0, 5
-   11: eval 1
-   12: push 2
-   13: div
-   14: assign 1
+   11: pushvar 0, 4
+   12: pushvar 0, 5
+   13: eval 1
+   14: push 2
+   15: div
+   16: assign 1
 # test/divbyzero.p, 9: 	x := y / z	{	opps!	}
-   15: pushvar 0, 4
-   16: pushvar 0, 5
-   17: eval 1
-# test/divbyzero.p, 10: end.
-   18: pushvar 0, 6
+   17: pushvar 0, 4
+   18: pushvar 0, 5
    19: eval 1
-   20: div
-   21: assign 1
-   22: ret
+# test/divbyzero.p, 10: end.
+   20: pushvar 0, 6
+   21: eval 1
+   22: div
+   23: assign 1
+   24: ret
 # test/divbyzero.p, 11: 
 
-Attempt to divide by zero @ pc (20)!
-runtime error @pc 20, sp: 12: divide-by-zero
+Attempt to divide by zero @ pc (22)!
+runtime error @pc 22, sp: 12: divide-by-zero

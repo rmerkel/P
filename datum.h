@@ -30,7 +30,7 @@ public:
 		Character,							///< Character (ASCII) value
 		Integer,							///< Signed integer
 		Real,								///< Floating point
-		Address								///< Datum is a reference to another Datum
+		Address								///< Unsigned, or a reference to another Datum
 	};
 
 	/// Thrown on runtime errors...
@@ -140,4 +140,3 @@ bool operator&&(const Datum& lsh, const Datum& rhs);
 bool operator||(const Datum& lsh, const Datum& rhs);
 
 #endif
-
