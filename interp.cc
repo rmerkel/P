@@ -220,6 +220,61 @@ PInterp::Result PInterp::write1(unsigned index) {
  * Instructions...
  ************************************************************************************************/
 
+PInterp::InstrPtr PInterp::instrTbl[] = {
+	&PInterp::NEG,
+	&PInterp::ITOR,
+	&PInterp::ITOR2,
+	&PInterp::ROUND,
+	&PInterp::TRUNC,
+	&PInterp::ABS,
+	&PInterp::ATAN,
+	&PInterp::EXP,
+	&PInterp::LOG,
+	&PInterp::DUP,
+	&PInterp::ODD,
+	&PInterp::PRED,
+	&PInterp::SUCC,
+	&PInterp::SIN,
+	&PInterp::SQR,
+	&PInterp::SQRT,
+	&PInterp::WRITE,
+	&PInterp::WRITELN,
+	&PInterp::NEW,
+	&PInterp::DISPOSE,
+	&PInterp::ADD,
+	&PInterp::SUB,
+	&PInterp::MUL,
+	&PInterp::DIV,
+	&PInterp::REM,
+	&PInterp::LT,
+	&PInterp::LTE,
+	&PInterp::EQU,
+	&PInterp::GTE,
+	&PInterp::GT,
+	&PInterp::NEQ,
+	&PInterp::OR,
+	&PInterp::AND,
+	&PInterp::NOT,
+	&PInterp::POP,
+	&PInterp::PUSH,
+	&PInterp::PUSHVAR,
+	&PInterp::EVAL,
+	&PInterp::ASSIGN,
+	&PInterp::COPY,
+	&PInterp::CALL,
+	&PInterp::CALLI,
+	&PInterp::ENTER,
+	&PInterp::RET,
+	&PInterp::RETF,
+	&PInterp::JUMP,
+	&PInterp::JUMPI,
+	&PInterp::JNEQ,
+	&PInterp::JNEQI,
+	&PInterp::LLIMIT,
+	&PInterp::ULIMIT,
+	&PInterp::HALT
+};
+
 /********************************************************************************************//**
  * Replace the Boolean value on the TOS with it's Boolean NOT.
  *
@@ -1295,77 +1350,25 @@ PInterp::Result PInterp::HALT() {
  * @return Result::success or...
  ************************************************************************************************/
 PInterp::Result PInterp::step() {
+	Result r = Result::success;
+
 	prevPc = pc++;
-	ir = code[prevPc];					// Fetch next instruction...
+	ir = code[prevPc];						// Fetch next instruction...
 	++ncycles;
 
 	auto info = OpCodeInfo::info(ir.op);
+	const unsigned op = static_cast<unsigned> (ir.op);
+
 	if (sp < info.nElements()) {
 		cerr << "Out of bounds stack access @ pc (" << prevPc << "), sp == " << sp << "!\n";
 		return Result::stackUnderflow;
-	}
-	assert(sp < stack.size());
 
-	Result r = Result::success;
-
-	switch(ir.op) {
-	case OpCode::NOT:		r = NOT();		break;
-	case OpCode::ITOR:		r = ITOR();		break;	
-	case OpCode::ITOR2:		r = ITOR2();	break;
-	case OpCode::ROUND:		r = ROUND();	break;
-	case OpCode::TRUNC:		r = TRUNC();	break;
-	case OpCode::ABS:		r = ABS();		break;
-	case OpCode::ATAN:		r = ATAN();		break;
-	case OpCode::EXP: 		r = EXP();		break;
-	case OpCode::LOG: 		r = LOG();		break;
-	case OpCode::DUP:		r = DUP();		break;
-	case OpCode::ODD:		r = ODD();		break;
-	case OpCode::PRED:		r = PRED();		break;
-	case OpCode::SIN:		r = SIN();		break;
-	case OpCode::SQR:		r = SQR();		break;
-	case OpCode::SQRT:		r = SQRT();		break;
-	case OpCode::SUCC:		r = SUCC();		break;
-	case OpCode::WRITE:		r = WRITE();	break;
-	case OpCode::WRITELN:	r = WRITELN();	break;
-	case OpCode::NEW:		r = NEW();		break;
-	case OpCode::DISPOSE:	r = DISPOSE();	break;
-	case OpCode::NEG:		r = NEG();		break;
-	case OpCode::ADD:		r = ADD();		break;
-	case OpCode::SUB:		r = SUB();		break;
-	case OpCode::MUL:		r = MUL();		break;
-	case OpCode::DIV:		r = DIV();		break;
-	case OpCode::REM:		r = REM();		break;
-	case OpCode::LT:		r = LT();		break;
-	case OpCode::LTE:   	r = LTE();		break;
-	case OpCode::EQU:   	r = EQU();		break;
-	case OpCode::GTE:  		r = GTE();		break;
-	case OpCode::GT:		r = GT();		break;
-	case OpCode::NEQ: 		r = NEQ();		break;
-	case OpCode::OR:  		r = OR();		break;
-	case OpCode::AND: 		r = AND();		break;
-	case OpCode::POP:		r = POP();		break;
-	case OpCode::PUSH: 		r = PUSH();		break;
-	case OpCode::PUSHVAR:	r = PUSHVAR();	break;
-	case OpCode::EVAL:		r = EVAL();		break;
-	case OpCode::ASSIGN:	r = ASSIGN();	break;
-	case OpCode::COPY:		r = COPY();		break;
-	case OpCode::CALL: 		r = CALL();		break;
-	case OpCode::CALLI: 	r = CALLI();	break;
-	case OpCode::RET:   	r = RET();  	break;
-	case OpCode::RETF: 		r = RETF();		break;
-	case OpCode::ENTER:		r = ENTER();	break;
-	case OpCode::JUMP:		r = JUMP();		break;
-	case OpCode::JUMPI:		r = JUMPI();	break;
-	case OpCode::JNEQ:		r = JNEQ();		break;
-	case OpCode::JNEQI:		r = JNEQI();	break;
-	case OpCode::LLIMIT:	r = LLIMIT();	break;
-	case OpCode::ULIMIT: 	r = ULIMIT();	break;
-	case OpCode::HALT:		r = HALT();		break;
-	default:
-		cerr	<< "Unknown op-code: " << OpCodeInfo::info(ir.op).name()
-				<< " found at pc (" << prevPc << ")!\n" << endl;
+	} else if (ir.op > OpCode::HALT) {
+		cerr << "Unknown op-code: " << hex << "0x" << op << " found at pc (" << prevPc << ")!\n";
 		r = Result::unknownInstr;
-	};
+
+	} else
+		r = (*this.*instrTbl[op]) ();
 
 	return r;
 }

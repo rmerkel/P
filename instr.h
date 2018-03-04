@@ -101,7 +101,7 @@ enum class OpCode : unsigned char {
 	LLIMIT,		///< Check array index; out-of-range error if TOS <  addr
 	ULIMIT,		///< Check array index; out-of-range error if TOS >  addr
 
-	HALT = 255	///< Halt the machine
+	HALT		///< Halt the machine
 };
 
 /********************************************************************************************//**

@@ -87,6 +87,12 @@ protected:
 	template<class T> void push(const T& value);
 	Result write1(unsigned index);			///< Write one expression on standard output...
 
+	typedef Result (PInterp::*InstrPtr)();	///< Pointer to an instruction
+	static InstrPtr instrTbl[];				///< Table of pointer to instructions, indexed by opcode
+
+	// The instructions...
+
+	Result NEG();							///< Negative
 	Result ITOR();							///< Convert to real
 	Result ITOR2();							///< Convert to real
 	Result ROUND();							///< Convert to integer by rounding 
@@ -106,7 +112,6 @@ protected:
 	Result WRITELN();						///< Write on standard output
 	Result NEW();							///< Allocate space
 	Result DISPOSE();						///< Free space
-	Result NEG();							///< Negative
 	Result ADD();							///< Replace the top two values on the stack with their sum
 	Result SUB();							///< Replace the top two vlaues on the stack with their difference
 	Result MUL();							///< Replace the top two values on the stack with their product
