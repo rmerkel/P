@@ -260,18 +260,20 @@ Compilier::Compilier() : nErrors{0}, verbose {false}, ts{cin} {}
  *
  * @param	fName			The source file name, where "-" means the standard input stream
  * @param	instructions	The generated machine code is appended here
- * @param	verbMode		Run in verbose mode if true
+ * @param	lst				Write listing on standard output.
+ * @param	ver				Run in verbose mode if true
  *
  * @return	The number of errors encountered
  ************************************************************************************************/
 unsigned Compilier::operator()(
 	const	string&			fName,
 			InstrVector&	instructions,
-			bool			verbMode)
+			bool			lst,
+			bool			ver)
 {
 	progName = fName;
 	code = &instructions;
-	verbose = verbMode;
+	verbose = ver;
 
 	if ("-" == fName)  {					// "-" means standard input
 		ts.set_input(cin);
@@ -291,8 +293,10 @@ unsigned Compilier::operator()(
 			run();
 
 			ifile.close();					// Rewind the source (seekg(0) isn't working!)...
-			ifile.open(fName);
-			listing(ifile, cout);	// 	create a listing...
+			if (lst) {
+				ifile.open(fName);
+				listing(ifile, cout);	// 	create a listing...
+			}
 		}
 	}
 

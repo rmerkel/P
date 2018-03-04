@@ -3,10 +3,8 @@
 # test/fahr.p, 3: 
 # test/fahr.p, 4: program fahrtest ;
 # test/fahr.p, 5: const
-    0: push 0
-    1: push 4
-    2: call
-    3: halt
+    0: calli 0, 2
+    1: halt
 # test/fahr.p, 6: 	LOWER =   0;	{	lower table limit	}
 # test/fahr.p, 7: 	UPPER = 300;	{	upper table limit	}
 # test/fahr.p, 8: 	STEP  =  20;	{	table step size		}
@@ -15,71 +13,95 @@
 # test/fahr.p, 11: 	fahr, celsius : real;
 # test/fahr.p, 12: 
 # test/fahr.p, 13: begin
-    4: enter 2
-# test/fahr.p, 14: 	fahr := LOWER;
-    5: pushvar 0, 4
-    6: push 0
-    7: itor
-    8: assign 1
-# test/fahr.p, 15: 	while fahr <= UPPER do begin
-    9: pushvar 0, 4
-   10: eval 1
-   11: push 300
-   12: itor
-   13: lte
-   14: push 47
-   15: jneq
-# test/fahr.p, 16: 		celsius := 5.0 * (fahr-32.0) / 9.0;
-   16: pushvar 0, 5
-   17: push 5.000000
-   18: pushvar 0, 4
-   19: eval 1
-   20: push 32.000000
-   21: sub
-   22: mul
-   23: push 9.000000
-   24: div
-   25: assign 1
-# test/fahr.p, 17: 		fahr := fahr + STEP;
+    2: enter 2
+# test/fahr.p, 14: 	writeln('Fahrenheit Celsius');
+    3: push 'F'
+    4: push 'a'
+    5: push 'h'
+    6: push 'r'
+    7: push 'e'
+    8: push 'n'
+    9: push 'h'
+   10: push 'e'
+   11: push 'i'
+   12: push 't'
+   13: push ' '
+   14: push 'C'
+   15: push 'e'
+   16: push 'l'
+   17: push 's'
+   18: push 'i'
+   19: push 'u'
+   20: push 's'
+   21: push 18
+   22: push 0
+   23: push 0
+   24: push 1
+   25: writeln
+# test/fahr.p, 15: 
+# test/fahr.p, 16: 	fahr := LOWER;
    26: pushvar 0, 4
-   27: pushvar 0, 4
-   28: eval 1
-   29: push 20
-   30: itor
-   31: add
-   32: assign 1
-# test/fahr.p, 18: 		writeln(fahr : 6 : 1, celsius : 6 : 1);
-   33: pushvar 0, 4
-   34: eval 1
-   35: push 1
-   36: push 6
-   37: push 1
-   38: pushvar 0, 5
+   27: push 0
+   28: itor
+   29: assign 1
+# test/fahr.p, 17: 	while fahr <= UPPER do begin
+   30: pushvar 0, 4
+   31: eval 1
+   32: push 300
+   33: itor
+   34: lte
+   35: jneqi 66
+# test/fahr.p, 18: 		celsius := 5.0 * (fahr-32.0) / 9.0;
+   36: pushvar 0, 5
+   37: push 5.000000
+   38: pushvar 0, 4
    39: eval 1
-   40: push 1
-   41: push 6
-   42: push 1
-   43: push 2
-   44: writeln
-# test/fahr.p, 19: 	end
-# test/fahr.p, 20:  end.
-   45: push 9
-   46: jump
-   47: ret
+   40: push 32.000000
+   41: sub
+   42: mul
+   43: push 9.000000
+   44: div
+   45: assign 1
+# test/fahr.p, 19: 		writeln(fahr : 9 : 1, celsius : 8 : 1);
+   46: pushvar 0, 4
+   47: eval 1
+   48: push 1
+   49: push 9
+   50: push 1
+   51: pushvar 0, 5
+   52: eval 1
+   53: push 1
+   54: push 8
+   55: push 1
+   56: push 2
+   57: writeln
+# test/fahr.p, 20: 		fahr := fahr + STEP;
+   58: pushvar 0, 4
+   59: pushvar 0, 4
+   60: eval 1
+   61: push 20
+   62: itor
+   63: add
+   64: assign 1
+# test/fahr.p, 21: 	end
+# test/fahr.p, 22:  end.
+   65: jumpi 30
+   66: ret
 
-  20.0  -17.8
-  40.0   -6.7
-  60.0    4.4
-  80.0   15.6
- 100.0   26.7
- 120.0   37.8
- 140.0   48.9
- 160.0   60.0
- 180.0   71.1
- 200.0   82.2
- 220.0   93.3
- 240.0  104.4
- 260.0  115.6
- 280.0  126.7
- 300.0  137.8
- 320.0  148.9
+Fahrenheit Celsius
+      0.0    -17.8
+     20.0     -6.7
+     40.0      4.4
+     60.0     15.6
+     80.0     26.7
+    100.0     37.8
+    120.0     48.9
+    140.0     60.0
+    160.0     71.1
+    180.0     82.2
+    200.0     93.3
+    220.0    104.4
+    240.0    115.6
+    260.0    126.7
+    280.0    137.8
+    300.0    148.9

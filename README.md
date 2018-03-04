@@ -78,6 +78,7 @@ Version | Description
  0.21   | Write and writeln nolonger quote character values. Major refactor of Datum.
  0.22   | Write[ln] now supports arrays and strings.
  0.23   | Call and jump indirection; target address is on the stack
+ 0.24	| Added -l[listing], fixed fahr*.p tests, added call and jump immediate instructions.
 
 ## Design and implementation notes
 

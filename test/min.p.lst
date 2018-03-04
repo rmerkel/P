@@ -1,9 +1,7 @@
 # test/min.p, 1: {	minimum Pascal program	}
 # test/min.p, 2: program minimum ;
 # test/min.p, 3: begin end.
-    0: push 0
-    1: push 4
-    2: call
-    3: halt
-    4: ret
+    0: calli 0, 2
+    1: halt
+    2: ret
 

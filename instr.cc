@@ -85,12 +85,17 @@ const OpCodeInfo::InfoMap OpCodeInfo::opInfoTbl {
 
 	// Call/return/jump...
 
-	{ OpCode::CALL,		OpCodeInfo{ "call",		0			} },
+	{ OpCode::CALL,		OpCodeInfo{ "call",		2			} },
+	{ OpCode::CALLI,	OpCodeInfo{ "calli",	0			} },
+
 	{ OpCode::ENTER,	OpCodeInfo{ "enter",	0			} },	// Size isn't staticly know
 	{ OpCode::RET,		OpCodeInfo{ "ret",		FrameSize	} },
 	{ OpCode::RETF,		OpCodeInfo{ "retf",		FrameSize	} }, 	// Pops frame, push return value
-	{ OpCode::JUMP,		OpCodeInfo{ "jump",		0			} },
-	{ OpCode::JNEQ,		OpCodeInfo{ "jneq",		0			} },
+
+	{ OpCode::JUMP,		OpCodeInfo{ "jump",		2			} },
+	{ OpCode::JUMPI,	OpCodeInfo{ "jumpi",	0			} },
+	{ OpCode::JNEQ,		OpCodeInfo{ "jneq",		1			} },
+	{ OpCode::JNEQI,	OpCodeInfo{ "jneqi",	0			} },
 
 	{ OpCode::LLIMIT,	OpCodeInfo{ "llimit",	1			} },
 	{ OpCode::ULIMIT,	OpCodeInfo{ "ulimit",	1			} },
@@ -143,21 +148,15 @@ unsigned disasm(ostream& out, unsigned loc, const Instr& instr, const string lab
 	case OpCode::PRED:
 	case OpCode::PUSH:
 	case OpCode::SUCC:
+	case OpCode::JUMPI:
+	case OpCode::JNEQI:
 		out << " " << instr.value;
 		break;
 
 	case OpCode::PUSHVAR:
-#if 0
-	case OpCode::CALL:
-#endif
+	case OpCode::CALLI:
 		out << " "	<< level << ", " << instr.value;
 		break;
-
-#if 0
-	case OpCode::CALL:
-		out << " "	<< level;
-		break;
-#endif
 
 	default:								// The rest don't use level, address or value
 		break;

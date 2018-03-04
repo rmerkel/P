@@ -11,10 +11,12 @@ var
 	fahr : real ; celsius : integer;
 
 begin
+	writeln('Fahrenheit Celsius');
+
 	fahr := LOWER;
 	while fahr <= UPPER do begin
 		celsius := round(5.0 * (fahr-32.0) / 9.0);
+		writeln(fahr : 8 : 1, celsius : 9 : 1);
 		fahr := fahr + STEP;
-		writeln(fahr : 6 : 1, celsius : 6 : 1);
 	end
  end.

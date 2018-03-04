@@ -4,17 +4,15 @@ test/unknown.p: expected 'end' got 'bad comment' near line 6
 test/unknown.p: expected '.' got 'bad comment' near line 6
 # test/unknown.p, 1: program unknown ;
 # test/unknown.p, 2: var x : integer;
-    0: push 0
-    1: push 4
-    2: call
-    3: halt
+    0: calli 0, 2
+    1: halt
 # test/unknown.p, 3: begin
-    4: enter 1
+    2: enter 1
 # test/unknown.p, 4: 	x # 123;	{	unknown operator "#"!
-    5: pushvar 0, 4
-    6: push 123
-    7: assign 1
+    3: pushvar 0, 4
+    4: push 123
+    5: assign 1
 # test/unknown.p, 5: end .
 # test/unknown.p, 6: 
-    8: ret
+    6: ret
 

@@ -113,7 +113,21 @@ size_t PInterp::base(size_t lvl) {
 /********************************************************************************************//**
  * @return the top-of-stack
  ************************************************************************************************/
-Datum PInterp::pop()	{
+Datum& PInterp::tos() {
+	return stack[sp];
+}
+
+/********************************************************************************************//**
+ * @return the top-of-stack
+ ************************************************************************************************/
+const Datum& PInterp::tos() const {
+	return stack[sp];
+}
+
+/********************************************************************************************//**
+ * @return the top-of-stack
+ ************************************************************************************************/
+Datum PInterp::pop() {
 	if (sp == 0)
 		throw Error(stackUnderflow, "stack underflow error");
 	else
@@ -207,13 +221,32 @@ PInterp::Result PInterp::write1(unsigned index) {
  ************************************************************************************************/
 
 /********************************************************************************************//**
+ * Replace the Boolean value on the TOS with it's Boolean NOT.
+ *
+ * @note TOS value to "not"
+ * @return	stackUnderflow if the stack underflowed, badDataType if either operation arn't
+ *			numeric.
+ ************************************************************************************************/
+PInterp::Result PInterp::NOT() {
+	Datum& TOS = tos();
+	Result r = Result::success;
+
+	if (TOS.kind() != Datum::Boolean)
+		r = Result::badDataType;
+	else
+		TOS = !TOS.boolean();
+
+	return r;
+}
+
+/********************************************************************************************//**
  * Convert the TOS interger value to real
- * @param	TOS	Interger value to convert
  * @return	badDataType if TOS isn't an Integer
  ************************************************************************************************/
-PInterp::Result PInterp::ITOR(PInterp::DatumVecIter TOS) {
-	if (TOS->kind() == Datum::Integer) {
-		*TOS = TOS->integer() * 1.0;
+PInterp::Result PInterp::ITOR() {
+	Datum& TOS = tos();
+	if (TOS.kind() == Datum::Integer) {
+		TOS = TOS.integer() * 1.0;
 		return Result::success;
 
 	} else
@@ -222,21 +255,23 @@ PInterp::Result PInterp::ITOR(PInterp::DatumVecIter TOS) {
 
 /********************************************************************************************//**
  * Convert the TOS-1 interger value to real, preserving the TOS value.
- * @param	TOS	Top-of-stack (unmodified).
  * @return	badDataType if TOS isn't an Integer
  ************************************************************************************************/
-PInterp::Result PInterp::ITOR2(PInterp::DatumVecIter TOS) {
-	return ITOR(--TOS);
+PInterp::Result PInterp::ITOR2() {
+	Datum savedTOS = pop();
+	Result r = ITOR();
+	push(savedTOS);
+	return r;
 }
 
 /********************************************************************************************//**
  * Round the TOS real value to the nearest integer
- * @param	TOS	Real value to round
  * @return	badDataType if TOS isn't a Real
  ************************************************************************************************/
-PInterp::Result PInterp::ROUND(PInterp::DatumVecIter TOS) {
-	if (TOS->kind() == Datum::Real) {
-		*TOS  = static_cast<int>(round(TOS->real()));
+PInterp::Result PInterp::ROUND() {
+	Datum& TOS = tos();
+	if (TOS.kind() == Datum::Real) {
+		TOS = static_cast<int>(round(TOS.real()));
 		return Result::success;
 
 	} else
@@ -245,12 +280,12 @@ PInterp::Result PInterp::ROUND(PInterp::DatumVecIter TOS) {
 
 /********************************************************************************************//**
  * Truncate the TOS value to a integer
- * @param	TOS	Real value to truncate
  * @return	badDataType if TOS isn't a real
  ************************************************************************************************/
-PInterp::Result PInterp::TRUNC(PInterp::DatumVecIter TOS) {
-	if (TOS->kind() == Datum::Real) {
-		*TOS = static_cast<int>(TOS->real());
+PInterp::Result PInterp::TRUNC() {
+	Datum& TOS = tos();
+	if (TOS.kind() == Datum::Real) {
+		TOS = static_cast<int>(TOS.real());
 		return Result::success;
 
 	} else
@@ -259,16 +294,16 @@ PInterp::Result PInterp::TRUNC(PInterp::DatumVecIter TOS) {
 
 /********************************************************************************************//**
  * Replace the TOS value with its absolute value
- * @param	TOS	Signed numeric value to calculate absolute value of 
  * @return	badDataType if TOS isn't a numeric type
  ************************************************************************************************/
-PInterp::Result PInterp::ABS(PInterp::DatumVecIter TOS) {
+PInterp::Result PInterp::ABS() {
+	Datum& TOS = tos();
 	Result r = Result::success;
 
-	if (TOS->kind() == Datum::Integer)
-		*TOS = abs(TOS->integer());
-	else if (TOS->kind() == Datum::Real)
-		*TOS = fabs(TOS->real());
+	if (TOS.kind() == Datum::Integer)
+		TOS = abs(TOS.integer());
+	else if (TOS.kind() == Datum::Real)
+		TOS = fabs(TOS.real());
 	else
 		r = Result::badDataType;
 
@@ -277,16 +312,16 @@ PInterp::Result PInterp::ABS(PInterp::DatumVecIter TOS) {
 
 /********************************************************************************************//**
  * Replace the TOS value with its arc tangent
- * @param	TOS	Numeric value to calculate arc tangent of
  * @return	badDagtaType if TOS isn't a numeric type
  ************************************************************************************************/
-PInterp::Result PInterp::ATAN(PInterp::DatumVecIter TOS) {
+PInterp::Result PInterp::ATAN() {
+	Datum& TOS = tos();
 	Result r = Result::success;
 
-	if (TOS->kind() == Datum::Integer)
-		*TOS = atan(TOS->integer());
-	else if (TOS->kind() == Datum::Real)
-		*TOS = atan(TOS->real());
+	if (TOS.kind() == Datum::Integer)
+		TOS = atan(TOS.integer());
+	else if (TOS.kind() == Datum::Real)
+		TOS = atan(TOS.real());
 	else
 		r = Result::badDataType;
 
@@ -295,16 +330,16 @@ PInterp::Result PInterp::ATAN(PInterp::DatumVecIter TOS) {
 
 /********************************************************************************************//**
  * Replace the TOS value with its base-e exponential
- * @param	TOS	Numeric value to calculate base-e exponential of
  * @return	badDataType if TOS isn't a numeric type.
  ************************************************************************************************/
-PInterp::Result PInterp::EXP(PInterp::DatumVecIter TOS) {
+PInterp::Result PInterp::EXP() {
+	Datum& TOS = tos();
 	Result r = Result::success;
 
-	if (TOS->kind() == Datum::Integer)
-		*TOS = exp(TOS->integer());
-	else if (TOS->kind() == Datum::Real)
-		*TOS = exp(TOS->real());
+	if (TOS.kind() == Datum::Integer)
+		TOS = exp(TOS.integer());
+	else if (TOS.kind() == Datum::Real)
+		TOS = exp(TOS.real());
 	else
 		return Result::badDataType;
 
@@ -312,53 +347,53 @@ PInterp::Result PInterp::EXP(PInterp::DatumVecIter TOS) {
 }
 
 /********************************************************************************************//**
- * @param	TOS	value to duplicate
- * @return	success
- ************************************************************************************************/
-PInterp::Result PInterp::DUP(PInterp::DatumVecIter TOS) {
-	push(*TOS);
-	return Result::success;
-}
-
-/********************************************************************************************//**
  * Replace the TOS value with its natural logarithm
- * @param	TOS	Numeric value to caluculate natural logarithm of
  * @return	badDataType if TOS isn't a numeric type, dividyByZero if zero.
  ************************************************************************************************/
-PInterp::Result PInterp::LOG(PInterp::DatumVecIter TOS) {
+PInterp::Result PInterp::LOG() {
+	Datum& TOS = tos();
 	Result r = Result::success;
 
-	if (!TOS->numeric())
+	if (!TOS.numeric())
 		r = Result::badDataType;
 
-	else if (TOS->kind() == Datum::Real) {
-		if (TOS->real() == 0.0) {
+	else if (TOS.kind() == Datum::Real) {
+		if (TOS.real() == 0.0) {
 			cerr << "Attempt to take log(0.0) @ pc (" << prevPc << ")!\n";
 			r = Result::divideByZero;
 
 		} else 
-			*TOS = log(TOS->real());
+			TOS = log(TOS.real());
 
-	} else if (TOS->kind() == Datum::Integer) {
-		if (TOS->kind() == Datum::Integer && TOS->integer() == 0) {
+	} else if (TOS.kind() == Datum::Integer) {
+		if (TOS.kind() == Datum::Integer && TOS.integer() == 0) {
 			cerr << "Attempt to take log(0) @ pc (" << prevPc << ")!\n";
 			r = Result::divideByZero;
 
 		} else 
-			*TOS = log(TOS->integer());
+			TOS = log(TOS.integer());
 	}
 
 	return r;
 }
 
 /********************************************************************************************//**
+ * @return	success
+ ************************************************************************************************/
+PInterp::Result PInterp::DUP() {
+	Datum& TOS = tos();
+	push(TOS);
+	return Result::success;
+}
+
+/********************************************************************************************//**
  * Replace the TOS integer value with true, if the value was an odd value, false otherwise.
- * @param	TOS	Integer value to test
  * @return	badDataType if TOS isn't an Integer.
  ************************************************************************************************/
-PInterp::Result PInterp::ODD(PInterp::DatumVecIter TOS) {
-	if (TOS->kind() == Datum::Integer) {
-		*TOS = (TOS->integer() & 1) ? true : false;
+PInterp::Result PInterp::ODD() {
+	Datum& TOS = tos();
+	if (TOS.kind() == Datum::Integer) {
+		TOS = (TOS.integer() & 1) ? true : false;
 		return Result::success;
 
 	} else
@@ -367,35 +402,35 @@ PInterp::Result PInterp::ODD(PInterp::DatumVecIter TOS) {
 
 /********************************************************************************************//**
  * Replace the TOS integer value with its predicesor value
- * @param	TOS	Integer value to calculate predicesor of
  * @return	badDataType if TOS isn't a numeric type, outOfRange if the operation would exceed
  *			the types range. 
  ************************************************************************************************/
-PInterp::Result PInterp::PRED(PInterp::DatumVecIter TOS) {
+PInterp::Result PInterp::PRED() {
+	Datum& TOS = tos();
 	Result r = Result::success;
 
-	if (!TOS->numeric())
+	if (!TOS.numeric())
 		r = Result::badDataType;
 
-	else if (*TOS <= ir.value)
+	else if (TOS <= ir.value)
 		r =  Result::outOfRange;
+	--TOS;
 
-	--(*TOS);
 	return r;
 }
 
 /********************************************************************************************//**
  * Replace the numeric TOS value with it's sine
- * @param	TOS	Value to calulate sine of
  * @return	badDataType if TOS isn't a numeric type.
  ************************************************************************************************/
-PInterp::Result PInterp::SIN(PInterp::DatumVecIter TOS) {
+PInterp::Result PInterp::SIN() {
+	Datum& TOS = tos();
 	Result r = Result::success;
 
-	if (TOS->kind() == Datum::Integer)
-		*TOS = sin(TOS->integer());
-	else if (TOS->kind() == Datum::Real)
-		*TOS = sin(stack[sp].real());
+	if (TOS.kind() == Datum::Integer)
+		TOS = sin(TOS.integer());
+	else if (TOS.kind() == Datum::Real)
+		TOS = sin(stack[sp].real());
 	else
 		r = Result::badDataType;
 
@@ -404,17 +439,17 @@ PInterp::Result PInterp::SIN(PInterp::DatumVecIter TOS) {
 
 /********************************************************************************************//**
  * Replace the numeric TOS value with it's square
- * @param	TOS	Value to square
  * @return	badDataType if TOS isn't a numeric type.
  ************************************************************************************************/
-PInterp::Result PInterp::SQR(PInterp::DatumVecIter TOS) {
+PInterp::Result PInterp::SQR() {
+	Datum& TOS = tos();
 	Result r = Result::success;
 
 	// note that Datum lacks a *= operator
-	if (TOS->kind() == Datum::Integer)
-		*TOS = TOS->integer() * TOS->integer();
-	else if (TOS->kind() == Datum::Real)
-		*TOS = TOS->real() * TOS->real();
+	if (TOS.kind() == Datum::Integer)
+		TOS = TOS.integer() * TOS.integer();
+	else if (TOS.kind() == Datum::Real)
+		TOS = TOS.real() * TOS.real();
 	else
 		r = Result::badDataType;
 
@@ -423,16 +458,16 @@ PInterp::Result PInterp::SQR(PInterp::DatumVecIter TOS) {
 
 /********************************************************************************************//**
  * Replace the numeric TOS value with its square-root.
- * @param	TOS	Value to calculate square root of
  * @return	badDataType if TOS isn't a numeric type.
  ************************************************************************************************/
-PInterp::Result PInterp::SQRT(PInterp::DatumVecIter TOS) {
+PInterp::Result PInterp::SQRT() {
+	Datum& TOS = tos();
 	Result r = Result::success;
 
-	if (TOS->kind() == Datum::Integer)
-		*TOS = sqrt(TOS->integer());
-	else if (TOS->kind() == Datum::Real)
-		*TOS = sqrt(TOS->real());
+	if (TOS.kind() == Datum::Integer)
+		TOS = sqrt(TOS.integer());
+	else if (TOS.kind() == Datum::Real)
+		TOS = sqrt(TOS.real());
 	else
 		r = Result::badDataType;
 
@@ -441,15 +476,15 @@ PInterp::Result PInterp::SQRT(PInterp::DatumVecIter TOS) {
 
 /********************************************************************************************//**
  * Replace the integer TOS valeu with it's successor value.
- * @param	TOS	Value to calculate successor of
  * @return	outOfRange if the operation would exceed the types range. 
  ************************************************************************************************/
-PInterp::Result PInterp::SUCC(PInterp::DatumVecIter TOS) {
+PInterp::Result PInterp::SUCC() {
+	Datum& TOS = tos();
 	Result r = Result::success;
 
-	if (*TOS >= ir.value)
+	if (TOS >= ir.value)
 		r =  Result::outOfRange;
-	++(*TOS);
+	++TOS;
 
 	return r;
 }
@@ -464,20 +499,20 @@ PInterp::Result PInterp::SUCC(PInterp::DatumVecIter TOS) {
  * @note	Maybe add an element count to each tuple ; v:w:p:n where n is the number of elements
  *			in v, i.e., 1 for scalers, or the number of elements in an array.
  *
- * @param	TOS	Number of 4-tuple elements to write
  * @return	BadDataType if TOS isn't an integer, stackUnderflow if the would underflow.
  ************************************************************************************************/
-PInterp::Result PInterp::WRITE(PInterp::DatumVecIter TOS) {
+PInterp::Result PInterp::WRITE() {
 	const	unsigned	tupleSz = 4;	// Each parameter is a 4-tuple
 			Result		r = Result::success;
 			size_t		nargs = 0;		// # of tuples to process...
+			Datum& 		TOS = tos();
 
-	if (TOS->kind() != Datum::Integer) {
+	if (TOS.kind() != Datum::Integer) {
 		cerr << "WRITE TOS is not an integer!" << endl;
 		r =  Result::badDataType;
 
 	} else {
-		nargs = TOS->integer();
+		nargs = TOS.integer();
 		if (nargs > sp) {
 			cerr << "Stack underflow @ pc " << pc << endl;
 			r = Result::stackUnderflow; 
@@ -499,11 +534,10 @@ PInterp::Result PInterp::WRITE(PInterp::DatumVecIter TOS) {
 
 /********************************************************************************************//**
  * Evaluates WRITE() and then writes a newline on the stardard output stream.
- * @param	TOS	Number of 3-tuple elements to write
  * @return	BadDataType if TOS isn't an integer, stackUnderflow if the would underflow.
  ************************************************************************************************/
-PInterp::Result PInterp::WRITELN(PInterp::DatumVecIter TOS) {
-	auto r = WRITE(TOS);
+PInterp::Result PInterp::WRITELN() {
+	auto r = WRITE();
 	cout << '\n';
 	return r;
 }
@@ -513,11 +547,11 @@ PInterp::Result PInterp::WRITELN(PInterp::DatumVecIter TOS) {
  * replaces the TOS with the address of the new block, or zero if there was insufficient space
  * in the heap.
  *
- * @param	TOS	Number of Datums to allocate off the heap.
  * @return	badDataType if TOS isn't an Integer.
  ************************************************************************************************/
-PInterp::Result PInterp::NEW(PInterp::DatumVecIter TOS) {
-	if (TOS->kind() != Datum::Integer) {
+PInterp::Result PInterp::NEW() {
+	Datum& TOS = tos();
+	if (TOS.kind() != Datum::Integer) {
 		cerr << "NEW TOS is not an integer!" << endl;
 		return Result::badDataType;
 	}
@@ -531,16 +565,16 @@ PInterp::Result PInterp::NEW(PInterp::DatumVecIter TOS) {
 
 /********************************************************************************************//**
  * Return a block of data, allocated by NEW, back on the heap
- * @param	TOS	Address of a block returned by NEW
  * @return	badDataType if the TOS isn't an Integer.
  ************************************************************************************************/
-PInterp::Result PInterp::DISPOSE(PInterp::DatumVecIter TOS) {
-	if (TOS->kind() != Datum::Address) {
+PInterp::Result PInterp::DISPOSE() {
+	Datum& TOS = tos();
+	if (TOS.kind() != Datum::Address) {
 		cerr << "DISPOSE TOS is not an address!" << endl;
 		return Result::badDataType;
 	}
 
-	const size_t addr = TOS->address(); pop();
+	const size_t addr = TOS.address(); pop();
 	if (!heap.free(addr)) {
 		cerr << "Dispose of " << addr << " failed!\n";
 		return Result::freeStoreError;
@@ -554,12 +588,12 @@ PInterp::Result PInterp::DISPOSE(PInterp::DatumVecIter TOS) {
 
 /********************************************************************************************//**
  * Replace the numberic TOS value with it's negative
- * @param	TOS	Value to negate
  * @return	badDataType if TOS isn't numeric.
  ************************************************************************************************/
-PInterp::Result PInterp::NEG(PInterp::DatumVecIter TOS) {
-	if (TOS->numeric()) {
-		*TOS = -*TOS;
+PInterp::Result PInterp::NEG() {
+	Datum& TOS = tos();
+	if (TOS.numeric()) {
+		TOS = -TOS;
 		return Result::success;
 
 	} else
@@ -941,23 +975,6 @@ PInterp::Result PInterp::AND() {
 }
 
 /********************************************************************************************//**
- * Replace the Boolean value on the TOS with it's Boolean NOT.
- *
- * @note TOS value to "not"
- * @return	stackUnderflow if the stack underflowed, badDataType if either operation arn't
- *			numeric.
- ************************************************************************************************/
-PInterp::Result PInterp::NOT(DatumVecIter TOS) {
-	Result r = Result::success;
-	if (TOS->kind() != Datum::Boolean)
-		r = Result::badDataType;
-	else
-		*TOS = !TOS->boolean();
-
-	return r;
-}
-
-/********************************************************************************************//**
  * Pops ir.value items off of the stack
  *
  * @return	stackUnderflow if the stack underflowed.
@@ -1093,18 +1110,13 @@ PInterp::Result PInterp::COPY() {
 }
 
 /********************************************************************************************//**
- * Call a subroutine whose level is ir.level and whose entry point is ir.value.
+ * Call a subroutine whose level is TOS-1 and whose entry point is TOS
  * @return	success.
  ************************************************************************************************/
 PInterp::Result PInterp::CALL() {
-#if 1
-	const	size_t	addr = pop().address();
-	const	int8_t	nlevel = pop().integer();
-#else
-	const	int8_t	nlevel = ir.level;
-	const	size_t	addr = ir.value.address();
-#endif
-	const	size_t	oldFp = fp;			// Save a copy before we modify it
+	const	size_t	addr	= pop().address();
+	const	int8_t	nlevel	= pop().integer();
+	const	size_t	oldFp	= fp;	// Save a copy before we modify it
 
 	// Push a new activation frame block on the stack:
 
@@ -1117,6 +1129,28 @@ PInterp::Result PInterp::CALL() {
 	push(0ul);						//	FrameRetVal
 
 	pc = addr;
+
+	return Result::success;
+}
+
+/********************************************************************************************//**
+ * Call a subroutine whose level is ir.level and whose entry point is ir.value.
+ * @return	success.
+ ************************************************************************************************/
+PInterp::Result PInterp::CALLI() {
+	const	size_t	oldFp	= fp;	// Save a copy before we modify it
+
+	// Push a new activation frame block on the stack:
+
+	push(base(ir.level));			//	Framebase
+
+	fp = sp;						// 	fp points to the start of the new frame
+
+	push(oldFp);					//	FrameOldFp
+	push(pc);						//	FrameRetAddr
+	push(0ul);						//	FrameRetVal
+
+	pc = ir.value.address();
 
 	return Result::success;
 }
@@ -1161,10 +1195,17 @@ PInterp::Result PInterp::ENTER() {
  * Jumps to TOS
  * @return	success.
  ************************************************************************************************/
-PInterp::Result PInterp::JUMP(PInterp::DatumVecIter TOS) {
-	pc = TOS->address();
-	pop();
+PInterp::Result PInterp::JUMP() {
+	pc = pop().address();
+	return Result::success;
+}
 
+/********************************************************************************************//**
+ * Jumps to ir.value
+ * @return	success.
+ ************************************************************************************************/
+PInterp::Result PInterp::JUMPI() {
+	pc = ir.value.address();
 	return Result::success;
 }
 
@@ -1186,45 +1227,61 @@ PInterp::Result PInterp::JNEQ() {
 }
 
 /********************************************************************************************//**
- * @note	The TOS is not consumed.
- * @param	TOS	Value to test
- * @return	BadDataType if TOS isn't an Integer or a Boolean, outOfRange if the check failed.
+ * Jump to TOS if TOS == false.
+ * @return	badDataType if TOS isn't a Boolean.
  ************************************************************************************************/
-PInterp::Result PInterp::LLIMIT(PInterp::DatumVecIter TOS) {
-	if (!TOS->ordinal()) 
+PInterp::Result PInterp::JNEQI() {
+	const Datum value = pop();
+
+	if (value.kind() != Datum::Boolean)
 		return Result::badDataType;
 
-	else if (TOS->kind() == Datum::Boolean) {
-		const Datum i(TOS->boolean() ? 1 : 0);
-		return i < ir.value ? Result::outOfRange : Result::success;
+	if (value.boolean() == false)
+		pc = ir.value.address();
 
-	} else if (TOS->kind() == Datum::Character) {
-		const Datum i(static_cast<size_t>(TOS->character()));
-		return i < ir.value ? Result::outOfRange : Result::success;
-
-	} else 
-		return *TOS < ir.value ? Result::outOfRange : Result::success;
+	return Result::success;
 }
 
 /********************************************************************************************//**
  * @note	The TOS is not consumed.
- * @param	TOS	Value to test
  * @return	BadDataType if TOS isn't an Integer or a Boolean, outOfRange if the check failed.
  ************************************************************************************************/
-PInterp::Result PInterp::ULIMIT(PInterp::DatumVecIter TOS) {
-	if (!TOS->ordinal()) 
+PInterp::Result PInterp::LLIMIT() {
+	Datum& TOS = tos();
+	if (!TOS.ordinal()) 
 		return Result::badDataType;
 
-	else if (TOS->kind() == Datum::Boolean) {
-		const Datum i(TOS->boolean() ? 1 : 0);
+	else if (TOS.kind() == Datum::Boolean) {
+		const Datum i(TOS.boolean() ? 1 : 0);
+		return i < ir.value ? Result::outOfRange : Result::success;
+
+	} else if (TOS.kind() == Datum::Character) {
+		const Datum i(static_cast<size_t>(TOS.character()));
+		return i < ir.value ? Result::outOfRange : Result::success;
+
+	} else 
+		return TOS < ir.value ? Result::outOfRange : Result::success;
+}
+
+/********************************************************************************************//**
+ * @note	The TOS is not consumed.
+ * @return	BadDataType if TOS isn't an Integer or a Boolean, outOfRange if the check failed.
+ ************************************************************************************************/
+PInterp::Result PInterp::ULIMIT() {
+	Datum& TOS = tos();
+	if (!TOS.ordinal()) 
+		return Result::badDataType;
+
+	else if (TOS.kind() == Datum::Boolean) {
+		const Datum i(TOS.boolean() ? 1 : 0);
 		return i > ir.value ? Result::outOfRange : Result::success;
 
-	} else if (TOS->kind() == Datum::Character) {
-		const Datum i(static_cast<size_t>(TOS->character()));
+	} else if (TOS.kind() == Datum::Character) {
+		const Datum i(static_cast<size_t>(TOS.character()));
 		return i > ir.value ? Result::outOfRange : Result::success;
 
 	} else
-		return *TOS > ir.value ? Result::outOfRange : Result::success;
+		return TOS > ir.value ? Result::outOfRange : Result::success;
 }
 
 /********************************************************************************************//**
@@ -1250,63 +1307,64 @@ PInterp::Result PInterp::step() {
 	assert(sp < stack.size());
 
 	Result r = Result::success;
-	DatumVecIter TOS = stack.begin() + sp;
 
 	switch(ir.op) {
-	case OpCode::ITOR:		r = ITOR(TOS);		break;	
-	case OpCode::ITOR2:		r = ITOR2(TOS);		break;
-	case OpCode::ROUND:		r = ROUND(TOS);		break;
-	case OpCode::TRUNC:		r = TRUNC(TOS);		break;
-	case OpCode::ABS:		r = ABS(TOS);		break;
-	case OpCode::ATAN:		r = ATAN(TOS);		break;
-	case OpCode::EXP: 		r = EXP(TOS);		break;
-	case OpCode::LOG: 		r = LOG(TOS);		break;
-	case OpCode::DUP:		r = DUP(TOS);		break;
-	case OpCode::ODD:		r = ODD(TOS);		break;
-	case OpCode::PRED:		r = PRED(TOS);		break;
-	case OpCode::SIN:		r = SIN(TOS);		break;
-	case OpCode::SQR:		r = SQR(TOS);		break;
-	case OpCode::SQRT:		r = SQRT(TOS);		break;
-	case OpCode::SUCC:		r = SUCC(TOS);		break;
-	case OpCode::WRITE:		r = WRITE(TOS);		break;
-	case OpCode::WRITELN:	r = WRITELN(TOS);	break;
-	case OpCode::NEW:		r = NEW(TOS);		break;
-	case OpCode::DISPOSE:	r = DISPOSE(TOS);	break;
-	case OpCode::NEG:		r = NEG(TOS);		break;
-	case OpCode::ADD:		r = ADD();			break;
-	case OpCode::SUB:		r = SUB();			break;
-	case OpCode::MUL:		r = MUL();			break;
-	case OpCode::DIV:		r = DIV();			break;
-	case OpCode::REM:		r = REM();			break;
-	case OpCode::LT:		r = LT();			break;
-	case OpCode::LTE:   	r = LTE();			break;
-	case OpCode::EQU:   	r = EQU();			break;
-	case OpCode::GTE:  		r = GTE();			break;
-	case OpCode::GT:		r = GT();			break;
-	case OpCode::NEQ: 		r = NEQ();			break;
-	case OpCode::OR:  		r = OR();			break;
-	case OpCode::AND: 		r = AND();			break;
-	case OpCode::NOT:		r = NOT(TOS);		break;
-	case OpCode::POP:		r = POP();			break;
-	case OpCode::PUSH: 		r = PUSH();			break;
-	case OpCode::PUSHVAR:	r = PUSHVAR();		break;
-	case OpCode::EVAL:		r = EVAL();			break;
-	case OpCode::ASSIGN:	r = ASSIGN();		break;
-	case OpCode::COPY:		r = COPY();			break;
-	case OpCode::CALL: 		r = CALL();			break;
-	case OpCode::RET:   	r = RET();  		break;
-	case OpCode::RETF: 		r = RETF();			break;
-	case OpCode::ENTER:		r = ENTER();		break;
-	case OpCode::JUMP:		r = JUMP(TOS);		break;
-	case OpCode::JNEQ:		r = JNEQ();			break;
-	case OpCode::LLIMIT:	r = LLIMIT(TOS);	break;
-	case OpCode::ULIMIT: 	r = ULIMIT(TOS);	break;
-	case OpCode::HALT:		r = HALT();			break;
-
+	case OpCode::NOT:		r = NOT();		break;
+	case OpCode::ITOR:		r = ITOR();		break;	
+	case OpCode::ITOR2:		r = ITOR2();	break;
+	case OpCode::ROUND:		r = ROUND();	break;
+	case OpCode::TRUNC:		r = TRUNC();	break;
+	case OpCode::ABS:		r = ABS();		break;
+	case OpCode::ATAN:		r = ATAN();		break;
+	case OpCode::EXP: 		r = EXP();		break;
+	case OpCode::LOG: 		r = LOG();		break;
+	case OpCode::DUP:		r = DUP();		break;
+	case OpCode::ODD:		r = ODD();		break;
+	case OpCode::PRED:		r = PRED();		break;
+	case OpCode::SIN:		r = SIN();		break;
+	case OpCode::SQR:		r = SQR();		break;
+	case OpCode::SQRT:		r = SQRT();		break;
+	case OpCode::SUCC:		r = SUCC();		break;
+	case OpCode::WRITE:		r = WRITE();	break;
+	case OpCode::WRITELN:	r = WRITELN();	break;
+	case OpCode::NEW:		r = NEW();		break;
+	case OpCode::DISPOSE:	r = DISPOSE();	break;
+	case OpCode::NEG:		r = NEG();		break;
+	case OpCode::ADD:		r = ADD();		break;
+	case OpCode::SUB:		r = SUB();		break;
+	case OpCode::MUL:		r = MUL();		break;
+	case OpCode::DIV:		r = DIV();		break;
+	case OpCode::REM:		r = REM();		break;
+	case OpCode::LT:		r = LT();		break;
+	case OpCode::LTE:   	r = LTE();		break;
+	case OpCode::EQU:   	r = EQU();		break;
+	case OpCode::GTE:  		r = GTE();		break;
+	case OpCode::GT:		r = GT();		break;
+	case OpCode::NEQ: 		r = NEQ();		break;
+	case OpCode::OR:  		r = OR();		break;
+	case OpCode::AND: 		r = AND();		break;
+	case OpCode::POP:		r = POP();		break;
+	case OpCode::PUSH: 		r = PUSH();		break;
+	case OpCode::PUSHVAR:	r = PUSHVAR();	break;
+	case OpCode::EVAL:		r = EVAL();		break;
+	case OpCode::ASSIGN:	r = ASSIGN();	break;
+	case OpCode::COPY:		r = COPY();		break;
+	case OpCode::CALL: 		r = CALL();		break;
+	case OpCode::CALLI: 	r = CALLI();	break;
+	case OpCode::RET:   	r = RET();  	break;
+	case OpCode::RETF: 		r = RETF();		break;
+	case OpCode::ENTER:		r = ENTER();	break;
+	case OpCode::JUMP:		r = JUMP();		break;
+	case OpCode::JUMPI:		r = JUMPI();	break;
+	case OpCode::JNEQ:		r = JNEQ();		break;
+	case OpCode::JNEQI:		r = JNEQI();	break;
+	case OpCode::LLIMIT:	r = LLIMIT();	break;
+	case OpCode::ULIMIT: 	r = ULIMIT();	break;
+	case OpCode::HALT:		r = HALT();		break;
 	default:
-		cerr 	<< "Unknown op-code: " << OpCodeInfo::info(ir.op).name()
+		cerr	<< "Unknown op-code: " << OpCodeInfo::info(ir.op).name()
 				<< " found at pc (" << prevPc << ")!\n" << endl;
-		return Result::unknownInstr;
+		r = Result::unknownInstr;
 	};
 
 	return r;

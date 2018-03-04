@@ -57,6 +57,14 @@ size_t PComp::emitJump(size_t where) {
  * @param	where	The jump to address, if known
  * @return  address	of the jump to address instruction, for patching when know
  ************************************************************************************************/
+size_t PComp::emitJumpI(size_t where) {
+	return emit(OpCode::JUMPI, 0, where);
+}
+
+/********************************************************************************************//**
+ * @param	where	The jump to address, if known
+ * @return  address	of the jump to address instruction, for patching when know
+ ************************************************************************************************/
 size_t PComp::emitJNEQ(size_t where) {
 	const size_t addr = emit(OpCode::PUSH, 0, where);
 	emit(OpCode::JNEQ);
@@ -64,9 +72,17 @@ size_t PComp::emitJNEQ(size_t where) {
 }
 
 /********************************************************************************************//**
- * @param	level	The call level
+ * @param	where	The jump to address, if known
+ * @return  address	of the jump to address instruction, for patching when know
+ ************************************************************************************************/
+size_t PComp::emitJNEQI(size_t where) {
+	return emit(OpCode::JNEQI, 0, where);
+}
+
+/********************************************************************************************//**
+ * @param	level	The new block level
  * @param	where	The subroutine entry point, if known
- * @return  address	of the call address instruction, for patching when know
+ * @return  address	of the call address instruction, for patching when known
  ************************************************************************************************/
 size_t PComp::emitCall(int8_t level, size_t where) {
 	emit(OpCode::PUSH, 0, level);
@@ -74,6 +90,15 @@ size_t PComp::emitCall(int8_t level, size_t where) {
 	emit(OpCode::CALL);
 
 	return addr;
+}
+
+/********************************************************************************************//**
+ * @param	level	The new block level
+ * @param	where	The subroutine entry point, if known
+ * @return  address	of the call address instruction, for patching when known
+ ************************************************************************************************/
+size_t PComp::emitCallI(int8_t level, size_t where) {
+	return emit(OpCode::CALLI, level, where);
 }
 
 /********************************************************************************************//**
@@ -621,11 +646,7 @@ void PComp::callStatement(int level, SymbolTable::iterator it) {
 	if (SymValue::Procedure != it->second.kind() && SymValue::Function != it->second.kind())
 		error("Identifier is not a function or procedure", it->first);
 
-#if 1
-	emitCall(level - it->second.level(), it->second.value().address());
-#else
-	emit(OpCode::CALL, level - it->second.level(), it->second.value());
-#endif
+	emitCallI(level - it->second.level(), it->second.value().address());
 }
 
 /********************************************************************************************//**
@@ -638,11 +659,11 @@ void PComp::whileStatement(int level) {
 	expression(level);
 
 	// jump if expr is false...
-	const auto jmp_pc = emitJNEQ();
+	const auto jmp_pc = emitJNEQI();
 	expect(Token::Do);					// consume "do"
 	statement(level);
 
-	emitJump(cond_pc);					// Jump back to expr test...
+	emitJumpI(cond_pc);					// Jump back to expr test...
 
 	if (verbose)
 		cout << progName << ": patching address at " << jmp_pc << " to " << code->size() << "\n";
@@ -658,7 +679,7 @@ void PComp::ifStatement(int level) {
 	expression(level);
 
 	// Jump if conditon is false
-	const size_t jmp_pc = emitJNEQ();
+	const size_t jmp_pc = emitJNEQI();
 	expect(Token::Then);							// Consume "then"
 	statement(level);
 
@@ -666,7 +687,7 @@ void PComp::ifStatement(int level) {
 	const bool Else = accept(Token::Else);
 	size_t else_pc = 0;
 	if (Else)
-		else_pc = emitJump();
+		else_pc = emitJumpI();
 
 	if (verbose)
 		cout << progName << ": patching address at " << jmp_pc << " to " << code->size() << "\n";
@@ -687,11 +708,11 @@ void PComp::ifStatement(int level) {
  * @param	level 	The current block level
  ************************************************************************************************/
 void PComp::repeateStatement(int level) {
-	 const size_t loop_pc = code->size();			// jump here until expr fails
-	 statement(level);
-	 expect(Token::Until);
-	 expression(level);
-	emitJNEQ(loop_pc);
+	const size_t loop_pc = code->size();			// jump here until expr fails
+	statement(level);
+	expect(Token::Until);
+	expression(level);
+	emitJNEQI(loop_pc);
 }
 
 /********************************************************************************************//**
@@ -723,7 +744,7 @@ void PComp::forStatement(int level) {
 	emit(OpCode::LTE);					// 											addr, cond?
 
 	// jump if expr is false...
-	const auto jmp_pc = emitJNEQ();
+	const auto jmp_pc = emitJNEQI();
 
 	expect(Token::Do);					// "do statement"
 	statement(level);
@@ -734,7 +755,7 @@ void PComp::forStatement(int level) {
 	emit(OpCode::PUSH, 0, inc);													//	addr, addr, value, 1
 	emit(OpCode::ADD);															//	addr, addr, new_value
 	emit(OpCode::ASSIGN, 0, 1);													//	addr
-	emitJump(cond_pc);
+	emitJumpI(cond_pc);
 
 	const auto pop_pc = emit(OpCode::POP, 0, 1);
 
@@ -1688,11 +1709,7 @@ void PComp::progDecl(int level) {
 	expect(Token::SemiColon);
 
 	// Emit a call to the main procedure, followed by a halt
-#if 1
-	const auto call_pc = emitCall(level, 0);
-#else
-	const auto call_pc = emit(OpCode::CALL, level, 0);
-#endif
+	const auto call_pc = emitCallI(level, 0);
 	emit(OpCode::HALT);
 
 	const size_t addr = blockDecl(val, level);	// emit the first block 

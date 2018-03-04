@@ -1,73 +1,70 @@
 # test/pointers.p, 1: program PointerTest ;
 # test/pointers.p, 2: var
-    0: push 0
-    1: push 4
-    2: call
-    3: halt
+    0: calli 0, 2
+    1: halt
 # test/pointers.p, 3: 	xp : ^integer;
 # test/pointers.p, 4: 
 # test/pointers.p, 5: begin
-    4: enter 1
+    2: enter 1
 # test/pointers.p, 6: 	xp := nil;
-    5: pushvar 0, 4
-    6: push 0
-    7: assign 1
+    3: pushvar 0, 4
+    4: push 0
+    5: assign 1
 # test/pointers.p, 7: 	writeln(xp);
-    8: pushvar 0, 4
-    9: eval 1
-   10: push 1
-   11: push 0
-   12: push 0
-   13: push 1
-   14: writeln
+    6: pushvar 0, 4
+    7: eval 1
+    8: push 1
+    9: push 0
+   10: push 0
+   11: push 1
+   12: writeln
 # test/pointers.p, 8: 
 # test/pointers.p, 9: 	new(xp);
-   15: pushvar 0, 4
-   16: push 1
-   17: new
-   18: assign 1
+   13: pushvar 0, 4
+   14: push 1
+   15: new
+   16: assign 1
 # test/pointers.p, 10: 	writeln(xp);
-   19: pushvar 0, 4
-   20: eval 1
-   21: push 1
-   22: push 0
-   23: push 0
-   24: push 1
-   25: writeln
+   17: pushvar 0, 4
+   18: eval 1
+   19: push 1
+   20: push 0
+   21: push 0
+   22: push 1
+   23: writeln
 # test/pointers.p, 11: 	if xp <> nil then begin
-   26: pushvar 0, 4
-   27: eval 1
-   28: push 0
-   29: neq
-   30: push 44
-   31: jneq
+   24: pushvar 0, 4
+   25: eval 1
+   26: push 0
+   27: neq
+   28: jneqi 41
 # test/pointers.p, 12: 		xp^ := 2048;
-   32: pushvar 0, 4
-   33: eval 1
-   34: push 2048
-   35: assign 1
+   29: pushvar 0, 4
+   30: eval 1
+   31: push 2048
+   32: assign 1
 # test/pointers.p, 13: 		writeln(xp^)
-   36: pushvar 0, 4
-   37: eval 1
-   38: eval 1
-   39: push 1
-   40: push 0
-   41: push 0
+   33: pushvar 0, 4
+   34: eval 1
+   35: eval 1
+   36: push 1
+   37: push 0
+   38: push 0
 # test/pointers.p, 14: 	end;
-   42: push 1
-   43: writeln
+   39: push 1
+   40: writeln
 # test/pointers.p, 15: 
 # test/pointers.p, 16: 	xp^ := 0;
-   44: pushvar 0, 4
-   45: eval 1
-   46: push 0
-   47: assign 1
+   41: pushvar 0, 4
+   42: eval 1
+   43: push 0
+   44: assign 1
 # test/pointers.p, 17: 	dispose(xp)
-   48: pushvar 0, 4
-   49: eval 1
-   50: dispose
+   45: pushvar 0, 4
+   46: eval 1
+   47: dispose
 # test/pointers.p, 18: end .
-   51: ret
+   48: ret
 
 0
 1024

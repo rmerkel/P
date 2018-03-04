@@ -78,33 +78,35 @@ protected:
 	bool rangeCheck(size_t begin, size_t end);
 
 	size_t base(size_t lvl);				///< Find the activation base 'lvl' levels up the stack...
-	Datum pop();							///< Pop a Datum from the top of stack...
+	Datum& tos();							///< Return the top-of-stack
+	const Datum& tos() const;				///< Return the top-of-stack
+	Datum pop();							///< Pop a Datum from the top-of-stack...
 	void pop(size_t n);						///< Pop and discard n Datums from the top of stack...
 
 	/// Push value onto the stack
 	template<class T> void push(const T& value);
 	Result write1(unsigned index);			///< Write one expression on standard output...
 
-	Result ITOR(DatumVecIter TOS);			///< Convert to real
-	Result ITOR2(DatumVecIter TOS);			///< Convert to real
-	Result ROUND(DatumVecIter TOS);			///< Convert to integer by rounding 
-	Result TRUNC(DatumVecIter TOS);			///< Convert to interger by truncation
-	Result ABS(DatumVecIter TOS);			///< Absolute value
-	Result ATAN(DatumVecIter TOS);			///< Arc tangent
-	Result EXP(DatumVecIter TOS);			///< Base-e exponential 
-	Result DUP(DatumVecIter TOS); 			///< Duplicate
-	Result LOG(DatumVecIter TOS); 			///< Natural logarithm
-	Result ODD(DatumVecIter TOS);			///< Is an odd number?
-	Result PRED(DatumVecIter TOS);			///< Predicesor
-	Result SIN(DatumVecIter TOS);			///< Sine
-	Result SQR(DatumVecIter TOS);			///< Square
-	Result SQRT(DatumVecIter TOS);			///< Square-root
-	Result SUCC(DatumVecIter TOS);			///< Successor
-	Result WRITE(DatumVecIter TOS);			///< Write on standard output
-	Result WRITELN(DatumVecIter TOS);		///< Write on standard output
-	Result NEW(DatumVecIter TOS);			///< Allocate space
-	Result DISPOSE(DatumVecIter TOS);		///< Free space
-	Result NEG(DatumVecIter TOS);			///< Negative
+	Result ITOR();							///< Convert to real
+	Result ITOR2();							///< Convert to real
+	Result ROUND();							///< Convert to integer by rounding 
+	Result TRUNC();							///< Convert to interger by truncation
+	Result ABS();							///< Absolute value
+	Result ATAN();							///< Arc tangent
+	Result EXP();							///< Base-e exponential 
+	Result DUP(); 							///< Duplicate
+	Result LOG(); 							///< Natural logarithm
+	Result ODD();							///< Is an odd number?
+	Result PRED();							///< Predicesor
+	Result SIN();							///< Sine
+	Result SQR();							///< Square
+	Result SQRT();							///< Square-root
+	Result SUCC();							///< Successor
+	Result WRITE();							///< Write on standard output
+	Result WRITELN();						///< Write on standard output
+	Result NEW();							///< Allocate space
+	Result DISPOSE();						///< Free space
+	Result NEG();							///< Negative
 	Result ADD();							///< Replace the top two values on the stack with their sum
 	Result SUB();							///< Replace the top two vlaues on the stack with their difference
 	Result MUL();							///< Replace the top two values on the stack with their product
@@ -118,7 +120,7 @@ protected:
 	Result NEQ();							///< Not equal?
 	Result OR();							///< Logical or
 	Result AND();							///< Logical and
-	Result NOT(DatumVecIter TOS);			///< Logical not
+	Result NOT();							///< Logical not
 	Result POP();							///< Pop datum(s) off the stack
 	Result PUSH();							///< Push constant on the stack
 	Result PUSHVAR();						///< Push variable offset on the stack
@@ -126,13 +128,16 @@ protected:
 	Result ASSIGN();						///< Assign N Datums...
 	Result COPY();							///< Copy N Datums...
 	Result CALL(); 							///< Call a subroutine...
+	Result CALLI();							///< Call a subroutine
 	Result RET();							///< Return from procedure...
 	Result RETF();							///< Return from a function...
 	Result ENTER();							///< Enter sub-routine, allocate space for locals
-	Result JUMP(PInterp::DatumVecIter TOS);	///< Jump
+	Result JUMP();							///< Jump
+	Result JUMPI();							///< Jump
 	Result JNEQ();							///< Jump if condition is false
-	Result LLIMIT(DatumVecIter TOS);		///< Check lower limit
-	Result ULIMIT(DatumVecIter TOS);		///< Check upper limit
+	Result JNEQI();							///< Jump if condition is false
+	Result LLIMIT();						///< Check lower limit
+	Result ULIMIT();						///< Check upper limit
 	Result HALT();							///< Stop the machine
 
 	Result step();							///< Single step the machine...

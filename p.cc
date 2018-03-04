@@ -15,6 +15,7 @@ using namespace std;
 
 static	string	progName;						///< This programs name
 static 	string	inputFile {"-"};				///< Source file name, or - for standard input
+static  bool	listing = false;				///< Generate listing if true
 static 	bool	verbose = false;				///< Verbose messages if true
 static	bool	trace = false;					///< Trace run if true
 
@@ -24,14 +25,11 @@ static	bool	trace = false;					///< Trace run if true
 static void help() {
 	cerr << "Usage: " << progName << ": [options[ [filename]\n"
 		 << "Where options is zero or more of the following:\n"
-		 << "-?        Print this message and exit.\n"
-		 << "-help     Same as -?\n"
-		 << "-trace    Set interpreter trace mode.\n"
-		 << "-t        Same as -trace.\n"
-		 << "-verbose  Set compilier verbose mode.\n"
-		 << "-v        Same as -verbose.\n"
- 		 << "-version  Print the program version.\n"
-		 << "-V        Same as -version.\n"
+		 << "-? | -help     Print this message and exit.\n"
+		 << "-l | -listing  Generate listing.\n"
+		 << "-t | -trace    Set interpreter trace mode.\n"
+		 << "-v | -verbose  Set compilier verbose mode.\n"
+ 		 << "-V | -version  Print the program version.\n"
 		 << "\n"
 		 << "filename  The name of the source file, or '-' or '' for standard input.\n";
 }
@@ -40,7 +38,7 @@ static void help() {
  * Print the version number as major.minor
  ************************************************************************************************/
 static void printVersion() {
-	cout << progName << ": verson: 0.23\n";		// make sure to update verison history in REAME.md!
+	cout << progName << ": verson: 0.24\n";		// make sure to update verison history in REAME.md!
 }
 
 /********************************************************************************************//** 
@@ -60,7 +58,10 @@ static bool parseCommandline(const vector<string>& args) {
 			help();
 			return false;
 
-		} else if ("-trace" == arg)
+		} else if ("-listing" == arg)
+			listing = true;
+
+		else if ("-trace" == arg)
 			trace = true;						// Trace...
 
 		else if ("-verbose" == arg)
@@ -72,22 +73,11 @@ static bool parseCommandline(const vector<string>& args) {
 		else if ('-' == arg[0])	{				// parse -options...
 			for (unsigned n = 1; n < arg.size(); ++n)
 				switch(arg[n]) {
-				case '?':
-					help();
-					return false;
-					break;
-
-				case 't':
-					trace = true;
-					break;
-
-				case 'v':
-					verbose = true;
-					break;
-
-				case 'V':
-					printVersion();
-					break;
+				case '?':	help();				return false;
+				case 'l':	listing = true;		break;
+				case 't':	trace = true;		break;
+				case 'v':	verbose = true;		break;
+				case 'V':	printVersion();		break;
 
 				default:
 					cerr << progName << ": unknown command line parameter: -" << arg[n] << "\n";
@@ -127,7 +117,7 @@ int main(int argc, char* argv[]) {
 	if (!parseCommandline(args))
 		++nErrors;
 												// Compile the source, run if no errors
-	else if (0 == (nErrors = comp(inputFile, code, verbose))) {
+	else if (0 == (nErrors = comp(inputFile, code, listing, verbose))) {
 		if (verbose) {
 			if (inputFile == "-")
 				cout << progName << ": loading program from standard input, and starting P...\n";

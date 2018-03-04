@@ -10,56 +10,52 @@
 # test/test.p, 10: {	10	3,628,800	}
 # test/test.p, 11: program test ;
 # test/test.p, 12: const nFacts = 10;
-    0: push 0
-    1: push 4
-    2: call
-    3: halt
+    0: calli 0, 2
+    1: halt
 # test/test.p, 13: var n, f : integer;	
 # test/test.p, 14: begin
-    4: enter 2
+    2: enter 2
 # test/test.p, 15:    n := 0;
-    5: pushvar 0, 4
-    6: push 0
-    7: assign 1
+    3: pushvar 0, 4
+    4: push 0
+    5: assign 1
 # test/test.p, 16:    f := 1;
-    8: pushvar 0, 5
-    9: push 1
-   10: assign 1
+    6: pushvar 0, 5
+    7: push 1
+    8: assign 1
 # test/test.p, 17:    while n < nFacts do begin
-   11: pushvar 0, 4
-   12: eval 1
-   13: push 10
-   14: lt
-   15: push 39
-   16: jneq
+    9: pushvar 0, 4
+   10: eval 1
+   11: push 10
+   12: lt
+   13: jneqi 35
 # test/test.p, 18:       n := n + 1;
-   17: pushvar 0, 4
-   18: pushvar 0, 4
-   19: eval 1
-   20: push 1
-   21: add
-   22: assign 1
+   14: pushvar 0, 4
+   15: pushvar 0, 4
+   16: eval 1
+   17: push 1
+   18: add
+   19: assign 1
 # test/test.p, 19:       f := f * n;
-   23: pushvar 0, 5
-   24: pushvar 0, 5
-   25: eval 1
-   26: pushvar 0, 4
-   27: eval 1
-   28: mul
-   29: assign 1
+   20: pushvar 0, 5
+   21: pushvar 0, 5
+   22: eval 1
+   23: pushvar 0, 4
+   24: eval 1
+   25: mul
+   26: assign 1
 # test/test.p, 20: 	  writeln(f : 8 : 6)
-   30: pushvar 0, 5
-   31: eval 1
-   32: push 1
-   33: push 8
-   34: push 6
+   27: pushvar 0, 5
+   28: eval 1
+   29: push 1
+   30: push 8
+   31: push 6
 # test/test.p, 21:    end
-   35: push 1
-   36: writeln
+   32: push 1
+   33: writeln
 # test/test.p, 22: end.
-   37: push 11
-   38: jump
-   39: ret
+   34: jumpi 9
+   35: ret
 # test/test.p, 23: 
 
        1

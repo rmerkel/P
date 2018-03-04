@@ -1,4 +1,4 @@
-# test/fact.p, 1: { Calculate 11 (0..10) factorials
+# test/fact.p, 1: { Calculate 11 (0..10) factorials }
 # test/fact.p, 2: {	 n		    n!	}
 # test/fact.p, 3: {  ---  ---------	}
 # test/fact.p, 4: {	 0		    0	}
@@ -11,69 +11,63 @@
 # test/fact.p, 11: 
 # test/fact.p, 12: program fact ;
 # test/fact.p, 13: const nFacts = 10;
-    0: push 0
-    1: push 43
-    2: call
-    3: halt
+    0: calli 0, 39
+    1: halt
 # test/fact.p, 14: var p : integer;
 # test/fact.p, 15: procedure factorial(n : integer) ; begin
 # test/fact.p, 16:         p := 1;
-    4: pushvar 1, 4
-    5: push 1
-    6: assign 1
+    2: pushvar 1, 4
+    3: push 1
+    4: assign 1
 # test/fact.p, 17: 		writeln(p);
-    7: pushvar 1, 4
-    8: eval 1
-    9: push 1
-   10: push 0
-   11: push 0
-   12: push 1
-   13: writeln
+    5: pushvar 1, 4
+    6: eval 1
+    7: push 1
+    8: push 0
+    9: push 0
+   10: push 1
+   11: writeln
 # test/fact.p, 18:         while n > 0 do begin
-   14: pushvar 0, -1
-   15: eval 1
-   16: push 0
-   17: gt
-   18: push 42
-   19: jneq
+   12: pushvar 0, -1
+   13: eval 1
+   14: push 0
+   15: gt
+   16: jneqi 38
 # test/fact.p, 19:             p := p * n;
-   20: pushvar 1, 4
-   21: pushvar 1, 4
-   22: eval 1
-   23: pushvar 0, -1
-   24: eval 1
-   25: mul
-   26: assign 1
+   17: pushvar 1, 4
+   18: pushvar 1, 4
+   19: eval 1
+   20: pushvar 0, -1
+   21: eval 1
+   22: mul
+   23: assign 1
 # test/fact.p, 20:             n := n - 1;
-   27: pushvar 0, -1
-   28: pushvar 0, -1
-   29: eval 1
-   30: push 1
-   31: sub
-   32: assign 1
+   24: pushvar 0, -1
+   25: pushvar 0, -1
+   26: eval 1
+   27: push 1
+   28: sub
+   29: assign 1
 # test/fact.p, 21: 			writeln(p)
-   33: pushvar 1, 4
-   34: eval 1
-   35: push 1
-   36: push 0
-   37: push 0
+   30: pushvar 1, 4
+   31: eval 1
+   32: push 1
+   33: push 0
+   34: push 0
 # test/fact.p, 22:         end
-   38: push 1
-   39: writeln
+   35: push 1
+   36: writeln
 # test/fact.p, 23:     end;
-   40: push 14
-   41: jump
-   42: ret
+   37: jumpi 12
+   38: ret
 # test/fact.p, 24: 
 # test/fact.p, 25: begin
-   43: enter 1
+   39: enter 1
 # test/fact.p, 26:     factorial(nFacts)
-   44: push 10
+   40: push 10
 # test/fact.p, 27: end.
-   45: push 0
-   46: push 4
-   47: call
-   48: ret
+   41: calli 0, 2
+   42: ret
 
 1
 10

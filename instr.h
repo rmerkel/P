@@ -38,15 +38,15 @@ enum Frame {
  * OP level, addr - description; definition: error
  ************************************************************************************************/
 enum class OpCode : unsigned char {
-	NEG,									///< NEG - Negate TOS
-	ITOR,									///< ITOR - Convert TOS to real
-	ITOR2,									///< ITOR2 - Convert TOS-1 to real
-	ROUND,									///< ROUND - Round TOS to nearest integer
-	TRUNC,									///< TRUNC - Truncate TOS to integer
-	ABS,									///< ABS - Replace TOS with its absolute value
-	ATAN,									///< ATAN - Replace TOS with its arc tangent
-	EXP,									///< EXP - Replacse TOS with its base-e exponential
-	LOG,									///< LOG - Replace TOS with its natural logarithm
+	NEG,		///< NEG - Negate TOS
+	ITOR,		///< ITOR - Convert TOS to real
+	ITOR2,		///< ITOR2 - Convert TOS-1 to real
+	ROUND,		///< ROUND - Round TOS to nearest integer
+	TRUNC,		///< TRUNC - Truncate TOS to integer
+	ABS,		///< ABS - Replace TOS with its absolute value
+	ATAN,		///< ATAN - Replace TOS with its arc tangent
+	EXP,		///< EXP - Replacse TOS with its base-e exponential
+	LOG,		///< LOG - Replace TOS with its natural logarithm
 
 	DUP,		///< DUP - Duplicate; Push(stack[sp])
 	ODD,		///< ODD - Is odd?; Push(IsOdd(pop()))
@@ -86,12 +86,17 @@ enum class OpCode : unsigned char {
 	ASSIGN,		///< ASSIGN ,n - Assign stack(TOS-n,TOS) to stack[addr,addr+n), POP ,n
 	COPY,		///< COPY ,n - Copy Datums; dest=pop(); src=pop(); copy n Datums from src to dest
 
-	CALL,		///< CALL TOS-1,TOS - Call a procedure, pushing a new acrivation Frame
+	CALL,		///< Call TOS-1,TOS - Call a subroutine, pushing a new activation Frame
+	CALLI,		///< Call level, address - Call a subroutine, pushing a new activation frame
+
 	ENTER,		///< ENTER ,n - Allocate n locals on the stack
 	RET,		///< Return from procedure; unlink Frame
 	RETF,		///< Return from function; push result
+
 	JUMP,		///< Jump to a location
+	JUMPI,		///< Jump to a location
 	JNEQ,		///< Jump if condition is false
+	JNEQI,		///< Jump if condition is false
 
 	LLIMIT,		///< Check array index; out-of-range error if TOS <  addr
 	ULIMIT,		///< Check array index; out-of-range error if TOS >  addr

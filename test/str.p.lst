@@ -1,9 +1,7 @@
 # test/str.p, 1: program StringTest ;
 # test/str.p, 2: type
-    0: push 0
-    1: push 4
-    2: call
-    3: halt
+    0: calli 0, 2
+    1: halt
 # test/str.p, 3: 	A = array [0..9] of char;
 # test/str.p, 4: 
 # test/str.p, 5: var
@@ -12,59 +10,57 @@
 # test/str.p, 8: 	i : integer;
 # test/str.p, 9: 
 # test/str.p, 10: begin
-    4: enter 21
+    2: enter 21
 # test/str.p, 11: 	a1 := 'abcdefghij';		{	fill a1 with 'abcd...'			}
-    5: pushvar 0, 4
-    6: push 'a'
-    7: push 'b'
-    8: push 'c'
-    9: push 'd'
-   10: push 'e'
-   11: push 'f'
-   12: push 'g'
-   13: push 'h'
-   14: push 'i'
-   15: push 'j'
-   16: assign 10
+    3: pushvar 0, 4
+    4: push 'a'
+    5: push 'b'
+    6: push 'c'
+    7: push 'd'
+    8: push 'e'
+    9: push 'f'
+   10: push 'g'
+   11: push 'h'
+   12: push 'i'
+   13: push 'j'
+   14: assign 10
 # test/str.p, 12: 	a2 := a1; 				{	copies the contents of a1 to a2	}
-   17: pushvar 0, 14
-   18: pushvar 0, 4
-   19: eval 10
-   20: assign 10
+   15: pushvar 0, 14
+   16: pushvar 0, 4
+   17: eval 10
+   18: assign 10
 # test/str.p, 13: 	for i := 0 to 9 do writeln(a2[i])
-   21: pushvar 0, 24
-   22: dup
-   23: push 0
-   24: assign 1
-   25: dup
-   26: eval 1
-   27: push 9
-   28: lte
-   29: push 51
-   30: jneq
-   31: pushvar 0, 14
-   32: pushvar 0, 24
-   33: eval 1
-   34: llimit 0
-   35: ulimit 9
-   36: add
-   37: eval 1
-   38: push 1
-   39: push 0
-   40: push 0
+   19: pushvar 0, 24
+   20: dup
+   21: push 0
+   22: assign 1
+   23: dup
+   24: eval 1
+   25: push 9
+   26: lte
+   27: jneqi 47
+   28: pushvar 0, 14
+   29: pushvar 0, 24
+   30: eval 1
+   31: llimit 0
+   32: ulimit 9
+   33: add
+   34: eval 1
+   35: push 1
+   36: push 0
+   37: push 0
 # test/str.p, 14: end .
-   41: push 1
-   42: writeln
-   43: dup
-   44: dup
-   45: eval 1
-   46: push 1
-   47: add
-   48: assign 1
-   49: push 25
-   50: jump
-   51: pop
-   52: ret
+   38: push 1
+   39: writeln
+   40: dup
+   41: dup
+   42: eval 1
+   43: push 1
+   44: add
+   45: assign 1
+   46: jumpi 23
+   47: pop
+   48: ret
 
 a
 b

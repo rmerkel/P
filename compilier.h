@@ -31,7 +31,8 @@ public:
 	unsigned operator()(
 		const	std::string&	fName,
 				InstrVector&	instructions,
-				bool			verbMode);
+				bool			lst,
+				bool			ver);
 
 protected:
 	/// A table, indexed by instruction address, yeilding source line numbers
