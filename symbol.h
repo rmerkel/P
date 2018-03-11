@@ -79,4 +79,9 @@ std::ostream& operator<<(std::ostream& os, const SymValue::Kind& kind);
  ************************************************************************************************/
 typedef std::multimap<std::string, SymValue> SymbolTable;
 
+/********************************************************************************************//**
+ * A SymbolTable iterator
+ ************************************************************************************************/
+typedef SymbolTable::iterator	SymbolTableIter;
+
 #endif

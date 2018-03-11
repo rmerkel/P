@@ -32,11 +32,13 @@
  *        sub-decl-lst = func-decl | proc-decl ;
  *           proc-decl = 'procedure' identifier param-lst ';' block-decl ';' ;
  *           func-decl = 'function'  identifier param-lst ':' type ';' block-decl ';' ; 
- *           param-lst = [ '(' var-decl-lst ')' ] ;
+ *           param-lst = [ '(' param-decl-lst ')' ] ;
+ *      param-decl-lst = param-decl { ';' param-decl } ;
+ *          param-decl = [ 'var' ] identifier-lst : type ;
  *            variable = identifier [ composite-desc { composite-desc } ] ;
  *      composite-desc = '[' expression-lst ']'                                             |
  *                       '.' identifier                                                     |
- *                       '^' ;
+ *                       '^' identifier ;
  *       statement-blk = 'begin' statement-lst 'end' ;
  *       statement-lst = 'begin' statement {';' statement } 'end' ;
  *           statement = [  variable '=' expression                                         |

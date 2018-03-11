@@ -21,6 +21,11 @@ class TypeDesc;
 typedef std::shared_ptr<TypeDesc>		TDescPtr;
 
 /********************************************************************************************//**
+ * Pointer to const TypeDesc
+ ************************************************************************************************/
+typedef std::shared_ptr<const TypeDesc>	ConstTDescPtr;
+
+/********************************************************************************************//**
  * Vector of TDescPtrs
  ************************************************************************************************/
 typedef std::vector<TDescPtr>			TDescPtrVec;
@@ -117,40 +122,36 @@ public:
 	// useful constants
 
 	static SubRange	maxRange;			///< Largest possible range
-
-	// pre-defined types
-
-	static TDescPtr boolDesc;			///< Boolean type descriptor
-	static TDescPtr charDesc;			///< Character type description
-	static TDescPtr intDesc;			///< Integer type description
-	static TDescPtr constIntDesc;		///< Constant integer type description
-	static TDescPtr realDesc;			///< Real type description
-	static TDescPtr constRealDesc;		///< Constant real type description
+	static SubRange charRange;			///< Range of ASCII characters
 
 	/// Create, and return, a TDescPtr to a new IntDesc
-	static TDescPtr newIntDesc(const SubRange& range = SubRange());
+	static TDescPtr newIntDesc(const SubRange& range = maxRange, bool ref = false);
 
-	static TDescPtr newRealDesc();		///< Create, and return, a TDescPtr to a new RealDesc
-	static TDescPtr newBoolDesc();		///< Create, and return, a TDescPtr to a BoolDesc
+	/// Create, and return, a TDescPtr to a new RealDesc
+	static TDescPtr newRealDesc(bool ref = false);
+
+	/// Create, and return, a TDescPtr to a BoolDesc
+	static TDescPtr newBoolDesc(bool ref = false);
 
 	/// Create, and return, a TDescPtr to a new CharDesc
-	static TDescPtr newCharDesc(const SubRange& range);
+	static TDescPtr newCharDesc(const SubRange& = charRange, bool ref = false);
 
 	/// Create, and return, a TDescPtr to a new ArrayDesc
 	static TDescPtr newArrayDesc(
 				size_t		size,
 		const	SubRange&	range,
 				TDescPtr	rtype,
-				TDescPtr	base = TDescPtr());
+				TDescPtr	base = TDescPtr(),
+				bool		ref = false);
 
 	/// Create, and return, a TDescPtr to a new RecordDesc
-	static TDescPtr newRcrdDesc(size_t size, const FieldVec& fields = FieldVec());
+	static TDescPtr newRcrdDesc(size_t size, const FieldVec& fields = FieldVec(), bool ref = false);
 
 	/// Create, and return, a TDescPtr to a new EnumDesc
-	static TDescPtr newEnumDesc(const SubRange& range, const FieldVec& fields = FieldVec());
+	static TDescPtr newEnumDesc(const SubRange& range, const FieldVec& fields = FieldVec(), bool ref = false);
 
 	/// Create, and return, a TDescPtr to a new PointerDesc
-	static TDescPtr newPointerDesc(TDescPtr base);
+	static TDescPtr newPointerDesc(TDescPtr base, bool ref = false);
 
 	virtual ~TypeDesc() {}				///< Destructor
 
@@ -167,22 +168,20 @@ public:
 
 	TDescPtr base() const;				///< Return by base type
 	TDescPtr base(TDescPtr type);		///< Set, and then return, my base type
-	bool isOrdinal() const;				///< Return true if I'm an ordinal
+	bool ordinal() const;				///< Return true if I'm an ordinal
+	bool ref(bool v);					///< Set, and then return, if this type is passed by reference
+	bool ref() const;					///< Return true if this type is passed by reference
 
 protected:
-	/**	Construct
-	 * @param	tclass	My type class
-	 * @param	size	Object size, in Datums
-	 * @param	range	Sub-Range, defaults SubRange()
-	 * @param	fields	Fields, defaults FieldVec()
-	 */
+	///	Constructor
 	TypeDesc(	TypeClass	tclass,
 				size_t		size,
 		const	SubRange&	range	= SubRange(),
 				TDescPtr	itype	= TDescPtr(),
 		const	FieldVec&	fields	= FieldVec(),
 				TDescPtr	base	= TDescPtr(),
-				bool		ordinal = false);
+				bool		ordinal = false,
+				bool		ref		= false);
 
 private:
 	TypeClass	_tclass;					///< Type class
@@ -192,7 +191,7 @@ private:
 	FieldVec	_fields;					///< My fields (enumeration and record)
 	TDescPtr	_base;						///< Arrays base type
 	bool		_ordinal;					///< An ordinal?
-
+	bool		_ref;						///< passed by reference?
 };
 
 bool operator<(const TypeDesc& lhs, const TypeDesc& rhs);

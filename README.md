@@ -80,17 +80,17 @@ Version | Description
  0.23   | Call and jump indirection; target address is on the stack
  0.24	| Added -l[listing], fixed fahr*.p tests, added call and jump immediate instructions.
  0.25	| Table of pointers to instructions
+ 0.26   | 'var' parameters; pass by reference
 
 ## Design and implementation notes
 
-* write[ln] string, or more generally, array parameters aren't currently
-  supported. At issue is that arrays don't start with a descriptor, just their 
-  initial value, as in C. Thus, writeln can't tell if it's been passed a single
-  T object, or a T[]. One possible solution is to push the element count after
-  each paramter, so that writeln can tell if it's been passed a scalar value,
-  or an array.
+* To support passing strings, or more generally, arrays to write[ln], a count
+  is passed with each parameters, 1 for scalers, N for the string or array
+  length. 
 * Need to make "()" manditory for subroutine declaractions and calls.
-* Need to add "var" subroutine parameter types.
+* Need to add "var" subroutine parameter types. This requires the ability to
+  create var types so that expresson results can be passed by reference, and so
+  subroutines know to deference these references.
 
 ## Author
     Randy Merkel, Slowly but Surly Software.

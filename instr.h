@@ -104,6 +104,9 @@ enum class OpCode : unsigned char {
 	HALT		///< Halt the machine
 };
 
+/// Return the ordinal value for op
+inline unsigned ordinal(OpCode op)			{	return static_cast<unsigned>(op);	}
+
 /********************************************************************************************//**
  * OpCode Information
  *

@@ -155,7 +155,7 @@ void PComp::assignPromote (TDescPtr lhs, TDescPtr rhs) {
 		error("incompatable assignment types");
 
 	// Emit limit checks, unless range is impossible to exceed
-	if (lhs->isOrdinal() && lhs->range() != TypeDesc::maxRange) {
+	if (lhs->ordinal() && lhs->range() != TypeDesc::maxRange) {
 		emit(OpCode::LLIMIT, 0, lhs->range().minimum());
 		emit(OpCode::ULIMIT, 0, lhs->range().maximum());
 	}
@@ -169,10 +169,12 @@ void PComp::assignPromote (TDescPtr lhs, TDescPtr rhs) {
  *
  * @param	id		The variable or prodecure identifier
  * @param	level	The current block level 
+ * @param	var		True if factor will be passed to a var parameter
+ *
  * @return	Data type 
  ************************************************************************************************/
-TDescPtr PComp::identFactor(int level, const string& id) {
-	auto type = TypeDesc::intDesc;
+TDescPtr PComp::identFactor(int level, const string& id, bool var) {
+	auto type = TypeDesc::newIntDesc();
    	auto it = lookup(id);
 
 	if (it != symtbl.end()) {
@@ -180,6 +182,8 @@ TDescPtr PComp::identFactor(int level, const string& id) {
 		case SymValue::Constant:
 			type = it->second.type();
 			emit(OpCode::PUSH, 0, it->second.value());
+			if (var) error("attempt to pass constant by reference!");
+			assert(!type->ref());
 			break;
 
 		case SymValue::Variable:
@@ -188,12 +192,18 @@ TDescPtr PComp::identFactor(int level, const string& id) {
 			assert(type->base().get() != 0);
 			type = type->base();
 			assert(type.get() != 0);
-			emit(OpCode::EVAL, 0, type->size());
+			if (!var)
+				emit(OpCode::EVAL, 0, type->size());
+			if (type->ref())
+				emit(OpCode::EVAL, 0, type->size());
 			break;
 
 		case SymValue::Function:
 			type = it->second.type();		// Use the function return type
 			callStatement(level, it);
+			if (var) error("attempt to pass function return by reference!");
+			if (type->ref())
+				error("passing functions by reference isn't supported!");
 			break;
 
 		default:
@@ -211,7 +221,7 @@ TDescPtr PComp::identFactor(int level, const string& id) {
  ************************************************************************************************/
 TDescPtr PComp::builtInFunc(int level)
 {
-	auto type = TypeDesc::intDesc;			// Factor data type
+	auto type = TypeDesc::newIntDesc();			// Factor data type
 	ostringstream oss;
 
 	if (accept(Token::Round))  {		// round(expr) to an integer
@@ -225,7 +235,7 @@ TDescPtr PComp::builtInFunc(int level)
 
 		} else {
 			emit(OpCode::ROUND);
-			type = TypeDesc::intDesc;
+			type = TypeDesc::newIntDesc();
 		}
 
 	} else if (accept(Token::Trunc)) {	// truncate(expr) to an integer
@@ -239,7 +249,7 @@ TDescPtr PComp::builtInFunc(int level)
 
 		} else {
 			emit(OpCode::TRUNC);
-			type = TypeDesc::intDesc;
+			type = TypeDesc::newIntDesc();
 		}
 
 	} else if (accept(Token::Abs)) {	// replace TOS with it's absolute value
@@ -259,7 +269,7 @@ TDescPtr PComp::builtInFunc(int level)
 		expect(Token::CloseParen);	
 
 		if (type->tclass() == TypeDesc::Integer)
-			type = TypeDesc::realDesc;		// Always produces a real
+			type = TypeDesc::newRealDesc();		// Always produces a real
 		else if (type->tclass() != TypeDesc::Real)
 			oss << "expeced integer, or real value, got: " << current();
 		emit(OpCode::ATAN);
@@ -270,7 +280,7 @@ TDescPtr PComp::builtInFunc(int level)
 		expect(Token::CloseParen);	
 
 		if (type->tclass() == TypeDesc::Integer)
-			type = TypeDesc::realDesc;		// Always produces a real
+			type = TypeDesc::newRealDesc();		// Always produces a real
 		else if (type->tclass() != TypeDesc::Real)
 			oss << "expeced integer, or real value, got: " << current();
 		emit(OpCode::EXP);
@@ -281,7 +291,7 @@ TDescPtr PComp::builtInFunc(int level)
 		expect(Token::CloseParen);	
 
 		if (type->tclass() == TypeDesc::Integer)
-			type = TypeDesc::realDesc;		// Always produces a real
+			type = TypeDesc::newRealDesc();		// Always produces a real
 		else if (type->tclass() != TypeDesc::Real)
 			oss << "expeced integer, or real value, got: " << current();
 		emit(OpCode::LOG);
@@ -300,7 +310,7 @@ TDescPtr PComp::builtInFunc(int level)
 		type = expression(level);
 		expect(Token::CloseParen);	
 
-		if (type->isOrdinal())
+		if (type->ordinal())
 			oss << "expeced ordinal value, got: " << current();
 		emit(OpCode::PRED, 0, type->range().minimum());
 
@@ -310,7 +320,7 @@ TDescPtr PComp::builtInFunc(int level)
 		expect(Token::CloseParen);	
 
 		if (type->tclass() == TypeDesc::Integer)
-			type = TypeDesc::realDesc;		// Always produces a real
+			type = TypeDesc::newRealDesc();		// Always produces a real
 		else if (type->tclass() != TypeDesc::Real)
 			oss << "expeced integer, or real value, got: " << current();
 		emit(OpCode::SIN);
@@ -321,7 +331,7 @@ TDescPtr PComp::builtInFunc(int level)
 		expect(Token::CloseParen);	
 
 		if (type->tclass() == TypeDesc::Integer)
-			type = TypeDesc::realDesc;		// Always produces a real
+			type = TypeDesc::newRealDesc();		// Always produces a real
 		else if (type->tclass() != TypeDesc::Real)
 			oss << "expeced integer, or real value, got: " << current();
 		emit(OpCode::SQR);
@@ -332,7 +342,7 @@ TDescPtr PComp::builtInFunc(int level)
 		expect(Token::CloseParen);	
 
 		if (type->tclass() == TypeDesc::Integer)
-			type = TypeDesc::realDesc;		// Always produces a real
+			type = TypeDesc::newRealDesc();		// Always produces a real
 		else if (type->tclass() != TypeDesc::Real)
 			oss << "expeced integer, or real value, got: " << current();
 		emit(OpCode::SQRT);
@@ -342,7 +352,7 @@ TDescPtr PComp::builtInFunc(int level)
 		type = expression(level);
 		expect(Token::CloseParen);	
 
-		if (type->isOrdinal())
+		if (type->ordinal())
 			oss << "expeced ordinal value, got: " << current();
 		emit(OpCode::SUCC, 0, type->range().maximum());
 
@@ -351,11 +361,11 @@ TDescPtr PComp::builtInFunc(int level)
 		type = expression(level);
 		expect(Token::CloseParen);	
 
-		if (!type->isOrdinal()) {
+		if (!type->ordinal()) {
 			oss << "expected ordinal, got: " << current();
 			error(oss.str());
 		} else 
-			type = TypeDesc::intDesc;
+			type = TypeDesc::newIntDesc();
 
 	} else {
 		oss << "bultInFunc: syntax error; expected ident | num | { expr }, got: " << current();
@@ -373,37 +383,41 @@ TDescPtr PComp::builtInFunc(int level)
  * number                               |
  * ( expr )
  * 
- * @param level		The current block level.
+ * @param	level	The current block level.
+ * @param	var		True if factor will be passed to a var parameter
  *
  * @return	Data type 
  ************************************************************************************************/
-TDescPtr PComp::factor(int level) {
-	auto type = TypeDesc::intDesc;			// Factor data type
+TDescPtr PComp::factor(int level, bool var) {
+	LogLevel	lvl;
+	if (verbose)
+		cout << progName << ": " << LogIndex << "factor (" << level << ", " << boolalpha << var << ")\n";
 
+	auto type = TypeDesc::newIntDesc();			// Factor data type
 	if (accept(Token::Identifier, false)) {
 		// Copy, and then consume the identifer...
     	const string id = ts.current().string_value;
     	next();
-		type = identFactor(level, id);
+		type = identFactor(level, id, var);
 
 	} else if (accept(Token::IntegerNum, false)) {
 		int value = ts.current().integer_value;
 		emit(OpCode::PUSH, 0, value);
 		expect(Token::IntegerNum);
-		type = TypeDesc::intDesc;
+		type = TypeDesc::newIntDesc();
 
 	} else if (accept(Token::RealNum, false)) {
 		emit(OpCode::PUSH, 0, ts.current().real_value);
 		expect(Token::RealNum);
-		type = TypeDesc::realDesc;
+		type = TypeDesc::newRealDesc();
 
 	} else if (accept(Token::OpenParen)) {
-		type = expression(level);
+		type = expression(level, var);
 		expect(Token::CloseParen);
 
 	} else if (accept(Token::Not)) {
 		emit(OpCode::NOT);
-		type = factor(level);
+		type = factor(level, var);
 
 	} else if (accept(Token::String, false)) {	// TBD: type = stringLiteral()
 		const auto s = ts.current().string_value;
@@ -411,12 +425,15 @@ TDescPtr PComp::factor(int level) {
 
 		if (s.size() == 1) {
 			emit(OpCode::PUSH, 0, s[0]);
-			type = TypeDesc::charDesc;
+			type = TypeDesc::newCharDesc();
 
 		} else {								// push each character...
 			for (char c : s)
 				emit(OpCode::PUSH, 0, c);
-			type = TypeDesc::newArrayDesc(s.size(), SubRange(0, s.size() - 1), TypeDesc::intDesc, TypeDesc::charDesc);
+			type = TypeDesc::newArrayDesc(	s.size(),
+											SubRange(0, s.size() - 1),
+											TypeDesc::newIntDesc(),
+											TypeDesc::newCharDesc());
 
 		}
 
@@ -429,28 +446,32 @@ TDescPtr PComp::factor(int level) {
 /********************************************************************************************//**
  * fact { ( * | / | mod | and ) fact } ;
  *
- * @param level		The current block level 
+ * @param	level	The current block level 
+ * @param	var		True if term will be passed to a var parameter
  *
  * @return	Data type  
  ************************************************************************************************/
-TDescPtr PComp::term(int level) {
-	auto lhs = factor(level);
+TDescPtr PComp::term(int level, bool var) {
+	LogLevel	lvl;
+	if (verbose)
+		cout << progName << ": " << LogIndex << "terminal(" << level << ',' << boolalpha << var << ")\n";
 
+	auto lhs = factor(level, var);
 	for (;;) {
 		if (accept(Token::Multiply)) {
-			lhs = promote(lhs, factor(level));
+			lhs = promote(lhs, factor(level, var));
 			emit(OpCode::MUL);
 			
 		} else if (accept(Token::Divide)) {
-			lhs = promote(lhs, factor(level));
+			lhs = promote(lhs, factor(level, var));
 			emit(OpCode::DIV);	
 			
 		} else if (accept(Token::Mod)) {
-			lhs = promote(lhs, factor(level));
+			lhs = promote(lhs, factor(level, var));
 			emit(OpCode::REM);
 
 		} else if (accept(Token::And)) {
-			lhs = promote(lhs, factor(level));
+			lhs = promote(lhs, factor(level, var));
 			emit(OpCode::AND);
 
 		} else
@@ -463,22 +484,26 @@ TDescPtr PComp::term(int level) {
 /********************************************************************************************//**
  * [ ( + | - ] term
  *
- * @param level		The current block level 
+ * @param	level	The current block level 
+ * @param	var		True if unary will be passed to a var parameter
  *
  * @return	Data type 
  ************************************************************************************************/
-TDescPtr PComp::unary(int level) {
-	auto type = TypeDesc::intDesc;			// Default factor data type
+TDescPtr PComp::unary(int level, bool var) {
+	LogLevel	lvl;
+	if (verbose)
+		cout << progName << ": " << LogIndex << "unary(" << level << ',' << boolalpha << var << ")\n";
 
+	auto type = TypeDesc::newIntDesc();		// Default factor data type
 	if (accept(Token::Add)) 
-		type = term(level);					// ignore unary + 
+		type = term(level, var);			// ignore unary + 
 
 	else if (accept(Token::Subtract)) {
-		type = term(level);
+		type = term(level, var);
 		emit(OpCode::NEG);
 
 	} else									
-		type = term(level);
+		type = term(level, var);
 
 	return type;
 }
@@ -486,24 +511,28 @@ TDescPtr PComp::unary(int level) {
 /********************************************************************************************//**
  * term { (+ | - | or ) term } ;
  *
- * @param level		The current block level. 
+ * @param	level	The current block level. 
+ * @param	var		True if simple-expr will be passed to a var parameter
  *
  * @return	Data type  
  ************************************************************************************************/
-TDescPtr PComp::simpleExpr(int level) {
-	auto lhs = unary(level);
+TDescPtr PComp::simpleExpr(int level, bool var) {
+	LogLevel	lvl;
+	if (verbose)
+		cout << progName << ": " << LogIndex << "simple-expr(" << level << ',' << boolalpha << var << ")\n";
 
+	auto lhs = unary(level, var);
 	for (;;) {
 		if (accept(Token::Add)) {
-			lhs = promote(lhs, unary(level));
+			lhs = promote(lhs, unary(level, var));
 			emit(OpCode::ADD);
 
 		} else if (accept(Token::Subtract)) {
-			lhs = promote(lhs, unary(level));
+			lhs = promote(lhs, unary(level, var));
 			emit(OpCode::SUB);
 
 		} else if (accept(Token::Or)) {
-			lhs = promote(lhs, unary(level));
+			lhs = promote(lhs, unary(level, var));
 			emit(OpCode::OR);
 
 		} else
@@ -516,36 +545,40 @@ TDescPtr PComp::simpleExpr(int level) {
 /********************************************************************************************//**
  * simpleExpr { (< | <= | = | >= | > | <> ) simpleExpr } ;
  *
- * @param level		The current block level 
+ * @param	level	The current block level 
+ * @param	var		True if expression will be passed to a var parameter
  *
  * @return	Data type. 
  ************************************************************************************************/
-TDescPtr PComp::expression(int level) {
-	auto lhs = simpleExpr(level);
+TDescPtr PComp::expression(int level, bool var) {
+	LogLevel	lvl;
+	if (verbose)
+		cout << progName << ": " << LogIndex << "expresson(" << level << ',' << boolalpha << var << ")\n";
 
+	auto lhs = simpleExpr(level, var);
 	for (;;) {
 		if (accept(Token::LTE)) {
-			lhs = promote(lhs, simpleExpr(level));
+			lhs = promote(lhs, simpleExpr(level, var));
 			emit(OpCode::LTE);
 
 		} else if (accept(Token::LT)) {
-			lhs = promote(lhs, simpleExpr(level));
+			lhs = promote(lhs, simpleExpr(level, var));
 			emit(OpCode::LT);
 
 		} else if (accept(Token::GT)) {
-			lhs = promote(lhs, simpleExpr(level));
+			lhs = promote(lhs, simpleExpr(level, var));
 			emit(OpCode::GT);
 			
 		} else if (accept(Token::GTE)) {
-			lhs = promote(lhs, simpleExpr(level));
+			lhs = promote(lhs, simpleExpr(level, var));
 			emit(OpCode::GTE);
 			
 		} else if (accept(Token::EQU)) {
-			lhs = promote(lhs, simpleExpr(level));
+			lhs = promote(lhs, simpleExpr(level, var));
 			emit(OpCode::EQU);
 
 		} else if (accept(Token::NEQ)) {
-			lhs = promote(lhs, simpleExpr(level));
+			lhs = promote(lhs, simpleExpr(level, var));
 			emit(OpCode::NEQ);
 
 		} else
@@ -563,8 +596,11 @@ TDescPtr PComp::expression(int level) {
  * @return a list (vector) of TDescPtrs, one for each array dimension
  ************************************************************************************************/
 TDescPtrVec	PComp::expressionList(int level) {
-	TDescPtrVec	v;
+	LogLevel	lvl;
+	if (verbose)
+		cout << progName << ": " << LogIndex << "expression-list(" << level << ")\n";
 
+	TDescPtrVec	v;
 	do {
 		v.push_back(expression(level));
 	} while(accept(Token::Comma));
@@ -621,15 +657,19 @@ pair<bool,Datum> PComp::constExpr() {
  * @param	level	The current block level 
  * @param	it		The sub-routines symbol table entry
  ************************************************************************************************/
-void PComp::callStatement(int level, SymbolTable::iterator it) {
+void PComp::callStatement(int level, SymbolTableIter it) {
 	if (accept(Token::OpenParen)) {
 		unsigned nParams = 0;					// Count actual parameters
-		const auto& params = it->second.params();		// Formal parameter kinds
+
+		const auto& params = it->second.params(); // Formal parameter kinds
 		if (!accept(Token::CloseParen, false))
 			do {								// collect actual parameters
-				const auto kind = expression(level);
-				if (params.size() > nParams)
+				if (params.size() > nParams) {
+					const auto kind = expression(level, params[nParams]->ref());
 					assignPromote(params[nParams], kind);
+				} else
+					expression(level); 			// consume the expression...
+
 				++nParams;
 
 			} while (accept (Token::Comma));
@@ -666,7 +706,7 @@ void PComp::whileStatement(int level) {
 	emitJumpI(cond_pc);					// Jump back to expr test...
 
 	if (verbose)
-		cout << progName << ": patching address at " << jmp_pc << " to " << code->size() << "\n";
+		cout << progName << ": " << LogIndex << "patching address at " << jmp_pc << " to " << code->size() << "\n";
 	(*code)[jmp_pc].value = code->size(); 
 }
 
@@ -690,14 +730,14 @@ void PComp::ifStatement(int level) {
 		else_pc = emitJumpI();
 
 	if (verbose)
-		cout << progName << ": patching address at " << jmp_pc << " to " << code->size() << "\n";
+		cout << progName << ": " << LogIndex << "patching address at " << jmp_pc << " to " << code->size() << "\n";
 	(*code)[jmp_pc].value = code->size();
 
 	if (Else) {
 		statement(level);
 
 		if (verbose)
-			cout << progName << ": patching address at " << else_pc << " to " << code->size() << "\n";
+			cout << progName << ": " << LogIndex << "patching address at " << else_pc << " to " << code->size() << "\n";
 		(*code)[else_pc].value = code->size();
 	}
 }
@@ -726,41 +766,42 @@ void PComp::forStatement(int level) {
 	next();
 	auto var = lookup(id);
 	if (var == symtbl.end())
-		return;							// Unidentified
-	assignStatement(level, var, true);										//		addr
+		return;
+	assignStatement(level, var, true);
 
-	int inc;							// ".. ( to | downto ) .."
+
+	int inc;							// "... ( to | downto ) ...|
 	if (accept(Token::To))
-		inc = 1;						// "to"
+		inc = 1;
 	else {
 		expect(Token::DownTo);
-		inc = -1;						// "downto"
+		inc = -1;
 	}
 
-	const auto cond_pc = code->size();	// Check condition
-	emit(OpCode::DUP);					// Duplicate variable refernece				addr, addr
-	emit(OpCode::EVAL, 0, 1);			// 											addr, value
-	expression(level);					// 											addr, value, cond
-	emit(OpCode::LTE);					// 											addr, cond?
-
-	// jump if expr is false...
+	const auto cond_pc = code->size();	// "... condition..."
+	emit(OpCode::DUP);
+	emit(OpCode::EVAL, 0, 1);
+	expression(level);
+	emit(OpCode::LTE);
 	const auto jmp_pc = emitJNEQI();
 
-	expect(Token::Do);					// "do statement"
+	expect(Token::Do);					// "... do statement"
 	statement(level);
 
-	emit(OpCode::DUP);					// iterate 									addr, addr
-	emit(OpCode::DUP);															//	addr, addr, addr
-	emit(OpCode::EVAL, 0, 1);													//	addr, addr, value
-	emit(OpCode::PUSH, 0, inc);													//	addr, addr, value, 1
-	emit(OpCode::ADD);															//	addr, addr, new_value
-	emit(OpCode::ASSIGN, 0, 1);													//	addr
+	emit(OpCode::DUP);					// iterate
+	emit(OpCode::DUP);
+	emit(OpCode::EVAL, 0, 1);
+	emit(OpCode::PUSH, 0, inc);
+	emit(OpCode::ADD);
+	emit(OpCode::ASSIGN, 0, 1);
 	emitJumpI(cond_pc);
 
+	// pop the condition varaible off the stack...
 	const auto pop_pc = emit(OpCode::POP, 0, 1);
 
 	if (verbose)
-		cout << progName << ": patching address at " << pop_pc << " to " << code->size() << "\n";
+		cout << progName << ": " << LogIndex << "patching address at " << pop_pc << " to " << code->size() << "\n";
+
 	(*code)[jmp_pc].value = pop_pc;
 }
 
@@ -787,7 +828,7 @@ void PComp::statementList(int level) {
  *
  * @return	The arrays base type
  ************************************************************************************************/
-TDescPtr PComp::varArray(int level, SymbolTable::iterator it, TDescPtr type) {
+TDescPtr PComp::varArray(int level, SymbolTableIter it, TDescPtr type) {
 	TDescPtr atype = type;					// The arrays type, e.g, ArrayDesc
 	type = atype->base();					// We'll return the arrays base type...
 
@@ -838,7 +879,7 @@ TDescPtr PComp::varArray(int level, SymbolTable::iterator it, TDescPtr type) {
  * @param 	type	The owning record type
  * @return	The identifier type
  ************************************************************************************************/
-TDescPtr PComp::varSelector(SymbolTable::iterator it, TDescPtr type) {
+TDescPtr PComp::varSelector(SymbolTableIter it, TDescPtr type) {
 	if (type->tclass() != TypeDesc::Record)
 		error("attempted selector reference into non-record", it->first);
 
@@ -873,8 +914,10 @@ TDescPtr PComp::varSelector(SymbolTable::iterator it, TDescPtr type) {
  * @param	level	The current block level.
  * @return	The identifier type
  ************************************************************************************************/
-TDescPtr PComp::variable(int level, SymbolTable::iterator it) {
+TDescPtr PComp::variable(int level, SymbolTableIter it) {
 	TDescPtr type = emitVarRef(level, it->second);
+	if (it->second.type()->ref())			// dereference if necessary...
+		emit(OpCode::EVAL, 0, type->size());
 
 	// process composite-desc's, if any...
 	for (;;) {
@@ -906,7 +949,7 @@ TDescPtr PComp::variable(int level, SymbolTable::iterator it) {
  *
  * @return	Reference to the variable reference
  ************************************************************************************************/
-void PComp::assignStatement(int level, SymbolTable::iterator it, bool dup) {
+void PComp::assignStatement(int level, SymbolTableIter it, bool dup) {
 	auto type = it->second.type();		// Start with the lvalue type
 
 	// Emit the l-value, a variable or a function reference...
@@ -983,7 +1026,7 @@ void PComp::writeStmt(int level) {
 	int nargs = 0;								// Count arguments, as an integer!
 	if (accept(Token::OpenParen)) {				// process, and count, each expr-tuple..
 		do {
-			auto expr = expression(level);		// value(s) to write
+			auto expr = expression(level); 		// value(s) to write
 			emit(OpCode::PUSH, 0, expr->size());
 
 			if (accept(Token::Colon)) {			// [ ':' width [ ':' precision ]]
@@ -1051,7 +1094,7 @@ void PComp::statementNew(int level) {
 	const string id = ts.current().string_value;
 	if (expect(Token::Identifier)) {
 		auto it = lookup(id);
-		TDescPtr tdesc = TypeDesc::intDesc;
+		TDescPtr tdesc = TypeDesc::newIntDesc();
 		if (it != symtbl.end())
 			tdesc = variable(level, it);
 
@@ -1173,14 +1216,15 @@ void PComp::constDeclList(int level) {
 /********************************************************************************************//**
  * ident = type
  * @param	level	The current block level.
+ * @param	var		True if type is a var parameter
  ************************************************************************************************/
-void PComp::typeDecl(int level) {
+void PComp::typeDecl(int level, bool var) {
 	const auto ident = nameDecl(level);				// Copy the identifier
 	expect(Token::EQU);								// Consume the "="
-	auto tdesc = type(level, ident);
+	TDescPtr tdesc = type(level, var, ident);
 
 	if (verbose)
-		cout << progName << ": type " << ident << " = " << tdesc->tclass() << "\n";
+		cout << progName << ": " << LogIndex << "type " << ident << " = " << tdesc->tclass() << "\n";
 
 	symtbl.insert(	{ ident, SymValue::makeType(level, tdesc) }	);
 }
@@ -1204,7 +1248,7 @@ void PComp::typeDeclList(int level) {
 		do {
 			if (oneOf(stops))
 				break;							// No more constants...
-			typeDecl(level);
+			typeDecl(level, false);
 
 		} while (accept(Token::SemiColon));
 	}
@@ -1223,11 +1267,12 @@ void PComp::constDecl(int level) {
 	if (!value.first)
 		error("expected a const-expression, got:", ts.current().string_value);
 
-	TDescPtr type = value.second.kind() == Datum::Kind::Integer ? TypeDesc::intDesc : TypeDesc::realDesc;
+	TDescPtr type = value.second.kind() == Datum::Kind::Integer
+		? TypeDesc::newIntDesc() : TypeDesc::newRealDesc();
 
 	symtbl.insert(	{ ident, SymValue::makeConst(level, value.second, type) } );
 	if (verbose)
-		cout << progName << ": constDecl " << ident << ": " << level << ", " << value.second << "\n";
+		cout << progName << ": " << LogIndex << "constDecl " << ident << ": " << level << ", " << value.second << "\n";
 }
 
 /********************************************************************************************//**
@@ -1275,7 +1320,7 @@ void PComp::varDeclList(int level, bool params, const string& prefix, FieldVec& 
 	do {
 		if (oneOf(stops))
 			break;								// No more variables...
-		varDecl(level, prefix, idents);
+		varDecl(level, false, prefix, idents);
 	} while (accept(Token::SemiColon));
 
 	/*
@@ -1290,8 +1335,8 @@ void PComp::varDeclList(int level, bool params, const string& prefix, FieldVec& 
 
 	for (const auto& id : idents) {				// install the results in the symbol table...
 		if (verbose)
-			cout << progName  
-				 << ": var/param " 	<< id.name() << ": " 
+			cout << progName  		<< ": " << LogIndex
+				 << "var/param " 	<< id.name() << ": " 
 				 << level 			<< ", "
 			     << dx	 			<< ", " 
 				 << id.type()->tclass() << "\n";
@@ -1319,16 +1364,18 @@ void PComp::varDeclList(int level, bool params, const string& prefix, FieldVec& 
  * by negative indexes from *before the start* of the frame; -1, -2, ..., -n. Create a new
  * entry in the symbol table for either.
  *  
- * @param			level	The current block level. 
- * @param			prefix	The identifer prefix
+ * @param	level	The current block level. 
+ * @param	var		True if parameter is a var parameter
+ * @param	prefix	The identifer prefix
+ *
  * @param[in,out]	idents	Vector of identifer, kind pairs
  ************************************************************************************************/
-void PComp::varDecl(int level, const string& prefix, FieldVec& idents) {
+void PComp::varDecl(int level, bool var, const string& prefix, FieldVec& idents) {
 	vector<string> ids = identifierList(level, prefix);
 	expect(Token::Colon);
-	const auto desc = type(level, prefix);
+	TDescPtr tdesc = type(level, var, prefix);
 	for (auto& id : ids)
-		idents.push_back({ id, desc });
+		idents.push_back({ id, tdesc });
 }
 
 /********************************************************************************************//**
@@ -1353,11 +1400,13 @@ vector<string> PComp::identifierList(int level, const string& prefix) {
  * Token::Type, thus we only need to look for new type declaractions, e.g., "array...".
  *
  * @param	level	The current block level. 
+ * @param	var		True if parameter is a var parameter
  * @param	prefix	Optional identifier prefix. Defaults to "".
+ *
  * @return the type description
  ************************************************************************************************/
-TDescPtr PComp::type(int level, const string& prefix) {
-	auto tdesc = TypeDesc::intDesc;
+TDescPtr PComp::type(int level, bool var, const string& prefix) {
+	TDescPtr tdesc = TypeDesc::newIntDesc();
 
 	if (accept(Token::Identifier, false)) { 	// previously defined type-name
 		const string id = ts.current().string_value;
@@ -1366,17 +1415,19 @@ TDescPtr PComp::type(int level, const string& prefix) {
 		auto it = lookup(id);
 		if (it == symtbl.end() || it->second.kind() != SymValue::Type)
 			error("expected type, got ", id);
-		else
+		else {
 			tdesc = it->second.type();
+			tdesc->ref(var);
+		}
 
 	} else if (accept(Token::Caret)) 			// Pointer type
-		tdesc = TypeDesc::newPointerDesc(type(level, prefix));
+		tdesc = TypeDesc::newPointerDesc(type(level, var, prefix), var);
 
-	else if ((tdesc = structuredType(level, prefix)) != 0)
+	else if ((tdesc = structuredType(level, prefix, var)) != 0)
 		;
 
 	else 
-		tdesc = simpleType(level);
+		tdesc = simpleType(level, var);
 
 	return tdesc;
 }
@@ -1387,9 +1438,11 @@ TDescPtr PComp::type(int level, const string& prefix) {
  * @note Needs to handle previously defined simple-types
  * 
  * @param	level	The current block level. 
+ * @param	var		True if parameter is a var parameter
+ *
  * @return the type description
  ************************************************************************************************/
-TDescPtr PComp::simpleType(int level) {
+TDescPtr PComp::simpleType(int level, bool var) {
 	TDescPtr type;
 
 	if (accept(Token::Identifier, false)) {		// Previously defined type, must be ordinal!
@@ -1399,16 +1452,20 @@ TDescPtr PComp::simpleType(int level) {
 		auto it = lookup(id);
 		if (it == symtbl.end() || it->second.kind() != SymValue::Type)
 			error("expected type, got ", it->first);
-		else if (!it->second.type()->isOrdinal())
+
+		else if (!it->second.type()->ordinal())
 			error("expected ordinal type, got ", it->first);
-		else
+
+		else {
 			type = it->second.type();
+			type->ref(var);
+		}
 
 	} else if (accept(Token::RealType))			// Real
-		type = TypeDesc::realDesc;
+		type = TypeDesc::newRealDesc(var);
 
 	else 
-		type = ordinalType(level);
+		type = ordinalType(level, var);
 
 	return type;
 }
@@ -1418,19 +1475,21 @@ TDescPtr PComp::simpleType(int level) {
  * '(' identifier-list ')' | 'array' '[' simple-type-list ']' 'of' type ;
  *
  * @param	level	The current block level. 
+ * @param	var		True if parameter is a var parameter
+ *
  * @return type description if successful, null pointer otherwise
  ************************************************************************************************/
-TDescPtr PComp::ordinalType(int level) {
+TDescPtr PComp::ordinalType(int level, bool var) {
 	TDescPtr type;
 
 	if (accept(Token::BoolType))				// Boolean
-		return TypeDesc::boolDesc;
+		return TypeDesc::newBoolDesc(var);
 
 	else if (accept(Token::CharType))			// Char
-		return TypeDesc::charDesc;
+		return TypeDesc::newCharDesc(TypeDesc::charRange, var);
 
 	else if (accept(Token::IntType))			// Integer
-		return TypeDesc::intDesc;
+		return TypeDesc::newIntDesc(TypeDesc::maxRange, var);
 
 	else if (accept(Token::OpenParen)) {		// Enumeration
 		FieldVec		enums;
@@ -1440,49 +1499,63 @@ TDescPtr PComp::ordinalType(int level) {
 		expect(Token::CloseParen);
 
 		// Create the type, excluding the fields (enumerations)
-		type = TypeDesc::newEnumDesc(r);
+		type = TypeDesc::newEnumDesc(r, FieldVec(), var);
 
 		int value = 0;							// Each enumeration gets a value...
 		for (auto id : ids) {
-			enums.push_back( { id, TypeDesc::intDesc } );
+			enums.push_back( { id, TypeDesc::newIntDesc() } );
 			symtbl.insert(	{ id, SymValue::makeConst(level, Datum(value), type) }	);
 			if (verbose)
-				cout << progName << ": enumeration '" << id << "' = " << value << ", " << level << "\n";
+				cout << progName << ": " << LogIndex << "enumeration '" << id << "' = " << value << ", " << level << "\n";
 			++value;
 		}
 
 		type->fields(enums);
 
-	} else {									// Sub-Range
-		auto minValue = constExpr();
-		if (minValue.first) {
-			ostringstream oss;
+	} else 
+		type = subRangeType(var);
 
-			expect(Token::Ellipsis);
-			auto maxValue = constExpr();
-			if (!maxValue.first) {
-				oss << "expected constant expression, got: " << current();
-				error(oss.str());
-				maxValue.second = minValue.second;
-			}
+	return type;
+}
 
-			if (minValue.second > maxValue.second) {
-				oss << "Minimum sub-range value (" << minValue.second << ")"
-					<< " is greater than the maximum value (" << maxValue.second << ")";
-				error(oss.str());
-				swap(minValue.second, maxValue.second);
+/********************************************************************************************//**
+ * const-expr '..' const-expr
+ *
+ * @param	var		True if parameter is a var parameter
+ *
+ * @return type description if successful, null pointer otherwise
+ ************************************************************************************************/
+TDescPtr PComp::subRangeType(bool var) {
+	TDescPtr type;
 
-			} else if (	minValue.second.kind() != Datum::Kind::Integer		||
-						maxValue.second.kind() != Datum::Kind::Integer) {
-				oss << "Both sub-range values must be ordinal types; "
-					<< minValue.second << ", " << maxValue.second;
-				error(oss.str());
-				minValue.second = 0; maxValue.second = 1;
-			}
+	auto minValue = constExpr();
+	if (minValue.first) {
+		ostringstream oss;
 
-			SubRange r(minValue.second.integer(), maxValue.second.integer());
-			type = TypeDesc::newIntDesc(r);
+		expect(Token::Ellipsis);
+		auto maxValue = constExpr();
+		if (!maxValue.first) {
+			oss << "expected constant expression, got: " << current();
+			error(oss.str());
+			maxValue.second = minValue.second;
 		}
+
+		if (minValue.second > maxValue.second) {
+			oss << "Minimum sub-range value (" << minValue.second << ")"
+				<< " is greater than the maximum value (" << maxValue.second << ")";
+			error(oss.str());
+			swap(minValue.second, maxValue.second);
+
+		} else if (	minValue.second.kind() != Datum::Kind::Integer		||
+					maxValue.second.kind() != Datum::Kind::Integer) {
+			oss << "Both sub-range values must be ordinal types; "
+				<< minValue.second << ", " << maxValue.second;
+			error(oss.str());
+			minValue.second = 0; maxValue.second = 1;
+		}
+
+		SubRange r(minValue.second.integer(), maxValue.second.integer());
+		type = TypeDesc::newIntDesc(r, var);
 	}
 
 	return type;
@@ -1493,19 +1566,21 @@ TDescPtr PComp::ordinalType(int level) {
  *
  * @param	level	The current block level. 
  * @param	previx	Optional identifier prefix
+ * @param	var		True if parameter is a var parameter
+ *
  * @return type description if successful, null pointer otherwise
  ************************************************************************************************/
-TDescPtr PComp::structuredType(int level, const string& prefix) {
+TDescPtr PComp::structuredType(int level, const string& prefix, bool var) {
 	TDescPtr tdesc = 0;
 
 	if (accept(Token::Array)) {					// Array
 		expect(Token::OpenBrkt);				// "["
 
 		TDescPtr tp;
-		TDescPtrVec indexes = simpleTypeList(level);
+		TDescPtrVec indexes = simpleTypeList(level, var);
 		for (auto index : indexes) {
 			const SubRange r = index->range();
-			tdesc = TypeDesc::newArrayDesc(r.span(), r, index);
+			tdesc = TypeDesc::newArrayDesc(r.span(), r, index, TDescPtr(), var);
 			if (tp == 0)						// Remember the first array type descriptior...
 				tp = tdesc;
 
@@ -1518,7 +1593,7 @@ TDescPtr PComp::structuredType(int level, const string& prefix) {
 		expect(Token::CloseBrkt);				// "] of"
 		expect(Token::Of);
 
-		tp->base(type(level, ""));				// Get the array's base type
+		tp->base(type(level, var, ""));			// Get the array's base type
 		tp->size(tp->size() * tp->base()->size());
 
 	} else if (accept(Token::Record)) {			// Record
@@ -1529,7 +1604,7 @@ TDescPtr PComp::structuredType(int level, const string& prefix) {
 		for (auto& element : fields)
 			sum += element.type()->size();
 
-		tdesc = TypeDesc::newRcrdDesc(sum, fields);
+		tdesc = TypeDesc::newRcrdDesc(sum, fields, var);
 
 		expect(Token::End);
 	}
@@ -1562,40 +1637,118 @@ void PComp::fieldList(int level, const string& prefix, FieldVec& fields) {
  * simple-type-lst: simple-type { ',' simple-type } ;
  *
  * @param	level	The current block level. 
+ * @param	var		True if parameter is a var parameter
+ *
+ * @return type description.
  ************************************************************************************************/
-TDescPtrVec PComp::simpleTypeList(int level) {
+TDescPtrVec PComp::simpleTypeList(int level, bool var) {
 	TDescPtrVec tdescs;
 
 	do {
-		tdescs.push_back(simpleType(level));
+		tdescs.push_back(simpleType(level, var));
 	} while (accept(Token::Comma));
 
 	return tdescs;
 }
 
 /********************************************************************************************//**
+ * param-decl { ';' param-decl } ;
+ * param-decl = [ 'var' ] identifier-lst : type ;
+ *
+ * Allocate space on the stack for each variable, as a postivie offset from the end of current
+ * activaction frame. Create a new entry in the symbol table, that notes the offset and data
+ * type.
+ *
+ * @param			level	The current block level.
+ * @param			params	True if processing formal parameters, false if variable declaractions. 
+ * @param			prefix	The identifier prefix
+ * @param[in,out]	idents	Vector of identifer, kind pairs 
+ *
+ * @return  Offset of the next variable/parmeter from the current activation frame.
+ ************************************************************************************************/
+void PComp::paramDeclList(
+			int			level,
+			bool		params,
+	const	string&		prefix,
+			FieldVec&	idents)
+{
+	// Stops if the ';' if followd by any of hte following tokens
+	static const Token::KindSet stops {
+		Token::ProcDecl,
+		Token::FuncDecl,
+		Token::Begin,
+		Token::CloseParen
+	};
+
+	bool var = false;
+	do {
+		if (oneOf(stops))
+			break;								// No more variables...
+
+		if (accept(Token::VarDecl))
+			var = true;
+
+		varDecl(level, var, prefix, idents);
+
+	} while (accept(Token::SemiColon));
+
+	/*
+	 * Set the starting offset from the activation frame. Locals have positive offsets, while
+	 * parameters have negative offsets in reverse. 
+	 */
+
+	int dx = 0;
+	if (params)
+		for (const auto& id : idents)
+			dx -= id.type()->size();
+
+	for (const auto& id : idents) {				// install the results in the symbol table...
+		if (verbose)
+			cout << progName  			<< ": "
+				 << LogIndex 			<< "var/param "
+				 << id.name() 			<< ": " 
+				 << level 				<< ", "
+			     << dx	 				<< ", " 
+				 << id.type()->tclass()	<< ", "
+				 << boolalpha			<< id.type()->ref()
+				 << "\n";
+
+		auto range = symtbl.equal_range(id.name());	// Already defined?
+		for (auto it = range.first; it != range.second; ++it)
+			if (it->second.level() == level)
+				error("previously defined", id.name());
+
+		symtbl.insert( { id.name(), SymValue::makeVar(level, dx, id.type())	} );
+		dx += id.type()->size();
+	}
+}
+
+/********************************************************************************************//**
  * Process the common subroutine delcaration for procedures and functions:
  *
- * ident [ ( var-decl-lst ) ] ) ...
+ * ident [ '(' param-decl-lst ')' ] ;
+ * param-decl-lst = param-decl { ';' param-decl } ;
+ * param-decl = [ 'var' ] identifier-lst : type ;
  *
  * @param	level	The current block level.
  * @param 	kind	The type of subroutine, e.g., procedure or fuction
  * @return	subrountine's symbol table entry
  ************************************************************************************************/
-SymValue& PComp::subPrefixDecl(int level, SymValue::Kind kind) {
-	SymbolTable::iterator	it;				// Will point to the new symbol table entry...
+SymValue& PComp::subRoutineDecl(int level, SymValue::Kind kind) {
+	SymbolTableIter	it;						// Will point to the new symbol table entry...
 
 	auto ident = nameDecl(level);			// insert the name into the symbol table
 	it = symtbl.insert( { ident, SymValue::makeSbr(kind, level)	} );
 	if (verbose)
-		cout << progName << ": subPrefixDecl " << ident << ": " << level << ", 0\n";
+		cout << progName << ": " << LogIndex << "subRoutineDecl " << ident << ": " << level << ", 0\n";
 
 	// Process the formal auguments, if any...
 	if (accept(Token::OpenParen)) {
-		// Note that the activation frame level is that of the *following* block!
-
 		FieldVec	idents;					// vector of name/type pairs.
-		varDeclList(level+1, true, "", idents);
+
+		// Note that the activation frame level is that of the *following* block!
+		paramDeclList(level+1, true, "", idents);
+
 		expect(Token::CloseParen);
 
 		for (auto id : idents)
@@ -1611,7 +1764,7 @@ SymValue& PComp::subPrefixDecl(int level, SymValue::Kind kind) {
  * @param	level	The current block level.
  ************************************************************************************************/
 void PComp::procDecl(int level) {
-	auto& val = subPrefixDecl(level, SymValue::Procedure);
+	auto& val = subRoutineDecl(level, SymValue::Procedure);
 	expect(Token::SemiColon);
 	blockDecl(val, level + 1);
 	expect(Token::SemiColon);				// procedure declarations end with a ';'!
@@ -1623,9 +1776,9 @@ void PComp::procDecl(int level) {
  * @param	level	The current block level.
  ************************************************************************************************/
 void PComp::funcDecl(int level) {
-	auto& val = subPrefixDecl(level, SymValue::Function);
+	auto& val = subRoutineDecl(level, SymValue::Function);
 	expect(Token::Colon);
-	val.type(type(level, ""));
+	val.type(type(level, false, ""));
 	expect(Token::SemiColon);
 	blockDecl(val, level + 1);
 	expect(Token::SemiColon);	// function declarations end with a ';'!
@@ -1667,6 +1820,8 @@ void PComp::subDeclList(int level) {
  * @return 	Entry point address
  ************************************************************************************************/
 size_t PComp::blockDecl(SymValue& val, int level) {
+	LogLevel lvl;
+
 	constDeclList(level);						// declaractions...
 	typeDeclList(level);
 	auto dx = varDeclBlock(level);
@@ -1705,7 +1860,7 @@ void PComp::progDecl(int level) {
 	next();										// Fetch the 1st token
 
 	expect(Token::ProgDecl);					// Program heading...
-	auto& val = subPrefixDecl(level, SymValue::Procedure);
+	auto& val = subRoutineDecl(level, SymValue::Procedure);
 	expect(Token::SemiColon);
 
 	// Emit a call to the main procedure, followed by a halt
@@ -1714,7 +1869,7 @@ void PComp::progDecl(int level) {
 
 	const size_t addr = blockDecl(val, level);	// emit the first block 
 	if (verbose)
-		cout << progName << ": patching call to program at " << call_pc << " to " << addr  << "\n";
+		cout << progName << ": " << LogIndex << "patching call to program at " << call_pc << " to " << addr  << "\n";
 
 	(*code)[call_pc].value = addr;
 
@@ -1733,31 +1888,27 @@ void PComp::run()								{	progDecl(0);	}
  * Construct a new compilier with the token stream initially bound to std::cin.
  ************************************************************************************************/
 PComp::PComp() : Compilier () {
+	TDescPtr boolean = TypeDesc::newBoolDesc();
+	TDescPtr integer = TypeDesc::newIntDesc();
 
 	// Insert builtin types into the symbol table
 
-	symtbl.insert( { "bool",	SymValue::makeType(0, TypeDesc::boolDesc)			} );
-	symtbl.insert( { "char",	SymValue::makeType(0, TypeDesc::charDesc)			} );
-	symtbl.insert( { "integer",	SymValue::makeType(0, TypeDesc::intDesc)			} );
-	symtbl.insert( { "real",	SymValue::makeType(0, TypeDesc::realDesc)			} );
+	symtbl.insert( { "bool",	SymValue::makeType(0, boolean)					} );
+	symtbl.insert( { "char",	SymValue::makeType(0, TypeDesc::newCharDesc())	} );
+	symtbl.insert( { "integer",	SymValue::makeType(0, integer)					} );
+	symtbl.insert( { "real",	SymValue::makeType(0, TypeDesc::newRealDesc())	} );
 
 	// Insert built-in constants into the symbol table; id, level (always zero), and value
 
 	symtbl.insert({"maxint", 	SymValue::makeConst(
 									0,
 									Datum(TypeDesc::maxRange.maximum()),
-									TypeDesc::intDesc)								});
+									integer)									});
 	symtbl.insert({"nil",    	SymValue::makeConst(
 									0,
 									Datum(0),
-									TypeDesc::newPointerDesc(TypeDesc::intDesc))	});
-	symtbl.insert({"true",   	SymValue::makeConst(
-									0,
-									Datum(true),
-									TypeDesc::boolDesc)								});
-	symtbl.insert({"false",  	SymValue::makeConst(
-									0,
-									Datum(false),
-									TypeDesc::boolDesc)								});
+									TypeDesc::newPointerDesc(integer))			});
+	symtbl.insert({"true",   	SymValue::makeConst(0, Datum(true), boolean)	});
+	symtbl.insert({"false",  	SymValue::makeConst(0, Datum(false), boolean)	});
 }
 

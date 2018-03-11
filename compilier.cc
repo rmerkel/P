@@ -21,6 +21,30 @@
 using namespace std;
 
 /************************************************************************************************
+ * LogLevel
+ ************************************************************************************************/
+
+LogLevel::LogLevel() {
+	if (n < numeric_limits<unsigned>::max())
+		++n;
+}
+
+LogLevel::~LogLevel() {
+	assert(n > 0);
+	if (n > 0)
+		--n;
+}
+
+unsigned LogLevel::n = 0;
+
+/// Indent the log level...
+ostream& LogIndex(ostream& oss) {
+	if (LogLevel::n > 0)
+		oss << setw(LogLevel::n) << ' ';
+	return oss;
+}
+
+/************************************************************************************************
  * class Compilier
  ************************************************************************************************/
 
@@ -59,8 +83,8 @@ Token Compilier::next() {
 	}
 
 	if (verbose)
-		cout	<< progName			<< ": getting '"
-				<< t.kind			<< "', "
+		cout	<< progName			<< ": "
+				<< "getting '"		<< t.kind << "', "
 				<< t.string_value	<< ", "
 				<< t.integer_value	<< "\n";
 
@@ -176,12 +200,13 @@ void Compilier::purge(int level) {
 	for (auto i = symtbl.begin(); i != symtbl.end(); ) {
 		if (i->second.level() == level) {
 			if (verbose)
-				cout << progName << ": purging "
-					 << i->first << ": "
-					 << i->second.kind() << ", "
-					 << static_cast<int>(i->second.level()) << ", "
-					 << i->second.value()
-					 << " from the symbol table\n";
+				cout	<< progName << ": "
+						<< LogIndex << "purging "
+						<< i->first << ": "
+						<< i->second.kind() << ", "
+						<< static_cast<int>(i->second.level()) << ", "
+						<< i->second.value()
+						<< " from the symbol table\n";
 			i = symtbl.erase(i);
 
 		} else

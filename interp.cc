@@ -75,11 +75,12 @@ void PInterp::dump() {
 }
 
 /********************************************************************************************//**
- * Checks to see if any part of the specified memory range is invalid, i.e.,  between the top of
- * the stack and the start of the heap.
+ * Checks to see if the memory range described by [begin, end] is valid, i.e., either within the
+ * data stack, or in the heap.
  *
  * @param	begin	Start of the memory range
  * @param 	end		One past the end of the memory range
+ * @return	true if [begin,end) describes a valid memory range
  ************************************************************************************************/
 bool PInterp::rangeCheck(size_t begin, size_t end) {
 	assert (begin <= end);
@@ -99,12 +100,12 @@ bool PInterp::rangeCheck(size_t begin, size_t end) {
 // protected:
 
 /********************************************************************************************//**
- * @param lvl Number of levels down
- * @return The base, lvl's down the stack
+ * @param nlevel Number of levels down
+ * @return The base, nlevel's down the stack
  ************************************************************************************************/
-size_t PInterp::base(size_t lvl) {
+size_t PInterp::base(size_t nlevel) {
 	auto b = fp;
-	for (; lvl > 0; --lvl)
+	for (; nlevel > 0; --nlevel)
 		b = stack[b].address();
 
 	return b;
@@ -113,16 +114,12 @@ size_t PInterp::base(size_t lvl) {
 /********************************************************************************************//**
  * @return the top-of-stack
  ************************************************************************************************/
-Datum& PInterp::tos() {
-	return stack[sp];
-}
+Datum& PInterp::tos() 						{	return stack[sp];	}
 
 /********************************************************************************************//**
  * @return the top-of-stack
  ************************************************************************************************/
-const Datum& PInterp::tos() const {
-	return stack[sp];
-}
+const Datum& PInterp::tos() const			{	return stack[sp];	}
 
 /********************************************************************************************//**
  * @return the top-of-stack
@@ -220,6 +217,9 @@ PInterp::Result PInterp::write1(unsigned index) {
  * Instructions...
  ************************************************************************************************/
 
+/********************************************************************************************//**
+ * @note	indexed by OpCode
+ ************************************************************************************************/
 PInterp::InstrPtr PInterp::instrTbl[] = {
 	&PInterp::NEG,
 	&PInterp::ITOR,
@@ -300,6 +300,7 @@ PInterp::Result PInterp::NOT() {
  ************************************************************************************************/
 PInterp::Result PInterp::ITOR() {
 	Datum& TOS = tos();
+
 	if (TOS.kind() == Datum::Integer) {
 		TOS = TOS.integer() * 1.0;
 		return Result::success;
@@ -325,6 +326,7 @@ PInterp::Result PInterp::ITOR2() {
  ************************************************************************************************/
 PInterp::Result PInterp::ROUND() {
 	Datum& TOS = tos();
+
 	if (TOS.kind() == Datum::Real) {
 		TOS = static_cast<int>(round(TOS.real()));
 		return Result::success;
@@ -339,6 +341,7 @@ PInterp::Result PInterp::ROUND() {
  ************************************************************************************************/
 PInterp::Result PInterp::TRUNC() {
 	Datum& TOS = tos();
+
 	if (TOS.kind() == Datum::Real) {
 		TOS = static_cast<int>(TOS.real());
 		return Result::success;
@@ -447,6 +450,7 @@ PInterp::Result PInterp::DUP() {
  ************************************************************************************************/
 PInterp::Result PInterp::ODD() {
 	Datum& TOS = tos();
+
 	if (TOS.kind() == Datum::Integer) {
 		TOS = (TOS.integer() & 1) ? true : false;
 		return Result::success;
@@ -606,6 +610,7 @@ PInterp::Result PInterp::WRITELN() {
  ************************************************************************************************/
 PInterp::Result PInterp::NEW() {
 	Datum& TOS = tos();
+
 	if (TOS.kind() != Datum::Integer) {
 		cerr << "NEW TOS is not an integer!" << endl;
 		return Result::badDataType;
@@ -624,6 +629,7 @@ PInterp::Result PInterp::NEW() {
  ************************************************************************************************/
 PInterp::Result PInterp::DISPOSE() {
 	Datum& TOS = tos();
+
 	if (TOS.kind() != Datum::Address) {
 		cerr << "DISPOSE TOS is not an address!" << endl;
 		return Result::badDataType;
@@ -647,6 +653,7 @@ PInterp::Result PInterp::DISPOSE() {
  ************************************************************************************************/
 PInterp::Result PInterp::NEG() {
 	Datum& TOS = tos();
+
 	if (TOS.numeric()) {
 		TOS = -TOS;
 		return Result::success;
@@ -660,14 +667,11 @@ PInterp::Result PInterp::NEG() {
  * @return	stackUndeflow if the stack underflowed, badDataType if either operand isn't numeric.
  ************************************************************************************************/
 PInterp::Result PInterp::ADD() {
-	if (sp < 2)
-		return Result::stackUnderflow;
+	const auto rhs = pop();
+	const auto lhs = pop();
 
-	const auto rhand = pop();
-	const auto lhand = pop();
-
-	if (lhand.numeric() && rhand.numeric()) {
-		push(lhand + rhand);
+	if (lhs.numeric() && rhs.numeric()) {
+		push(lhs + rhs);
 		return Result::success;
 
 	} else {
@@ -682,14 +686,11 @@ PInterp::Result PInterp::ADD() {
  * @return	stackUndeflow if the stack underflowed, badDataType if either operand isn't numeric.
  ************************************************************************************************/
 PInterp::Result PInterp::SUB() {
-	if (sp < 2)
-		return Result::stackUnderflow;
+	const auto rhs = pop();
+	const auto lhs = pop();
 
-	const auto rhand = pop();
-	const auto lhand = pop();
-
-	if (lhand.numeric() && rhand.numeric()) {
-		push(lhand - rhand);
+	if (lhs.numeric() && rhs.numeric()) {
+		push(lhs - rhs);
 		return Result::success;
 
 	} else {
@@ -703,14 +704,11 @@ PInterp::Result PInterp::SUB() {
  * @return	stackUndeflow if the stack underflowed, badDataType if either operand isn't numeric.
  ************************************************************************************************/
 PInterp::Result PInterp::MUL() {
-	if (sp < 2)
-		return Result::stackUnderflow;
+	const auto rhs = pop();
+	const auto lhs = pop();
 
-	const auto rhand = pop();
-	const auto lhand = pop();
-
-	if (lhand.numeric() && rhand.numeric()) {
-		push(lhand * rhand);
+	if (lhs.numeric() && rhs.numeric()) {
+		push(lhs * rhs);
 		return Result::success;
 
 	} else {
@@ -726,30 +724,24 @@ PInterp::Result PInterp::MUL() {
  * 			if either operand isn't numeric.
  ************************************************************************************************/
 PInterp::Result PInterp::DIV() {
-	Result r = Result::success;
+	const	Datum	rhs = pop();
+	const	Datum	lhs = pop();
+			Result	r	= Result::success;
 
-	if (sp < 2)
-		r =  Result::stackUnderflow;
+	if (!lhs.numeric() || !rhs.numeric()) {
+		cerr << "Attampt to divide with non-numbeic value\n";
+		r =  Result::badDataType;
 
-	else {
-		const auto rhand = pop();
-		const auto lhand = pop();
+	} else if (rhs.kind() == Datum::Real && rhs.real() == 0.0) {
+		cerr << "Attempt to divide by zero @ pc (" << prevPc << ")!\n";
+		r= Result::divideByZero;
 
-		if (!lhand.numeric() || !rhand.numeric()) {
-			cerr << "Attampt to divide with non-numbeic value\n";
-			r =  Result::badDataType;
+	} else if (rhs.kind() == Datum::Integer && rhs.integer() == 0) {
+		cerr << "Attempt to divide by zero @ pc (" << prevPc << ")!\n";
+		r = Result::divideByZero;
 
-		} else if (rhand.kind() == Datum::Real && rhand.real() == 0.0) {
-			cerr << "Attempt to divide by zero @ pc (" << prevPc << ")!\n";
-			r= Result::divideByZero;
-
-		} else if (rhand.kind() == Datum::Integer && rhand.integer() == 0) {
-			cerr << "Attempt to divide by zero @ pc (" << prevPc << ")!\n";
-			r = Result::divideByZero;
-
-		} else
-			push(lhand / rhand);
-	}
+	} else
+		push(lhs / rhs);
 
 	if (r != Result::success)
 		push(0);
@@ -764,26 +756,20 @@ PInterp::Result PInterp::DIV() {
  * 			if either operand isn't numeric.
  ************************************************************************************************/
 PInterp::Result PInterp::REM() {
-	Result r = Result::success;
+	const	Datum	rhs = pop();
+	const	Datum	lhs = pop();
+			Result	r	= Result::success;
 
-	if (sp < 2)
-		r =  Result::stackUnderflow;
+	if (lhs.kind() != Datum::Integer || rhs.kind() != Datum::Integer) {
+		cerr << "Attampt to calulate reminder with non-integer value\n";
+		r =  Result::badDataType;
 
-	else {
-		const auto rhand = pop();
-		const auto lhand = pop();
+	} else if (rhs.integer() == 0) {
+		cerr << "Attempt to divide by zero @ pc (" << prevPc << ")!\n";
+		r = Result::divideByZero;
 
-		if (lhand.kind() != Datum::Integer || rhand.kind() != Datum::Integer) {
-			cerr << "Attampt to calulate reminder with non-integer value\n";
-			r =  Result::badDataType;
-
-		} else if (rhand.integer() == 0) {
-			cerr << "Attempt to divide by zero @ pc (" << prevPc << ")!\n";
-			r = Result::divideByZero;
-
-		} else
-			push(lhand % rhand);
-	}
+	} else
+		push(lhs % rhs);
 
 	if (r != Result::success)
 		push(0);
@@ -800,23 +786,17 @@ PInterp::Result PInterp::REM() {
  *			numeric.
  ************************************************************************************************/
 PInterp::Result PInterp::LT() {
-	Result r = Result::success;
+	const	Datum	rhs = pop();
+	const	Datum	lhs = pop();
+			Result	r	= Result::success;
 
-	if (sp < 2)
-		r =  Result::stackUnderflow;
+	if (!rhs.numeric() || !lhs.numeric()) {
+		cerr << "Non-numeric binary value\n";
+		push(false);
+		r = Result::badDataType;
 
-	else {
-		const auto rhand = pop();
-		const auto lhand = pop();
-
-		if (!rhand.numeric() || !lhand.numeric()) {
-			cerr << "Non-numeric binary value\n";
-			push(false);
-			r = Result::badDataType;
-
-		} else
-			push(lhand < rhand ? true : false);
-	}
+	} else
+		push(lhs < rhs ? true : false);
 	
 	return r;
 }
@@ -830,23 +810,17 @@ PInterp::Result PInterp::LT() {
  *			numeric.
  ************************************************************************************************/
 PInterp::Result PInterp::LTE() {
-	Result r = Result::success;
+	const	Datum	rhs = pop();
+	const	Datum	lhs = pop();
+			Result	r	= Result::success;
 
-	if (sp < 2)
-		r =  Result::stackUnderflow;
+	if (!rhs.numeric() || !lhs.numeric()) {
+		cerr << "Non-numeric binary value\n";
+		push(false);
+		r = Result::badDataType;
 
-	else {
-		const auto rhand = pop();
-		const auto lhand = pop();
-
-		if (!rhand.numeric() || !lhand.numeric()) {
-			cerr << "Non-numeric binary value\n";
-			push(false);
-			r = Result::badDataType;
-
-		} else
-			push(lhand <= rhand ? true : false);
-	}
+	} else
+		push(lhs <= rhs ? true : false);
 	
 	return r;
 }
@@ -860,23 +834,17 @@ PInterp::Result PInterp::LTE() {
  *			numeric.
  ************************************************************************************************/
 PInterp::Result PInterp::EQU() {
-	Result r = Result::success;
+	const	Datum	rhs = pop();
+	const	Datum	lhs = pop();
+			Result	r	= Result::success;
 
-	if (sp < 2)
-		r =  Result::stackUnderflow;
+	if (!rhs.numeric() || !lhs.numeric()) {
+		cerr << "Non-numeric binary value\n";
+		push(false);
+		r = Result::badDataType;
 
-	else {
-		const auto rhand = pop();
-		const auto lhand = pop();
-
-		if (!rhand.numeric() || !lhand.numeric()) {
-			cerr << "Non-numeric binary value\n";
-			push(false);
-			r = Result::badDataType;
-
-		} else
-			push(Datum(lhand == rhand ? true : false));
-	}
+	} else
+		push(Datum(lhs == rhs ? true : false));
 	
 	return r;
 }
@@ -890,23 +858,17 @@ PInterp::Result PInterp::EQU() {
  *			numeric.
  ************************************************************************************************/
 PInterp::Result PInterp::GTE() {
-	Result r = Result::success;
+	const	Datum	rhs = pop();
+	const	Datum	lhs = pop();
+			Result	r	= Result::success;
 
-	if (sp < 2)
-		r =  Result::stackUnderflow;
+	if (!rhs.numeric() || !lhs.numeric()) {
+		cerr << "Non-numeric binary value\n";
+		push(false);
+		r = Result::badDataType;
 
-	else {
-		const auto rhand = pop();
-		const auto lhand = pop();
-
-		if (!rhand.numeric() || !lhand.numeric()) {
-			cerr << "Non-numeric binary value\n";
-			push(false);
-			r = Result::badDataType;
-
-		} else
-			push(lhand >= rhand ? true : false);
-	}
+	} else
+		push(lhs >= rhs ? true : false);
 	
 	return r;
 }
@@ -920,23 +882,17 @@ PInterp::Result PInterp::GTE() {
  *			numeric.
  ************************************************************************************************/
 PInterp::Result PInterp::GT() {
-	Result r = Result::success;
+	const	Datum	rhs = pop();
+	const	Datum	lhs = pop();
+			Result	r	= Result::success;
 
-	if (sp < 2)
-		r =  Result::stackUnderflow;
+	if (!rhs.numeric() || !lhs.numeric()) {
+		cerr << "Non-numeric binary value\n";
+		push(false);
+		r = Result::badDataType;
 
-	else {
-		const auto rhand = pop();
-		const auto lhand = pop();
-
-		if (!rhand.numeric() || !lhand.numeric()) {
-			cerr << "Non-numeric binary value\n";
-			push(false);
-			r = Result::badDataType;
-
-		} else
-			push(Datum(lhand > rhand ? true : false));
-	}
+	} else
+		push(Datum(lhs > rhs ? true : false));
 	
 	return r;
 }
@@ -950,23 +906,17 @@ PInterp::Result PInterp::GT() {
  *			numeric.
  ************************************************************************************************/
 PInterp::Result PInterp::NEQ() {
-	Result r = Result::success;
+	const	Datum	rhs = pop();
+	const	Datum	lhs = pop();
+			Result	r	= Result::success;
 
-	if (sp < 2)
-		r =  Result::stackUnderflow;
+	if (!rhs.numeric() || !lhs.numeric()) {
+		cerr << "Non-numeric binary value\n";
+		push(false);
+		r = Result::badDataType;
 
-	else {
-		const auto rhand = pop();
-		const auto lhand = pop();
-
-		if (!rhand.numeric() || !lhand.numeric()) {
-			cerr << "Non-numeric binary value\n";
-			push(false);
-			r = Result::badDataType;
-
-		} else
-			push(Datum(lhand != rhand ? true : false));
-	}
+	} else
+		push(Datum(lhs != rhs ? true : false));
 	
 	return r;
 }
@@ -979,23 +929,17 @@ PInterp::Result PInterp::NEQ() {
  *			numeric.
  ************************************************************************************************/
 PInterp::Result PInterp::OR() {
-	Result r = Result::success;
+	const	Datum	rhs = pop();
+	const	Datum	lhs = pop();
+			Result	r	= Result::success;
 
-	if (sp < 2)
-		r =  Result::stackUnderflow;
+	if (lhs.kind() != Datum::Boolean || rhs.kind() != Datum::Boolean) {
+		cerr << "Non-boolean binary value\n";
+		push(false);
+		r = Result::badDataType;
 
-	else {
-		const auto rhand = pop();
-		const auto lhand = pop();
-
-		if (lhand.kind() != Datum::Boolean || rhand.kind() != Datum::Boolean) {
-			cerr << "Non-boolean binary value\n";
-			push(false);
-			r = Result::badDataType;
-
-		} else
-			push(Datum(lhand || rhand ? true : false));
-	}
+	} else
+		push(Datum(lhs || rhs ? true : false));
 	
 	return r;
 }
@@ -1008,23 +952,17 @@ PInterp::Result PInterp::OR() {
  *			numeric.
  ************************************************************************************************/
 PInterp::Result PInterp::AND() {
-	Result r = Result::success;
+	const	Datum	rhs = pop();
+	const	Datum	lhs = pop();
+			Result	r	= Result::success;
 
-	if (sp < 2)
-		r =  Result::stackUnderflow;
+	if (lhs.kind() != Datum::Boolean || rhs.kind() != Datum::Boolean) {
+		cerr << "Non-boolean binary value\n";
+		push(false);
+		r = Result::badDataType;
 
-	else {
-		const auto rhand = pop();
-		const auto lhand = pop();
-
-		if (lhand.kind() != Datum::Boolean || rhand.kind() != Datum::Boolean) {
-			cerr << "Non-boolean binary value\n";
-			push(false);
-			r = Result::badDataType;
-
-		} else
-			push(Datum(lhand && rhand ? true : false));
-	}
+	} else
+		push(Datum(lhs && rhs ? true : false));
 	
 	return r;
 }
@@ -1352,23 +1290,21 @@ PInterp::Result PInterp::HALT() {
 PInterp::Result PInterp::step() {
 	Result r = Result::success;
 
-	prevPc = pc++;
-	ir = code[prevPc];						// Fetch next instruction...
+	prevPc = pc++;							// Fetch the next instruction...
+	ir = code[prevPc];
 	++ncycles;
 
-	auto info = OpCodeInfo::info(ir.op);
-	const unsigned op = static_cast<unsigned> (ir.op);
-
-	if (sp < info.nElements()) {
+	if (sp < OpCodeInfo::info(ir.op).nElements()) {
 		cerr << "Out of bounds stack access @ pc (" << prevPc << "), sp == " << sp << "!\n";
-		return Result::stackUnderflow;
+		r = Result::stackUnderflow;
 
 	} else if (ir.op > OpCode::HALT) {
-		cerr << "Unknown op-code: " << hex << "0x" << op << " found at pc (" << prevPc << ")!\n";
+		cerr	<< "Unknown op-code: " << hex << "0x" << ordinal(ir.op)
+				<< " found at pc (" << prevPc << ")!\n";
 		r = Result::unknownInstr;
 
 	} else
-		r = (*this.*instrTbl[op]) ();
+		r = (*this.*instrTbl[ordinal(ir.op)]) ();
 
 	return r;
 }

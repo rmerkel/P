@@ -10,6 +10,7 @@
 #ifndef	COMPBASE_H
 #define	COMPBASE_H
 
+#include <iostream>
 #include <set>
 #include <string>
 #include <utility>
@@ -18,6 +19,19 @@
 #include "datum.h"
 #include "symbol.h"
 #include "token.h"
+
+/************************************************************************************************
+ * LogLevel
+ ************************************************************************************************/
+
+/// Control the log index level
+struct LogLevel {
+	static unsigned n;						///< indent level
+	LogLevel();								///< Enter the next level
+	~LogLevel();							///< Exit the previous level
+};
+
+std::ostream& LogIndex(std::ostream& oss);	///< Indent per the current log level...
 
 /********************************************************************************************//**
  * Framework for a recursive decent compilier

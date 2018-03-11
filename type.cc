@@ -160,6 +160,7 @@ ostream& operator<<(std::ostream& os, const SubRange& srange) {
  * @param	fields	Fields. Defaults to FieldVec()
  * @param	base	Base type. Defaults to TDescPtr().
  * @param	ordinal	True if is an ordinal type.
+ * @param	ref		True if objects of this type are passed by reference
  */
 TypeDesc::TypeDesc(
 			TypeClass	tclass,
@@ -168,7 +169,8 @@ TypeDesc::TypeDesc(
 			TDescPtr	itype,
 	const	FieldVec&	fields,
 			TDescPtr	base,
-			bool		ordinal)
+			bool		ordinal,
+			bool		ref)
 
 	: _tclass{tclass},
 	  _size{size},
@@ -176,52 +178,79 @@ TypeDesc::TypeDesc(
 	  _itype{itype},
 	  _fields{fields},
 	  _base{base},
-	  _ordinal{ordinal}
+	  _ordinal{ordinal},
+	  _ref{ref}
 {}
 
 // public static
 
 SubRange TypeDesc::maxRange(numeric_limits<int>::min(), numeric_limits<int>::max());
-
-TDescPtr TypeDesc::intDesc	= TypeDesc::newIntDesc(maxRange);
-TDescPtr TypeDesc::realDesc	= TypeDesc::newRealDesc();
-TDescPtr TypeDesc::boolDesc	= TypeDesc::newBoolDesc();
-TDescPtr TypeDesc::charDesc	= TypeDesc::newCharDesc(SubRange(0, 127));
+SubRange TypeDesc::charRange(0, 127);
 
 /********************************************************************************************//**
  * @param	range		The type sub-range range. Defaults to SubRange().
+ * @param	ref			Type is passed by reference
+ *
  * @return TDescPtr to a IntDesc
  ************************************************************************************************/
-TDescPtr TypeDesc::newIntDesc(const SubRange& range) {
-	return TDescPtr(new TypeDesc(Integer, 1, range, TDescPtr(), FieldVec(), TDescPtr(), true));
+TDescPtr TypeDesc::newIntDesc(const SubRange& range, bool ref) {
+	return TDescPtr(new TypeDesc(Integer,
+								1,
+								range,
+								TDescPtr(),
+								FieldVec(),
+								TDescPtr(),
+								true,
+								ref));
 }
 
 /********************************************************************************************//**
+ * @param	ref			Type is passed by reference
+ *
  * @return TDescPtr to a new RealDesc
  ************************************************************************************************/
-TDescPtr TypeDesc::newRealDesc() {
-	return TDescPtr(new TypeDesc(Real, 1, SubRange(), TDescPtr(), FieldVec(), TDescPtr(), false));
+TDescPtr TypeDesc::newRealDesc(bool ref) {
+	return TDescPtr(new TypeDesc(Real,
+								1,
+								SubRange(),
+								TDescPtr(),
+								FieldVec(),
+								TDescPtr(),
+								false,
+								ref));
 }
 
 /********************************************************************************************//**
+ * @param	ref			Type is passed by reference
+ *
  * @return TDescPtr to a new BoolDesc
  ************************************************************************************************/
-TDescPtr TypeDesc::newBoolDesc() {
+TDescPtr TypeDesc::newBoolDesc(bool ref) {
 	return TDescPtr(new TypeDesc(Boolean,
 								1,
 								SubRange(0, 1),
 								TDescPtr(),
 								FieldVec(),
 								TDescPtr(),
-								true));
+								true,
+								ref));
 }
 
 /********************************************************************************************//**
- * @param	range		The type sub-range range. Defaults to SubRange().
+ * @param	range		The type sub-range range. Defaults to charRange.
+ * @param	ref			Type is passed by reference
+ *
  * @return TDescPtr to a new CharDesc
  ************************************************************************************************/
-TDescPtr TypeDesc::newCharDesc(const SubRange& range) {
-	return TDescPtr(new TypeDesc(Character, 1, range, TDescPtr(), FieldVec(), TDescPtr(), true));
+TDescPtr TypeDesc::newCharDesc(const SubRange& range, bool ref) {
+	return TDescPtr(new TypeDesc(Character,
+								1,
+								range,
+								TDescPtr(),
+								FieldVec(),
+								TDescPtr(),
+								true,
+								ref));
 }
 
 /********************************************************************************************//**
@@ -229,47 +258,71 @@ TDescPtr TypeDesc::newCharDesc(const SubRange& range) {
  * @param	range		The type sub-range range.
  * @param	itype		The type array type.
  * @param	base		The type base type. Defaults to TDescPtr().
+ * @param	ref			Type is passed by reference
+ *
  * @return TDescPtr to a new ArrayDesc
  ************************************************************************************************/
 TDescPtr TypeDesc::newArrayDesc(
 			size_t		size,
 	const	SubRange&	range,
 			TDescPtr	itype,
-			TDescPtr	base)
+			TDescPtr	base,
+			bool		ref)
 {
-	return TDescPtr(new TypeDesc(Array, size, range, itype, FieldVec(), base, false));
+	return TDescPtr(new TypeDesc(Array, size, range, itype, FieldVec(), base, false, ref));
 }
 
 /********************************************************************************************//**
  * @param	size		Size, in bytes, of a object of this type
  * @param	fields		The type fields. Defaults to FieldVec().
+ * @param	ref			Type is passed by reference
+ *
  * @return TDescPtr to a new RecordDesc
  ************************************************************************************************/
-TDescPtr TypeDesc::newRcrdDesc(size_t size, const FieldVec& fields) {
+TDescPtr TypeDesc::newRcrdDesc(size_t size, const FieldVec& fields, bool ref) {
 	return TDescPtr(new TypeDesc(Record,
 								size,
 								SubRange(),
 								TDescPtr(),
 								fields,
 								TDescPtr(),
-								false));
+								false,
+								ref));
 }
 
 /********************************************************************************************//**
  * @param	range		The type sub-range range.
  * @param	fields		The type fields. Defaults to FieldVec().
+ * @param	ref			Type is passed by reference
+ *
  * @return TDescPtr to a new EnumDesc
  ************************************************************************************************/
-TDescPtr TypeDesc::newEnumDesc(const SubRange& range, const FieldVec& fields) {
-	return TDescPtr(new TypeDesc(Enumeration, 1, range, TDescPtr(), fields, TDescPtr(), true));
+TDescPtr TypeDesc::newEnumDesc(const SubRange& range, const FieldVec& fields, bool ref) {
+	return TDescPtr(new TypeDesc(Enumeration,
+								1,
+								range,
+								TDescPtr(),
+								fields,
+								TDescPtr(),
+								true,
+								ref));
 }
 
 /********************************************************************************************//**
  * @param	base		The type base type. Defaults to TDescPtr().
+ * @param	ref			Type is passed by reference
+ *
  * @return TDescPtr to a new PtrDesc
  ************************************************************************************************/
-TDescPtr TypeDesc::newPointerDesc(TDescPtr base) {
-	return TDescPtr(new TypeDesc(Pointer, 1, SubRange(), TDescPtr(), FieldVec(), base, false));
+TDescPtr TypeDesc::newPointerDesc(TDescPtr base, bool ref) {
+	return TDescPtr(new TypeDesc(Pointer,
+								1,
+								SubRange(),
+								TDescPtr(),
+								FieldVec(),
+								base,
+								false,
+								ref));
 }
 
 // public
@@ -322,14 +375,26 @@ const FieldVec& TypeDesc::fields(const FieldVec& fields) {
 TDescPtr TypeDesc::base() const 				{	return _base;					}
 
 /********************************************************************************************//**
- * @return by base type
+ * @param	type	My new base type
+ * @return type
  ************************************************************************************************/
 TDescPtr TypeDesc::base(TDescPtr type)			{	return _base = type;			}
 
 /********************************************************************************************//**
  * @return true if my type is ordinal
  ************************************************************************************************/
-bool TypeDesc::isOrdinal() const 				{	return _ordinal;				}
+bool TypeDesc::ordinal() const 					{	return _ordinal;				}
+
+/********************************************************************************************//**
+ * @return true if my type is passed by reference
+ ************************************************************************************************/
+bool TypeDesc::ref() const						{	return _ref;					}
+
+/********************************************************************************************//**
+ * @param	r	True if my type is passed by refernce
+ * @return	r
+ ************************************************************************************************/
+bool TypeDesc::ref(bool r)						{	return _ref = r;				}
 
 // operators
 
@@ -340,17 +405,17 @@ bool TypeDesc::isOrdinal() const 				{	return _ordinal;				}
  * @return true if lhs == rhs
  ************************************************************************************************/
 bool operator<(const TypeDesc& lhs, const TypeDesc& rhs) {
-	if (lhs.tclass()			< rhs.tclass())
+	if (lhs.tclass()		< rhs.tclass())
 		return true;
-	else if (lhs.size()			< rhs.size())
+	else if (lhs.size()		< rhs.size())
 		return true;
-	else if (lhs.range()		< rhs.range())
+	else if (lhs.range()	< rhs.range())
 		return true;
-	else if (lhs.base()			< rhs.base())
+	else if (lhs.base()		< rhs.base())
 		return true;
-	else if (lhs.fields()		< rhs.fields())
+	else if (lhs.fields()	< rhs.fields())
 		return true;
-	else if (lhs.isOrdinal()	< rhs.isOrdinal())
+	else if (lhs.ordinal()	< rhs.ordinal())
 		return true;
 	else 
 		return false;
@@ -363,12 +428,12 @@ bool operator<(const TypeDesc& lhs, const TypeDesc& rhs) {
  * @return true if lhs == rhs
  ************************************************************************************************/
 bool operator==(const TypeDesc& lhs, const TypeDesc& rhs) {
-	return	lhs.tclass()		== rhs.tclass()		&&
-			lhs.size()			== rhs.size()		&&
-			lhs.range()			== rhs.range()		&&
-			lhs.base()			== rhs.base()		&&
-			lhs.fields()		== rhs.fields()		&&
-			lhs.isOrdinal()		== rhs.isOrdinal();
+	return	lhs.tclass()	== rhs.tclass()		&&
+			lhs.size()		== rhs.size()		&&
+			lhs.range()		== rhs.range()		&&
+			lhs.base()		== rhs.base()		&&
+			lhs.fields()	== rhs.fields()		&&
+			lhs.ordinal()	== rhs.ordinal();
 }
 
 /********************************************************************************************//**
@@ -414,6 +479,6 @@ ostream& operator<<(std::ostream& os, const TypeDesc& tdesc) {
 	for (auto fld : tdesc.fields())
 		os << fld			<< ", ";
 
-	return os 				<< tdesc.isOrdinal();
+	return os 				<< tdesc.ordinal();
 };
 
