@@ -81,6 +81,7 @@ Version | Description
  0.24	| Added -l[listing], fixed fahr*.p tests, added call and jump immediate instructions.
  0.25	| Table of pointers to instructions
  0.26   | 'var' parameters; pass by reference
+ 0.27	| Fixed typo in varparam.p
 
 ## Design and implementation notes
 

@@ -114,24 +114,24 @@ private:
 	/// variable-declaration-list production...
 	void varDeclList(	int					level,
 						bool				params,
-				const	std::string&		prefix,
+				const	std::string&		idprefix,
 						FieldVec&			idents);
 
 	/// variable-declaration production...
 	void varDecl(		int					level,
 						bool				var,
-				const	std::string&		prefix,
+				const	std::string&		idprefix,
 						FieldVec&			idents);
 
 	/// identifier-lst production...
 	std::vector<std::string> identifierList(
 						int					level,
-				const	std::string&		prefix);
+				const	std::string&		idprefix);
 
 	/// type productions...
 	TDescPtr type(		int 				level,
 						bool				var,
-				const	std::string&		prefix = "");
+				const	std::string&		idprefix = "");
 
 	/// simple-type productions...
 	TDescPtr simpleType(int level, bool var);
@@ -143,12 +143,12 @@ private:
 
 	/// structued-type productions...
 	TDescPtr structuredType(int				level,
-				const		std::string&	prefix,
+				const		std::string&	idprefix,
 							bool			var);
 
 	/// field-list productions...
 	void fieldList(		int					level,
-				const	std::string&		prefix,
+				const	std::string&		idprefix,
 						FieldVec&			idents);
 
 	/// simple-type-list productions...
@@ -157,7 +157,7 @@ private:
 	/// variable-declaration-list production...
 	void paramDeclList(	int					level,
 						bool				params,
-				const	std::string& 		prefix,
+				const	std::string& 		idprefix,
 						FieldVec&			idents);
 
 	/// Subroutine-declaration production...

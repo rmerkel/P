@@ -21,24 +21,45 @@
 using namespace std;
 
 /************************************************************************************************
- * LogLevel
+ * Log utilities
  ************************************************************************************************/
 
+/********************************************************************************************//**
+ ************************************************************************************************/
 LogLevel::LogLevel() {
 	if (n < numeric_limits<unsigned>::max())
 		++n;
 }
 
+/********************************************************************************************//**
+ ************************************************************************************************/
 LogLevel::~LogLevel() {
 	assert(n > 0);
 	if (n > 0)
 		--n;
 }
 
+/********************************************************************************************//**
+ ************************************************************************************************/
 unsigned LogLevel::n = 0;
 
-/// Indent the log level...
-ostream& LogIndex(ostream& oss) {
+/********************************************************************************************//**
+ * Construct a LogPrefix from s...
+ ************************************************************************************************/
+LogPrefix::LogPrefix(const std::string& s) : prefix(s) {}
+
+/********************************************************************************************//**
+ * Return a LogPrefix from prefix
+ ************************************************************************************************/
+LogPrefix prefix(const std::string& prefix)	{
+	return LogPrefix(prefix);
+}
+
+/********************************************************************************************//**
+ * Write p on oss and then return oss...
+ ************************************************************************************************/
+std::ostream& operator<<(std::ostream& oss, LogPrefix p) {
+	oss << p.prefix << ":";
 	if (LogLevel::n > 0)
 		oss << setw(LogLevel::n) << ' ';
 	return oss;
@@ -200,9 +221,8 @@ void Compilier::purge(int level) {
 	for (auto i = symtbl.begin(); i != symtbl.end(); ) {
 		if (i->second.level() == level) {
 			if (verbose)
-				cout	<< progName << ": "
-						<< LogIndex << "purging "
-						<< i->first << ": "
+				cout	<< prefix(progName)	<< "purging "
+						<< i->first 		<< ": "
 						<< i->second.kind() << ", "
 						<< static_cast<int>(i->second.level()) << ", "
 						<< i->second.value()
@@ -247,14 +267,15 @@ SymbolTable::iterator Compilier::lookup(const string& id) {
  * the undecroated version is returned. Prefixed identifiers are for record elements, so they
  * can't collide with variable, type or procedure names.
  *
- * @param 	level	The current block level.
- * @param	prefix	The identifier prefix.
- * @return 	the next, undecorated, identifier in the token stream, "unknown" if the next token
+ * @param 	level		The current block level.
+ * @param	idprefix	The identifier prefix.
+ *
+ * @return	The next, undecorated, identifier in the token stream, "unknown" if the next token
  * 			 wasn't an identifier.
  ************************************************************************************************/
-const std::string Compilier::nameDecl(int level, const string& prefix) {
+const std::string Compilier::nameDecl(int level, const string& idprefix) {
 	const string id = ts.current().string_value;	// Copy the identifer before consuming it
-	const string prefixed = prefix.empty()	? id : prefix + string(".") + id;
+	const string prefixed = idprefix.empty()	? id : idprefix + string(".") + id;
 
 	if (expect(Token::Identifier)) {				// Consume the identifier
 		auto range = symtbl.equal_range(prefixed);	// Already defined?

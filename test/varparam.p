@@ -1,6 +1,6 @@
 {	test var parameters		}
 program VarParamTest ;
-var	i	 integer;
+var	i : integer;
 	procedure inc(var x : integer) ;
 	begin
 		x := x + 1

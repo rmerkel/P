@@ -21,27 +21,48 @@
 #include "token.h"
 
 /************************************************************************************************
- * LogLevel
+ * Log utilities
  ************************************************************************************************/
 
-/// Control the log index level
+/********************************************************************************************//**
+ * Maintains a log level index...
+ *
+ * Create a LogLevel to enter the next level in the current scope.
+ ************************************************************************************************/
 struct LogLevel {
-	static unsigned n;						///< indent level
+	static unsigned n;						///< current indent level
+
 	LogLevel();								///< Enter the next level
 	~LogLevel();							///< Exit the previous level
 };
 
-std::ostream& LogIndex(std::ostream& oss);	///< Indent per the current log level...
+/********************************************************************************************//**
+ * Simple continer for the log previx manipulor... 
+ ************************************************************************************************/
+struct LogPrefix {
+	std::string	prefix;						///< Prefix string
+	LogPrefix(const std::string& s);
+};
+
+/********************************************************************************************//**
+ * Log prefix mainpulator...
+ ************************************************************************************************/
+LogPrefix prefix(const std::string& prefix);
+
+/********************************************************************************************//**
+ * Write p onto oss and return oss...
+ ************************************************************************************************/
+std::ostream& operator<<(std::ostream& oss, LogPrefix p);
 
 /********************************************************************************************//**
  * Framework for a recursive decent compilier
  ************************************************************************************************/
 class Compilier {
 public:
-	Compilier();							///< Constructor
-	virtual ~Compilier() {}					///< Destructor
+	Compilier();							///< Constructor...
+	virtual ~Compilier() {}					///< Destructor...
 
-	/// Compile a P source file
+	/// Compile a P source file...
 	unsigned operator()(
 		const	std::string&	fName,
 				InstrVector&	instructions,
@@ -49,7 +70,7 @@ public:
 				bool			ver);
 
 protected:
-	/// A table, indexed by instruction address, yeilding source line numbers
+	/// A table, indexed by instruction address, yeilding source line numbers...
 	typedef std::vector<unsigned> SourceIndex;
 
 	std::string			progName;			///< The compilier's name, used in error messages
@@ -65,7 +86,7 @@ protected:
 	/// Write an error message...
 	void error(const std::string& msg, const std::string& name);
 
-	/// Return the current token kind..
+	/// Return the current token kind...
 	Token::Kind current() 					{	return ts.current().kind;	}
 
 	Token next();							///< Read and return the next token...
@@ -77,7 +98,6 @@ protected:
 	bool expect(Token::Kind k, bool get = true);
 
 	bool oneOf(Token::KindSet set);			///< Is the current token one of the given set?
-
 	size_t emit(const OpCode op);			///< Emit an instruction
 
 	/// Emit an instruction...
@@ -96,7 +116,7 @@ protected:
 	SymbolTable::iterator lookup(const std::string& id);
 
 	/// name (identifier) check...
-	const std::string nameDecl(int level, const std::string& prefix = "");
+	const std::string nameDecl(int level, const std::string& idprefix = "");
 
 	virtual void run() = 0;					///< Compile...
 };
