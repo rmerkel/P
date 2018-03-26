@@ -78,7 +78,7 @@ ostream& operator<<(std::ostream& os, const Field& field) {
 }
 
 /****************************************************************************
- * Sub-Range - minimum to maximum
+ * Subrange - minimum to maximum
  ****************************************************************************/
 
 // public
@@ -87,36 +87,36 @@ ostream& operator<<(std::ostream& os, const Field& field) {
  * @param	minimum	The minimum value in the range
  * @param	maximum	The maximum value in the range
  ****************************************************************************/
-SubRange::SubRange(int minimum, int maximum)
+Subrange::Subrange(int minimum, int maximum)
 	: _min{minimum}, _max{maximum} {
 }
 
 /********************************************************************************************//**
  * @return my minmum value
  ************************************************************************************************/
-int SubRange::minimum() const					{	return _min;		}
+int Subrange::minimum() const					{	return _min;		}
 
 /********************************************************************************************//**
  * @return my maximum value
  ************************************************************************************************/
-int SubRange::maximum() const					{	return _max;		}
+int Subrange::maximum() const					{	return _max;		}
 
 /************************************************************************//**
  * @return the maximum() - minimum() + 1;
  ****************************************************************************/
-unsigned SubRange::span() const	{
+unsigned Subrange::span() const	{
 	return maximum() - minimum() + 1;
 }
 
 // operators
 
 /********************************************************************************************//**
- * @brief SubRange less-then operator
+ * @brief Subrange less-then operator
  * @param lhs	The left-hand side
  * @param rhs	The right-hand side
  * @return true if lhs == rhs
  ************************************************************************************************/
-bool operator<(const SubRange& lhs, const SubRange& rhs) {
+bool operator<(const Subrange& lhs, const Subrange& rhs) {
 	if (lhs.minimum() < rhs.minimum())
 		return true;
 	else if (lhs.maximum() < rhs.minimum())
@@ -126,12 +126,12 @@ bool operator<(const SubRange& lhs, const SubRange& rhs) {
 }
 
 /********************************************************************************************//**
- * @brief SubRange equality operator
+ * @brief Subrange equality operator
  * @param lhs	The left-hand side
  * @param rhs	The right-hand side
  * @return true if lhs == rhs
  ************************************************************************************************/
-bool operator==(const SubRange& lhs, const SubRange& rhs) {
+bool operator==(const Subrange& lhs, const Subrange& rhs) {
 	return	lhs.minimum() == rhs.minimum()	&&
 			lhs.maximum() == rhs.maximum();
 }
@@ -142,7 +142,7 @@ bool operator==(const SubRange& lhs, const SubRange& rhs) {
  * @param	srange	Value to write 
  * @return	os
  ************************************************************************************************/
-ostream& operator<<(std::ostream& os, const SubRange& srange) {
+ostream& operator<<(std::ostream& os, const Subrange& srange) {
 	return os << srange.minimum() << ".." << srange.maximum();
 }
 
@@ -155,7 +155,7 @@ ostream& operator<<(std::ostream& os, const SubRange& srange) {
 /**	Construct
  * @param	tclass	My type class
  * @param	size	Object size, in Datums. Defaults to 1.
- * @param	range	Sub-Range, defaults SubRange()
+ * @param	range	Subrange, defaults Subrange()
  * @param	itype	Index type. Defaults to TDescPtr()
  * @param	fields	Fields. Defaults to FieldVec()
  * @param	base	Base type. Defaults to TDescPtr().
@@ -165,7 +165,7 @@ ostream& operator<<(std::ostream& os, const SubRange& srange) {
 TypeDesc::TypeDesc(
 			TypeClass	tclass,
 			size_t		size,
-	const	SubRange&	range,
+	const	Subrange&	range,
 			TDescPtr	itype,
 	const	FieldVec&	fields,
 			TDescPtr	base,
@@ -184,16 +184,16 @@ TypeDesc::TypeDesc(
 
 // public static
 
-SubRange TypeDesc::maxRange(numeric_limits<int>::min(), numeric_limits<int>::max());
-SubRange TypeDesc::charRange(0, 127);
+Subrange TypeDesc::maxRange(numeric_limits<int>::min(), numeric_limits<int>::max());
+Subrange TypeDesc::charRange(0, 127);
 
 /********************************************************************************************//**
- * @param	range		The type sub-range range. Defaults to SubRange().
+ * @param	range		The type sub-range range. Defaults to Subrange().
  * @param	ref			Type is passed by reference
  *
  * @return TDescPtr to a IntDesc
  ************************************************************************************************/
-TDescPtr TypeDesc::newIntDesc(const SubRange& range, bool ref) {
+TDescPtr TypeDesc::newIntDesc(const Subrange& range, bool ref) {
 	return TDescPtr(new TypeDesc(Integer,
 								1,
 								range,
@@ -212,7 +212,7 @@ TDescPtr TypeDesc::newIntDesc(const SubRange& range, bool ref) {
 TDescPtr TypeDesc::newRealDesc(bool ref) {
 	return TDescPtr(new TypeDesc(Real,
 								1,
-								SubRange(),
+								Subrange(),
 								TDescPtr(),
 								FieldVec(),
 								TDescPtr(),
@@ -228,7 +228,7 @@ TDescPtr TypeDesc::newRealDesc(bool ref) {
 TDescPtr TypeDesc::newBoolDesc(bool ref) {
 	return TDescPtr(new TypeDesc(Boolean,
 								1,
-								SubRange(0, 1),
+								Subrange(0, 1),
 								TDescPtr(),
 								FieldVec(),
 								TDescPtr(),
@@ -242,7 +242,7 @@ TDescPtr TypeDesc::newBoolDesc(bool ref) {
  *
  * @return TDescPtr to a new CharDesc
  ************************************************************************************************/
-TDescPtr TypeDesc::newCharDesc(const SubRange& range, bool ref) {
+TDescPtr TypeDesc::newCharDesc(const Subrange& range, bool ref) {
 	return TDescPtr(new TypeDesc(Character,
 								1,
 								range,
@@ -264,7 +264,7 @@ TDescPtr TypeDesc::newCharDesc(const SubRange& range, bool ref) {
  ************************************************************************************************/
 TDescPtr TypeDesc::newArrayDesc(
 			size_t		size,
-	const	SubRange&	range,
+	const	Subrange&	range,
 			TDescPtr	itype,
 			TDescPtr	base,
 			bool		ref)
@@ -282,7 +282,7 @@ TDescPtr TypeDesc::newArrayDesc(
 TDescPtr TypeDesc::newRcrdDesc(size_t size, const FieldVec& fields, bool ref) {
 	return TDescPtr(new TypeDesc(Record,
 								size,
-								SubRange(),
+								Subrange(),
 								TDescPtr(),
 								fields,
 								TDescPtr(),
@@ -297,7 +297,7 @@ TDescPtr TypeDesc::newRcrdDesc(size_t size, const FieldVec& fields, bool ref) {
  *
  * @return TDescPtr to a new EnumDesc
  ************************************************************************************************/
-TDescPtr TypeDesc::newEnumDesc(const SubRange& range, const FieldVec& fields, bool ref) {
+TDescPtr TypeDesc::newEnumDesc(const Subrange& range, const FieldVec& fields, bool ref) {
 	return TDescPtr(new TypeDesc(Enumeration,
 								1,
 								range,
@@ -317,7 +317,7 @@ TDescPtr TypeDesc::newEnumDesc(const SubRange& range, const FieldVec& fields, bo
 TDescPtr TypeDesc::newPointerDesc(TDescPtr base, bool ref) {
 	return TDescPtr(new TypeDesc(Pointer,
 								1,
-								SubRange(),
+								Subrange(),
 								TDescPtr(),
 								FieldVec(),
 								base,
@@ -345,7 +345,7 @@ size_t TypeDesc::size(size_t sz) 				{	return _size = sz;				}
 /********************************************************************************************//**
  * @return my sub-range
  ************************************************************************************************/
-const SubRange& TypeDesc::range() const 		{	return _range;					}
+const Subrange& TypeDesc::range() const 		{	return _range;					}
 
 /********************************************************************************************//**
  * @return my index type

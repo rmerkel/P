@@ -150,9 +150,9 @@ Token TokenStream::get() {
 		return ct;
 
 	default:							// ident, ident = or error
-		if (isalpha(ch)) {
+		if (isalpha(ch) || ch == '_') {
 			ct.string_value = ch;
-			while (getch(ch) && isalnum(ch))
+			while (getch(ch) && (isalnum(ch) || ch == '_'))
 				ct.string_value += ch;
 
 			unget();
@@ -208,6 +208,10 @@ TokenStream::KeywordTable	TokenStream::keywords = {
 	{	"array",		Token::Array		},
 	{	"arctan",		Token::Atan			},
 	{	"begin",		Token::Begin		},
+	{	"bit_and",		Token::BitAnd		},
+	{	"bit_not",		Token::BitNot		},
+	{	"bit_or",		Token::BitOr		},
+	{	"bit_xor",		Token::BitXor		},
 	{	"boolean",		Token::BoolType		},
 	{	"char",			Token::CharType		},
 	{   "const",		Token::ConsDecl		},
@@ -310,6 +314,11 @@ ostream& operator<<(std::ostream& os, const Token::Kind& kind) {
 
 	case Token::Or:			os << "or";				break;
 	case Token::And:		os << "and";			break;
+
+	case Token::BitNot:		os << "bit_not";		break;
+	case Token::BitAnd:		os << "bit_and";		break;
+	case Token::BitOr:		os << "bit_or";			break;
+	case Token::BitXor:		os << "bit_xor";		break;
 
 	case Token::Add:		os << "+";				break;
 	case Token::Subtract:	os << "-";				break;

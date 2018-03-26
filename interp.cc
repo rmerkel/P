@@ -106,7 +106,7 @@ bool PInterp::rangeCheck(size_t begin, size_t end) {
 size_t PInterp::base(size_t nlevel) {
 	auto b = fp;
 	for (; nlevel > 0; --nlevel)
-		b = stack[b].address();
+		b = stack[b].natural();
 
 	return b;
 }
@@ -165,13 +165,16 @@ PInterp::Result PInterp::write1(unsigned index) {
 
 	Result r = Result::success;
 
-	if (nValue.kind() == Datum::Address)
-		n = nValue.address();
-
-	else {
+	if (nValue.kind() != Datum::Integer) {
 		cerr << "WRITE[LN] value count paramters is not an integer!" << endl;
 		r =  Result::badDataType;
-	}
+
+	} else if (nValue.integer() < 0) {
+		cerr << "WRITE[LN] value count paramters is negative!" << endl;
+		r =  Result::badDataType;
+
+	} else
+		n = nValue.integer();
 
 	if (width.kind() == Datum::Integer)
 		w = width.integer();
@@ -196,7 +199,6 @@ PInterp::Result PInterp::write1(unsigned index) {
 		case Datum::Boolean:	cout << boolalpha << value.boolean();					break;
 		case Datum::Character:	cout << setw(w) << value.character();					break;
 		case Datum::Integer:	cout << setw(w) << setprecision(p) << value.integer();	break;
-		case Datum::Address:	cout << setw(w) << setprecision(p) << value.address();	break;
 		case Datum::Real:
 			if (p == 0)
 				cout << setw(w) << scientific << setprecision(6) << value.real();
@@ -246,6 +248,10 @@ PInterp::InstrPtr PInterp::instrTbl[] = {
 	&PInterp::MUL,
 	&PInterp::DIV,
 	&PInterp::REM,
+	&PInterp::BNOT,
+	&PInterp::BAND,
+	&PInterp::BOR,
+	&PInterp::BXOR,
 	&PInterp::LT,
 	&PInterp::LTE,
 	&PInterp::EQU,
@@ -616,7 +622,7 @@ PInterp::Result PInterp::NEW() {
 		return Result::badDataType;
 	}
 
-	push(heap.alloc(pop().address()));
+	push(heap.alloc(pop().natural()));
 	if (trace)
 		heap.dump(cout);					// Dump the new heap state...
 
@@ -630,12 +636,16 @@ PInterp::Result PInterp::NEW() {
 PInterp::Result PInterp::DISPOSE() {
 	Datum& TOS = tos();
 
-	if (TOS.kind() != Datum::Address) {
-		cerr << "DISPOSE TOS is not an address!" << endl;
+	if (TOS.kind() != Datum::Integer) {
+		cerr << "DISPOSE TOS is not an integer!" << endl;
+		return Result::badDataType;
+
+	} else if (TOS.integer() < 0) {
+		cerr << "DISPOSE TOS is negative!" << endl;
 		return Result::badDataType;
 	}
 
-	const size_t addr = TOS.address(); pop();
+	const size_t addr = TOS.natural(); pop();
 	if (!heap.free(addr)) {
 		cerr << "Dispose of " << addr << " failed!\n";
 		return Result::freeStoreError;
@@ -775,6 +785,77 @@ PInterp::Result PInterp::REM() {
 		push(0);
 
 	return r;
+}
+
+/********************************************************************************************//**
+ * Replace the top-of-stac with it's bitwise not
+ * @return	stackUndeflow if the stack underflowed, badDataType if either operand isn't numeric.
+ ************************************************************************************************/
+PInterp::Result PInterp::BNOT() {
+	const auto rhs = pop();
+
+	if (rhs.numeric()) {
+		push(~rhs);
+		return Result::success;
+
+	} else {
+		push(0);
+		return Result::badDataType;
+	}
+}
+
+/********************************************************************************************//**
+ * Replace the top two values on the stack with their bitwise and
+ * @return	stackUndeflow if the stack underflowed, badDataType if either operand isn't numeric.
+ ************************************************************************************************/
+PInterp::Result PInterp::BAND() {
+	const auto rhs = pop();
+	const auto lhs = pop();
+
+	if (lhs.numeric() && rhs.numeric()) {
+		push(lhs & rhs);
+		return Result::success;
+
+	} else {
+		push(0);
+		return Result::badDataType;
+	}
+}
+
+/********************************************************************************************//**
+ * Replace the top two values on the stack with their bitwise or
+ * @return	stackUndeflow if the stack underflowed, badDataType if either operand isn't numeric.
+ ************************************************************************************************/
+PInterp::Result PInterp::BOR() {
+	const auto rhs = pop();
+	const auto lhs = pop();
+
+	if (lhs.numeric() && rhs.numeric()) {
+		push(lhs | rhs);
+		return Result::success;
+
+	} else {
+		push(0);
+		return Result::badDataType;
+	}
+}
+
+/********************************************************************************************//**
+ * Replace the top two values on the stack with their bitwise exclusive or
+ * @return	stackUndeflow if the stack underflowed, badDataType if either operand isn't numeric.
+ ************************************************************************************************/
+PInterp::Result PInterp::BXOR() {
+	const auto rhs = pop();
+	const auto lhs = pop();
+
+	if (lhs.numeric() && rhs.numeric()) {
+		push(lhs ^ rhs);
+		return Result::success;
+
+	} else {
+		push(0);
+		return Result::badDataType;
+	}
 }
 
 /********************************************************************************************//**
@@ -976,7 +1057,7 @@ PInterp::Result PInterp::POP() {
 	if (ir.value < Datum(0))
 		return Result::stackUnderflow;
 
-	const size_t n = ir.value.address();		// Accually, just an unsigned value
+	const size_t n = ir.value.natural();		// Accually, just an unsigned value
 	if (sp < n)
 		return Result::stackUnderflow;
 
@@ -1012,7 +1093,7 @@ PInterp::Result PInterp::PUSHVAR() {
  * @return	stackUnderflow if the stack underflowed, 
  ************************************************************************************************/
 PInterp::Result PInterp::EVAL() {
-	const	size_t	n = ir.value.address();	// acually, an unsigned integer
+	const	size_t	n = ir.value.natural();	// acually, an unsigned integer
 			Result	r = Result::success;
 
 	if (sp < n) {
@@ -1020,7 +1101,7 @@ PInterp::Result PInterp::EVAL() {
 		r = Result::stackUnderflow;
 	}
 
-	size_t dst = pop().address();
+	size_t dst = pop().natural();
 	if (!rangeCheck(dst, dst + n)) {
 		cerr << "Stack underflow evaluating " << n << " Datums!\n";
 		r = Result::stackUnderflow;
@@ -1057,13 +1138,13 @@ PInterp::Result PInterp::EVAL() {
  * @return	stackUnderflow if the stack underflowed, 
  ************************************************************************************************/
 PInterp::Result PInterp::ASSIGN() {
-	const	size_t	n = ir.value.address();	// Accually, just unsigned
+	const	size_t	n = ir.value.natural();	// Accually, just unsigned
 			Result	r = Result::success;
 
 	if (sp < n)
 		r = Result::stackUnderflow;
 
-	size_t dst = stack[sp - ir.value.address()].address();
+	size_t dst = stack[sp - ir.value.natural()].natural();
 	if (!rangeCheck(dst, dst + n))
 		r = Result::stackUnderflow;
 
@@ -1084,14 +1165,14 @@ PInterp::Result PInterp::ASSIGN() {
  * @return	stackUnderflow if the stack underflowed.
  ************************************************************************************************/
 PInterp::Result PInterp::COPY() {
-	const	size_t	n = ir.value.address();	// Accually, just unsinged value
+	const	size_t	n = ir.value.natural();	// Accually, just unsinged value
 			Result	r = Result::success;
 
-	size_t src  = pop().address();
+	size_t src  = pop().natural();
 	if (!rangeCheck(src, src + n))
 		r = Result::stackUnderflow;
 
-	size_t dst = pop().address();
+	size_t dst = pop().natural();
 	if (!rangeCheck(dst, dst + n))
 		r = Result::stackUnderflow;
 
@@ -1107,7 +1188,7 @@ PInterp::Result PInterp::COPY() {
  * @return	success.
  ************************************************************************************************/
 PInterp::Result PInterp::CALL() {
-	const	size_t	addr	= pop().address();
+	const	size_t	addr	= pop().natural();
 	const	int8_t	nlevel	= pop().integer();
 	const	size_t	oldFp	= fp;	// Save a copy before we modify it
 
@@ -1143,7 +1224,7 @@ PInterp::Result PInterp::CALLI() {
 	push(pc);						//	FrameRetAddr
 	push(0ul);						//	FrameRetVal
 
-	pc = ir.value.address();
+	pc = ir.value.natural();
 
 	return Result::success;
 }
@@ -1154,9 +1235,9 @@ PInterp::Result PInterp::CALLI() {
  ************************************************************************************************/
 PInterp::Result PInterp::RET() {
 	sp = fp - 1; 					// "pop" the activaction frame
-	pc = stack[fp + FrameRetAddr].address();
-	fp = stack[fp + FrameOldFp].address();
-	sp -= ir.value.address();		// Pop n parameters, if any...
+	pc = stack[fp + FrameRetAddr].natural();
+	fp = stack[fp + FrameOldFp].natural();
+	sp -= ir.value.natural();		// Pop n parameters, if any...
 
 	return Result::success;
 }
@@ -1189,7 +1270,7 @@ PInterp::Result PInterp::ENTER() {
  * @return	success.
  ************************************************************************************************/
 PInterp::Result PInterp::JUMP() {
-	pc = pop().address();
+	pc = pop().natural();
 	return Result::success;
 }
 
@@ -1198,7 +1279,7 @@ PInterp::Result PInterp::JUMP() {
  * @return	success.
  ************************************************************************************************/
 PInterp::Result PInterp::JUMPI() {
-	pc = ir.value.address();
+	pc = ir.value.natural();
 	return Result::success;
 }
 
@@ -1207,7 +1288,7 @@ PInterp::Result PInterp::JUMPI() {
  * @return	badDataType if TOS isn't a Boolean.
  ************************************************************************************************/
 PInterp::Result PInterp::JNEQ() {
-	const uint32_t addr = pop().address();
+	const uint32_t addr = pop().natural();
 	const Datum value = pop();
 
 	if (value.kind() != Datum::Boolean)
@@ -1230,7 +1311,7 @@ PInterp::Result PInterp::JNEQI() {
 		return Result::badDataType;
 
 	if (value.boolean() == false)
-		pc = ir.value.address();
+		pc = ir.value.natural();
 
 	return Result::success;
 }

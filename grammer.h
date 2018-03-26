@@ -52,8 +52,9 @@
  *          const-expr = [ '+' | '-' ] number | identifier | ' characters ' ;
  *      expression-lst = expression { ',' expression } ;
  *          expression = simple-expr { '<' | '<=' | '=' | '>=' | '>' | '<>' simple-expr } ;
- *         simple-expr = [ '+' | '-' ] terminal { '+' | '-' | 'or' terminal } ;
- *            terminal = factor { '*' | '/' | 'rem' | 'and' factor } ;
+ *         simple-expr = [ '+' | '-' | 'bit_not' ] terminal { simple-expr-op terminal } ;
+ *      simple-expr-op = '+' | '-' | 'bit_or' |'bit_xor' | 'or' ;
+ *            terminal = factor { '*' | '/' | 'rem' | 'bit_and' | 'and' factor } ;
  *              factor = variable | ' string '                                              |
  *                       identifier [ '(' expression-lst ')' ]                              |
  *                       'round' '(' expression ')'                                         |

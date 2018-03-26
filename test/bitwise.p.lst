@@ -1,0 +1,200 @@
+# test/bitwise.p, 1: program TestBitWise ;
+# test/bitwise.p, 2: var	x, y, z : integer ;
+    0: calli 0, 2
+    1: halt
+# test/bitwise.p, 3: begin
+    2: enter 3
+# test/bitwise.p, 4: 	x := 15;
+    3: pushvar 0, 4
+    4: push 15
+    5: assign 1
+# test/bitwise.p, 5: 	y := 1;
+    6: pushvar 0, 5
+    7: push 1
+    8: assign 1
+# test/bitwise.p, 6: 	writeln('x = ', x);
+    9: push 'x'
+   10: push ' '
+   11: push '='
+   12: push ' '
+   13: push 4
+   14: push 0
+   15: push 0
+   16: pushvar 0, 4
+   17: eval 1
+   18: push 1
+   19: push 0
+   20: push 0
+   21: push 2
+   22: writeln
+# test/bitwise.p, 7: 	writeln('y = ', y);
+   23: push 'y'
+   24: push ' '
+   25: push '='
+   26: push ' '
+   27: push 4
+   28: push 0
+   29: push 0
+   30: pushvar 0, 5
+   31: eval 1
+   32: push 1
+   33: push 0
+   34: push 0
+   35: push 2
+   36: writeln
+# test/bitwise.p, 8: 
+# test/bitwise.p, 9: 	z := x bit_and y;
+   37: pushvar 0, 6
+   38: pushvar 0, 4
+   39: eval 1
+   40: pushvar 0, 5
+   41: eval 1
+   42: bitand
+   43: assign 1
+# test/bitwise.p, 10: 	writeln('z := x bit_and y = ', z);
+   44: push 'z'
+   45: push ' '
+   46: push ':'
+   47: push '='
+   48: push ' '
+   49: push 'x'
+   50: push ' '
+   51: push 'b'
+   52: push 'i'
+   53: push 't'
+   54: push '_'
+   55: push 'a'
+   56: push 'n'
+   57: push 'd'
+   58: push ' '
+   59: push 'y'
+   60: push ' '
+   61: push '='
+   62: push ' '
+   63: push 19
+   64: push 0
+   65: push 0
+   66: pushvar 0, 6
+   67: eval 1
+   68: push 1
+   69: push 0
+   70: push 0
+   71: push 2
+   72: writeln
+# test/bitwise.p, 11: 
+# test/bitwise.p, 12: 	z := 10 bit_or z;
+   73: pushvar 0, 6
+   74: push 10
+   75: pushvar 0, 6
+   76: eval 1
+   77: bitor
+   78: assign 1
+# test/bitwise.p, 13: 	writeln('z :+ 10 bit_or z = ', z);
+   79: push 'z'
+   80: push ' '
+   81: push ':'
+   82: push '+'
+   83: push ' '
+   84: push '1'
+   85: push '0'
+   86: push ' '
+   87: push 'b'
+   88: push 'i'
+   89: push 't'
+   90: push '_'
+   91: push 'o'
+   92: push 'r'
+   93: push ' '
+   94: push 'z'
+   95: push ' '
+   96: push '='
+   97: push ' '
+   98: push 19
+   99: push 0
+  100: push 0
+  101: pushvar 0, 6
+  102: eval 1
+  103: push 1
+  104: push 0
+  105: push 0
+  106: push 2
+  107: writeln
+# test/bitwise.p, 14: 
+# test/bitwise.p, 15: 	z := x bit_xor y;
+  108: pushvar 0, 6
+  109: pushvar 0, 4
+  110: eval 1
+  111: pushvar 0, 5
+  112: eval 1
+  113: bitxor
+  114: assign 1
+# test/bitwise.p, 16: 	writeln('z := x bit_xor y = ', z);
+  115: push 'z'
+  116: push ' '
+  117: push ':'
+  118: push '='
+  119: push ' '
+  120: push 'x'
+  121: push ' '
+  122: push 'b'
+  123: push 'i'
+  124: push 't'
+  125: push '_'
+  126: push 'x'
+  127: push 'o'
+  128: push 'r'
+  129: push ' '
+  130: push 'y'
+  131: push ' '
+  132: push '='
+  133: push ' '
+  134: push 19
+  135: push 0
+  136: push 0
+  137: pushvar 0, 6
+  138: eval 1
+  139: push 1
+  140: push 0
+  141: push 0
+  142: push 2
+  143: writeln
+# test/bitwise.p, 17: 
+# test/bitwise.p, 18: 	z := bit_not z;
+  144: pushvar 0, 6
+  145: pushvar 0, 6
+  146: eval 1
+  147: bitand
+  148: assign 1
+# test/bitwise.p, 19: 	writeln('bit_not z = ', y)
+  149: push 'b'
+  150: push 'i'
+  151: push 't'
+  152: push '_'
+  153: push 'n'
+  154: push 'o'
+  155: push 't'
+  156: push ' '
+  157: push 'z'
+  158: push ' '
+  159: push '='
+  160: push ' '
+  161: push 12
+  162: push 0
+  163: push 0
+  164: pushvar 0, 5
+  165: eval 1
+  166: push 1
+  167: push 0
+  168: push 0
+# test/bitwise.p, 20: 
+# test/bitwise.p, 21: end .
+  169: push 2
+  170: writeln
+  171: ret
+
+x =  15
+y =  1
+z := x bit_and y =  1
+z :+ 10 bit_or z =  11
+z := x bit_xor y =  14
+bit_not z =  1

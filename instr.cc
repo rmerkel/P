@@ -63,6 +63,11 @@ const OpCodeInfo::InfoMap OpCodeInfo::opInfoTbl {
 	{ OpCode::DIV,		OpCodeInfo{ "div",		2			} },
 	{ OpCode::REM,		OpCodeInfo{ "rem",		2			} },
 
+	{ OpCode::BNOT,		OpCodeInfo{ "bitand",	1			} },
+	{ OpCode::BAND,		OpCodeInfo{ "bitand",	2			} },
+	{ OpCode::BOR,		OpCodeInfo{ "bitor",	2			} },
+	{ OpCode::BXOR,		OpCodeInfo{ "bitxor",	2			} },
+
 	{ OpCode::LT,		OpCodeInfo{ "lt",		2			} },
 	{ OpCode::LTE,		OpCodeInfo{ "lte",		2			} },
 	{ OpCode::EQU,		OpCodeInfo{ "equ",		2			} },

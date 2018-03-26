@@ -61,25 +61,25 @@ std::ostream& operator<<(std::ostream& os, const Field& field);
 typedef std::vector<Field>	FieldVec;
 
 /********************************************************************************************//**
- * Sub-Range - a contiguoush sub-range of integer values
+ * Subrange - a contiguoush sub-range of integer values
  ************************************************************************************************/
-class SubRange {
+class Subrange {
 	int		_min;						///< The sub-ranges minimum value
 	int		_max;						///< The Sub-ranges maximum value
 
 public:
-	SubRange() : _min{0}, _max{0} {}	///< Default constructor
-	SubRange(int minimum, int maximum);	///< Constructor
-	virtual ~SubRange() {}				///< Destructor
+	Subrange() : _min{0}, _max{0} {}	///< Default constructor
+	Subrange(int minimum, int maximum);	///< Constructor
+	virtual ~Subrange() {}				///< Destructor
 
 	int minimum() const;				///< Return type sub-range minimum value
 	int maximum() const;				///< Return type sub-range maximum value
 	unsigned span() const;				///< Return type sub-range's span
 };	
 
-bool operator<(const SubRange& lhs, const SubRange& rhs);
-bool operator==(const SubRange& lhs, const SubRange& rhs);
-std::ostream& operator<<(std::ostream& os, const SubRange& srange);
+bool operator<(const Subrange& lhs, const Subrange& rhs);
+bool operator==(const Subrange& lhs, const Subrange& rhs);
+std::ostream& operator<<(std::ostream& os, const Subrange& srange);
 
 /********************************************************************************************//**
  * Type Descriptor a type classes size, sub-range and fields
@@ -87,7 +87,7 @@ std::ostream& operator<<(std::ostream& os, const SubRange& srange);
  * Describes both built-in/pre-defined types and user defined types with in
  * the following type kinds (classes):
  *
- * | Kind         | Size | Sub-Range   | IType | Base | Fields | Ordinal |
+ * | Kind         | Size | Subrange    | IType | Base | Fields | Ordinal |
  * | :----------- | :--: | :---------: | :---: | :--: | :----: | :-----: |
  * |  Array       |	N    |   1 - 10    |  T1   |  T2  |   -    |	N    |
  * |  Boolean     |	1    |   0 - 1     |   -   |   -  |   -    |	Y    |
@@ -121,11 +121,11 @@ public:
 
 	// useful constants
 
-	static SubRange	maxRange;			///< Largest possible range
-	static SubRange charRange;			///< Range of ASCII characters
+	static Subrange	maxRange;			///< Largest possible range
+	static Subrange charRange;			///< Range of ASCII characters
 
 	/// Create, and return, a TDescPtr to a new IntDesc
-	static TDescPtr newIntDesc(const SubRange& range = maxRange, bool ref = false);
+	static TDescPtr newIntDesc(const Subrange& range = maxRange, bool ref = false);
 
 	/// Create, and return, a TDescPtr to a new RealDesc
 	static TDescPtr newRealDesc(bool ref = false);
@@ -134,12 +134,12 @@ public:
 	static TDescPtr newBoolDesc(bool ref = false);
 
 	/// Create, and return, a TDescPtr to a new CharDesc
-	static TDescPtr newCharDesc(const SubRange& = charRange, bool ref = false);
+	static TDescPtr newCharDesc(const Subrange& = charRange, bool ref = false);
 
 	/// Create, and return, a TDescPtr to a new ArrayDesc
 	static TDescPtr newArrayDesc(
 				size_t		size,
-		const	SubRange&	range,
+		const	Subrange&	range,
 				TDescPtr	rtype,
 				TDescPtr	base = TDescPtr(),
 				bool		ref = false);
@@ -148,7 +148,7 @@ public:
 	static TDescPtr newRcrdDesc(size_t size, const FieldVec& fields = FieldVec(), bool ref = false);
 
 	/// Create, and return, a TDescPtr to a new EnumDesc
-	static TDescPtr newEnumDesc(const SubRange& range, const FieldVec& fields = FieldVec(), bool ref = false);
+	static TDescPtr newEnumDesc(const Subrange& range, const FieldVec& fields = FieldVec(), bool ref = false);
 
 	/// Create, and return, a TDescPtr to a new PointerDesc
 	static TDescPtr newPointerDesc(TDescPtr base, bool ref = false);
@@ -158,7 +158,7 @@ public:
 	TypeClass tclass() const;			///< Return my type class
 	size_t size() const;				///< Return my size, in Datums
 	size_t size(size_t sz); 			///< Set, and then return, my size in Datums
-	const SubRange& range() const;		///< Return my sub-range
+	const Subrange& range() const;		///< Return my sub-range
 	TDescPtr itype() const;				///< Return my array sub-rane (index) type. 
 	TDescPtr itype(TDescPtr type);		///< Set, and then return, my range type
 	const FieldVec& fields() const;		///< Return my fields
@@ -176,7 +176,7 @@ protected:
 	///	Constructor
 	TypeDesc(	TypeClass	tclass,
 				size_t		size,
-		const	SubRange&	range	= SubRange(),
+		const	Subrange&	range	= Subrange(),
 				TDescPtr	itype	= TDescPtr(),
 		const	FieldVec&	fields	= FieldVec(),
 				TDescPtr	base	= TDescPtr(),
@@ -186,7 +186,7 @@ protected:
 private:
 	TypeClass	_tclass;					///< Type class
 	size_t		_size;						///< Size, in Datums
-	SubRange	_range;						///< My sub-range. For arrays, the array's span
+	Subrange	_range;						///< My sub-range. For arrays, the array's span
 	TDescPtr	_itype;						///< Arrays index (sub-range) type
 	FieldVec	_fields;					///< My fields (enumeration and record)
 	TDescPtr	_base;						///< Arrays base type

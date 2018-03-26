@@ -112,11 +112,15 @@ protected:
 	Result WRITELN();						///< Write on standard output
 	Result NEW();							///< Allocate space
 	Result DISPOSE();						///< Free space
-	Result ADD();							///< Replace the top two values on the stack with their sum
-	Result SUB();							///< Replace the top two vlaues on the stack with their difference
-	Result MUL();							///< Replace the top two values on the stack with their product
-	Result DIV();							///< Replace the top two values on the stack with their quotient
+	Result ADD();							///< Addition
+	Result SUB();							///< Subtraction
+	Result MUL();							///< Multiplication
+	Result DIV();							///< Division
 	Result REM();							///< Reminder
+	Result BNOT();							///< Bitwise Unary Not
+	Result BAND();							///< Bitwise And
+	Result BOR();							///< Bitwise Or
+	Result BXOR();							///< Bitwise XOR
 	Result LT();							///< Less than?
 	Result LTE();							///< Less than, or equal?
 	Result EQU();							///< Equal?

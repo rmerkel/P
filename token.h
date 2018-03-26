@@ -76,9 +76,14 @@ struct Token {
 		GT,								///< Greater then
 		NEQ,                           	///< Not equal? (<>)
 
-		And,							///< And?
-		Or,								///< Or? 
-		Not,							///< Not?
+		And,							///< Logical And
+		Or,								///< Logical Or
+		Not,							///< Logical Not
+
+		BitNot,							///< Bitwise Not
+		BitAnd,							///< Bitwise And
+		BitOr,							///< Bitwise Or
+		BitXor,							///< Bitwise Xor
 
 		Add,							///< Addition
 		Subtract,						///< Subtraction

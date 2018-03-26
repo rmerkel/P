@@ -63,10 +63,15 @@ enum class OpCode : unsigned char {
 	DISPOSE,	///< DISPOSE - Dispose of allocated dynamic store; free pop()
 
 	ADD,		///< ADD - Addition; push(pop() + pop())
-	SUB,		///< SUB - Subtraction; r = pop(); push(pop - r)
+	SUB,		///< SUB - Subtraction; r = pop(); push(pop() - r)
 	MUL,		///< MUL - Multiplication; push(pop() * pop())
 	DIV,		///< DIV - Division; r = pop(); push(pop() * r)
 	REM,		///< REM - Remainder; r = pop(); push(pop() % r)
+
+	BNOT,		///< BNOT - Unary bitwise Not; push(~pop())
+	BAND,		///< BAND - Bitwise And; r = pop(); push(pop() & r)
+	BOR,		///< BOR - Bitwise Or; r = pop(); push(pop() | r)
+	BXOR,		///< BXOR - Bitwise Exclusive Or; r = pop(); push(pop() ^ r)
 
 	LT,			///< LT - Less than; r = pop(); push(pop() < r)
 	LTE,		///< LTE - Less then or equal; push(pop() > pop()

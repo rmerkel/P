@@ -431,7 +431,7 @@ TDescPtr PComp::factor(int level, bool var) {
 			for (char c : s)
 				emit(OpCode::PUSH, 0, c);
 			type = TypeDesc::newArrayDesc(	s.size(),
-											SubRange(0, s.size() - 1),
+											Subrange(0, s.size() - 1),
 											TypeDesc::newIntDesc(),
 											TypeDesc::newCharDesc());
 
@@ -470,6 +470,10 @@ TDescPtr PComp::term(int level, bool var) {
 			lhs = promote(lhs, factor(level, var));
 			emit(OpCode::REM);
 
+		} else if (accept(Token::BitAnd)) {
+			lhs = promote(lhs, unary(level, var));
+			emit(OpCode::BAND);
+			
 		} else if (accept(Token::And)) {
 			lhs = promote(lhs, factor(level, var));
 			emit(OpCode::AND);
@@ -502,6 +506,10 @@ TDescPtr PComp::unary(int level, bool var) {
 		type = term(level, var);
 		emit(OpCode::NEG);
 
+	} else if (accept(Token::BitNot)) {
+		type = term(level, var);
+		emit(OpCode::BNOT);
+
 	} else									
 		type = term(level, var);
 
@@ -530,6 +538,14 @@ TDescPtr PComp::simpleExpr(int level, bool var) {
 		} else if (accept(Token::Subtract)) {
 			lhs = promote(lhs, unary(level, var));
 			emit(OpCode::SUB);
+
+		} else if (accept(Token::BitOr)) {
+			lhs = promote(lhs, unary(level, var));
+			emit(OpCode::BOR);
+
+		} else if (accept(Token::BitXor)) {
+			lhs = promote(lhs, unary(level, var));
+			emit(OpCode::BXOR);
 
 		} else if (accept(Token::Or)) {
 			lhs = promote(lhs, unary(level, var));
@@ -686,7 +702,7 @@ void PComp::callStatement(int level, SymbolTableIter it) {
 	if (SymValue::Procedure != it->second.kind() && SymValue::Function != it->second.kind())
 		error("Identifier is not a function or procedure", it->first);
 
-	emitCallI(level - it->second.level(), it->second.value().address());
+	emitCallI(level - it->second.level(), it->second.value().natural());
 }
 
 /********************************************************************************************//**
@@ -1497,7 +1513,7 @@ TDescPtr PComp::ordinalType(int level, bool var) {
 		FieldVec		enums;
 
 		const auto ids = identifierList(level, "");
-		SubRange r(0, ids.empty() ? 0 : ids.size()-1);
+		Subrange r(0, ids.empty() ? 0 : ids.size()-1);
 		expect(Token::CloseParen);
 
 		// Create the type, excluding the fields (enumerations)
@@ -1556,7 +1572,7 @@ TDescPtr PComp::subRangeType(bool var) {
 			minValue.second = 0; maxValue.second = 1;
 		}
 
-		SubRange r(minValue.second.integer(), maxValue.second.integer());
+		Subrange r(minValue.second.integer(), maxValue.second.integer());
 		type = TypeDesc::newIntDesc(r, var);
 	}
 
@@ -1581,7 +1597,7 @@ TDescPtr PComp::structuredType(int level, const string& idprefix, bool var) {
 		TDescPtr tp;
 		TDescPtrVec indexes = simpleTypeList(level, var);
 		for (auto index : indexes) {
-			const SubRange r = index->range();
+			const Subrange r = index->range();
 			tdesc = TypeDesc::newArrayDesc(r.span(), r, index, TDescPtr(), var);
 			if (tp == 0)						// Remember the first array type descriptior...
 				tp = tdesc;
@@ -1891,6 +1907,7 @@ void PComp::run()								{	progDecl(0);	}
 PComp::PComp() : Compilier () {
 	TDescPtr boolean = TypeDesc::newBoolDesc();
 	TDescPtr integer = TypeDesc::newIntDesc();
+	TDescPtr natural = TypeDesc::newIntDesc(Subrange(0, TypeDesc::maxRange.maximum()));
 
 	// Insert builtin types into the symbol table
 

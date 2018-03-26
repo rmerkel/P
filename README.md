@@ -11,7 +11,7 @@ Current plans are to start to diverge from Pascal, for example:
  * Allow pointers to point to any varaible, thus pass by reference would be 
    simular to C; pass a pointer.
  * Add object attributes, simular to ADA
- * Maybe bit operators in place of Pascal sets?
+ * Bit operators in place of Pascal sets
 ...
 
 Like PL/0, P is a combination compiler and interpreter; it first runs the
@@ -82,16 +82,18 @@ Version | Description
  0.25	| Table of pointers to instructions
  0.26   | 'var' parameters; pass by reference
  0.27	| Fixed typo in varparam.p
+ 0.28	| Bit-wise operations
 
 ## Design and implementation notes
 
 * To support passing strings, or more generally, arrays to write[ln], a count
-  is passed with each parameters, 1 for scalers, N for the string or array
+  is passed with each parameter, 1 for scalers, N for the string or array
   length. 
 * Need to make "()" manditory for subroutine declaractions and calls.
 * Need to add "var" subroutine parameter types. This requires the ability to
   create var types so that expresson results can be passed by reference, and so
   subroutines know to deference these references.
+* No set operations, but using bitwise operators, bit_and/or/xor/not in their place.
 
 ## Author
     Randy Merkel, Slowly but Surly Software.
