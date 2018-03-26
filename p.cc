@@ -3,6 +3,37 @@
  *
  * The front-end for the P Programming Language compilier and interpeter. main() runs the
  * compilier, and if no errors where encountered, passed the results to the interpreter.
+ *
+ * @example test/array.p
+ * @example test/bitwise.p
+ * @example test/bool.p
+ * @example test/builtins.p
+ * @example test/character.p
+ * @example test/comment.p
+ * @example test/divbyzero.p
+ * @example test/eval.p
+ * @example test/fact.p
+ * @example test/fahr.p
+ * @example test/fib.p
+ * @example test/fortest.p
+ * @example test/min.p
+ * @example test/pointers.p
+ * @example test/precedence.p
+ * @example test/predfail.p
+ * @example test/predsucc.p
+ * @example test/proc.p
+ * @example test/rcrdtest.p
+ * @example test/real.p
+ * @example test/repeatst.p
+ * @example test/simple.p
+ * @example test/str.p
+ * @example test/succfail.p
+ * @example test/testif.p
+ * @example test/test.p
+ * @example test/typefail.p
+ * @example test/typetest.p
+ * @example test/unknown.p
+ * @example test/varparam.p
  ************************************************************************************************/
 
 #include "comp.h"
