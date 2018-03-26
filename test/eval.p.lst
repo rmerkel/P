@@ -1,6 +1,6 @@
 # test/eval.p, 1: { Test promotion bug if lhs is integer, rhs is real	}
 # test/eval.p, 2: {	emits two itor2 instructions					}
-# test/eval.p, 3: program eval ;
+# test/eval.p, 3: program eval()
 # test/eval.p, 4: var 
     0: calli 0, 2
     1: halt

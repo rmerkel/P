@@ -1,7 +1,7 @@
 { print Fahrenheit-Celsius table	}
 {	first version; integers only	}
 
-program fact2 ;
+program fact2()
 const
 	LOWER =   0.0;	{	lower table limit	}
 	UPPER = 300.0;	{	upper table limit	}

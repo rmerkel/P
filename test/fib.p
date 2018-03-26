@@ -1,5 +1,5 @@
-program Fibonacci ;
-	function fib(a, b, limit : integer) : integer ;
+program Fibonacci()
+	function fib(a, b, limit : integer) : integer
 	begin
 		writeln(b);
 		if limit > 0 then

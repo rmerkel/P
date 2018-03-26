@@ -1,4 +1,4 @@
-program CharTest ;
+program CharTest()
 type
 	A = array [0..9] of char;
 

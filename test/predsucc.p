@@ -1,4 +1,4 @@
-program PredSucc ;
+program PredSucc()
 type 
 	e = (zero, one, two, three, four);
 

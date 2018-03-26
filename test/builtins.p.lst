@@ -1,5 +1,5 @@
 # test/builtins.p, 1: { test builtin functions and procedures	}
-# test/builtins.p, 2: program builtins ;
+# test/builtins.p, 2: program builtins()
 # test/builtins.p, 3: const
     0: calli 0, 2
     1: halt

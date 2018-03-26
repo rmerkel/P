@@ -674,7 +674,7 @@ pair<bool,Datum> PComp::constExpr() {
  * @param	it		The sub-routines symbol table entry
  ************************************************************************************************/
 void PComp::callStatement(int level, SymbolTableIter it) {
-	if (accept(Token::OpenParen)) {
+	if (expect(Token::OpenParen)) {
 		unsigned nParams = 0;					// Count actual parameters
 
 		const auto& params = it->second.params(); // Formal parameter kinds
@@ -1759,8 +1759,7 @@ SymValue& PComp::subRoutineDecl(int level, SymValue::Kind kind) {
 	if (verbose)
 		cout << prefix(progName) << "subRoutineDecl " << ident << ": " << level << ", 0\n";
 
-	// Process the formal auguments, if any...
-	if (accept(Token::OpenParen)) {
+	if (expect(Token::OpenParen)) {			// Process the formal arguments, if any...
 		FieldVec	idents;					// vector of name/type pairs.
 
 		// Note that the activation frame level is that of the *following* block!
@@ -1782,7 +1781,6 @@ SymValue& PComp::subRoutineDecl(int level, SymValue::Kind kind) {
  ************************************************************************************************/
 void PComp::procDecl(int level) {
 	auto& val = subRoutineDecl(level, SymValue::Procedure);
-	expect(Token::SemiColon);
 	blockDecl(val, level + 1);
 	expect(Token::SemiColon);				// procedure declarations end with a ';'!
 }
@@ -1796,7 +1794,6 @@ void PComp::funcDecl(int level) {
 	auto& val = subRoutineDecl(level, SymValue::Function);
 	expect(Token::Colon);
 	val.type(type(level, false, ""));
-	expect(Token::SemiColon);
 	blockDecl(val, level + 1);
 	expect(Token::SemiColon);	// function declarations end with a ';'!
 }
@@ -1878,7 +1875,6 @@ void PComp::progDecl(int level) {
 
 	expect(Token::ProgDecl);					// Program heading...
 	auto& val = subRoutineDecl(level, SymValue::Procedure);
-	expect(Token::SemiColon);
 
 	// Emit a call to the main procedure, followed by a halt
 	const auto call_pc = emitCallI(level, 0);

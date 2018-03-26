@@ -1,5 +1,5 @@
 { Test advanced types, fail	}
-program Typefail ;
+program Typefail()
 type
 	rng = 0..9;
 	enum = (	one, two, three	);

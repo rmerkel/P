@@ -1,5 +1,5 @@
-# test/fib.p, 1: program Fibonacci ;
-# test/fib.p, 2: 	function fib(a, b, limit : integer) : integer ;
+# test/fib.p, 1: program Fibonacci()
+# test/fib.p, 2: 	function fib(a, b, limit : integer) : integer
     0: calli 0, 37
     1: halt
 # test/fib.p, 3: 	begin

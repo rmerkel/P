@@ -83,6 +83,7 @@ Version | Description
  0.26   | 'var' parameters; pass by reference
  0.27	| Fixed typo in varparam.p
  0.28	| Bit-wise operations
+ 0.29	| Manditory '()' on procedure/function declaractions and calls.
 
 ## Design and implementation notes
 

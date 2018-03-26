@@ -30,9 +30,9 @@
  *     simple-type-lst = simple-type { ',' simple-type } ;
  *      identifier-lst = identifier { ',' identifier } ;
  *        sub-decl-lst = func-decl | proc-decl ;
- *           proc-decl = 'procedure' identifier param-lst ';' block-decl ';' ;
- *           func-decl = 'function'  identifier param-lst ':' type ';' block-decl ';' ; 
- *           param-lst = [ '(' param-decl-lst ')' ] ;
+ *           proc-decl = 'procedure' identifier param-lst block-decl ';' ;
+ *           func-decl = 'function'  identifier param-lst ':' type block-decl ';' ; 
+ *           param-lst = '(' [ param-decl-lst ] ')' ;
  *      param-decl-lst = param-decl { ';' param-decl } ;
  *          param-decl = [ 'var' ] identifier-lst : type ;
  *            variable = identifier [ composite-desc { composite-desc } ] ;
@@ -42,7 +42,7 @@
  *       statement-blk = 'begin' statement-lst 'end' ;
  *       statement-lst = 'begin' statement {';' statement } 'end' ;
  *           statement = [  variable '=' expression                                         |
- *                          identifier [ '(' expression-lst ')' ]                           |
+ *                          identifier '(' [ expression-lst ] ')'                           |
  *                          'if' expression 'then' statement { 'else' statement }           |
  *                          'while' expression 'do' statement                               |
  *                          'repeat' statement 'until' expression                           |
@@ -56,7 +56,7 @@
  *      simple-expr-op = '+' | '-' | 'bit_or' |'bit_xor' | 'or' ;
  *            terminal = factor { '*' | '/' | 'rem' | 'bit_and' | 'and' factor } ;
  *              factor = variable | ' string '                                              |
- *                       identifier [ '(' expression-lst ')' ]                              |
+ *                       identifier '(' [ expression-lst ] ')'                              |
  *                       'round' '(' expression ')'                                         |
  *                       number                                                             |
  *                       '(' expression ')' ;

@@ -9,7 +9,7 @@
 # test/repeatst.p, 9: {	 9	  362,880	}
 # test/repeatst.p, 10: {	10	3,628,800	}
 # test/repeatst.p, 11: 
-# test/repeatst.p, 12: program repeatst ;
+# test/repeatst.p, 12: program repeatst()
 # test/repeatst.p, 13: var n, f : integer;
     0: calli 0, 2
     1: halt

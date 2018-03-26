@@ -1,6 +1,6 @@
 { Test promotion bug if lhs is integer, rhs is real	}
 {	emits two itor2 instructions					}
-program eval ;
+program eval()
 var 
 	r : real;
 begin

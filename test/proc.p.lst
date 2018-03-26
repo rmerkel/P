@@ -1,9 +1,9 @@
 test/proc.p: rounding real to fit in an integer near line 9
-# test/proc.p, 1: program ProcTest ;
+# test/proc.p, 1: program ProcTest()
 # test/proc.p, 2: var	i : integer;
     0: calli 0, 20
     1: halt
-# test/proc.p, 3: procedure Proc(i : integer; r : real; b : boolean) ;
+# test/proc.p, 3: procedure Proc(i : integer; r : real; b : boolean)
 # test/proc.p, 4: 	begin
 # test/proc.p, 5: 		writeln(i, r, b);
     2: pushvar 0, -3

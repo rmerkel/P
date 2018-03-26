@@ -1,4 +1,4 @@
-# test/array.p, 1: program CharTest ;
+# test/array.p, 1: program CharTest()
 # test/array.p, 2: type
     0: calli 0, 2
     1: halt

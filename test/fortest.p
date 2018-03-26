@@ -1,4 +1,4 @@
-program ForTest;
+program ForTest()
 var
 	i : integer;
 

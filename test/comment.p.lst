@@ -1,5 +1,5 @@
 # test/comment.p, 1: { "main" starts here... }
-# test/comment.p, 2: program comment ;
+# test/comment.p, 2: program comment()
 # test/comment.p, 3: const nFacts = 10;
     0: calli 0, 2
     1: halt

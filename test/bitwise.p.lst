@@ -1,4 +1,4 @@
-# test/bitwise.p, 1: program TestBitWise ;
+# test/bitwise.p, 1: program TestBitWise()
 # test/bitwise.p, 2: var	x, y, z : integer ;
     0: calli 0, 2
     1: halt

@@ -1,5 +1,5 @@
 { Test records }
-program RecordTests;
+program RecordTests()
 type
 	R = record 
 		i1, i2 : integer;

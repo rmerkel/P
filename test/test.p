@@ -8,7 +8,7 @@
 {	...				}
 {	 9	  362,880	}
 {	10	3,628,800	}
-program test ;
+program test()
 const nFacts = 10;
 var n, f : integer;	
 begin

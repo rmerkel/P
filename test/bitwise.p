@@ -1,4 +1,4 @@
-program TestBitWise ;
+program TestBitWise()
 var	x, y, z : integer ;
 begin
 	x := 15;

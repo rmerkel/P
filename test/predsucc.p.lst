@@ -1,4 +1,4 @@
-# test/predsucc.p, 1: program PredSucc ;
+# test/predsucc.p, 1: program PredSucc()
 # test/predsucc.p, 2: type 
     0: calli 0, 2
     1: halt

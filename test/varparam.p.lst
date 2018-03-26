@@ -1,9 +1,9 @@
 # test/varparam.p, 1: {	test var parameters		}
-# test/varparam.p, 2: program VarParamTest ;
+# test/varparam.p, 2: program VarParamTest()
 # test/varparam.p, 3: var	i : integer;
     0: calli 0, 12
     1: halt
-# test/varparam.p, 4: 	procedure inc(var x : integer) ;
+# test/varparam.p, 4: 	procedure inc(var x : integer)
 # test/varparam.p, 5: 	begin
 # test/varparam.p, 6: 		x := x + 1
     2: pushvar 0, -1

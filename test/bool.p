@@ -1,4 +1,4 @@
-program BoolTest ;
+program BoolTest()
 var
 	b : boolean;
 begin

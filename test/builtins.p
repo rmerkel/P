@@ -1,5 +1,5 @@
 { test builtin functions and procedures	}
-program builtins ;
+program builtins()
 const
 	pi = 3.1415926;
 

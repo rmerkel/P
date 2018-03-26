@@ -1,6 +1,6 @@
-program ProcTest ;
+program ProcTest()
 var	i : integer;
-procedure Proc(i : integer; r : real; b : boolean) ;
+procedure Proc(i : integer; r : real; b : boolean)
 	begin
 		writeln(i, r, b);
 	end ;

@@ -1,4 +1,4 @@
-program PredSuccFail ;
+program PredSuccFail()
 type 
 	e = (zero, one, two, three, four);
 

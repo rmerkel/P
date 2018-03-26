@@ -1,3 +1,3 @@
-{	minimum Pascal program	}
-program minimum ;
+{	minimum P program	}
+program minimum()
 begin end.

@@ -1,4 +1,4 @@
-program StringTest ;
+program StringTest()
 type
 	A = array [0..9] of char;
 

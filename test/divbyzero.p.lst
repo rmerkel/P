@@ -1,4 +1,4 @@
-# test/divbyzero.p, 1: program divbyzero ;
+# test/divbyzero.p, 1: program divbyzero()
 # test/divbyzero.p, 2: var x, y, z : integer;
     0: calli 0, 2
     1: halt

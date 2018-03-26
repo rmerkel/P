@@ -1,4 +1,4 @@
-# test/bool.p, 1: program BoolTest ;
+# test/bool.p, 1: program BoolTest()
 # test/bool.p, 2: var
     0: calli 0, 2
     1: halt

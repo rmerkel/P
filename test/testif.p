@@ -1,4 +1,4 @@
-program testif ;
+program testif()
 var x, y, z : integer;
 begin
 	x := 1;

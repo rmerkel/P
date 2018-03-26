@@ -9,10 +9,10 @@
 {	 9	  362,880	}
 {	10	3,628,800	}
 
-program fact3 ;
+program fact3()
 const nFacts = 10;
 var result : integer;
-function factorial(n : integer) : integer ;
+function factorial(n : integer) : integer
 	var p : integer;
 	begin
 		p := 1;

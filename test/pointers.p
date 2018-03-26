@@ -1,4 +1,4 @@
-program PointerTest ;
+program PointerTest()
 var
 	xp : ^integer;
 

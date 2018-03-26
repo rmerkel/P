@@ -2,7 +2,7 @@ test/unknown.p: Unknown token: '#', (0x23) near line 4
 test/unknown.p: expected ':=' got 'integernum' near line 4
 test/unknown.p: expected 'end' got 'bad comment' near line 6
 test/unknown.p: expected '.' got 'bad comment' near line 6
-# test/unknown.p, 1: program unknown ;
+# test/unknown.p, 1: program unknown()
 # test/unknown.p, 2: var x : integer;
     0: calli 0, 2
     1: halt

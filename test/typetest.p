@@ -1,5 +1,5 @@
 { Test advanced types	}
-program typetest;
+program typetest()
 type
 	int = integer;
 	rng = 1..10;
