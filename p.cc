@@ -69,7 +69,7 @@ static void help() {
  * Print the version number as major.minor
  ************************************************************************************************/
 static void printVersion() {
-	cout << progName << ": verson: 0.29\n";		// make sure to update verison history in REAME.md!
+	cout << progName << ": verson: 0.30\n";		// make sure to update verison history in REAME.md!
 }
 
 /********************************************************************************************//** 

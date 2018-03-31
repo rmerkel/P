@@ -1910,6 +1910,7 @@ PComp::PComp() : Compilier () {
 	symtbl.insert( { "bool",	SymValue::makeType(0, boolean)					} );
 	symtbl.insert( { "char",	SymValue::makeType(0, TypeDesc::newCharDesc())	} );
 	symtbl.insert( { "integer",	SymValue::makeType(0, integer)					} );
+	symtbl.insert( { "natural",	SymValue::makeType(0, natural)					} );
 	symtbl.insert( { "real",	SymValue::makeType(0, TypeDesc::newRealDesc())	} );
 
 	// Insert built-in constants into the symbol table; id, level (always zero), and value

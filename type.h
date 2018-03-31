@@ -87,17 +87,16 @@ std::ostream& operator<<(std::ostream& os, const Subrange& srange);
  * Describes both built-in/pre-defined types and user defined types with in
  * the following type kinds (classes):
  *
- * | Kind         | Size | Subrange    | IType | Base | Fields | Ordinal |
- * | :----------- | :--: | :---------: | :---: | :--: | :----: | :-----: |
- * |  Array       |	N    |   1 - 10    |  T1   |  T2  |   -    |	N    |
- * |  Boolean     |	1    |   0 - 1     |   -   |   -  |   -    |	Y    |
- * |  Character   |	1    |   0 - 127   |   -   |   -  |   -    |	Y    |
- * |  Enumeration |	1    |   X - Y     |   -   |   -  |   -    |	Y    |
- * |  Integer	  |	1    | IMIN - IMAX |   -   |   -  |   -    |	Y    |
- * |  Pointer     |  1   |     -       |   -   |   T  |   -    |    N    |
- * |  Real        |	1    |     -       |   -   |   -  |   -    |	N    |
- * |  Record      |	N    |     -       |   -   |   -  | Fields |    N    |
- * |  Set         |	N    |     ?       |   -   |  T2  | Fields |    ?    |
+ * |Kind        |Size|Subrange   |IType|Base|Fields|Ordinal|
+ * |:-----------|:--:|:---------:|:---:|:--:|:----:|:-----:|
+ * | Array      | N  |  1 - 10   | T1  | T2 |  -   |   N   |
+ * | Boolean    | 1  |  0 - 1    |  -  |  - |  -   |   Y   |
+ * | Character  | 1  |  0 - 127  |  -  |  - |  -   |   Y   |
+ * | Enumeration| 1  |  X - Y    |  -  |  - |  -   |   Y   |
+ * | Integer	| 1  |IMIN - IMAX|  -  |  - |  -   |   Y   |
+ * | Pointer    | 1  |    -      |  -  |  T |  -   |   N   |
+ * | Real       | 1  |    -      |  -  |  - |  -   |   N   |
+ * | Record     | N  |    -      |  -  |  - |Fields|   N   |
  *
  * Key:
  * - IType - is the sub-range (index) type for arrays
@@ -200,3 +199,4 @@ std::ostream& operator<<(std::ostream& os, TypeDesc::TypeClass);
 std::ostream& operator<<(std::ostream& os, const TypeDesc& value);
 
 #endif
+

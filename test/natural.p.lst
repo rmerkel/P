@@ -1,0 +1,55 @@
+# test/natural.p, 1: program Natural()
+# test/natural.p, 2: var	n : natural;
+    0: calli 0, 2
+    1: halt
+# test/natural.p, 3: begin
+    2: enter 1
+# test/natural.p, 4: 	n := 0;
+    3: pushvar 0, 4
+    4: push 0
+    5: llimit 0
+    6: ulimit 2147483647
+    7: assign 1
+# test/natural.p, 5: 	writeln(n);
+    8: pushvar 0, 4
+    9: eval 1
+   10: push 1
+   11: push 0
+   12: push 0
+   13: push 1
+   14: writeln
+# test/natural.p, 6: 	n := 1;
+   15: pushvar 0, 4
+   16: push 1
+   17: llimit 0
+   18: ulimit 2147483647
+   19: assign 1
+# test/natural.p, 7: 	writeln(n);
+   20: pushvar 0, 4
+   21: eval 1
+   22: push 1
+   23: push 0
+   24: push 0
+   25: push 1
+   26: writeln
+# test/natural.p, 8: 	n := -1;
+   27: pushvar 0, 4
+   28: push 1
+   29: neg
+   30: llimit 0
+   31: ulimit 2147483647
+   32: assign 1
+# test/natural.p, 9: 	writeln(n)
+   33: pushvar 0, 4
+   34: eval 1
+   35: push 1
+   36: push 0
+   37: push 0
+# test/natural.p, 10: end .
+   38: push 1
+   39: writeln
+   40: ret
+
+0
+1
+runtime error @pc 30, sp: 10: out-of-range
