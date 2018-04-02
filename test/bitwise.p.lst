@@ -165,7 +165,7 @@
   146: eval 1
   147: bitand
   148: assign 1
-# test/bitwise.p, 19: 	writeln('bit_not z = ', y)
+# test/bitwise.p, 19: 	writeln('bit_not z = ', z);
   149: push 'b'
   150: push 'i'
   151: push 't'
@@ -181,20 +181,106 @@
   161: push 12
   162: push 0
   163: push 0
-  164: pushvar 0, 5
+  164: pushvar 0, 6
   165: eval 1
   166: push 1
   167: push 0
   168: push 0
-# test/bitwise.p, 20: 
-# test/bitwise.p, 21: end .
   169: push 2
   170: writeln
-  171: ret
+# test/bitwise.p, 20: 
+# test/bitwise.p, 21: 	z := x shift_left y;
+  171: pushvar 0, 6
+  172: pushvar 0, 4
+  173: eval 1
+  174: pushvar 0, 5
+  175: eval 1
+  176: shiftl
+  177: assign 1
+# test/bitwise.p, 22: 	writeln('z := x shift_left y = ', z);
+  178: push 'z'
+  179: push ' '
+  180: push ':'
+  181: push '='
+  182: push ' '
+  183: push 'x'
+  184: push ' '
+  185: push 's'
+  186: push 'h'
+  187: push 'i'
+  188: push 'f'
+  189: push 't'
+  190: push '_'
+  191: push 'l'
+  192: push 'e'
+  193: push 'f'
+  194: push 't'
+  195: push ' '
+  196: push 'y'
+  197: push ' '
+  198: push '='
+  199: push ' '
+  200: push 22
+  201: push 0
+  202: push 0
+  203: pushvar 0, 6
+  204: eval 1
+  205: push 1
+  206: push 0
+  207: push 0
+  208: push 2
+  209: writeln
+# test/bitwise.p, 23: 
+# test/bitwise.p, 24: 	z := x shift_right y;
+  210: pushvar 0, 6
+  211: pushvar 0, 4
+  212: eval 1
+  213: pushvar 0, 5
+  214: eval 1
+  215: shiftr
+  216: assign 1
+# test/bitwise.p, 25: 	writeln('z := x shift_right y = ', z)
+  217: push 'z'
+  218: push ' '
+  219: push ':'
+  220: push '='
+  221: push ' '
+  222: push 'x'
+  223: push ' '
+  224: push 's'
+  225: push 'h'
+  226: push 'i'
+  227: push 'f'
+  228: push 't'
+  229: push '_'
+  230: push 'r'
+  231: push 'i'
+  232: push 'g'
+  233: push 'h'
+  234: push 't'
+  235: push ' '
+  236: push 'y'
+  237: push ' '
+  238: push '='
+  239: push ' '
+  240: push 23
+  241: push 0
+  242: push 0
+  243: pushvar 0, 6
+  244: eval 1
+  245: push 1
+  246: push 0
+  247: push 0
+# test/bitwise.p, 26: end .
+  248: push 2
+  249: writeln
+  250: ret
 
 x =  15
 y =  1
 z := x bit_and y =  1
 z :+ 10 bit_or z =  11
 z := x bit_xor y =  14
-bit_not z =  1
+bit_not z =  -15
+z := x shift_left y =  30
+z := x shift_right y =  7

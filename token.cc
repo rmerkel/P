@@ -237,6 +237,8 @@ TokenStream::KeywordTable	TokenStream::keywords = {
 	{	"real",			Token::RealType		},
 	{	"repeat",		Token::Repeat		},
 	{	"round",		Token::Round		},
+	{	"shift_left",	Token::ShiftLeft	},
+	{	"shift_right",	Token::ShiftRight	},
 	{	"sin",			Token::Sin			},
 	{	"sqr",			Token::Sqr			},
 	{	"sqrt",			Token::Sqrt			},
@@ -319,6 +321,9 @@ ostream& operator<<(std::ostream& os, const Token::Kind& kind) {
 	case Token::BitAnd:		os << "bit_and";		break;
 	case Token::BitOr:		os << "bit_or";			break;
 	case Token::BitXor:		os << "bit_xor";		break;
+
+	case Token::ShiftLeft:	os << "shift_left";		break;
+	case Token::ShiftRight:	os << "shift_right";	break;
 
 	case Token::Add:		os << "+";				break;
 	case Token::Subtract:	os << "-";				break;

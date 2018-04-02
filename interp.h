@@ -12,11 +12,11 @@
 
 #include <iostream>
 #include <cstdint>
-#include <stdexcept>
 #include <vector>
 
-#include "instr.h"
 #include "freestore.h"
+#include "instr.h"
+#include "results.h"
 
 /********************************************************************************************//**
  * A Machine for the P languange
@@ -38,30 +38,6 @@
  ********************************************************************************************//**/
 class PInterp {
 public:
-	/// Interpeter results
-	enum Result {
-		success,							///< No errors
-		divideByZero,						///< Divide by zero
-		badFetch,							///< Attempt to fetch uninitialized code
-		badDataType,						///< Wrong data type for operation
-		unknownInstr,						///< Attempt to execute an undefined instruction
-		stackOverflow,						///< Attempt to access beyound the end of the statck
-		stackUnderflow,						///< Attempt to access an empty stack
-		freeStoreError,						///< Allocation or free error
-		outOfRange,							///< Attempt to index object with out-of-range index
-		halted								///< Machine has halted
-	};
-
-	/// Runtime exception
-	class Error : public std::runtime_error {
-		Result	rcode;						///< The result code
-	public:
-		/// Construct with results code and description
-		explicit Error(Result code, const std::string& what) : runtime_error(what), rcode(code) {}
-		/// Return my results code
-		Result result() const {	return rcode;	}
-	};
-
 	PInterp(unsigned stackSz = 1024, unsigned fstoreSz = 3*1024);
 	virtual ~PInterp() {}
 
@@ -121,6 +97,8 @@ protected:
 	Result BAND();							///< Bitwise And
 	Result BOR();							///< Bitwise Or
 	Result BXOR();							///< Bitwise XOR
+	Result SHIFTL();						///< Bitwise shift-left
+	Result SHIFTR();						///< Bitwise shift-right
 	Result LT();							///< Less than?
 	Result LTE();							///< Less than, or equal?
 	Result EQU();							///< Equal?
@@ -195,14 +173,9 @@ private:
  ************************************************************************************************/
 template <class T> void PInterp::push(const T& value) {
 	if (sp >= heap.addr())
-		throw Error(stackOverflow, "stack overflow error");
+		throw Result::outOfRange;
 	else
 		stack[++sp] = Datum(value);
 }
-
-/********************************************************************************************//**
- * PInterp::Result stream put operator
- ************************************************************************************************/
-std::ostream& operator<<(std::ostream& os, const PInterp::Result& result);
 
 #endif

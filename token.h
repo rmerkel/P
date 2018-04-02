@@ -1,4 +1,5 @@
-/**	@file	token.h
+/********************************************************************************************//**
+ *	@file	token.h
  *
  *  The P Language scanner.
  *
@@ -8,7 +9,7 @@
  *
  * @author Randy Merkel, Slowly but Surly Software.
  * @copyright  (c) 2017 Slowly but Surly Software. All rights reserved.
- */
+ ************************************************************************************************/
 
 #ifndef TOKEN_H
 #define TOKEN_H
@@ -20,7 +21,9 @@
 #include <sstream>
 #include <set>
 
-/// A token "kind"/value pair
+/********************************************************************************************//**
+ * A token "kind"/value pair
+ ************************************************************************************************/
 struct Token {
 	/** Token kinds
 	 *
@@ -85,6 +88,9 @@ struct Token {
 		BitOr,							///< Bitwise Or
 		BitXor,							///< Bitwise Xor
 
+		ShiftLeft,						///< Bitwise shift left
+		ShiftRight,						///< Bitwise shift right
+
 		Add,							///< Addition
 		Subtract,						///< Subtraction
 		Multiply /*	= '*' */,			///< Multiplication
@@ -142,6 +148,8 @@ struct Token {
 	virtual ~Token() {}					///< Destructor
 };
 
+/********************************************************************************************//**
+ ************************************************************************************************/
 /** A restartiable stream of tokens
  *
  *	Maintains the last Token read from the input stream.

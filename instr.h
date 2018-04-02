@@ -73,6 +73,9 @@ enum class OpCode : unsigned char {
 	BOR,		///< BOR - Bitwise Or; r = pop(); push(pop() | r)
 	BXOR,		///< BXOR - Bitwise Exclusive Or; r = pop(); push(pop() ^ r)
 
+	SHIFTL,		///< SLEFT ,n - Shift, and replace, TOS left n bits
+	SHIFTR,		///< SRIGHT ,n - Shift, and replace, TOS right n bits
+
 	LT,			///< LT - Less than; r = pop(); push(pop() < r)
 	LTE,		///< LTE - Less then or equal; push(pop() > pop()
 	EQU,		///< EQU - Is equal to; push(pop() == pop())

@@ -16,6 +16,11 @@ begin
 	writeln('z := x bit_xor y = ', z);
 
 	z := bit_not z;
-	writeln('bit_not z = ', y)
+	writeln('bit_not z = ', z);
 
+	z := x shift_left y;
+	writeln('z := x shift_left y = ', z);
+
+	z := x shift_right y;
+	writeln('z := x shift_right y = ', z)
 end .

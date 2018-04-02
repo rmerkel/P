@@ -53,8 +53,9 @@
  *      expression-lst = expression { ',' expression } ;
  *          expression = simple-expr { '<' | '<=' | '=' | '>=' | '>' | '<>' simple-expr } ;
  *         simple-expr = [ '+' | '-' | 'bit_not' ] terminal { simple-expr-op terminal } ;
- *      simple-expr-op = '+' | '-' | 'bit_or' |'bit_xor' | 'or' ;
- *            terminal = factor { '*' | '/' | 'rem' | 'bit_and' | 'and' factor } ;
+ *      simple-expr-op = '+' | '-' | 'bit_or' |'bit_xor' | 'shift_left' | 'shift_right | 'or' ;
+ *            terminal = factor { term_op  factor } ;
+ *             term_op = '*' | '/' | 'rem' | 'bit_and' | | 'and' ;
  *              factor = variable | ' string '                                              |
  *                       identifier '(' [ expression-lst ] ')'                              |
  *                       'round' '(' expression ')'                                         |
@@ -67,6 +68,9 @@
  *           ()  Grouping
  *           |   One of ...
  *           ;   End of production
+ *
+ * @author Randy Merkel, Slowly but Surly Software.
+ * @copyright  (c) 2017 Slowly but Surly Software. All rights reserved.
  ************************************************************************************************/
 
 #ifndef	GRAMMER_H

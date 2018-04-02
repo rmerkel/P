@@ -2,6 +2,9 @@
  * @file freestore.h
  *
  * class FreeStore, a dynmaic memory manager.
+ *
+ * @author Randy Merkel, Slowly but Surly Software.
+ * @copyright  (c) 2017 Slowly but Surly Software. All rights reserved.
  ************************************************************************************************/
 
 #ifndef	FREESTORE_H

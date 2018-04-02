@@ -156,8 +156,8 @@ int main(int argc, char* argv[]) {
 				cout << progName << ": loading program '" << inputFile << "', and starting P...\n";
 		}
 
-		const PInterp::Result r = machine(code, trace);
-		if (PInterp::success != r)
+		const Result r = machine(code, trace);
+		if (Result::success != r)
 			nErrors = static_cast<int> (r);		// Return error code 
 
 		if (verbose) cout << progName << ": Ending P after " << machine.cycles() << " machine cycles\n";

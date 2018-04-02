@@ -3,7 +3,8 @@
  *
  * The P Machine's data type.
  *
- * class Datum.
+ * @author Randy Merkel, Slowly but Surly Software.
+ * @copyright  (c) 2017 Slowly but Surly Software. All rights reserved.
  ************************************************************************************************/
 
 #ifndef	DATUM_H
@@ -12,6 +13,8 @@
 #include <iostream>
 #include <utility>
 #include <vector>
+
+#include "subrange.h"
 
 /********************************************************************************************//**
  * A Data Value
@@ -31,18 +34,6 @@ public:
 		Character,							///< Character (ASCII) value
 		Integer,							///< Signed integer
 		Real,								///< Floating point
-	};
-
- 	/// Thrown on illegal operation, for the given parameters, attempted
-	struct IllegalOp : public std::runtime_error {
-		/// Constructor
-		explicit IllegalOp(const char* what) : std::runtime_error(what)		{}
-	};
-
- 	///  Throw on attempt to divide by zero attempted
-	struct DivideByZero : public std::runtime_error {
-		/// Constructor
-		explicit DivideByZero(const char* what) : std::runtime_error(what)	{}
 	};
 
 	Datum();								///< Default constructor...
@@ -87,6 +78,9 @@ public:
 	Datum& operator|=(const Datum& rhs);	///< Bitwise Or...
 	Datum& operator^=(const Datum& rhs);	///< Bitwise Exclusive-Or...
 
+	Datum& operator>>=(const Datum& rhs);	///< Bitwise shift-right...
+	Datum& operator<<=(const Datum& rhs);	///< Bitwise shift-left...
+
 	Kind kind() const;						///< Return my kind...
 
 	bool boolean() const;					///< Return my Boolean value...
@@ -98,6 +92,7 @@ public:
 	bool numeric() const;					///< Return true if value is numeric...
 	bool ordinal() const;					///< Return true if value is ordinal...
 	bool zero() const;						///< Return true if value is equal to zero...
+	const Subrange& range() const;			///< Return my rnage of legal values...
 
 private:
 	union {
@@ -107,6 +102,7 @@ private:
 		double		r;						///< if k == Real
 	};
 	Kind			k;  					///< What Datum type?
+	Subrange		rng;					///< Ranges for ordinal types
 };
 
 /********************************************************************************************//**

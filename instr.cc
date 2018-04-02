@@ -67,6 +67,8 @@ const OpCodeInfo::InfoMap OpCodeInfo::opInfoTbl {
 	{ OpCode::BAND,		OpCodeInfo{ "bitand",	2			} },
 	{ OpCode::BOR,		OpCodeInfo{ "bitor",	2			} },
 	{ OpCode::BXOR,		OpCodeInfo{ "bitxor",	2			} },
+	{ OpCode::SHIFTL,	OpCodeInfo{ "shiftl",	2			} },
+	{ OpCode::SHIFTR,	OpCodeInfo{ "shiftr",	2			} },
 
 	{ OpCode::LT,		OpCodeInfo{ "lt",		2			} },
 	{ OpCode::LTE,		OpCodeInfo{ "lte",		2			} },

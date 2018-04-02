@@ -12,6 +12,8 @@
 #include <cmath>
 #include <limits>
 
+#include "results.h"
+
 using namespace std;
 
 // Datum::public
@@ -19,7 +21,7 @@ using namespace std;
 /********************************************************************************************//**
  * Yeilds an Integer zero.
  ************************************************************************************************/
-Datum::Datum() : i{0}, k{Kind::Integer}							{}
+Datum::Datum() : i{0}, k{Kind::Integer}, rng(Subrange::maxRange) {}
 
 /********************************************************************************************//**
  * @param	rhs	New value
@@ -34,7 +36,7 @@ Datum::Datum(Datum&& rhs) 										{	*this = rhs;	}
 /********************************************************************************************//**
  * @param	value	initial value
  ************************************************************************************************/
-Datum::Datum(bool value) : b{value}, k{Kind::Boolean}			{}
+Datum::Datum(bool value) : b{value}, k{Kind::Boolean}, rng(false, true) {}
 
 /********************************************************************************************//**
  * @param	value	initial value
@@ -47,23 +49,23 @@ Datum::Datum(char value) : c{value}, k{Kind::Character}			{}
 Datum::Datum(int value) : i{value}, k{Kind::Integer}			{}
 
 /********************************************************************************************//**
- * Throws IllegalOp if value is out of range
+ * @throws Result::illegalOp if value is out of range
  * @param	value	initial value
  ************************************************************************************************/
 Datum::Datum(unsigned value) : k{Kind::Integer} {
 	if (value > numeric_limits<int>::max())
-		throw IllegalOp("Attempt to construct an integer with an out-of-range value");
+		throw Result::illegalOp;
 	else
 		i = value;
 }
 
 /********************************************************************************************//**
- * Throws utOfRange if value is out of range
+ * @throws Result::illegalOp if value is out of range
  * @param	value	initial value
  ************************************************************************************************/
 Datum::Datum(size_t value) : k{Kind::Integer} {
 	if (value > numeric_limits<int>::max())
-		throw IllegalOp("Attempt to construct an integer with an out-of-range value");
+		throw Result::illegalOp;
 	else
 		i = value;
 }
@@ -86,6 +88,7 @@ Datum& Datum::operator=(const Datum& value) {
 		case Kind::Real:		r = value.real();		break;
 		default:				assert(false && "unknown Datum::Kind!");
 		}
+		rng = value.rng;
 	}
 
 	return *this;
@@ -104,6 +107,7 @@ Datum& Datum::operator=(Datum&& value) {
 		case Kind::Real:		r = value.real();		break;
 		default:				assert(false && "unknown Datum::Kind!");
 		}
+		rng = value.rng;
 	}
 
 	// note really neded, but put value into default constructed state
@@ -132,23 +136,25 @@ Datum& Datum::operator=(char value)			{	return *this = Datum(value);	}
 Datum& Datum::operator=(int value)			{	return *this = Datum(value);	}
 
 /********************************************************************************************//**
+ * @throws	Result::illegalOp if value is out of range
  * @param	value	new value, and type
  * @return	*this, which is now an Integer
  ************************************************************************************************/
 Datum& Datum::operator=(unsigned value) {
 	if (value > numeric_limits<int>::max())
-		throw IllegalOp("Attempt to construct an integer with an out-of-range value");
+		throw Result::illegalOp;
 
 	return *this = Datum(value);
 }
 
 /********************************************************************************************//**
+ * @throws	Result::illegalOp if value is out of range
  * @param	value	new value, and type
  * @return	*this, which is now an Integer
  ************************************************************************************************/
 Datum& Datum::operator=(size_t value) {
 	if (value > numeric_limits<int>::max())
-		throw IllegalOp("Attempt to construct an integer from an out-of-range value");
+		throw Result::illegalOp;
 
 	return *this = Datum(value);
 }
@@ -165,53 +171,58 @@ Datum& Datum::operator=(double value)		{	return *this = Datum(value);	}
 Datum Datum::operator!() const				{	return Datum(!b);	}
 
 /********************************************************************************************//**
+ * @throws	Result::illegalOp if illegal type for unary negation
  * @return	modified copy of this
  ************************************************************************************************/
 Datum Datum::operator-() const {
 	switch(kind()) {
 	case Datum::Integer:	return Datum(-i);
 	case Datum::Real:		return Datum(-r);
-	default: throw IllegalOp("unary negation on illegal type");
+	default: throw Result::illegalOp;
 	}
 }
 
 /********************************************************************************************//**
+ * @throws	Result::illegalOp if illegal type for unary bitwise not
  * @return	modified copy of this
  ************************************************************************************************/
 Datum Datum::operator~() const {
 	if (kind() != Kind::Integer)
-		throw IllegalOp("bitwise 'not' on illegal type");
+		throw Result::illegalOp;
 
 	return Datum(~i);
 }
 
 /********************************************************************************************//**
+ * @throws	Result::illegalOp if type is a non-numeric
  * @return	*this
  ************************************************************************************************/
 Datum& Datum::operator++() {
 	switch(kind()) {
 	case Kind::Integer:	++i;	break;
 	case Kind::Real:	++r;	break;
-	default: throw IllegalOp("pre-increment on non-numeric value");
+	default: throw Result::illegalOp;
 	}
 
 	return *this;
 }
 
 /********************************************************************************************//**
+ * @throws	Result::illegalOp if type is a non-numeric
  * @return	*this
  ************************************************************************************************/
 Datum& Datum::operator--() {
 	switch(kind()) {
 	case Kind::Integer:	--i;	break;
 	case Kind::Real:	--r;	break;
-	default: throw IllegalOp("pre-decrement on non-numeric value");
+	default: throw Result::illegalOp;
 	}
 
 	return *this;
 }
 
 /********************************************************************************************//**
+ * @throws	Result::illegalOp if type is a non-numeric
  * @return	Copy of *this before the operator
  ************************************************************************************************/
 Datum Datum::operator++(int) {
@@ -220,13 +231,14 @@ Datum Datum::operator++(int) {
 	switch(kind()) {
 	case Kind::Integer:	++i;	break;
 	case Kind::Real:	++r;	break;
-	default: throw IllegalOp("pre-increment on non-numeric value");
+	default: throw Result::illegalOp;
 	}
 
 	return prev;
 }
 
 /********************************************************************************************//**
+ * @throws	Result::illegalOp if type is a non-numeric
  * @return	Copy of *this before the operator
  ************************************************************************************************/
 Datum Datum::operator--(int) {
@@ -235,201 +247,193 @@ Datum Datum::operator--(int) {
 	switch(kind()) {
 	case Kind::Integer:	--i;	break;
 	case Kind::Real:	--r;	break;
-	default: throw IllegalOp("pre-decrement on non-numeric value");
+	default: throw Result::illegalOp;
 	}
 
 	return prev;
 }
 
 /********************************************************************************************//**
+ * @throws	Result::illegalOp if type is a non-numeric
  * @param	rhs	right-hand-side value
  * @return	*this
  ************************************************************************************************/
 Datum& Datum::operator+=(const Datum& rhs) {
+	if (kind() != rhs.kind())
+		throw Result::illegalOp;
+
 	switch(kind()) {
-	case Kind::Integer:
-		switch(rhs.kind()) {
-		case Kind::Integer:	i += rhs.integer();		break;
-		case Kind::Real:	i += rhs.real();		break;
-		default: throw IllegalOp("Attempt to add illegal types");
-		}
-		break;
-
-	case Kind::Real:
-		switch(rhs.kind()) {
-		case Kind::Integer:	r += rhs.integer();		break;
-		case Kind::Real:	r += rhs.real();		break;
-		default: throw IllegalOp("Attempt to add illegal types");
-		}
-		break;
-
-	default: throw IllegalOp("Attempt to add illegal types");
+	case Kind::Integer:	i += rhs.integer();	break;
+	case Kind::Real:	r += rhs.real();	break;
+	default: throw Result::illegalOp;
 	}
 
 	return *this;
 }
 
 /********************************************************************************************//**
+ * @throws	Result::illegalOp if type is a non-numeric
  * @param	rhs	right-hand-side value
  * @return	*this
  ************************************************************************************************/
 Datum& Datum::operator-=(const Datum& rhs) {
+	if (kind() != rhs.kind())
+		throw Result::illegalOp;
+
 	switch(kind()) {
-	case Kind::Integer:
-		switch(rhs.kind()) {
-		case Kind::Integer:	i -= rhs.integer();		break;
-		case Kind::Real:	i -= rhs.real();		break;
-		default: throw IllegalOp("Attempt to subtract illegal types");
-		}
-		break;
-
-	case Kind::Real:
-		switch(rhs.kind()) {
-		case Kind::Integer:	r -= rhs.integer();		break;
-		case Kind::Real:	r -= rhs.real();		break;
-		default: throw IllegalOp("Attempt to subtract illegal types");
-		}
-		break;
-
-	default: throw IllegalOp("Subtract on illegal types");
+	case Kind::Integer:	i -= rhs.integer();	break;
+	case Kind::Real:	r -= rhs.real();	break;
+	default: throw Result::illegalOp;
 	}
 
 	return *this;
 }
 
 /********************************************************************************************//**
+ * @throws	Result::illegalOp if type is a non-numeric
  * @param	rhs	right-hand-side value
  * @return	*this
  ************************************************************************************************/
 Datum& Datum::operator*=(const Datum& rhs) {
+	if (kind() != rhs.kind())
+		throw Result::illegalOp;
+
 	switch(kind()) {
-	case Kind::Integer:
-		switch(rhs.kind()) {
-		case Kind::Integer:	i *= rhs.integer();		break;
-		case Kind::Real:	i *= rhs.real();		break;
-		default: throw IllegalOp("Attempt to multiply illegal types");
-		}
-		break;
-
-	case Kind::Real:
-		switch(rhs.kind()) {
-		case Kind::Integer:	r *= rhs.integer();		break;
-		case Kind::Real:	r *= rhs.real();		break;
-		default: throw IllegalOp("attempt to multiply illegal types");
-		}
-		break;
-
-	default: throw IllegalOp("attempt to multiply illegal types");
+	case Kind::Integer:	i *= rhs.integer();	break;
+	case Kind::Real:	r *= rhs.real();	break;
+	default: throw Result::illegalOp;
 	}
 
 	return *this;
 }
 
 /********************************************************************************************//**
+ * @throws	Result::divideByZero if rhs.zero().
+ * @throws	Result::illegalOp if type is a non-numeric
  * @param	rhs	right-hand-side value
  * @return	*this
  ************************************************************************************************/
 Datum& Datum::operator/=(const Datum& rhs) {
-	if (rhs.zero())
-		throw DivideByZero("Attempt to divide by zero");
+	if (kind() != rhs.kind())
+		throw Result::illegalOp;
+
+	else if (rhs.zero())
+		throw Result::divideByZero;
 	
 	switch(kind()) {
-	case Kind::Integer:
-		switch(rhs.kind()) {
-		case Kind::Integer:	i /= rhs.integer(); break;
-		case Kind::Real:	i /= rhs.real(); break;
-		default:			throw IllegalOp("attempt to divide illegal types");
-		}
-		break;
-
-	case Kind::Real:
-		switch(rhs.kind()) {
-		case Kind::Integer:	r /= rhs.integer();	break;
-		case Kind::Real:	r /= rhs.real();	break;
-		default: throw IllegalOp("attempt to divide illegal types");
-		}
-		break;
-
-	default: throw IllegalOp("Attempt divide illegal types");
+	case Kind::Integer:	i /= rhs.integer();	break;
+	case Kind::Real:	r /= rhs.real();	break;
+	default: throw Result::illegalOp;
 	}
 
 	return *this;
 }
 
 /********************************************************************************************//**
+ * @throws	Result::divideByZero if rhs.zero().
+ * @throws	Result::illegalOp if type is a non-numeric
  * @param	rhs	right-hand-side value
  * @return	*this
  ************************************************************************************************/
 Datum& Datum::operator%=(const Datum& rhs) {
-	if (rhs.zero())
-		throw DivideByZero("Attempt to divide by zero");
+	if (kind() != rhs.kind())
+		throw Result::illegalOp;
+
+	else if (rhs.zero())
+		throw Result::divideByZero;
 
 	switch(kind()) {
-	case Kind::Integer:
-		switch(rhs.kind()) {
-		case Kind::Integer:	i %= rhs.integer();				break;
-		default: throw IllegalOp("attempt to take remander of illegal types");
-		}
-		break;
-
-	case Kind::Real:
-		switch(rhs.kind()) {
-		case Kind::Integer:	r = remainder(r,rhs.integer());	break;
-		case Kind::Real:	r = remainder(r,rhs.real());	break;
-		default: throw IllegalOp("attempt to take remander of illegal types");
-		}
-		break;
-
-	default: throw IllegalOp("attempt to take remander of illegal types");
+	case Kind::Integer:	i %= rhs.integer();				break;
+	case Kind::Real:	r = remainder(r,rhs.real());	break;
+	default: throw Result::illegalOp;
 	}
 
 	return *this;
 }
 
 /********************************************************************************************//**
+ * @throws	Result::illegalOp if type is a non-numeric or negative
  * @param	rhs	right-hand-side value
  * @return	*this
  ************************************************************************************************/
 Datum& Datum::operator&=(const Datum& rhs) {
 	if (kind() != Kind::Integer || rhs.kind() != Kind::Integer)
-		throw IllegalOp("bitwise AND attempt with non-interger values");
+		throw Result::illegalOp;
 
 	else if (i < 0 || rhs.integer() < 0)
-		throw IllegalOp("bitwise AND attempt with negative value");
+		throw Result::illegalOp;
 
-	i &= rhs.integer();
+	i &= rhs.natural();
 
 	return *this;
 }
 
 /********************************************************************************************//**
+ * @throws	Result::illegalOp if type is a non-numeric or negative
  * @param	rhs	right-hand-side value
  * @return	*this
  ************************************************************************************************/
 Datum& Datum::operator|=(const Datum& rhs) {
 	if (kind() != Kind::Integer || rhs.kind() != Kind::Integer)
-		throw IllegalOp("bitwise OR attempt with non-interger values");
+		throw Result::illegalOp;
 
 	else if (i < 0 || rhs.integer() < 0)
-		throw IllegalOp("bitwise OR attempt with negative value");
+		throw Result::illegalOp;
 
-	i |= rhs.integer();
+	i |= rhs.natural();
 
 	return *this;
 }
 
 /********************************************************************************************//**
+ * @throws	Result::illegalOp if type is a non-numeric or negative
  * @param	rhs	right-hand-side value
  * @return	*this
  ************************************************************************************************/
 Datum& Datum::operator^=(const Datum& rhs) {
 	if (kind() != Kind::Integer || rhs.kind() != Kind::Integer)
-		throw IllegalOp("bitwise XOR attempt with non-integer values");
+		throw Result::illegalOp;
 
 	else if (i < 0 || rhs.integer() < 0)
-		throw IllegalOp("bitwise XOR attempt with negative value");
+		throw Result::illegalOp;
 
-	i ^= rhs.integer();
+	i ^= rhs.natural();
+
+	return *this;
+}
+
+/********************************************************************************************//**
+ * @throw	Result::illegalOp if kind() or rhs.kind() != Datum::Integer or are negative
+ * @param	rhs The right-hand-side
+ *
+ * @return lhs << rhs
+ ************************************************************************************************/
+Datum& Datum::operator>>=(const Datum& rhs) {
+	if (kind() != Kind::Integer || rhs.kind() != Kind::Integer)
+		throw Result::illegalOp;
+
+	else if (integer() < 0 || rhs.integer() < 0)
+		throw Result::illegalOp;
+
+	i >>= rhs.natural();
+
+	return *this;
+}
+
+/********************************************************************************************//**
+ * @throw	Result::illegalOp if kind() or rhs.kind() != Datum::Integer or are negative
+ * @param	rhs The right-hand-side
+ *
+ * @return lhs << rhs
+ ************************************************************************************************/
+Datum& Datum::operator<<=(const Datum& rhs) {
+	if (kind() != Kind::Integer || rhs.kind() != Kind::Integer)
+		throw Result::illegalOp;
+
+	else if (integer() < 0 || rhs.integer() < 0)
+		throw Result::illegalOp;
+
+	i <<= rhs.natural();
 
 	return *this;
 }
@@ -440,47 +444,51 @@ Datum& Datum::operator^=(const Datum& rhs) {
 Datum::Kind Datum::kind() const				{	return k;	};
 
 /********************************************************************************************//**
+ * @throws	Result::illegalOp if type isn't boolean
  * @return my boolean value
  ************************************************************************************************/
 bool Datum::boolean() const {
 	if (kind() != Datum::Boolean)
-		throw IllegalOp("attempt to take boolean value of non-Boolean");
+		throw Result::illegalOp;
 
 	return b;
 }
 
 /********************************************************************************************//**
+ * @throws	Result::illegalOp if type isn't a character
  * @return my character value
  ************************************************************************************************/
 char Datum::character() const {
 	if (kind() != Datum::Character)
-		throw IllegalOp("attempt to take character value of non-Character");
+		throw Result::illegalOp;
 
 	return c;
 }
 
 /********************************************************************************************//**
+ * @throws	Result::illegalOp if type isn't an integer
  * @return my interger value
  ************************************************************************************************/
 int Datum::integer() const {
 	if (kind() != Datum::Integer)
-		throw IllegalOp("attempt to take integer value of non-Integer");
+		throw Result::illegalOp;
 
 	return i;
 }
 
 /********************************************************************************************//**
- * @invariant	Throws IllegalOp if my value is negative
+ * @throws	Result::illegalOp if my value is negative
  * @return my interger value
  ************************************************************************************************/
 unsigned Datum::natural() const {
 	if (i < 0)
-		throw IllegalOp("attempt to convert negative value to unsigned");
+		throw Result::illegalOp;
 
 	return i;
 }
 
 /********************************************************************************************//**
+ * @throws	Result::illegalOp if type is non-numeric
  * @note will convert an integer to a real.
  * @return my real value
  ************************************************************************************************/
@@ -492,7 +500,7 @@ double Datum::real() const {
 		return i * 1.0;
 
 	else
-		throw IllegalOp("attempt to take real value of non-Real/Integer");
+		throw Result::illegalOp;
 }
 
 /********************************************************************************************//**
@@ -516,6 +524,11 @@ bool Datum::zero() const {
 		default:			return false;
 	}
 }
+
+/********************************************************************************************//**
+ * @return	My range
+ ************************************************************************************************/
+const Subrange& Datum::range() const		{	return rng;	}
 
 // operators
 
@@ -656,29 +669,27 @@ Datum operator^(const Datum& lhs, const Datum& rhs) {
 }
 
 /********************************************************************************************//**
- * @invariant	undefined if lhs.kind() != rhs.kind() != Datum::Integer
+ * @throw	Result::illegalOp if lhs.kind() != rhs.kind() != Datum::Integer
  * @param	lhs	The left-hand-side
  * @param	rhs The right-hand-side
  *
  * @return lhs << rhs
  ************************************************************************************************/
 Datum operator<<(const Datum& lhs, const Datum& rhs) {
-	if (lhs.kind() != rhs.kind())
-		assert(false);
-	return Datum(lhs.integer() << rhs.integer());
+	Datum result = lhs;
+	return result <<= rhs;
 }
 
 /********************************************************************************************//**
- * @invariant	undefined if lhs.kind() != rhs.kind() != Datum::Integer
+ * @throw	Result::illegalOp if lhs.kind() != rhs.kind() != Datum::Integer
  * @param	lhs	The left-hand-side
  * @param	rhs The right-hand-side
  *
  * @return lhs << rhs
  ************************************************************************************************/
 Datum operator>>(const Datum& lhs, const Datum& rhs) {
-	if (lhs.kind() != rhs.kind())
-		assert(false);
-	return Datum(lhs.integer() >> rhs.integer());
+	Datum result = lhs;
+	return result >>= rhs;
 }
 
 /********************************************************************************************//**
@@ -689,44 +700,17 @@ Datum operator>>(const Datum& lhs, const Datum& rhs) {
  * @return lhs < rhs
  ************************************************************************************************/
 bool operator<(const Datum& lhs, const Datum& rhs) {
+	if (lhs.kind() != rhs.kind())
+		return false;
+
 	switch(lhs.kind()) {
-	case Datum::Boolean:
-		switch(rhs.kind()) {
-			case Datum::Boolean:	return lhs.boolean() < rhs.boolean();
-			default:				assert(false);
-		}
-		break;
-
-	case Datum::Character:
-		switch(rhs.kind()) {
-			case Datum::Character:	return lhs.character() < rhs.character();
-			case Datum::Integer:	return lhs.character() < rhs.integer();
-			default:				assert(false);
-		}
-		break;
-
-	case Datum::Integer:
-		switch(rhs.kind()) {
-			case Datum::Character:	return lhs.integer() < rhs.character();
-			case Datum::Integer:	return lhs.integer() < rhs.integer();
-			case Datum::Real:		return lhs.integer() < rhs.real();
-			default:				assert(false);
-		}
-		break;
-
-	case Datum::Real:
-		switch(rhs.kind()) {
-			case Datum::Character:	return lhs.real()	< rhs.character();
-			case Datum::Integer:	return lhs.real()  < rhs.integer();
-			case Datum::Real:		return lhs.real()  < rhs.real();
-			default:				assert(false);
-		}
-		break;
-
-	default:			assert(false);
+	case Datum::Boolean:	return lhs.boolean()	< rhs.boolean();
+	case Datum::Character:	return lhs.character()	< rhs.character();
+	case Datum::Integer:	return lhs.integer()	< rhs.integer();
+	case Datum::Real:		return lhs.real()		< rhs.real();
+	default:				assert(false); return false;
 	}
 
-	return false;
 }
 
 /********************************************************************************************//**
@@ -737,34 +721,17 @@ bool operator<(const Datum& lhs, const Datum& rhs) {
  * @return lhs == rhs
  ************************************************************************************************/
 bool operator==(const Datum& lhs, const Datum& rhs) {
+	if (lhs.kind() != rhs.kind())
+		return false;
+
 	switch(lhs.kind()) {
-	case Datum::Boolean:
-		switch(rhs.kind()) {
-			case Datum::Boolean:	return lhs.boolean() == rhs.boolean();
-			default:				assert(false);
-		}
-		break;
-
-	case Datum::Integer:
-		switch(rhs.kind()) {
-			case Datum::Integer:	return lhs.integer() == rhs.integer();
-			case Datum::Real:		return lhs.integer() == rhs.real();
-			default:				assert(false);
-		}
-		break;
-
-	case Datum::Real:
-		switch(rhs.kind()) {
-			case Datum::Integer:	return lhs.real()  == rhs.integer();
-			case Datum::Real:		return lhs.real()  == rhs.real();
-			default:				assert(false);
-		}
-		break;
-
-	default:			assert(false);
+	case Datum::Boolean:	return lhs.boolean()	== rhs.boolean();
+	case Datum::Character:	return lhs.character()	== rhs.character();
+	case Datum::Integer:	return lhs.integer()	== rhs.integer();
+	case Datum::Real:		return lhs.real()		== rhs.real();
+	default:				assert(false); return false;
 	}
 
-	return false;
 }
 
 /********************************************************************************************//**
@@ -772,7 +739,7 @@ bool operator==(const Datum& lhs, const Datum& rhs) {
  * @return lhs && rhs
  ************************************************************************************************/
 bool operator&&(const Datum& lhs, const Datum& rhs) {
-	return lhs.boolean()	&& rhs.boolean();
+	return lhs.boolean() && rhs.boolean();
 }
 
 /********************************************************************************************//**
@@ -780,6 +747,6 @@ bool operator&&(const Datum& lhs, const Datum& rhs) {
  * @return lhs || rhs
  ************************************************************************************************/
 bool operator||(const Datum& lhs, const Datum& rhs) {
-	return lhs.boolean()	|| rhs.boolean();
+	return lhs.boolean() || rhs.boolean();
 }
 

@@ -547,6 +547,14 @@ TDescPtr PComp::simpleExpr(int level, bool var) {
 			lhs = promote(lhs, unary(level, var));
 			emit(OpCode::BXOR);
 
+		} else if (accept(Token::ShiftLeft)) {
+			lhs = promote(lhs, unary(level, var));
+			emit(OpCode::SHIFTL);
+
+		} else if (accept(Token::ShiftRight)) {
+			lhs = promote(lhs, unary(level, var));
+			emit(OpCode::SHIFTR);
+
 		} else if (accept(Token::Or)) {
 			lhs = promote(lhs, unary(level, var));
 			emit(OpCode::OR);

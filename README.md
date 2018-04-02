@@ -84,7 +84,8 @@ Version | Description
  0.27	| Fixed typo in varparam.p
  0.28	| Bit-wise operations
  0.29	| Manditory '()' on procedure/function declaractions and calls.
- 0.30	| Added builtin type natural; a range of 0..maxint
+ 0.30	| Added builtin type natural, refactored exceptions, added shift left & right
+ 0.31	| TBD: add Datum ranges...
 
 ## Design and implementation notes
 
