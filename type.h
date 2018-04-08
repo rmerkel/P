@@ -98,14 +98,13 @@ public:
 		Integer,
 		Pointer,
 		Real,
-		Record,
-		Set
+		Record
 	};
 
 	// useful constants
 
-	static Subrange	maxRange;			///< Largest possible range
-	static Subrange charRange;			///< Range of ASCII characters
+	static const Subrange maxRange;			///< Largest possible range
+	static const Subrange charRange;		///< Range of ASCII characters
 
 	/// Create, and return, a TDescPtr to a new IntDesc
 	static TDescPtr newIntDesc(const Subrange& range = maxRange, bool ref = false);
@@ -135,6 +134,9 @@ public:
 
 	/// Create, and return, a TDescPtr to a new PointerDesc
 	static TDescPtr newPointerDesc(TDescPtr base, bool ref = false);
+
+	/// Return a new copy of a TypeDesc
+	static TDescPtr clone(TDescPtr tdesc);
 
 	virtual ~TypeDesc() {}				///< Destructor
 

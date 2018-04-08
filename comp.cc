@@ -1441,8 +1441,9 @@ TDescPtr PComp::type(int level, bool var, const string& idprefix) {
 		auto it = lookup(id);
 		if (it == symtbl.end() || it->second.kind() != SymValue::Type)
 			error("expected type, got ", id);
+
 		else {
-			tdesc = it->second.type();
+			tdesc = TypeDesc::clone(it->second.type());
 			tdesc->ref(var);
 		}
 
@@ -1471,7 +1472,7 @@ TDescPtr PComp::type(int level, bool var, const string& idprefix) {
 TDescPtr PComp::simpleType(int level, bool var) {
 	TDescPtr type;
 
-	if (accept(Token::Identifier, false)) {		// Previously defined type, must be ordinal!
+	if (accept(Token::Identifier, false)) {		// Previously defined type, including real!
 		const string id = ts.current().string_value;
 		next();
 
@@ -1487,10 +1488,7 @@ TDescPtr PComp::simpleType(int level, bool var) {
 			type->ref(var);
 		}
 
-	} else if (accept(Token::RealType))			// Real
-		type = TypeDesc::newRealDesc(var);
-
-	else 
+	} else 
 		type = ordinalType(level, var);
 
 	return type;
@@ -1500,6 +1498,9 @@ TDescPtr PComp::simpleType(int level, bool var) {
  * 'Boolean' | 'Integer' | 'Char' |
  * '(' identifier-list ')' | 'array' '[' simple-type-list ']' 'of' type ;
  *
+ * @note	built-in ordinal types, such as "integer" or non-ordinal types, such as "real" are 
+ * 			already in the type system, and thus discovered as an identifier w/SymValue::Type.
+ *
  * @param	level	The current block level. 
  * @param	var		True if parameter is a var parameter
  *
@@ -1508,16 +1509,7 @@ TDescPtr PComp::simpleType(int level, bool var) {
 TDescPtr PComp::ordinalType(int level, bool var) {
 	TDescPtr type;
 
-	if (accept(Token::BoolType))				// Boolean
-		return TypeDesc::newBoolDesc(var);
-
-	else if (accept(Token::CharType))			// Char
-		return TypeDesc::newCharDesc(TypeDesc::charRange, var);
-
-	else if (accept(Token::IntType))			// Integer
-		return TypeDesc::newIntDesc(TypeDesc::maxRange, var);
-
-	else if (accept(Token::OpenParen)) {		// Enumeration
+	if (accept(Token::OpenParen)) {		// Enumeration
 		FieldVec		enums;
 
 		const auto ids = identifierList(level, "");
@@ -1921,7 +1913,7 @@ PComp::PComp() : Compilier () {
 
 	// Built-in subrange types
 
-	symtbl.insert( { "char",		SymValue::makeType(0, TypeDesc::newCharDesc())	} );
+	symtbl.insert( { "character",	SymValue::makeType(0, TypeDesc::newCharDesc())	} );
 	symtbl.insert( { "natural",		SymValue::makeType(0, natural) 					} );
 	symtbl.insert( { "positive",	SymValue::makeType(1, natural) 					} );
 

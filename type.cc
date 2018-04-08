@@ -115,8 +115,8 @@ TypeDesc::TypeDesc(
 
 // public static
 
-Subrange TypeDesc::maxRange = Subrange::maxRange;
-Subrange TypeDesc::charRange(0, 127);
+const Subrange TypeDesc::maxRange = Subrange::maxRange;
+const Subrange TypeDesc::charRange(0, 127);
 
 /********************************************************************************************//**
  * @param	range		The type sub-range range. Defaults to Subrange().
@@ -256,6 +256,14 @@ TDescPtr TypeDesc::newPointerDesc(TDescPtr base, bool ref) {
 								ref));
 }
 
+/********************************************************************************************//**
+ * @param	tdesc		The type descriptor to clone
+ * @return	TDescPtr to a new copy of tdesc
+ ************************************************************************************************/
+TDescPtr TypeDesc::clone(TDescPtr tdesc) {
+	return TDescPtr(new TypeDesc(*tdesc));
+}
+
 // public
 
 /********************************************************************************************//**
@@ -384,7 +392,6 @@ std::ostream& operator<<(std::ostream& os, TypeDesc::TypeClass tclass) {
 	case TypeDesc::Pointer:		os << "pointer";		break;
 	case TypeDesc::Real:		os << "real";			break;
 	case TypeDesc::Record:		os << "record";			break;
-	case TypeDesc::Set:			os << "set";			break;
 	default:
 		os << "unknown (" << static_cast<unsigned>(tclass) << ")";
 		assert(false);

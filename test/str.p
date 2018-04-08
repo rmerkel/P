@@ -1,6 +1,6 @@
 program StringTest()
 type
-	A = array [0..9] of char;
+	A = array [0..9] of character;
 
 var
  	a1 : A;

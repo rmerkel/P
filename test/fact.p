@@ -11,8 +11,9 @@
 
 program fact()
 const nFacts = 10;
-var p : integer;
-procedure factorial(n : integer) begin
+procedure factorial(n : integer)
+	var p : integer;
+	begin
         p := 1;
 		writeln(p);
         while n > 0 do begin

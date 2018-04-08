@@ -27,9 +27,9 @@
 struct Token {
 	/** Token kinds
 	 *
-	 *  Token kinds are divided up into keywords, operators, identifiers andNumber
-	 *  numbers. Single character tokens are represented by the integer value of
-	 *  its character
+	 *  Token kinds are divided up into keywords, operators, identifiers and
+	 *  numbers. Built-in types, such as "integer" or "real" are installed directly into the 
+	 *  symbol table, and thus don't have a Token Kind.
 	 */
 	enum Kind {
 		Unknown,						///< Unknown token kind; (integer_value)
@@ -62,11 +62,6 @@ struct Token {
 
 		Ellipsis,						///< ".."
 		Caret,							///< "^"
-
-		BoolType,						///< "boolean"
-		CharType,						///< "char"
-		IntType,						///< "integer"
-		RealType,						///< "real"
 
 		Array,							///< "array"
 		Of,								///< "of"

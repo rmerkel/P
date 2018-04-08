@@ -1,9 +1,9 @@
 program CharTest()
 type
-	A = array [0..9] of char;
+	A = array [0..9] of character;
 
 var i : integer;
-	c : char;
+	c : character;
  	a1 : A;
  	a2 : A;
 

@@ -2,10 +2,10 @@
 # test/array.p, 2: type
     0: calli 0, 2
     1: halt
-# test/array.p, 3: 	A = array [0..9] of char;
+# test/array.p, 3: 	A = array [0..9] of character;
 # test/array.p, 4: 
 # test/array.p, 5: var i : integer;
-# test/array.p, 6: 	c : char;
+# test/array.p, 6: 	c : character;
 # test/array.p, 7:  	a1 : A;
 # test/array.p, 8:  	a2 : A;
 # test/array.p, 9: 

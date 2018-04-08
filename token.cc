@@ -212,8 +212,6 @@ TokenStream::KeywordTable	TokenStream::keywords = {
 	{	"bit_not",		Token::BitNot		},
 	{	"bit_or",		Token::BitOr		},
 	{	"bit_xor",		Token::BitXor		},
-	{	"boolean",		Token::BoolType		},
-	{	"char",			Token::CharType		},
 	{   "const",		Token::ConsDecl		},
 	{	"dispose",		Token::Dispose		},
 	{	"do",			Token::Do			},
@@ -222,7 +220,6 @@ TokenStream::KeywordTable	TokenStream::keywords = {
 	{	"exp",			Token::Exp			},
 	{	"function",		Token::FuncDecl		},
 	{	"if",			Token::If			},
-	{	"integer",		Token::IntType		},
 	{	"ln",			Token::Log			},
 	{	"mod",			Token::Mod			},
 	{	"not",			Token::Not			},
@@ -234,7 +231,6 @@ TokenStream::KeywordTable	TokenStream::keywords = {
 	{	"procedure",	Token::ProcDecl		},
 	{	"pred",			Token::Pred			},
 	{	"record",		Token::Record		},
-	{	"real",			Token::RealType		},
 	{	"repeat",		Token::Repeat		},
 	{	"round",		Token::Round		},
 	{	"shift_left",	Token::ShiftLeft	},
@@ -297,11 +293,6 @@ ostream& operator<<(std::ostream& os, const Token::Kind& kind) {
 
 	case Token::Ellipsis:	os << "..";				break;
 	case Token::Caret:		os << "^";				break;
-
-	case Token::BoolType:	os << "boolean";		break;
-	case Token::CharType:	os << "char";			break;
-	case Token::IntType:	os << "integer";		break;
-	case Token::RealType:	os << "real";			break;
 
 	case Token::Array:		os << "array";			break;
 	case Token::Of:			os << "of";				break;
