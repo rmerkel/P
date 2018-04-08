@@ -14,18 +14,17 @@
  * Subrange - a contiguoush sub-range of integer values
  ************************************************************************************************/
 class Subrange {
-	int		_min;						///< The sub-ranges minimum value
-	int		_max;						///< The Sub-ranges maximum value
+	int	minimum;						///< The sub-ranges minimum value
+	int	maximum;						///< The Sub-ranges maximum value
 
 public:
 	static Subrange	maxRange;			///< Maximum possbile range
 
-	Subrange() : _min{0}, _max{0} {}	///< Default constructor
-	Subrange(int minimum, int maximum);	///< Constructor
+	Subrange(int min = 0, int max = 0);	///< Constructor
 	virtual ~Subrange() {}				///< Destructor
 
-	int minimum() const;				///< Return type sub-range minimum value
-	int maximum() const;				///< Return type sub-range maximum value
+	int min() const;					///< Return type sub-range minimum value
+	int max() const;					///< Return type sub-range maximum value
 	unsigned span() const;				///< Return type sub-range's span
 };	
 

@@ -14,14 +14,12 @@
 #include <utility>
 #include <vector>
 
-#include "subrange.h"
-
 /********************************************************************************************//**
  * A Data Value
  *  
  * Datums contain either a boolean, character, signed interger, floating point value.
  * Convertsion between types is limited to signed and unsigned intergers, as long as signed
- * values are limited from 0..std::numeric_limits<int>::maximum().
+ * values are limited from 0..std::numeric_limits<int>::max().
  *  
  * A discriminator (kind()), which is initialized by the constructors, and enforced by the
  * operators, which throw a Datum::Error, i.e., bitwise operators on Real values are illegal.
@@ -46,7 +44,6 @@ public:
 	explicit Datum(unsigned value);			///< Construct a Integer...
 	explicit Datum(size_t value);			///< Construct a Integer...
 	explicit Datum(double value);			///< Construct a Double...
-
 	virtual ~Datum() {}						///< Destructor
 
 	Datum& operator=(const Datum& value);	///< Assignment...
@@ -92,7 +89,6 @@ public:
 	bool numeric() const;					///< Return true if value is numeric...
 	bool ordinal() const;					///< Return true if value is ordinal...
 	bool zero() const;						///< Return true if value is equal to zero...
-	const Subrange& range() const;			///< Return my rnage of legal values...
 
 private:
 	union {
@@ -102,7 +98,6 @@ private:
 		double		r;						///< if k == Real
 	};
 	Kind			k;  					///< What Datum type?
-	Subrange		rng;					///< Ranges for ordinal types
 };
 
 /********************************************************************************************//**

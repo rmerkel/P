@@ -115,7 +115,7 @@ TypeDesc::TypeDesc(
 
 // public static
 
-Subrange TypeDesc::maxRange(numeric_limits<int>::min(), numeric_limits<int>::max());
+Subrange TypeDesc::maxRange = Subrange::maxRange;
 Subrange TypeDesc::charRange(0, 127);
 
 /********************************************************************************************//**

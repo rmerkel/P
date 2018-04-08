@@ -56,11 +56,11 @@ static	bool	trace = false;					///< Trace run if true
 static void help() {
 	cerr << "Usage: " << progName << ": [options[ [filename]\n"
 		 << "Where options is zero or more of the following:\n"
-		 << "-? | -help     Print this message and exit.\n"
-		 << "-l | -listing  Generate listing.\n"
-		 << "-t | -trace    Set interpreter trace mode.\n"
-		 << "-v | -verbose  Set compilier verbose mode.\n"
- 		 << "-V | -version  Print the program version.\n"
+		 << "-? | --help    Print this message and exit.\n"
+		 << "-l | --listing Generate listing.\n"
+		 << "-t | --trace   Set interpreter trace mode.\n"
+		 << "-v | --verbose Set compilier verbose mode.\n"
+ 		 << "-V | --version Print the program version.\n"
 		 << "\n"
 		 << "filename  The name of the source file, or '-' or '' for standard input.\n";
 }
@@ -69,7 +69,7 @@ static void help() {
  * Print the version number as major.minor
  ************************************************************************************************/
 static void printVersion() {
-	cout << progName << ": verson: 0.30\n";		// make sure to update verison history in REAME.md!
+	cout << progName << ": verson: 0.31\n";		// make sure to update verison history in REAME.md!
 }
 
 /********************************************************************************************//** 
@@ -85,20 +85,20 @@ static bool parseCommandline(const vector<string>& args) {
 		else if ("-" == arg)
 			inputFile = arg;					// read from standard input
 
-		else if ("-help" == arg) {
+		else if ("--help" == arg) {
 			help();
 			return false;
 
-		} else if ("-listing" == arg)
+		} else if ("--listing" == arg)
 			listing = true;
 
-		else if ("-trace" == arg)
+		else if ("--trace" == arg)
 			trace = true;						// Trace...
 
-		else if ("-verbose" == arg)
+		else if ("--verbose" == arg)
 			verbose = true;						// annoy the user with lots-o-messages...
 
-		else if ("-version" == arg)
+		else if ("--version" == arg)
 			printVersion();
 
 		else if ('-' == arg[0])	{				// parse -options...

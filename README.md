@@ -4,15 +4,15 @@ Yet another small, interpreted, computer language... just for the fun of it!
 
 A compiler/interpreter, inspired by the original PL/0 language and machine
 described in "Algorithms + Data Structures = Programs," 1st Edition, by Wirth.
-Currently, the compiler supports a dialect somewhere between PL/0 and ISO
-Pascal, but may *never* be fully ISO compatible. 
+Originally, the goal was a ISO compatible Pascal complier. P progressed to a
+point somewhere between PL/0 and ISO Pascal before this goal was abandoned.
 
-Current plans are to start to diverge from Pascal, for example:
+Current plans is to diverge from Pascal, for a sort of "ADA Lite," but with 
+other differences, for example;
  * Allow pointers to point to any variable, thus pass by reference would be 
    similar to C; pass a pointer.
  * Add object attributes, similar to ADA
  * Bit operators in place of Pascal sets
-...
 
 Like PL/0, P is a combination compiler and interpreter; it first runs the
 compiler (PComp), and if no errors where encountered, it runs the results in
@@ -20,13 +20,13 @@ the interpreter (PInterp). A listing and machine output are written to
 standard output.
 
 The compiler started life as a copy of the C example;
-[Recursive Descent Parser](https://en.wikipedia.org/wiki/Recursive_descent_parser/), 
-modified to emit code per Wirth's interpret procedure while using the
-TokenStream (TokenStream) from "The C++ Programming Language," 4th Edition, by 
-Stroustrup, modified to support the PL/0 dialect, and thus Pascal. By default, 
-PComp writes error messages on standard error output. The listing (-l) option
-writes a listing on standard output, and and the verbose (-v) option logs tokens
-found and code emitted.
+[Recursive Descent Parser]
+(https://en.wikipedia.org/wiki/Recursive_descent_parser/), modified to emit code
+per Wirth's interpret procedure while using the TokenStream (TokenStream) from
+"The C++ Programming Language," 4th Edition, by Stroustrup, modified to support
+the PL/0 dialect, and thus Pascal. By default, PComp writes error messages on 
+standard error output. The listing (-l) option writes a listing on standard
+output, and and the verbose (-v) option logs tokens found and code emitted.
 
 The machine/interpreter stated life as a C/C++ port of Wirth's machine
 (interpret procedure), modified to use lest "weird" instruction names,
@@ -50,59 +50,30 @@ necessary.
 * No input instructions, and just elementary Write/Writeln implementation.
 * No interactive mode for debugging; just automatic single stepping (-v)
 
-## History
-
-Version | Description
-------: | --------------
-  0.1   | Initial fork form pl0c, modified to use =, <> etc.
-  0.2   | Program declaraction
-  0.3   | Removed the C/C++ bit and shift operations
-  0.4   | Added types, limited to ranges and arrays.
-  0.5   | Added enumerations
-  0.6   | Fixed array index type checks
-  0.7   | Supports non-zero based array indexes
-  0.8   | Supports multiple dimensioned arrays. Fixed promotion bug
-  0.9   | Supports a[i,j] and a[i][j] syntax
- 0.10   | Adding built-in functions and constants, refactored types, capitalized built-in "nouns" and functions. WIP.
- 0.11   | Primitive Write and Writeln, refactoring.
- 0.12   | Limit checks, successor, predecessor. for statement.
- 0.13   | Refactored TDesc into iTDesc and it's derived classes
- 0.14   | Write/WriteLn field specifiers.
- 0.15   | Records and selectors
- 0.16   | Refactored records, selectors and arrays. Added New(), Dispose() and nil
- 0.16   | Boolean
- 0.17	| Arrays are now passed by value correctly.
- 0.18	| Writeln now prints "true" "false" for booleans.
- 0.19   | Clean up, removed unused global data/constants, use input filename in messages
- 0.20	| Refactored the interpreter step routine, adding more run-time tests and -t option
- 0.21   | Write and writeln nolonger quote character values. Major refactor of Datum.
- 0.22   | Write[ln] now supports arrays and strings.
- 0.23   | Call and jump indirection; target address is on the stack
- 0.24	| Added -l[listing], fixed fahr*.p tests, added call and jump immediate instructions.
- 0.25	| Table of pointers to instructions
- 0.26   | 'var' parameters; pass by reference
- 0.27	| Fixed typo in varparam.p
- 0.28	| Bit-wise operations
- 0.29	| Manditory '()' on procedure/function declaractions and calls.
- 0.30	| Added builtin type natural, refactored exceptions, added shift left & right
- 0.31	| TBD: add Datum ranges...
-
 ## Design and implementation notes
 
-* To support passing strings, or more generally, arrays to write[ln], a count
-  is passed with each parameter, 1 for scalers, N for the string or array
-  length. 
-* Opening and closing brackets "()" are mandatory for subroutine declarations
-  and calls.
-* Currently supports "var" subroutine parameter types for pass by reference, but
-  pointers might be a better choice. 
-* No set operations, but using bitwise operators, bit_and/or/xor/not in their
-  place.
-* Currently, the interpreter uses a memory model somewhere between fully tagged,
-  and a simple. While Datum directly supports simple types, there is no support 
-  for user defined types. This requires the compiler to generate limit check
-  instructions. If Datums contained a TypeDescPtr, the interpreter could could 
-  make range check errors directly.
+ * There is just one basic integer type, the signed Integer. 
+ * Unsigned integers (Natural), is a built-in subrange of Integer; 0..maxint, the
+   maximum Integer value; thus any Natural value will 'fit' in a Integer.
+ * Likewise, Positive is 1..maxint.
+ * Boolean is a built-in enumeration of false, true.
+ * Currently, Character is a subrange of 0..127, but will be replaced with a
+   built-in enumeration of all ASCII literals, e.g., 'A' and not the identifier 
+   A. 
+ * Subrange checking is accomplished via the limit check instructions, LLIMIT and
+   ULIMIT when for assignments from a ordinal value with a wider range to a
+   narrower one. This should be omitted in the case of constant expressions where
+   the range of the value is know... but isn't currently.
+ * Variables do not have default values; they must be explicitly initialized by
+   the program via assignment, otherwise, the compiler would have to emit 
+   initialization instructions on entry to every new block.
+ * Either the compiler or the machine could emit errors if a uninitialized 
+   variable is used. Alternatively, variables could have default values.
+ * Allow pointers to point to any variable, thus pass by reference would be 
+   similar to C, e.g, pass a pointer.
+ * Add object attributes, similar to ADA.
+ * Bit operators in place of Pascal sets; bit_and, bit_or, ..., shift_left,
+   shift_right.
 
 ## Author
     Randy Merkel, Slowly but Surly Software.

@@ -20,29 +20,30 @@ Subrange	Subrange::maxRange(numeric_limits<int>::min(), numeric_limits<int>::max
 
 /********************************************************************************************//**
  * @throws	Result::outOfRange if minimum > maximum
- * @param	minimum	The minimum value in the range
- * @param	maximum	The maximum value in the range
+ *
+ * @param	min	The minimum value in the range
+ * @param	max	The maximum value in the range
  ************************************************************************************************/
-Subrange::Subrange(int minimum, int maximum) : _min{minimum}, _max{maximum} {
-	if (_min > _max)
+Subrange::Subrange(int min, int max) : minimum{min}, maximum{max} {
+	if (minimum > maximum)
 		throw Result::outOfRange;
 }
 
 /********************************************************************************************//**
  * @return my minmum value
  ************************************************************************************************/
-int Subrange::minimum() const					{	return _min;		}
+int Subrange::min() const						{	return minimum;		}
 
 /********************************************************************************************//**
  * @return my maximum value
  ************************************************************************************************/
-int Subrange::maximum() const					{	return _max;		}
+int Subrange::max() const						{	return maximum;		}
 
 /********************************************************************************************//**
- * @return the maximum() - minimum() + 1;
+ * @return the max() - min() + 1;
  ************************************************************************************************/
 unsigned Subrange::span() const	{
-	return maximum() - minimum() + 1;
+	return max() - min() + 1;
 }
 
 // operators
@@ -54,9 +55,9 @@ unsigned Subrange::span() const	{
  * @return true if lhs == rhs
  ************************************************************************************************/
 bool operator<(const Subrange& lhs, const Subrange& rhs) {
-	if (lhs.minimum() < rhs.minimum())
+	if (lhs.min() < rhs.min())
 		return true;
-	else if (lhs.maximum() < rhs.minimum())
+	else if (lhs.max() < rhs.max())
 		return true;
 	else
 		return false;
@@ -69,8 +70,7 @@ bool operator<(const Subrange& lhs, const Subrange& rhs) {
  * @return true if lhs == rhs
  ************************************************************************************************/
 bool operator==(const Subrange& lhs, const Subrange& rhs) {
-	return	lhs.minimum() == rhs.minimum()	&&
-			lhs.maximum() == rhs.maximum();
+	return	lhs.min() == rhs.min() && lhs.max() == rhs.max();
 }
 
 /********************************************************************************************//**
@@ -80,6 +80,6 @@ bool operator==(const Subrange& lhs, const Subrange& rhs) {
  * @return	os
  ************************************************************************************************/
 ostream& operator<<(std::ostream& os, const Subrange& srange) {
-	return os << srange.minimum() << ".." << srange.maximum();
+	return os << srange.min() << ".." << srange.max();
 }
 

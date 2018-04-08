@@ -1179,25 +1179,24 @@ Result PInterp::EVAL() {
  * @return	stackUnderflow if the stack underflowed, 
  ************************************************************************************************/
 Result PInterp::ASSIGN() {
-	const	size_t	n = ir.value.natural();	// Accually, just unsigned
-			Result	r = Result::success;
+	const	size_t	n = ir.value.natural();	// the # of values to assign
 
 	if (sp < n)
-		r = Result::stackUnderflow;
+		return Result::stackUnderflow;
 
-	size_t dst = stack[sp - ir.value.natural()].natural();
+	const size_t dst = stack[sp - n].natural();
 	if (!rangeCheck(dst, dst + n))
-		r = Result::stackUnderflow;
+		return Result::stackUnderflow;
 
 	lastWrite = dst + n - 1;
 
-	size_t src = sp - n + 1;
-	for (size_t i = 0; i < n; ++i)
-		stack[dst++] = stack[src++];
+	Datum* lhs = &stack[dst];
+	Datum* rhs = &stack[sp - n + 1];
+	for (size_t i = 0; i < n; i++)
+		*lhs++ = *rhs++;
+	pop(n+1);								// 'pop' the stack, including the dest addr
 
-	pop(n+1);					// 'pop' the stack, including dest addr
-
-	return r;
+	return Result::success;
 }
 
 /********************************************************************************************//**

@@ -156,8 +156,8 @@ void PComp::assignPromote (TDescPtr lhs, TDescPtr rhs) {
 
 	// Emit limit checks, unless range is impossible to exceed
 	if (lhs->ordinal() && lhs->range() != TypeDesc::maxRange) {
-		emit(OpCode::LLIMIT, 0, lhs->range().minimum());
-		emit(OpCode::ULIMIT, 0, lhs->range().maximum());
+		emit(OpCode::LLIMIT, 0, lhs->range().min());
+		emit(OpCode::ULIMIT, 0, lhs->range().max());
 	}
 }
 
@@ -312,7 +312,7 @@ TDescPtr PComp::builtInFunc(int level)
 
 		if (type->ordinal())
 			oss << "expeced ordinal value, got: " << current();
-		emit(OpCode::PRED, 0, type->range().minimum());
+		emit(OpCode::PRED, 0, type->range().min());
 
 	} else if (accept(Token::Sin)) {	// Replace TOS with sin(TOS)
 		expect(Token::OpenParen);
@@ -354,7 +354,7 @@ TDescPtr PComp::builtInFunc(int level)
 
 		if (type->ordinal())
 			oss << "expeced ordinal value, got: " << current();
-		emit(OpCode::SUCC, 0, type->range().maximum());
+		emit(OpCode::SUCC, 0, type->range().max());
 
 	} else if (accept(Token::Ord)) {	// replace ordinal with it's ordinal
 		expect(Token::OpenParen);
@@ -865,8 +865,8 @@ TDescPtr PComp::varArray(int level, SymbolTableIter it, TDescPtr type) {
 
 	unsigned nindexes = indexes.size();
 	for (auto index : indexes) {			// process each index, in turn
-		emit(OpCode::LLIMIT, 0, atype->range().minimum());
-		emit(OpCode::ULIMIT, 0, atype->range().maximum());
+		emit(OpCode::LLIMIT, 0, atype->range().min());
+		emit(OpCode::ULIMIT, 0, atype->range().max());
 
 		if (atype->itype()->tclass() != index->tclass()) {
 			ostringstream oss;
@@ -880,8 +880,8 @@ TDescPtr PComp::varArray(int level, SymbolTableIter it, TDescPtr type) {
 		}
 
 		// offset index for non-zero based arrays
-		if (atype->range().minimum() != 0) {
-			emit(OpCode::PUSH, 0, atype->range().minimum());
+		if (atype->range().min() != 0) {
+			emit(OpCode::PUSH, 0, atype->range().min());
 			emit(OpCode::SUB);
 		}
 
@@ -1911,27 +1911,31 @@ void PComp::run()								{	progDecl(0);	}
 PComp::PComp() : Compilier () {
 	TDescPtr boolean = TypeDesc::newBoolDesc();
 	TDescPtr integer = TypeDesc::newIntDesc();
-	TDescPtr natural = TypeDesc::newIntDesc(Subrange(0, TypeDesc::maxRange.maximum()));
+	TDescPtr natural = TypeDesc::newIntDesc(Subrange(0, TypeDesc::maxRange.max()));
 
-	// Insert builtin types into the symbol table
+	// Insert built-in types into the symbol table
 
-	symtbl.insert( { "bool",	SymValue::makeType(0, boolean)					} );
-	symtbl.insert( { "char",	SymValue::makeType(0, TypeDesc::newCharDesc())	} );
-	symtbl.insert( { "integer",	SymValue::makeType(0, integer)					} );
-	symtbl.insert( { "natural",	SymValue::makeType(0, natural)					} );
-	symtbl.insert( { "real",	SymValue::makeType(0, TypeDesc::newRealDesc())	} );
+	symtbl.insert( { "boolean",		SymValue::makeType(0, boolean)					} );
+	symtbl.insert( { "integer",		SymValue::makeType(0, integer)					} );
+	symtbl.insert( { "real",		SymValue::makeType(0, TypeDesc::newRealDesc())	} );
 
-	// Insert built-in constants into the symbol table; id, level (always zero), and value
+	// Built-in subrange types
 
-	symtbl.insert({"maxint", 	SymValue::makeConst(
-									0,
-									Datum(TypeDesc::maxRange.maximum()),
-									integer)									});
-	symtbl.insert({"nil",    	SymValue::makeConst(
-									0,
-									Datum(0),
-									TypeDesc::newPointerDesc(integer))			});
-	symtbl.insert({"true",   	SymValue::makeConst(0, Datum(true), boolean)	});
-	symtbl.insert({"false",  	SymValue::makeConst(0, Datum(false), boolean)	});
+	symtbl.insert( { "char",		SymValue::makeType(0, TypeDesc::newCharDesc())	} );
+	symtbl.insert( { "natural",		SymValue::makeType(0, natural) 					} );
+	symtbl.insert( { "positive",	SymValue::makeType(1, natural) 					} );
+
+	// Built-in constants into the symbol table; id, level (always zero), and value
+
+	symtbl.insert({"maxint", 		SymValue::makeConst(
+										0,
+										Datum(TypeDesc::maxRange.max()),
+										integer)									});
+	symtbl.insert({"nil",    		SymValue::makeConst(
+										0,
+										Datum(0),
+										TypeDesc::newPointerDesc(integer))			});
+	symtbl.insert({"true",   		SymValue::makeConst(0, Datum(true), boolean)	});
+	symtbl.insert({"false",  		SymValue::makeConst(0, Datum(false), boolean)	});
 }
 

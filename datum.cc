@@ -21,7 +21,7 @@ using namespace std;
 /********************************************************************************************//**
  * Yeilds an Integer zero.
  ************************************************************************************************/
-Datum::Datum() : i{0}, k{Kind::Integer}, rng(Subrange::maxRange) {}
+Datum::Datum() : i{0}, k{Kind::Integer}							{}
 
 /********************************************************************************************//**
  * @param	rhs	New value
@@ -36,7 +36,7 @@ Datum::Datum(Datum&& rhs) 										{	*this = rhs;	}
 /********************************************************************************************//**
  * @param	value	initial value
  ************************************************************************************************/
-Datum::Datum(bool value) : b{value}, k{Kind::Boolean}, rng(false, true) {}
+Datum::Datum(bool value) : b{value}, k{Kind::Boolean}			{}
 
 /********************************************************************************************//**
  * @param	value	initial value
@@ -46,28 +46,26 @@ Datum::Datum(char value) : c{value}, k{Kind::Character}			{}
 /********************************************************************************************//**
  * @param	value	initial value
  ************************************************************************************************/
-Datum::Datum(int value) : i{value}, k{Kind::Integer}			{}
+Datum::Datum(int value) : i{value}, k{Kind::Integer} 			{}
 
 /********************************************************************************************//**
- * @throws Result::illegalOp if value is out of range
+ * @throws Result::outOfRange if value exceeds the maximum interger value
  * @param	value	initial value
  ************************************************************************************************/
 Datum::Datum(unsigned value) : k{Kind::Integer} {
 	if (value > numeric_limits<int>::max())
-		throw Result::illegalOp;
-	else
-		i = value;
+		throw Result::outOfRange;
+	i = value;
 }
 
 /********************************************************************************************//**
- * @throws Result::illegalOp if value is out of range
+ * @throws Result::outOfRange if value exceeds the maximum interger value
  * @param	value	initial value
  ************************************************************************************************/
 Datum::Datum(size_t value) : k{Kind::Integer} {
 	if (value > numeric_limits<int>::max())
-		throw Result::illegalOp;
-	else
-		i = value;
+		throw Result::outOfRange;
+	i = value;
 }
 
 /********************************************************************************************//**
@@ -76,94 +74,92 @@ Datum::Datum(size_t value) : k{Kind::Integer} {
 Datum::Datum(double value) : r{value}, k{Kind::Real}			{}
 
 /********************************************************************************************//**
- * @param	value	new value, and type
+ * @param	rhs		new value, and type
  * @return	*this
  ************************************************************************************************/
-Datum& Datum::operator=(const Datum& value) {
-	if (this != &value) {
-		switch(k = value.kind()) {
-		case Kind::Boolean:		b = value.boolean();	break;
-		case Kind::Character:	c = value.character();	break;
-		case Kind::Integer:		i = value.integer();	break;
-		case Kind::Real:		r = value.real();		break;
+Datum& Datum::operator=(const Datum& rhs) {
+	if (this != &rhs) {
+		switch(k = rhs.kind()) {
+		case Kind::Boolean:		b = rhs.boolean();		break;
+		case Kind::Character:	c = rhs.character();	break;
+		case Kind::Integer:		i = rhs.integer();		break;
+		case Kind::Real:		r = rhs.real();			break;
 		default:				assert(false && "unknown Datum::Kind!");
 		}
-		rng = value.rng;
 	}
 
 	return *this;
 }
 
 /********************************************************************************************//**
- * @param	value	new value, and type
+ * @param	rhs		new value, and type
  * @return	*this
  ************************************************************************************************/
-Datum& Datum::operator=(Datum&& value) {
-	if (this != &value) {
-		switch(k = value.kind()) {
-		case Kind::Boolean:		b = value.boolean();	break;
-		case Kind::Character:	c = value.character();	break;
-		case Kind::Integer:		i = value.integer();	break;
-		case Kind::Real:		r = value.real();		break;
+Datum& Datum::operator=(Datum&& rhs) {
+	if (this != &rhs) {
+		switch(k = rhs.kind()) {
+		case Kind::Boolean:		b = rhs.boolean();		break;
+		case Kind::Character:	c = rhs.character();	break;
+		case Kind::Integer:		i = rhs.integer();		break;
+		case Kind::Real:		r = rhs.real();			break;
 		default:				assert(false && "unknown Datum::Kind!");
 		}
-		rng = value.rng;
 	}
 
 	// note really neded, but put value into default constructed state
-	value.k = Kind::Integer;
-	value.i = 0;
+	rhs.k = Kind::Integer;
+	rhs.i = 0;
 
 	return *this;
 }
 
 /********************************************************************************************//**
- * @param	value	new value, and type
+ * @param	rhs		new value, and type
  * @return	*this, which is now a Boolean
  ************************************************************************************************/
-Datum& Datum::operator=(bool value)			{	return *this = Datum(value);	}
+Datum& Datum::operator=(bool rhs)			{	return *this = Datum(rhs);	}
 
 /********************************************************************************************//**
- * @param	value	new value, and type
+ * @param	rhs		new value, and type
  * @return	*this, which is now a Character
  ************************************************************************************************/
-Datum& Datum::operator=(char value)			{	return *this = Datum(value);	}
+Datum& Datum::operator=(char rhs)			{	return *this = Datum(rhs);	}
 
 /********************************************************************************************//**
- * @param	value	new value, and type
+ * @param	rhs		new value, and type
  * @return	*this, which is now an Integer
  ************************************************************************************************/
-Datum& Datum::operator=(int value)			{	return *this = Datum(value);	}
+Datum& Datum::operator=(int rhs)			{	return *this = Datum(rhs);	}
 
 /********************************************************************************************//**
- * @throws	Result::illegalOp if value is out of range
- * @param	value	new value, and type
+ * @throws	Result::illegalOp if rhs is out of range
+ * @param	rhs		new value, and type
  * @return	*this, which is now an Integer
  ************************************************************************************************/
-Datum& Datum::operator=(unsigned value) {
-	if (value > numeric_limits<int>::max())
+Datum& Datum::operator=(unsigned rhs) {
+	if (rhs > numeric_limits<int>::max())
 		throw Result::illegalOp;
 
-	return *this = Datum(value);
+	return *this = Datum(rhs);
 }
 
 /********************************************************************************************//**
  * @throws	Result::illegalOp if value is out of range
- * @param	value	new value, and type
+ * @param	rhs		new value, and type
  * @return	*this, which is now an Integer
  ************************************************************************************************/
-Datum& Datum::operator=(size_t value) {
-	if (value > numeric_limits<int>::max())
+Datum& Datum::operator=(size_t rhs) {
+	if (rhs > numeric_limits<int>::max())
 		throw Result::illegalOp;
 
-	return *this = Datum(value);
+	return *this = Datum(rhs);
 }
 
 /********************************************************************************************//**
- * @param	value	new value, and type
+ * @param	rhs		new value, and type
  * @return	*this, which is now a Real
  ************************************************************************************************/
-Datum& Datum::operator=(double value)		{	return *this = Datum(value);	}
+Datum& Datum::operator=(double rhs)			{	return *this = Datum(rhs);	}
 
 /********************************************************************************************//**
  * @return	modified copy of this
@@ -524,11 +520,6 @@ bool Datum::zero() const {
 		default:			return false;
 	}
 }
-
-/********************************************************************************************//**
- * @return	My range
- ************************************************************************************************/
-const Subrange& Datum::range() const		{	return rng;	}
 
 // operators
 
