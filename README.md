@@ -52,14 +52,13 @@ necessary.
 
 ## Design and implementation notes
 
+ * Single quotes for character literals, double for strings.
  * There is just one basic integer type, the signed Integer. 
- * Unsigned integers (Natural), is a built-in subrange of Integer; 0..maxint, the
-   maximum Integer value; thus any Natural value will 'fit' in a Integer.
+ * Unsigned integers (Natural), is a built-in subrange of Integer; 0..maxint, 
+   the maximum Integer value; thus any Natural value will 'fit' in a Integer.
  * Likewise, Positive is 1..maxint.
- * Boolean is a built-in enumeration of false, true.
- * Currently, Character is a subrange of 0..127, but will be replaced with a
-   built-in enumeration of all ASCII literals, e.g., 'A' and not the identifier 
-   A. 
+ * Boolean is a built-in enumeration of false, true [0, 1]
+ * Character is a subrange of 0..127.
  * Subrange checking is accomplished via the limit check instructions, LLIMIT and
    ULIMIT when for assignments from a ordinal value with a wider range to a
    narrower one. This should be omitted in the case of constant expressions where

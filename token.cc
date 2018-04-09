@@ -44,11 +44,11 @@ std::istream& TokenStream::unget() {
 Token TokenStream::get() {
 	char ch = 0;
 
-	do {										// skip whitespace...
+	do {									// skip whitespace...
 		if (!getch(ch))
 			return ct = { Token::EOS };
 
-		if ('\n' == ch) ++lineNum;				// Count lines
+		if ('\n' == ch) ++lineNum;			// Count lines
 
 	} while (isspace(ch));
 
@@ -67,55 +67,55 @@ Token TokenStream::get() {
 	case ';': return ct.kind = Token::SemiColon;	break;
 	case '^': return ct.kind = Token::Caret;		break;
 
-	case '>':									// >, or >=?
+	case '>':								// >, or >=?
 		if (!getch(ch))		ct.kind = Token::GT;
 		else if ('=' == ch)	ct.kind = Token::GTE;
 		else {	unget();	ct.kind = Token::GT;	}
 		return ct;
 
-	case '<':									// <, <=, or <>?
+	case '<':								// <, <=, or <>?
 		if (!getch(ch))		ct.kind = Token::LT;
 		else if ('=' == ch)	ct.kind = Token::LTE;
 		else if ('>' == ch) ct.kind = Token::NEQ;
 		else {	unget();	ct.kind = Token::LT;	}
 		return ct;
 
-	case ':':									// : or :=?
+	case ':':								// : or :=?
 		if (!getch(ch))		ct.kind = Token::Colon;
 		else if ('=' == ch)	ct.kind = Token::Assign;
 		else {	unget();	ct.kind = Token::Colon;	}
 		return ct;
 
-	case '{':									// comment; { ... }
-		ct.integer_value = lineNum;				// remember where the comment stated...
-		do {									// eat everthhing up to the closing '}'
+	case '{':								// comment; { ... }
+		ct.integer_value = lineNum;			// remember where the comment stated...
+		do {								// eat everthhing up to the closing '}'
 			if (!getch(ch)) {
 				ct.kind = Token::BadComment;
 				return ct;
 			}
 
 			if ('\n' == ch)
-				++lineNum;						// keep counting lines...
+				++lineNum;					// keep counting lines...
 
 		} while ('}' != ch);
-		return get();							// restart the scan..
+		return get();						// restart the scan..
 
-	case '.': 									// '.', or '..'
+	case '.': 								// '.', or '..'
 		if (!getch(ch))		ct.kind = Token::Period;
 		else if ('.' == ch)	ct.kind = Token::Ellipsis;
 		else {	unget();	ct.kind = Token::Period;	}
 		return ct;
-												// integer or real number
+											// integer or real number
 	case '0': case '1': case '2': case '3': case '4':
 	case '5': case '6': case '7': case '8': case '9': {
-		ct.kind = Token::IntegerNum;			// Assume integer value...
+		ct.kind = Token::IntegerNum;		// Assume integer value...
 		ct.string_value = ch;
 		while (getch(ch)) {
 			if ('.' == ch) {
 				if (Token::IntegerNum == ct.kind)
 					ct.kind = Token::RealNum;
 
-				else {							// Assuming '..' and not 'e.'
+				else {						// Assuming '..' and not 'e.'
 					unget();
 					ct.string_value.pop_back();
 					ct.kind = Token::IntegerNum;
@@ -139,17 +139,25 @@ Token TokenStream::get() {
 			iss >> ct.integer_value;
 		return ct;
 	}
-	case '\'':									// ' c'  or ' string '
+	
+	case '\'':								// Character literal
 		ct.string_value = "";
-		while (getch(ch) && ch != '\'')
+		if (getch(ch))
 			ct.string_value += ch;
-		if (ch != '\'')
-			ct.kind = Token::Unknown;
-		else
-			ct.kind = Token::String;
+
+		getch(ch);							// just assume ch is a close quote
+		ct.kind = Token::Character;
 		return ct;
 
-	default:							// ident, ident = or error
+	case '"':								// String literal
+		ct.string_value = "";
+		while (getch(ch) && ch != '"')
+			ct.string_value += ch;
+
+		ct.kind = Token::String;			// Assume the ch is a close quote
+		return ct;
+
+	default:								// ident, ident = or error
 		if (isalpha(ch) || ch == '_') {
 			ct.string_value = ch;
 			while (getch(ch) && (isalnum(ch) || ch == '_'))
@@ -267,6 +275,7 @@ ostream& operator<<(std::ostream& os, const Token::Kind& kind) {
 	case Token::BadComment:	os << "bad comment";	break;
 
 	case Token::Identifier:	os << "identifier";		break;
+	case Token::Character:	os << "character";		break;
 	case Token::String:		os << "string";			break;
 	case Token::IntegerNum:	os << "integernum";		break;
 	case Token::RealNum:	os << "RealNum";		break;

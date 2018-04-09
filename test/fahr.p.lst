@@ -14,7 +14,7 @@
 # test/fahr.p, 12: 
 # test/fahr.p, 13: begin
     2: enter 2
-# test/fahr.p, 14: 	writeln('Fahrenheit Celsius');
+# test/fahr.p, 14: 	writeln("Fahrenheit Celsius");
     3: push 'F'
     4: push 'a'
     5: push 'h'

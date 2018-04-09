@@ -36,7 +36,8 @@ struct Token {
 		BadComment,						///< Unterminated comment, started at line # (integer_value)
 
 		Identifier,	  		  			///< An identifier (string_value)
-		String,							///< A string (string_value)
+		Character,						///< A single character, e.g., string_value[0] = 'c'
+		String,							///< A string (string_value), "string"
 		IntegerNum,						///< Integer literal number (integer_value)
 		RealNum,						///< Real literal number (real_value)
 
@@ -134,7 +135,7 @@ struct Token {
 	typedef std::set<Kind>	KindSet;
 
 	Kind			kind;				///< Token type
-	std::string		string_value;		///< kind == Identifier
+	std::string		string_value;		///< kind == Identifier, or String or Character
 	int				integer_value;      ///< Kind == IntegerNum
 	double			real_value;			///< Kind == RealNum
 

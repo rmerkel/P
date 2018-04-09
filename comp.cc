@@ -419,13 +419,24 @@ TDescPtr PComp::factor(int level, bool var) {
 		emit(OpCode::NOT);
 		type = factor(level, var);
 
-	} else if (accept(Token::String, false)) {	// TBD: type = stringLiteral()
-		const auto s = ts.current().string_value;
+	} else if (accept(Token::Character, false)) {
+		const string s = ts.current().string_value;
 		next();
 
-		if (s.size() == 1) {
+		if (s.empty())
+			error("expected a character, but got ''");
+
+		else {
 			emit(OpCode::PUSH, 0, s[0]);
 			type = TypeDesc::newCharDesc();
+		}
+
+	} else if (accept(Token::String, false)) {
+		const string s = ts.current().string_value;
+		next();
+
+		if (s.empty()) {
+			error("expected a string, but got got \"\"");
 
 		} else {								// push each character...
 			for (char c : s)
@@ -434,7 +445,6 @@ TDescPtr PComp::factor(int level, bool var) {
 											Subrange(0, s.size() - 1),
 											TypeDesc::newIntDesc(),
 											TypeDesc::newCharDesc());
-
 		}
 
 	} else 

@@ -25,7 +25,7 @@
    12: push 0
    13: push 1
    14: writeln
-# test/character.p, 13: 	a1 := 'abcdefghij';		{	fill a1 with 'abcd...'			}
+# test/character.p, 13: 	a1 := "abcdefghij";		{	fill a1 with "abcd..."			}
    15: pushvar 0, 6
    16: push 'a'
    17: push 'b'
@@ -59,7 +59,7 @@
    42: push 0
    43: push 1
    44: writeln
-# test/character.p, 17: 	a1 := '0123456788';		{	fill a1 with '0123...'			}
+# test/character.p, 17: 	a1 := "0123456788";		{	fill a1 with "0123..."			}
    45: pushvar 0, 6
    46: push '0'
    47: push '1'

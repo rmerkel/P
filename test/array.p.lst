@@ -26,7 +26,7 @@
    13: push 1
    14: writeln
 # test/array.p, 13: 
-# test/array.p, 14: 	a1 := 'abcdefghij';		{	fill a1 with 'abcd...'			}
+# test/array.p, 14: 	a1 := "abcdefghij";		{	fill a1 with "abcd..."			}
    15: pushvar 0, 6
    16: push 'a'
    17: push 'b'
@@ -62,7 +62,7 @@
    43: push 1
    44: writeln
 # test/array.p, 19: 
-# test/array.p, 20: 	a1 := '0123456788';		{	fill a1 with '0123...'			}
+# test/array.p, 20: 	a1 := "0123456789";		{	fill a1 with "0123..."			}
    45: pushvar 0, 6
    46: push '0'
    47: push '1'
@@ -73,7 +73,7 @@
    52: push '6'
    53: push '7'
    54: push '8'
-   55: push '8'
+   55: push '9'
    56: assign 10
 # test/array.p, 21: 							{	while a1 has changed...			}
 # test/array.p, 22: 	writeln(a1);
@@ -99,5 +99,5 @@
 x
 abcdefghij
 abcdefghij
-0123456788
+0123456789
 abcdefghij

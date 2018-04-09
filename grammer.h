@@ -21,9 +21,7 @@
  *            var-decl = identifier-lst : type ;
  *                type = simple-type | structured-type | pointer-type ;
  *         simple-type = 'real' | ordinal-type ;
- *          enumerator = identifier | char-literal ;
- *           enum-list = enumerator { ',' enumarator } ;
- *        ordinal-type = '(' enum-lst ')' | const-expr '..' const-expr                      |
+ *        ordinal-type = '(' identifier-lst ')' | const-expr '..' const-expr                      |
  *                       'boolean' | 'integer' | 'natual' | 'positive' | 'character' ;
  *     structured-type = 'array' '[' simple-type-list ']' 'of' type                         |
  *                       'record' field-lst 'end' ;
@@ -51,14 +49,14 @@
  *                          'for' identifer ':=' expression
  *                                            ( 'to' | 'downto' ) expression 'do' statement |
  *                          statement-blk ] ;
- *          const-expr = [ '+' | '-' ] number | identifier | char-literal | string-literal ;
+ *          const-expr = [ '+' | '-' ] number | identifier | character | string ;
  *      expression-lst = expression { ',' expression } ;
  *          expression = simple-expr { '<' | '<=' | '=' | '>=' | '>' | '<>' simple-expr } ;
  *         simple-expr = [ '+' | '-' | 'bit_not' ] terminal { simple-expr-op terminal } ;
  *      simple-expr-op = '+' | '-' | 'bit_or' |'bit_xor' | 'shift_left' | 'shift_right | 'or' ;
  *            terminal = factor { term_op  factor } ;
  *             term_op = '*' | '/' | 'rem' | 'bit_and' | | 'and' ;
- *              factor = variable | char-literal | string-literal                           |
+ *              factor = variable | character | string                                      |
  *                       identifier '(' [ expression-lst ] ')'                              |
  *                       'round' '(' expression ')'                                         |
  *                       number                                                             |

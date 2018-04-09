@@ -12,7 +12,7 @@
     6: pushvar 0, 5
     7: push 1
     8: assign 1
-# test/bitwise.p, 6: 	writeln('x = ', x);
+# test/bitwise.p, 6: 	writeln("x = ", x);
     9: push 'x'
    10: push ' '
    11: push '='
@@ -27,7 +27,7 @@
    20: push 0
    21: push 2
    22: writeln
-# test/bitwise.p, 7: 	writeln('y = ', y);
+# test/bitwise.p, 7: 	writeln("y = ", y);
    23: push 'y'
    24: push ' '
    25: push '='
@@ -51,7 +51,7 @@
    41: eval 1
    42: bitand
    43: assign 1
-# test/bitwise.p, 10: 	writeln('z := x bit_and y = ', z);
+# test/bitwise.p, 10: 	writeln("z := x bit_and y = ", z);
    44: push 'z'
    45: push ' '
    46: push ':'
@@ -89,7 +89,7 @@
    76: eval 1
    77: bitor
    78: assign 1
-# test/bitwise.p, 13: 	writeln('z :+ 10 bit_or z = ', z);
+# test/bitwise.p, 13: 	writeln("z :+ 10 bit_or z = ", z);
    79: push 'z'
    80: push ' '
    81: push ':'
@@ -128,7 +128,7 @@
   112: eval 1
   113: bitxor
   114: assign 1
-# test/bitwise.p, 16: 	writeln('z := x bit_xor y = ', z);
+# test/bitwise.p, 16: 	writeln("z := x bit_xor y = ", z);
   115: push 'z'
   116: push ' '
   117: push ':'
@@ -165,7 +165,7 @@
   146: eval 1
   147: bitand
   148: assign 1
-# test/bitwise.p, 19: 	writeln('bit_not z = ', z);
+# test/bitwise.p, 19: 	writeln("bit_not z = ", z);
   149: push 'b'
   150: push 'i'
   151: push 't'
@@ -197,7 +197,7 @@
   175: eval 1
   176: shiftl
   177: assign 1
-# test/bitwise.p, 22: 	writeln('z := x shift_left y = ', z);
+# test/bitwise.p, 22: 	writeln("z := x shift_left y = ", z);
   178: push 'z'
   179: push ' '
   180: push ':'
@@ -239,7 +239,7 @@
   214: eval 1
   215: shiftr
   216: assign 1
-# test/bitwise.p, 25: 	writeln('z := x shift_right y = ', z)
+# test/bitwise.p, 25: 	writeln("z := x shift_right y = ", z)
   217: push 'z'
   218: push ' '
   219: push ':'
