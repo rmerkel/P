@@ -1,4 +1,4 @@
-# test/if.p, 1: program IfTest()
+# test/if.p, 1: program IfTest() is
 # test/if.p, 2: var i : integer;
     0: calli 0, 2
     1: halt
@@ -60,10 +60,11 @@
    49: push 1
    50: push 0
    51: push 0
-# test/if.p, 11: end;
+# test/if.p, 11: endprog
    52: push 2
    53: writeln
-   54: ret
 # test/if.p, 12: 
+# test/if.p, 13: 
+   54: ret
 
 i is  10

@@ -1,4 +1,4 @@
-# test/predsucc.p, 1: program PredSucc()
+# test/predsucc.p, 1: program PredSucc() is
 # test/predsucc.p, 2: type e is (zero, one, two, three, four);
     0: calli 0, 2
     1: halt
@@ -33,7 +33,8 @@
    25: push 0
    26: push 1
    27: writeln
-# test/predsucc.p, 8: end;
+# test/predsucc.p, 8: endprog
+# test/predsucc.p, 9: 
    28: ret
 
 0

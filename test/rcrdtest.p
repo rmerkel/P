@@ -1,5 +1,5 @@
 { Test records }
-program RecordTests()
+program RecordTests() is
 type
 	R is record 
 		i1, i2 : integer;
@@ -33,4 +33,4 @@ begin
 	z.i2 := 8;
 	z.r := 9.0;
 	writeln(x.i1, x.i2, x.r : 8 : 6)
-end;
+endprog

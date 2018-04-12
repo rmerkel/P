@@ -1,4 +1,4 @@
-program Natural()
+program Natural() is
 var	n : natural;
 begin
 	n := 0;
@@ -7,4 +7,4 @@ begin
 	writeln(n);
 	n := -1;
 	writeln(n)
-end;
+endprog

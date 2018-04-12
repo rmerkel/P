@@ -9,7 +9,7 @@
 {	 9	  362,880	}
 {	10	3,628,800	}
 
-program repeatst()
+program repeatst() is
 var n, f : integer;
 begin
 	n := 0;
@@ -19,4 +19,4 @@ begin
 		f := f * n;
 		writeln(f : 8 : 6)
 	until n >= 10 endloop
-end;
+endprog

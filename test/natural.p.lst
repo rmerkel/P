@@ -1,4 +1,4 @@
-# test/natural.p, 1: program Natural()
+# test/natural.p, 1: program Natural() is
 # test/natural.p, 2: var	n : natural;
     0: calli 0, 2
     1: halt
@@ -45,9 +45,10 @@
    35: push 1
    36: push 0
    37: push 0
-# test/natural.p, 10: end;
+# test/natural.p, 10: endprog
    38: push 1
    39: writeln
+# test/natural.p, 11: 
    40: ret
 
 0

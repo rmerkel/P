@@ -1,9 +1,9 @@
 # test/varparam.p, 1: {	test var parameters		}
-# test/varparam.p, 2: program VarParamTest()
+# test/varparam.p, 2: program VarParamTest() is
 # test/varparam.p, 3: var	i : integer;
     0: calli 0, 12
     1: halt
-# test/varparam.p, 4: 	procedure inc(var x : integer)
+# test/varparam.p, 4: 	procedure inc(var x : integer) is
 # test/varparam.p, 5: 	begin
 # test/varparam.p, 6: 		x := x + 1
     2: pushvar 0, -1
@@ -13,11 +13,11 @@
     6: eval 1
     7: eval 1
     8: push 1
-# test/varparam.p, 7: 	end ;
+# test/varparam.p, 7: 	endproc
     9: add
    10: assign 1
-   11: ret
 # test/varparam.p, 8: begin
+   11: ret
    12: enter 1
 # test/varparam.p, 9: 	i := 0;
    13: pushvar 0, 4
@@ -32,10 +32,11 @@
    20: push 1
    21: push 0
    22: push 0
-# test/varparam.p, 12: end;
+# test/varparam.p, 12: endprog
    23: push 1
    24: writeln
-   25: ret
 # test/varparam.p, 13: 
+# test/varparam.p, 14: 
+   25: ret
 
 1

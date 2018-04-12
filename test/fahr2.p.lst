@@ -1,7 +1,7 @@
 # test/fahr2.p, 1: { print Fahrenheit-Celsius table	}
 # test/fahr2.p, 2: {	first version; integers only	}
 # test/fahr2.p, 3: 
-# test/fahr2.p, 4: program fact2()
+# test/fahr2.p, 4: program fact2() is
 # test/fahr2.p, 5: const
     0: calli 0, 2
     1: halt
@@ -81,8 +81,9 @@
    60: add
    61: assign 1
 # test/fahr2.p, 21: 	endloop
-# test/fahr2.p, 22:  end ;
+# test/fahr2.p, 22: endprog
    62: jumpi 29
+# test/fahr2.p, 23: 
    63: ret
 
 Fahrenheit Celsius

@@ -1,4 +1,4 @@
-# test/ifelifelse.p, 1: program IfElifElseTest()
+# test/ifelifelse.p, 1: program IfElifElseTest() is
 # test/ifelifelse.p, 2: var i : integer;
     0: calli 0, 2
     1: halt
@@ -142,11 +142,12 @@
   125: push 1
   126: push 0
   127: push 0
-# test/ifelifelse.p, 17: end;
+# test/ifelifelse.p, 17: endprog
   128: push 2
   129: writeln
-  130: ret
 # test/ifelifelse.p, 18: 
+# test/ifelifelse.p, 19: 
+  130: ret
 
 i is between 1 and 10, inclusive 10
 i is  3

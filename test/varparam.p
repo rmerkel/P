@@ -1,13 +1,13 @@
 {	test var parameters		}
-program VarParamTest()
+program VarParamTest() is
 var	i : integer;
-	procedure inc(var x : integer)
+	procedure inc(var x : integer) is
 	begin
 		x := x + 1
-	end ;
+	endproc
 begin
 	i := 0;
 	inc(i);
     writeln(i)				{	s/b 1, not zero	}
-end;
+endprog
 

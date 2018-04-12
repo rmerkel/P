@@ -1,4 +1,4 @@
-# test/pointers.p, 1: program PointerTest()
+# test/pointers.p, 1: program PointerTest() is
 # test/pointers.p, 2: var
     0: calli 0, 2
     1: halt
@@ -63,7 +63,8 @@
    45: pushvar 0, 4
    46: eval 1
    47: dispose
-# test/pointers.p, 18: end;
+# test/pointers.p, 18: endprog
+# test/pointers.p, 19: 
    48: ret
 
 0

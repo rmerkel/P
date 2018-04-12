@@ -1,4 +1,4 @@
-program CharTest()
+program CharTest() is
 type
 	A is array [0..9] of character;
 
@@ -17,4 +17,4 @@ begin
 	a1 := "0123456788";		{	fill a1 with "0123..."			}
 	writeln(a1);			{	while a1 has changed...			}
 	writeln(a2)				{	... a2 has not!					}
-end;
+endprog

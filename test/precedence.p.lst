@@ -1,4 +1,4 @@
-# test/precedence.p, 1: program precedence()
+# test/precedence.p, 1: program precedence() is
 # test/precedence.p, 2: begin
     0: calli 0, 2
     1: halt
@@ -27,9 +27,10 @@
    22: push 1
    23: push 0
    24: push 0
-# test/precedence.p, 5: end;
+# test/precedence.p, 5: endprog
    25: push 1
    26: writeln
+# test/precedence.p, 6: 
    27: ret
 
 3

@@ -1,4 +1,4 @@
-program PointerTest()
+program PointerTest() is
 var
 	xp : ^integer;
 
@@ -15,4 +15,4 @@ begin
 
 	xp^ := 0;
 	dispose(xp)
-end;
+endprog

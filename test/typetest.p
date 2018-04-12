@@ -1,5 +1,5 @@
 { Test advanced types	}
-program typetest()
+program typetest() is
 type
 	int is integer;
 	rng is 1..10;
@@ -47,4 +47,4 @@ begin
 		writeln;
 		i := i + 1
 	endloop
-end;
+endprog

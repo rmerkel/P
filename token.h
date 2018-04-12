@@ -50,8 +50,11 @@ struct Token {
 
 		Begin,							///< "begin" ... "end"
 		End,							///< "end"
+		Endfunc,						///< "endfunc"
 		Endif,							///< "endif"
 		Endloop,						///< "endloop"
+		Endproc,						///< "endproc"
+		Endprog,						///< "endprog"
 		If,								///< "if" condition "then" ...
 		Then,							///< "then"
 		Elif,							///< "elif"

@@ -1,4 +1,4 @@
-# test/ifelse.p, 1: program IfElseTest()
+# test/ifelse.p, 1: program IfElseTest() is
 # test/ifelse.p, 2: var i : integer;
     0: calli 0, 2
     1: halt
@@ -82,11 +82,12 @@
    68: push 1
    69: push 0
    70: push 0
-# test/ifelse.p, 14: end;
+# test/ifelse.p, 14: endprog
    71: push 2
    72: writeln
-   73: ret
 # test/ifelse.p, 15: 
+# test/ifelse.p, 16: 
+   73: ret
 
 i is <= 10
 i is  3

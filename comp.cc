@@ -868,7 +868,16 @@ void PComp::forStatement(int level) {
  * @param	level		The current block level.
  ************************************************************************************************/
 void PComp::statementList(int level) {
+	static const Token::KindSet stops {
+		Token::End,
+		Token::Endfunc,
+		Token::Endproc,
+		Token::Endprog
+	};
+
 	do {
+		if (oneOf(stops))
+			break;
 		statement(level);
 	} while (accept(Token::SemiColon));
 }
@@ -1220,12 +1229,6 @@ void PComp::statement(int level) {
 		const string id = ts.current().string_value;
 		next();
 		identStatement(level, id);
-
-#if 0
-	} else if (accept(Token::Begin)) {				// begin ... end
-		statementList(level);
-		expect(Token::End);
-#endif
 
 	} else if (accept(Token::If)) 					// if expr then stmt { then stmt... }
 		ifStatement(level);
@@ -1813,8 +1816,8 @@ SymValue& PComp::subRoutineDecl(int level, SymValue::Kind kind) {
  ************************************************************************************************/
 void PComp::procDecl(int level) {
 	auto& val = subRoutineDecl(level, SymValue::Procedure);
-	blockDecl(val, level + 1);
-	expect(Token::SemiColon);				// procedure declarations end with a ';'!
+	expect(Token::Is);
+	blockDecl(val, level + 1, Token::Endproc);
 }
 
 /********************************************************************************************//**
@@ -1826,8 +1829,8 @@ void PComp::funcDecl(int level) {
 	auto& val = subRoutineDecl(level, SymValue::Function);
 	expect(Token::Colon);
 	val.type(type(level, false, ""));
-	blockDecl(val, level + 1);
-	expect(Token::SemiColon);	// function declarations end with a ';'!
+	expect(Token::Is);
+	blockDecl(val, level + 1, Token::Endfunc);
 }
 
 /********************************************************************************************//**
@@ -1863,9 +1866,11 @@ void PComp::subDeclList(int level) {
  *
  * @param	val		The blocks (procedures) symbol table entry value
  * @param	level	The current block level.
+ * @param	end		End of block token
+ *
  * @return 	Entry point address
  ************************************************************************************************/
-size_t PComp::blockDecl(SymValue& val, int level) {
+size_t PComp::blockDecl(SymValue& val, int level, Token::Kind end) {
 	LogLevel lvl;
 
 	constDeclList(level);						// declaractions...
@@ -1884,7 +1889,7 @@ size_t PComp::blockDecl(SymValue& val, int level) {
 
 	if (expect(Token::Begin)) {					// "begin" statements... "end"
 		statementList(level);
-		expect(Token::End);
+		expect(end);
 	}
 
 	// block postfix...
@@ -1907,18 +1912,17 @@ void PComp::progDecl(int level) {
 
 	expect(Token::ProgDecl);					// Program heading...
 	auto& val = subRoutineDecl(level, SymValue::Procedure);
+	expect(Token::Is);
 
 	// Emit a call to the main procedure, followed by a halt
 	const auto call_pc = emitCallI(level, 0);
 	emit(OpCode::HALT);
 
-	const size_t addr = blockDecl(val, level);	// emit the first block 
+	// Emit the first block...
+	const size_t addr = blockDecl(val, level, Token::Endprog);
 	if (verbose)
 		cout << prefix(progName) << "patching call to program at " << call_pc << " to " << addr  << '\n';
-
 	(*code)[call_pc].value = addr;
-
-	expect(Token::SemiColon);
 }
 
 /********************************************************************************************//**

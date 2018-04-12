@@ -1,5 +1,5 @@
 # test/typetest.p, 1: { Test advanced types	}
-# test/typetest.p, 2: program typetest()
+# test/typetest.p, 2: program typetest() is
 # test/typetest.p, 3: type
     0: calli 0, 2
     1: halt
@@ -286,8 +286,9 @@
 # test/typetest.p, 49: 	endloop
   237: add
   238: assign 1
-# test/typetest.p, 50: end;
+# test/typetest.p, 50: endprog
   239: jumpi 170
+# test/typetest.p, 51: 
   240: ret
 
 1

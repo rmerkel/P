@@ -1,4 +1,4 @@
-program IfTest()
+program IfTest() is
 var i : integer;
 begin
 	i := 10;
@@ -8,5 +8,5 @@ begin
 	endif;
 
 	writeln("i is ", i)
-end;
+endprog
 

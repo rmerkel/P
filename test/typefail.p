@@ -1,5 +1,5 @@
 { Test advanced types, fail	}
-program Typefail()
+program Typefail() is
 type
 	rng is 0..9;
 	enum is (	one, two, three	);
@@ -25,4 +25,4 @@ begin
 	a2[one] := 1;
 	a2[2] := 2;				{	error: got integer, expected enum		}
 	a2[two + 1] := 3		{	error: expected enum, got integer		}
-end;
+endprog

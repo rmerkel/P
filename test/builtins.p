@@ -1,5 +1,5 @@
 { test builtin functions and procedures	}
-program builtins()
+program builtins() is
 const
 	pi = 3.1415926;
 
@@ -43,5 +43,5 @@ begin
 	writeln(100, 1.41421, pi);
 	writeln(pi : 7 : 5);
 	writeln
-end;
+endprog
 

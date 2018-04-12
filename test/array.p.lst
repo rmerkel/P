@@ -1,4 +1,4 @@
-# test/array.p, 1: program CharTest()
+# test/array.p, 1: program CharTest() is
 # test/array.p, 2: type A is array [0..9] of character;
     0: calli 0, 2
     1: halt
@@ -90,9 +90,10 @@
    66: push 10
    67: push 0
    68: push 0
-# test/array.p, 24: end;
+# test/array.p, 24: endprog
    69: push 1
    70: writeln
+# test/array.p, 25: 
    71: ret
 
 x

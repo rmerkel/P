@@ -1,4 +1,4 @@
-# test/testif.p, 1: program testif()
+# test/testif.p, 1: program testif() is
 # test/testif.p, 2: var x, y, z : integer;
     0: calli 0, 2
     1: halt
@@ -64,11 +64,12 @@
    50: push 1
    51: push 0
    52: push 0
-# test/testif.p, 14: end;
+# test/testif.p, 14: endprog
    53: push 1
    54: writeln
-   55: ret
 # test/testif.p, 15: 
+# test/testif.p, 16: 
+   55: ret
 
 2
 3

@@ -1,5 +1,5 @@
-program Fibonacci()
-	function fib(a, b, limit : integer) : integer
+program Fibonacci() is
+	function fib(a, b, limit : integer) : integer is
 	begin
 		writeln(b);
 		if limit > 0 then
@@ -7,10 +7,10 @@ program Fibonacci()
 		else
 			fib := a + b
 		endif
-	end ;
+	endfunc
 
 begin
 	writeln(0);
 	writeln(fib(0, 1, 10))
-end ;
+endprog
 

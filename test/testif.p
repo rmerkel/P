@@ -1,4 +1,4 @@
-program testif()
+program testif() is
 var x, y, z : integer;
 begin
 	x := 1;
@@ -11,5 +11,5 @@ begin
 	{ set x to  3	}
 	if x = y then x := z else x := y endif;
 	writeln(x)
-end;
+endprog
 

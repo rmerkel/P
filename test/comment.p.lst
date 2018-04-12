@@ -1,5 +1,5 @@
 # test/comment.p, 1: { "main" starts here... }
-# test/comment.p, 2: program comment()
+# test/comment.p, 2: program comment() is
 # test/comment.p, 3: const nFacts = 10;
     0: calli 0, 2
     1: halt
@@ -47,9 +47,10 @@
    32: push 0
    33: push 1
    34: writeln
-# test/comment.p, 15: end;
-   35: ret
+# test/comment.p, 15: endprog
 # test/comment.p, 16: 
 # test/comment.p, 17: {	unterminated comment, but we don't care as it follows the period!
+# test/comment.p, 18: 
+   35: ret
 
 3628800

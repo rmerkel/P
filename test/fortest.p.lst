@@ -1,4 +1,4 @@
-# test/fortest.p, 1: program ForTest()
+# test/fortest.p, 1: program ForTest() is
 # test/fortest.p, 2: var
     0: calli 0, 2
     1: halt
@@ -74,7 +74,7 @@
    65: push 0
    66: push 1
    67: writeln
-# test/fortest.p, 9: end ;
+# test/fortest.p, 9: endprog
    68: dup
    69: dup
    70: eval 1
@@ -83,6 +83,7 @@
    73: assign 1
    74: jumpi 56
    75: pop
+# test/fortest.p, 10: 
    76: ret
 
 0

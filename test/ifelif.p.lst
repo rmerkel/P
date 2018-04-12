@@ -1,4 +1,4 @@
-# test/ifelif.p, 1: program IfElifTest()
+# test/ifelif.p, 1: program IfElifTest() is
 # test/ifelif.p, 2: var i : integer;
     0: calli 0, 2
     1: halt
@@ -93,10 +93,11 @@
    79: push 1
    80: push 0
    81: push 0
-# test/ifelif.p, 14: end;
+# test/ifelif.p, 14: endprog
    82: push 2
    83: writeln
-   84: ret
 # test/ifelif.p, 15: 
+# test/ifelif.p, 16: 
+   84: ret
 
 i is  10

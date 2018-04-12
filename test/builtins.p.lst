@@ -1,5 +1,5 @@
 # test/builtins.p, 1: { test builtin functions and procedures	}
-# test/builtins.p, 2: program builtins()
+# test/builtins.p, 2: program builtins() is
 # test/builtins.p, 3: const
     0: calli 0, 2
     1: halt
@@ -235,11 +235,12 @@
   190: push 1
   191: writeln
 # test/builtins.p, 45: 	writeln
-# test/builtins.p, 46: end;
+# test/builtins.p, 46: endprog
   192: push 0
   193: writeln
-  194: ret
 # test/builtins.p, 47: 
+# test/builtins.p, 48: 
+  194: ret
 
 1
 2

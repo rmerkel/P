@@ -9,10 +9,10 @@
 {	 9	  362,880	}
 {	10	3,628,800	}
 
-program fact3()
+program fact3() is
 const nFacts = 10;
 var result : integer;
-function factorial(n : integer) : integer
+function factorial(n : integer) : integer is
 	var p : integer;
 	begin
 		p := 1;
@@ -20,11 +20,11 @@ function factorial(n : integer) : integer
 			p := p * n;
 			n := n - 1
 		endloop;
-		factorial := p;
-	end;
+		factorial := p
+	endfunc
 
 begin
 	{ call with wrong number of parameters! }
     result := factorial(nFacts, nFacts);
 	writeln(result)
-end;
+endprog

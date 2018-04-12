@@ -170,7 +170,8 @@ private:
 
 	/// block-declaration production...
 	size_t blockDecl(SymValue&				val,
-					int						level);
+					int						level,
+					Token::Kind				end);
 
 	void progDecl(int level);				///< program-declaration production...
 

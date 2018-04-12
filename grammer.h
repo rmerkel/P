@@ -4,7 +4,7 @@
  * @page grammer The P EBNF grammer
  * @see https://en.wikipedia.org/wiki/Extended_Backus%E2%80%93Naur_form
  *
- *             program = "program" identifier param-lst block-decl ';' ;
+ *             program = "program" identifier param-lst "is" block-decl "endprog" ;
  *          block-decl = [ const-decl-lst ';'   		]
  *                       [ type-decl-lst ';'    		]
  *                       [ var-decl-blk ';'     		]
@@ -27,8 +27,8 @@
  *        pointer-type = '^' identifier ;
  *     simple-type-lst = simple-type { ',' simple-type } ;
  *        sub-decl-lst = func-decl | proc-decl ;
- *           proc-decl = "procedure" identifier param-lst block-decl ';' ;
- *           func-decl = "function"  identifier param-lst ':' type block-decl ';' ; 
+ *           proc-decl = "procedure" identifier param-lst "is" block-decl "endproc" ;
+ *           func-decl = "function"  identifier param-lst ':' type "is" block-decl "endfunc" ; 
  *           param-lst = '(' [ param-decl-lst ] ')' ;
  *      param-decl-lst = param-decl { ';' param-decl } ;
  *          param-decl = [ "var" ] identifier-lst : type ;

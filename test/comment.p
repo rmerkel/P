@@ -1,5 +1,5 @@
 { "main" starts here... }
-program comment()
+program comment() is
 const nFacts = 10;
 var n, f : integer;	{ var z; parser doesn't see 'z' }
 begin
@@ -12,6 +12,6 @@ begin
       f := f * n
    endloop;
    writeln(f);
-end;
+endprog
 
 {	unterminated comment, but we don't care as it follows the period!

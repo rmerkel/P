@@ -1,7 +1,7 @@
 { print Fahrenheit-Celsius table	}
 {	first version; integers only	}
 
-program fahrtest()
+program fahrtest() is
 const
 	LOWER =   0;	{	lower table limit	}
 	UPPER = 300;	{	upper table limit	}
@@ -19,4 +19,4 @@ begin
 		writeln(fahr : 9 : 1, celsius : 8 : 1);
 		fahr := fahr + STEP;
 	endloop
- end ;
+endprog

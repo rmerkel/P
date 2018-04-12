@@ -1,4 +1,4 @@
-# test/succfail.p, 1: program PredSuccFail()
+# test/succfail.p, 1: program PredSuccFail() is
 # test/succfail.p, 2: type e is (zero, one, two, three, four);
     0: calli 0, 2
     1: halt
@@ -9,9 +9,10 @@
     4: push 1
     5: push 0
     6: push 0
-# test/succfail.p, 5: end;
+# test/succfail.p, 5: endprog
     7: push 1
     8: writeln
+# test/succfail.p, 6: 
     9: ret
 
 runtime error @pc 3, sp: 8: out-of-range

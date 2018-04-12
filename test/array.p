@@ -1,4 +1,4 @@
-program CharTest()
+program CharTest() is
 type A is array [0..9] of character;
 
 var i : integer;
@@ -21,4 +21,4 @@ begin
 	writeln(a1);
 							{	... a2 has not!					}
 	writeln(a2)
-end;
+endprog

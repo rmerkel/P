@@ -1,4 +1,4 @@
-# test/str.p, 1: program StringTest()
+# test/str.p, 1: program StringTest() is
 # test/str.p, 2: type
     0: calli 0, 2
     1: halt
@@ -51,7 +51,7 @@
    37: push 0
    38: push 1
    39: writeln
-# test/str.p, 14: end;
+# test/str.p, 14: endprog
    40: dup
    41: dup
    42: eval 1
@@ -60,6 +60,7 @@
    45: assign 1
    46: jumpi 23
    47: pop
+# test/str.p, 15: 
    48: ret
 
 a

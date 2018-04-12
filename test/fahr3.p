@@ -1,7 +1,7 @@
 { print Fahrenheit-Celsius table	}
 {	third version; integers & reals	}
 
-program fahr3()
+program fahr3() is
 const
 	LOWER =   0.0;	{	lower table limit	}
 	UPPER = 300.0;	{	upper table limit	}
@@ -19,4 +19,4 @@ begin
 		writeln(fahr : 8 : 1, celsius : 9 : 1);
 		fahr := fahr + STEP;
 	endloop
- end ;
+endprog

@@ -9,12 +9,12 @@
 # test/fact2.p, 9: {	 9	  362,880	}
 # test/fact2.p, 10: {	10	3,628,800	}
 # test/fact2.p, 11: 
-# test/fact2.p, 12: program fact2()
+# test/fact2.p, 12: program fact2() is
 # test/fact2.p, 13: const nFacts = 10;
     0: calli 0, 30
     1: halt
 # test/fact2.p, 14: var result : integer;
-# test/fact2.p, 15: function factorial(n : integer) : integer
+# test/fact2.p, 15: function factorial(n : integer) : integer is
 # test/fact2.p, 16: 	var p : integer;
 # test/fact2.p, 17: 	begin
     2: enter 1
@@ -36,24 +36,24 @@
    15: eval 1
    16: mul
    17: assign 1
-# test/fact2.p, 21: 			n := n - 1;
+# test/fact2.p, 21: 			n := n - 1
    18: pushvar 0, -1
    19: pushvar 0, -1
    20: eval 1
    21: push 1
+# test/fact2.p, 22: 		endloop;
    22: sub
    23: assign 1
-# test/fact2.p, 22: 		endloop;
    24: jumpi 6
-# test/fact2.p, 23: 		factorial := p;
+# test/fact2.p, 23: 		factorial := p
    25: pushvar 0, 3
+# test/fact2.p, 24: 	endfunc
    26: pushvar 0, 4
    27: eval 1
    28: assign 1
-# test/fact2.p, 24: 	end;
-   29: retf
 # test/fact2.p, 25: 
 # test/fact2.p, 26: begin
+   29: retf
    30: enter 1
 # test/fact2.p, 27: 	{ The result is the 10th factorial; 3,628,000	}
 # test/fact2.p, 28:     result := factorial(nFacts);
@@ -67,9 +67,10 @@
    37: push 1
    38: push 0
    39: push 0
-# test/fact2.p, 30: end;
+# test/fact2.p, 30: endprog
    40: push 1
    41: writeln
+# test/fact2.p, 31: 
    42: ret
 
 3628800

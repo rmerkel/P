@@ -1,3 +1,3 @@
 {	minimum P program	}
-program minimum()
-begin end;
+program minimum() is
+begin endprog;

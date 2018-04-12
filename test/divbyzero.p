@@ -1,4 +1,4 @@
-program divbyzero()
+program divbyzero() is
 var x, y, z : integer;
 
 begin
@@ -7,5 +7,5 @@ begin
 
 	x := y / 2;
 	x := y / z	{	opps!	}
-end;
+endprog
 

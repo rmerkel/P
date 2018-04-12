@@ -226,8 +226,11 @@ TokenStream::KeywordTable	TokenStream::keywords = {
 	{	"elif",			Token::Elif			},
 	{	"else",			Token::Else			},
 	{	"end",			Token::End			},
+	{	"endfunc",		Token::Endfunc		},
 	{	"endif",		Token::Endif		},
 	{	"endloop",		Token::Endloop		},
+	{	"endproc",		Token::Endproc		},
+	{	"endprog",		Token::Endprog		},
 	{	"exp",			Token::Exp			},
 	{	"function",		Token::FuncDecl		},
 	{	"if",			Token::If			},
@@ -294,8 +297,11 @@ ostream& operator<<(std::ostream& os, const Token::Kind& kind) {
 
 	case Token::Begin:		os << "begin";			break;
 	case Token::End:		os << "end";			break;
+	case Token::Endfunc:	os << "endfunc";		break;
 	case Token::Endif:		os << "endif";			break;
 	case Token::Endloop:	os << "endloop";		break;
+	case Token::Endproc:	os << "endproc";		break;
+	case Token::Endprog:	os << "endprog";		break;
 	case Token::If:			os << "if";				break;
 	case Token::Then:		os << "then";			break;
 	case Token::Else:		os << "else";			break;

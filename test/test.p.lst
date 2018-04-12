@@ -8,7 +8,7 @@
 # test/test.p, 8: {	...				}
 # test/test.p, 9: {	 9	  362,880	}
 # test/test.p, 10: {	10	3,628,800	}
-# test/test.p, 11: program test()
+# test/test.p, 11: program test() is
 # test/test.p, 12: const nFacts = 10;
     0: calli 0, 2
     1: halt
@@ -53,10 +53,11 @@
 # test/test.p, 21:    endloop
    32: push 1
    33: writeln
-# test/test.p, 22: end;
+# test/test.p, 22: endprog
    34: jumpi 9
-   35: ret
 # test/test.p, 23: 
+# test/test.p, 24: 
+   35: ret
 
        1
        2

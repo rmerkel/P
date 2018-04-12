@@ -9,7 +9,7 @@
 # test/repeatst.p, 9: {	 9	  362,880	}
 # test/repeatst.p, 10: {	10	3,628,800	}
 # test/repeatst.p, 11: 
-# test/repeatst.p, 12: program repeatst()
+# test/repeatst.p, 12: program repeatst() is
 # test/repeatst.p, 13: var n, f : integer;
     0: calli 0, 2
     1: halt
@@ -53,7 +53,8 @@
    31: push 10
    32: gte
    33: jneqi 9
-# test/repeatst.p, 22: end;
+# test/repeatst.p, 22: endprog
+# test/repeatst.p, 23: 
    34: ret
 
        1

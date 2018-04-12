@@ -9,9 +9,9 @@
 {	 9	  362,880	}
 {	10	3,628,800	}
 
-program fact()
+program fact() is
 const nFacts = 10;
-procedure factorial(n : integer)
+procedure factorial(n : integer) is
 	var p : integer;
 	begin
         p := 1;
@@ -21,8 +21,8 @@ procedure factorial(n : integer)
             n := n - 1;
 			writeln(p)
         endloop
-    end;
+    endproc
 
 begin
     factorial(nFacts)
-end;
+endprog

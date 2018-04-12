@@ -2,7 +2,7 @@ test/typefail.p: incompatable assignment types near line 14
 test/typefail.p: incompatable array index type, expected enumeration got integer near line 26
 test/typefail.p: incompatable binary types near line 27
 # test/typefail.p, 1: { Test advanced types, fail	}
-# test/typefail.p, 2: program Typefail()
+# test/typefail.p, 2: program Typefail() is
 # test/typefail.p, 3: type
     0: calli 0, 2
     1: halt
@@ -105,7 +105,8 @@ test/typefail.p: incompatable binary types near line 27
    74: ulimit 2
    75: add
    76: push 3
-# test/typefail.p, 28: end;
+# test/typefail.p, 28: endprog
    77: assign 1
+# test/typefail.p, 29: 
    78: ret
 

@@ -8,7 +8,7 @@
 {	...				}
 {	 9	  362,880	}
 {	10	3,628,800	}
-program test()
+program test() is
 const nFacts = 10;
 var n, f : integer;	
 begin
@@ -19,5 +19,5 @@ begin
       f := f * n;
 	  writeln(f : 8 : 6)
    endloop
-end;
+endprog
 

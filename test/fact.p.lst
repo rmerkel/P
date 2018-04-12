@@ -9,11 +9,11 @@
 # test/fact.p, 9: {	 9	  362,880	}
 # test/fact.p, 10: {	10	3,628,800	}
 # test/fact.p, 11: 
-# test/fact.p, 12: program fact()
+# test/fact.p, 12: program fact() is
 # test/fact.p, 13: const nFacts = 10;
     0: calli 0, 40
     1: halt
-# test/fact.p, 14: procedure factorial(n : integer)
+# test/fact.p, 14: procedure factorial(n : integer) is
 # test/fact.p, 15: 	var p : integer;
 # test/fact.p, 16: 	begin
     2: enter 1
@@ -59,15 +59,16 @@
 # test/fact.p, 23:         endloop
    36: push 1
    37: writeln
-# test/fact.p, 24:     end;
+# test/fact.p, 24:     endproc
    38: jumpi 13
-   39: ret
 # test/fact.p, 25: 
 # test/fact.p, 26: begin
+   39: ret
 # test/fact.p, 27:     factorial(nFacts)
    40: push 10
-# test/fact.p, 28: end;
+# test/fact.p, 28: endprog
    41: calli 0, 2
+# test/fact.p, 29: 
    42: ret
 
 1

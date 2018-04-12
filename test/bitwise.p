@@ -1,4 +1,4 @@
-program TestBitWise()
+program TestBitWise() is
 var	x, y, z : integer ;
 begin
 	x := 15;
@@ -23,4 +23,4 @@ begin
 
 	z := x shift_right y;
 	writeln("z := x shift_right y = ", z)
-end;
+endprog

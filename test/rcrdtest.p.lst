@@ -1,5 +1,5 @@
 # test/rcrdtest.p, 1: { Test records }
-# test/rcrdtest.p, 2: program RecordTests()
+# test/rcrdtest.p, 2: program RecordTests() is
 # test/rcrdtest.p, 3: type
     0: calli 0, 2
     1: halt
@@ -136,9 +136,10 @@
   100: push 1
   101: push 8
   102: push 6
-# test/rcrdtest.p, 36: end;
+# test/rcrdtest.p, 36: endprog
   103: push 3
   104: writeln
+# test/rcrdtest.p, 37: 
   105: ret
 
 1 2 3.000000
