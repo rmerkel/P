@@ -45,7 +45,7 @@
    35: push 1
    36: push 0
    37: push 0
-# test/natural.p, 10: end .
+# test/natural.p, 10: end;
    38: push 1
    39: writeln
    40: ret

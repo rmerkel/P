@@ -50,9 +50,13 @@ struct Token {
 
 		Begin,							///< "begin" ... "end"
 		End,							///< "end"
+		Endif,							///< "endif"
+		Endloop,						///< "endloop"
 		If,								///< "if" condition "then" ...
 		Then,							///< "then"
+		Elif,							///< "elif"
 		Else,							///< "else"
+		Loop,							///< "loop"
 		While,							///< "while" ... "do"
 		Do,								///< "do"
 		Repeat,							///< "repeat" ... "until"
@@ -60,6 +64,7 @@ struct Token {
 		For,							///< "for"
 		To,								///< "to"
 		DownTo,							///< "downto"
+		Is,								///< "is"
 
 		Ellipsis,						///< ".."
 		Caret,							///< "^"
@@ -145,8 +150,7 @@ struct Token {
 };
 
 /********************************************************************************************//**
- ************************************************************************************************/
-/** A restartiable stream of tokens
+ * A restartiable stream of tokens
  *
  *	Maintains the last Token read from the input stream.
  *
@@ -154,7 +158,7 @@ struct Token {
  *	the current Token is equal to end of stream (Kind::end), a new input source
  *	maybe set via set_input(); get() will return the first Token of the new
  *	input.
- */
+ ************************************************************************************************/
 class TokenStream {
 public:
 	size_t			lineNum;			///< Line # of the current stream
@@ -197,6 +201,9 @@ private:								/// A map of keywords to their 'kind'
 	void close()						{	if (owns) delete ip;	}
 };
 
+/********************************************************************************************//**
+ * Kind put operator
+ ************************************************************************************************/
 std::ostream& operator<<(std::ostream& os, const Token::Kind& kind);
 
 #endif

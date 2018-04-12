@@ -8,11 +8,11 @@ begin
 
 	new(xp);
 	writeln(xp);
-	if xp <> nil then begin
+	if xp <> nil then
 		xp^ := 2048;
 		writeln(xp^)
-	end;
+	endif;
 
 	xp^ := 0;
 	dispose(xp)
-end .
+end;

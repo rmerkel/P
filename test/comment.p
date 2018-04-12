@@ -7,11 +7,11 @@ begin
    f := 1;
    {	calculate factor (n)
 		comment continued on this line... }
-   while n < nFacts do begin
+   while n < nFacts loop
       n := n + 1;
       f := f * n
-   end;
+   endloop;
    writeln(f);
-end.
+end;
 
 {	unterminated comment, but we don't care as it follows the period!

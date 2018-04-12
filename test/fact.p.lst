@@ -29,7 +29,7 @@
    10: push 0
    11: push 1
    12: writeln
-# test/fact.p, 19:         while n > 0 do begin
+# test/fact.p, 19:         while n > 0 loop
    13: pushvar 0, -1
    14: eval 1
    15: push 0
@@ -56,7 +56,7 @@
    33: push 1
    34: push 0
    35: push 0
-# test/fact.p, 23:         end
+# test/fact.p, 23:         endloop
    36: push 1
    37: writeln
 # test/fact.p, 24:     end;
@@ -66,7 +66,7 @@
 # test/fact.p, 26: begin
 # test/fact.p, 27:     factorial(nFacts)
    40: push 10
-# test/fact.p, 28: end.
+# test/fact.p, 28: end;
    41: calli 0, 2
    42: ret
 

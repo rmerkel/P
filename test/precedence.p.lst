@@ -27,7 +27,7 @@
    22: push 1
    23: push 0
    24: push 0
-# test/precedence.p, 5: end .
+# test/precedence.p, 5: end;
    25: push 1
    26: writeln
    27: ret

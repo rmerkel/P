@@ -23,7 +23,7 @@
     6: pushvar 0, 5
     7: push 1
     8: assign 1
-# test/test.p, 17:    while n < nFacts do begin
+# test/test.p, 17:    while n < nFacts loop
     9: pushvar 0, 4
    10: eval 1
    11: push 10
@@ -50,10 +50,10 @@
    29: push 1
    30: push 8
    31: push 6
-# test/test.p, 21:    end
+# test/test.p, 21:    endloop
    32: push 1
    33: writeln
-# test/test.p, 22: end.
+# test/test.p, 22: end;
    34: jumpi 9
    35: ret
 # test/test.p, 23: 

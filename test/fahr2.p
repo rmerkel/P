@@ -14,9 +14,9 @@ begin
 	writeln("Fahrenheit Celsius");
 
 	fahr := LOWER;
-	while fahr <= UPPER do begin
+	while fahr <= UPPER loop
 		celsius := 5.0 * (fahr-32.0) / 9.0;
 		writeln(fahr : 9 : 1, celsius : 8 : 1);
 		fahr := fahr + STEP;
-	end
- end.
+	endloop
+ end ;

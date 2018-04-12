@@ -32,7 +32,7 @@
    20: push 1
    21: push 0
    22: push 0
-# test/varparam.p, 12: end .
+# test/varparam.p, 12: end;
    23: push 1
    24: writeln
    25: ret

@@ -50,22 +50,22 @@ necessary.
 * No input instructions, and just elementary Write/Writeln implementation.
 * No interactive mode for debugging; just automatic single stepping (-v)
 
-## Design and implementation notes
+## Design notes and goals
 
  * Single quotes for character literals, double for strings.
  * There is just one basic integer type, the signed Integer. 
  * Unsigned integers (Natural), is a built-in subrange of Integer; 0..maxint, 
    the maximum Integer value; thus any Natural value will 'fit' in a Integer.
- * Likewise, Positive is 1..maxint.
+   Likewise, Positive is 1..maxint.
  * Boolean is a built-in enumeration of false, true [0, 1]
  * Character is a subrange of 0..127.
  * Subrange checking is accomplished via the limit check instructions, LLIMIT and
    ULIMIT when for assignments from a ordinal value with a wider range to a
    narrower one. This should be omitted in the case of constant expressions where
-   the range of the value is know... but isn't currently.
+   the range of the value is know... but currently isn't.
  * Variables do not have default values; they must be explicitly initialized by
-   the program via assignment, otherwise, the compiler would have to emit 
-   initialization instructions on entry to every new block.
+   via assignment, otherwise, the compiler would have to emit initialization
+   instructions on entry to every new block.
  * Either the compiler or the machine could emit errors if a uninitialized 
    variable is used. Alternatively, variables could have default values.
  * Allow pointers to point to any variable, thus pass by reference would be 

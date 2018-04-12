@@ -563,8 +563,6 @@ Result PInterp::SUCC() {
  * 3-tuple in the form v:w:p for Value, field Width and Precision if value is a Real. TOS is the
  * number of 3-tuple elements preceeding it, with the last 3-tuple precieeding the count.
  *
- * @bug		Doesn't support arrays, including strings.
- *
  * @note	Maybe add an element count to each tuple ; v:w:p:n where n is the number of elements
  *			in v, i.e., 1 for scalers, or the number of elements in an array.
  *

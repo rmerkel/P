@@ -24,15 +24,14 @@
     7: push 1
     8: assign 1
 # test/repeatst.p, 17: 	repeat
-# test/repeatst.p, 18: 		begin
-# test/repeatst.p, 19: 			n := n + 1;
+# test/repeatst.p, 18: 		n := n + 1;
     9: pushvar 0, 4
    10: pushvar 0, 4
    11: eval 1
    12: push 1
    13: add
    14: assign 1
-# test/repeatst.p, 20: 			f := f * n;
+# test/repeatst.p, 19: 		f := f * n;
    15: pushvar 0, 5
    16: pushvar 0, 5
    17: eval 1
@@ -40,22 +39,21 @@
    19: eval 1
    20: mul
    21: assign 1
-# test/repeatst.p, 21: 			writeln(f : 8 : 6)
+# test/repeatst.p, 20: 		writeln(f : 8 : 6)
    22: pushvar 0, 5
    23: eval 1
    24: push 1
    25: push 8
    26: push 6
-# test/repeatst.p, 22: 		end
+# test/repeatst.p, 21: 	until n >= 10 endloop
    27: push 1
    28: writeln
-# test/repeatst.p, 23: 	until n >= 10
    29: pushvar 0, 4
    30: eval 1
    31: push 10
-# test/repeatst.p, 24: end.
    32: gte
    33: jneqi 9
+# test/repeatst.p, 22: end;
    34: ret
 
        1

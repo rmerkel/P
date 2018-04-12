@@ -4,4 +4,4 @@ begin
 	x := 0;
 	y := 1;
 	writeln(x, y)
-end .
+end;

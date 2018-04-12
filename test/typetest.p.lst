@@ -3,9 +3,9 @@
 # test/typetest.p, 3: type
     0: calli 0, 2
     1: halt
-# test/typetest.p, 4: 	int = integer;
-# test/typetest.p, 5: 	rng = 1..10;
-# test/typetest.p, 6: 	enum = (	one, two, three	);
+# test/typetest.p, 4: 	int is integer;
+# test/typetest.p, 5: 	rng is 1..10;
+# test/typetest.p, 6: 	enum is (	one, two, three	);
 # test/typetest.p, 7: 
 # test/typetest.p, 8: var
 # test/typetest.p, 9: 	i : int;
@@ -46,7 +46,7 @@
    25: pushvar 0, 4
    26: push 1
    27: assign 1
-# test/typetest.p, 21:  	while i < 11 do begin 
+# test/typetest.p, 21:  	while i < 11 loop 
    28: pushvar 0, 4
    29: eval 1
    30: push 11
@@ -84,7 +84,7 @@
    59: pushvar 0, 4
    60: eval 1
    61: push 1
-# test/typetest.p, 25: 	end;
+# test/typetest.p, 25: 	endloop;
    62: add
    63: assign 1
    64: jumpi 28
@@ -95,7 +95,7 @@
    67: llimit 1
    68: ulimit 10
    69: assign 1
-# test/typetest.p, 28: 	repeat begin
+# test/typetest.p, 28: 	repeat
 # test/typetest.p, 29: 		a[r] := a[r] * 10;
    70: pushvar 0, 7
    71: pushvar 0, 6
@@ -137,7 +137,7 @@
   105: pushvar 0, 6
   106: eval 1
   107: push 1
-# test/typetest.p, 32: 	end until r = 10;
+# test/typetest.p, 32: 	until r = 10 endloop;
   108: add
   109: llimit 1
   110: ulimit 10
@@ -207,7 +207,7 @@
   167: pushvar 0, 4
   168: push 0
   169: assign 1
-# test/typetest.p, 40: 	while (i < 5) do begin
+# test/typetest.p, 40: 	while (i < 5) loop
   170: pushvar 0, 4
   171: eval 1
   172: push 5
@@ -217,7 +217,7 @@
   175: pushvar 0, 5
   176: push 0
   177: assign 1
-# test/typetest.p, 42: 		while (j < 5) do begin
+# test/typetest.p, 42: 		while (j < 5) loop
   178: pushvar 0, 5
   179: eval 1
   180: push 5
@@ -271,7 +271,7 @@
   225: pushvar 0, 5
   226: eval 1
   227: push 1
-# test/typetest.p, 46: 		end;
+# test/typetest.p, 46: 		endloop;
   228: add
   229: assign 1
   230: jumpi 178
@@ -283,10 +283,10 @@
   234: pushvar 0, 4
   235: eval 1
   236: push 1
-# test/typetest.p, 49: 	end
+# test/typetest.p, 49: 	endloop
   237: add
   238: assign 1
-# test/typetest.p, 50: end .
+# test/typetest.p, 50: end;
   239: jumpi 170
   240: ret
 

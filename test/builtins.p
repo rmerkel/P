@@ -4,7 +4,7 @@ const
 	pi = 3.1415926;
 
 type
-	e = (zero, one, two, three);
+	e is (zero, one, two, three);
 
 begin
 	writeln(1);				{ 1			}
@@ -43,5 +43,5 @@ begin
 	writeln(100, 1.41421, pi);
 	writeln(pi : 7 : 5);
 	writeln
-end .
+end;
 

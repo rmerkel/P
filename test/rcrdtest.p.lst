@@ -3,11 +3,11 @@
 # test/rcrdtest.p, 3: type
     0: calli 0, 2
     1: halt
-# test/rcrdtest.p, 4: 	R = record 
+# test/rcrdtest.p, 4: 	R is record 
 # test/rcrdtest.p, 5: 		i1, i2 : integer;
 # test/rcrdtest.p, 6: 		r : real
 # test/rcrdtest.p, 7: 	end;
-# test/rcrdtest.p, 8: 	R2 = record
+# test/rcrdtest.p, 8: 	R2 is record
 # test/rcrdtest.p, 9: 		i1, i2 : integer;
 # test/rcrdtest.p, 10: 		r : real
 # test/rcrdtest.p, 11: 	end;
@@ -136,7 +136,7 @@
   100: push 1
   101: push 8
   102: push 6
-# test/rcrdtest.p, 36: end .
+# test/rcrdtest.p, 36: end;
   103: push 3
   104: writeln
   105: ret

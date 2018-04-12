@@ -6,4 +6,4 @@ var
 begin
 	r := 1 + 3 * 10.0;
 	writeln(r)
-end .
+end;

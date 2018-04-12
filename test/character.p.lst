@@ -2,7 +2,7 @@
 # test/character.p, 2: type
     0: calli 0, 2
     1: halt
-# test/character.p, 3: 	A = array [0..9] of character;
+# test/character.p, 3: 	A is array [0..9] of character;
 # test/character.p, 4: 
 # test/character.p, 5: var i : integer;
 # test/character.p, 6: 	c : character;
@@ -86,8 +86,7 @@
    66: push 10
    67: push 0
    68: push 0
-# test/character.p, 20: 
-# test/character.p, 21: end .
+# test/character.p, 20: end;
    69: push 1
    70: writeln
    71: ret

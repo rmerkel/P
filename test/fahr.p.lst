@@ -44,7 +44,7 @@
    27: push 0
    28: itor
    29: assign 1
-# test/fahr.p, 17: 	while fahr <= UPPER do begin
+# test/fahr.p, 17: 	while fahr <= UPPER loop
    30: pushvar 0, 4
    31: eval 1
    32: push 300
@@ -83,8 +83,8 @@
    62: itor
    63: add
    64: assign 1
-# test/fahr.p, 21: 	end
-# test/fahr.p, 22:  end.
+# test/fahr.p, 21: 	endloop
+# test/fahr.p, 22:  end ;
    65: jumpi 30
    66: ret
 

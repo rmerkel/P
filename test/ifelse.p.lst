@@ -1,0 +1,92 @@
+# test/ifelse.p, 1: program IfElseTest()
+# test/ifelse.p, 2: var i : integer;
+    0: calli 0, 2
+    1: halt
+# test/ifelse.p, 3: begin
+    2: enter 1
+# test/ifelse.p, 4: 	i := 10;
+    3: pushvar 0, 4
+    4: push 10
+    5: assign 1
+# test/ifelse.p, 5: 	if i > 10 then
+    6: pushvar 0, 4
+    7: eval 1
+    8: push 10
+    9: gt
+   10: jneqi 40
+# test/ifelse.p, 6: 		writeln("i is greater than 10");
+   11: push 'i'
+   12: push ' '
+   13: push 'i'
+   14: push 's'
+   15: push ' '
+   16: push 'g'
+   17: push 'r'
+   18: push 'e'
+   19: push 'a'
+   20: push 't'
+   21: push 'e'
+   22: push 'r'
+   23: push ' '
+   24: push 't'
+   25: push 'h'
+   26: push 'a'
+   27: push 'n'
+   28: push ' '
+   29: push '1'
+   30: push '0'
+   31: push 20
+   32: push 0
+   33: push 0
+   34: push 1
+   35: writeln
+# test/ifelse.p, 7: 		i := 1
+   36: pushvar 0, 4
+   37: push 1
+# test/ifelse.p, 8: 	else
+   38: assign 1
+# test/ifelse.p, 9: 		writeln("i is <= 10");
+   39: jumpi 58
+   40: push 'i'
+   41: push ' '
+   42: push 'i'
+   43: push 's'
+   44: push ' '
+   45: push '<'
+   46: push '='
+   47: push ' '
+   48: push '1'
+   49: push '0'
+   50: push 10
+   51: push 0
+   52: push 0
+   53: push 1
+   54: writeln
+# test/ifelse.p, 10: 		i := 3
+   55: pushvar 0, 4
+   56: push 3
+# test/ifelse.p, 11: 	endif;
+   57: assign 1
+# test/ifelse.p, 12: 
+# test/ifelse.p, 13: 	writeln("i is ", i)
+   58: push 'i'
+   59: push ' '
+   60: push 'i'
+   61: push 's'
+   62: push ' '
+   63: push 5
+   64: push 0
+   65: push 0
+   66: pushvar 0, 4
+   67: eval 1
+   68: push 1
+   69: push 0
+   70: push 0
+# test/ifelse.p, 14: end;
+   71: push 2
+   72: writeln
+   73: ret
+# test/ifelse.p, 15: 
+
+i is <= 10
+i is  3

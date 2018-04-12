@@ -14,10 +14,10 @@ var n, f : integer;
 begin
    n := 0;
    f := 1;
-   while n < nFacts do begin
+   while n < nFacts loop
       n := n + 1;
       f := f * n;
 	  writeln(f : 8 : 6)
-   end
-end.
+   endloop
+end;
 

@@ -7,4 +7,4 @@ begin
 	writeln(n);
 	n := -1;
 	writeln(n)
-end .
+end;

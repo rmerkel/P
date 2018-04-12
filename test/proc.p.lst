@@ -37,6 +37,6 @@ test/proc.p: rounding real to fit in an integer near line 9
    26: llimit 0
    27: ulimit 1
    28: calli 0, 2
-# test/proc.p, 10: end .
+# test/proc.p, 10: end;
    29: ret
 

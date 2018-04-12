@@ -23,4 +23,4 @@ begin
 
 	z := x shift_right y;
 	writeln("z := x shift_right y = ", z)
-end .
+end;

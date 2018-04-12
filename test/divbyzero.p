@@ -7,5 +7,5 @@ begin
 
 	x := y / 2;
 	x := y / z	{	opps!	}
-end.
+end;
 

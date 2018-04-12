@@ -11,7 +11,7 @@
     5: llimit 0
     6: ulimit 1
     7: assign 1
-# test/bool.p, 6: 	if (b) then b := false;
+# test/bool.p, 6: 	if (b) then b := false endif;
     8: pushvar 0, 4
     9: eval 1
    10: jneqi 16
@@ -26,7 +26,7 @@
    18: push 1
    19: push 0
    20: push 0
-# test/bool.p, 8: end .
+# test/bool.p, 8: end;
    21: push 1
    22: writeln
    23: ret

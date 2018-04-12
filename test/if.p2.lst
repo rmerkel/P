@@ -1,0 +1,95 @@
+# if.p, 1: program IfTest()
+# if.p, 2: var i : integer;
+    0: calli 0, 2
+    1: halt
+# if.p, 3: begin
+    2: enter 1
+# if.p, 4: 	i := 10;
+    3: pushvar 0, 4
+    4: push 10
+    5: assign 1
+# if.p, 5: 	if i > 10 then begin
+    6: pushvar 0, 4
+    7: eval 1
+    8: push 10
+    9: gt
+   10: jneqi 37
+# if.p, 6: 		writeln("i is greater than 10")
+   11: push 'i'
+   12: push ' '
+   13: push 'i'
+   14: push 's'
+   15: push ' '
+   16: push 'g'
+   17: push 'r'
+   18: push 'e'
+   19: push 'a'
+   20: push 't'
+   21: push 'e'
+   22: push 'r'
+   23: push ' '
+   24: push 't'
+   25: push 'h'
+   26: push 'a'
+   27: push 'n'
+   28: push ' '
+   29: push '1'
+   30: push '0'
+   31: push 20
+   32: push 0
+   33: push 0
+# if.p, 7: 	end else if i < 0 then begin
+   34: push 1
+   35: writeln
+   36: jumpi 78
+   37: pushvar 0, 4
+   38: eval 1
+   39: push 0
+   40: lt
+   41: jneqi 64
+# if.p, 8: 		writeln("i is less than 0")
+   42: push 'i'
+   43: push ' '
+   44: push 'i'
+   45: push 's'
+   46: push ' '
+   47: push 'l'
+   48: push 'e'
+   49: push 's'
+   50: push 's'
+   51: push ' '
+   52: push 't'
+   53: push 'h'
+   54: push 'a'
+   55: push 'n'
+   56: push ' '
+   57: push '0'
+   58: push 16
+   59: push 0
+   60: push 0
+# if.p, 9: 	end else begin
+   61: push 1
+   62: writeln
+   63: jumpi 78
+# if.p, 10: 		writeln("i is", i)
+   64: push 'i'
+   65: push ' '
+   66: push 'i'
+   67: push 's'
+   68: push 4
+   69: push 0
+   70: push 0
+   71: pushvar 0, 4
+   72: eval 1
+   73: push 1
+   74: push 0
+   75: push 0
+# if.p, 11: 	end
+   76: push 2
+   77: writeln
+# if.p, 12: end
+# if.p, 13: 
+# if.p, 14: 
+   78: ret
+
+i is 10

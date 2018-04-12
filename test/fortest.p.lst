@@ -6,7 +6,7 @@
 # test/fortest.p, 4: 
 # test/fortest.p, 5: begin
     2: enter 1
-# test/fortest.p, 6: 	for i := 0 to -1 do writeln(i);
+# test/fortest.p, 6: 	for i := 0 to -1 do writeln(i) endloop;
     3: pushvar 0, 4
     4: dup
     5: push 0
@@ -32,7 +32,7 @@
    25: assign 1
    26: jumpi 7
    27: pop
-# test/fortest.p, 7: 	for i := 0 to 0 do writeln(i);
+# test/fortest.p, 7: 	for i := 0 to 0 do writeln(i) endloop;
    28: pushvar 0, 4
    29: dup
    30: push 0
@@ -57,7 +57,7 @@
    49: assign 1
    50: jumpi 32
    51: pop
-# test/fortest.p, 8: 	for i := 1 to 9 do writeln(i)
+# test/fortest.p, 8: 	for i := 1 to 9 do writeln(i) endloop
    52: pushvar 0, 4
    53: dup
    54: push 1
@@ -72,9 +72,9 @@
    63: push 1
    64: push 0
    65: push 0
-# test/fortest.p, 9: end .
    66: push 1
    67: writeln
+# test/fortest.p, 9: end ;
    68: dup
    69: dup
    70: eval 1

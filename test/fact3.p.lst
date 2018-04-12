@@ -23,7 +23,7 @@ test/fact3.p: passing 2 parameters, where 1 expected near line 28
     3: pushvar 0, 4
     4: push 1
     5: assign 1
-# test/fact3.p, 19: 		while n > 0 do begin
+# test/fact3.p, 19: 		while n > 0 loop
     6: pushvar 0, -1
     7: eval 1
     8: push 0
@@ -42,7 +42,7 @@ test/fact3.p: passing 2 parameters, where 1 expected near line 28
    19: pushvar 0, -1
    20: eval 1
    21: push 1
-# test/fact3.p, 22: 		end;
+# test/fact3.p, 22: 		endloop;
    22: sub
    23: assign 1
    24: jumpi 6
@@ -69,7 +69,7 @@ test/fact3.p: passing 2 parameters, where 1 expected near line 28
    38: push 1
    39: push 0
    40: push 0
-# test/fact3.p, 30: end.
+# test/fact3.p, 30: end;
    41: push 1
    42: writeln
    43: ret

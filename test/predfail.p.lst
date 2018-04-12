@@ -1,17 +1,15 @@
 # test/predfail.p, 1: program PredSuccFail()
-# test/predfail.p, 2: type 
+# test/predfail.p, 2: type e is (zero, one, two, three, four);
     0: calli 0, 2
     1: halt
-# test/predfail.p, 3: 	e = (zero, one, two, three, four);
-# test/predfail.p, 4: 
-# test/predfail.p, 5: begin
-# test/predfail.p, 6: 	writeln(pred(zero))
+# test/predfail.p, 3: begin
+# test/predfail.p, 4: 	writeln(pred(zero))
     2: push 0
     3: pred 0
     4: push 1
     5: push 0
     6: push 0
-# test/predfail.p, 7: end .
+# test/predfail.p, 5: end;
     7: push 1
     8: writeln
     9: ret

@@ -734,8 +734,9 @@ void PComp::whileStatement(int level) {
 
 	// jump if expr is false...
 	const auto jmp_pc = emitJNEQI();
-	expect(Token::Do);					// consume "do"
-	statement(level);
+	expect(Token::Loop);				// consume "loop"
+	statementList(level);
+	expect(Token::Endloop);
 
 	emitJumpI(cond_pc);					// Jump back to expr test...
 
@@ -745,35 +746,55 @@ void PComp::whileStatement(int level) {
 }
 
 /********************************************************************************************//**
- * if expr then statement [ else statement ]
+ * if expr then statement-lst [ else statement-lst ]
  *
  * @param	level 	The current block level
  ************************************************************************************************/
 void PComp::ifStatement(int level) {
-	expression(level);
+	vector<size_t> jmp_end;					// Jump to the end locations..
 
-	// Jump if conditon is false
-	const size_t jmp_pc = emitJNEQI();
-	expect(Token::Then);							// Consume "then"
-	statement(level);
+	expression(level);						// Condition expression
+	size_t jmp_pc = emitJNEQI();			// Jump if condition is false
+	expect(Token::Then);					// Consume "then"
+	statementList(level);					// Statements...
 
-	// Jump over else statement, but only if there is an else
-	const bool Else = accept(Token::Else);
-	size_t else_pc = 0;
-	if (Else)
-		else_pc = emitJumpI();
+	while (accept(Token::Elif)) {			// 0 or more elif...
+		jmp_end.push_back(emitJumpI());		// Jump to the end...
 
-	if (verbose)
-		cout << prefix(progName) << "patching address at " << jmp_pc << " to " << code->size() << '\n';
-	(*code)[jmp_pc].value = code->size();
+		if (verbose)						// jump here if above condition was false
+			cout << prefix(progName) << "patching address at " << jmp_pc << " to " << code->size() << '\n';
+		(*code)[jmp_pc].value = code->size();
 
-	if (Else) {
-		statement(level);
-
-		if (verbose)
-			cout << prefix(progName) << "patching address at " << else_pc << " to " << code->size() << '\n';
-		(*code)[else_pc].value = code->size();
+		expression(level);					// Condition expression
+		jmp_pc = emitJNEQI();				// Jump if condition is false
+		expect(Token::Then);				// Consume "then"
+		statementList(level);				// Statements...
 	}
+
+	if (accept(Token::Else)) {
+		jmp_end.push_back(emitJumpI());		// Jump to the end...
+
+		if (verbose)						// Jump here if above condition was false
+			cout << prefix(progName) << "patching address at " << jmp_pc << " to " << code->size() << '\n';
+		(*code)[jmp_pc].value = code->size();
+		jmp_pc = 0;
+
+		statementList(level);				// Statements...
+	}
+
+	if (jmp_pc) {
+		if (verbose)							// Final jump over to here...
+			cout << prefix(progName) << "patching address at " << jmp_pc << " to " << code->size() << '\n';
+		(*code)[jmp_pc].value = code->size();
+	}
+
+	for (size_t pc : jmp_end) {				// Patch jumps to here
+		if (verbose)
+			cout << prefix(progName) << "patching address at " << pc << " to " << code->size() << '\n';
+		(*code)[pc].value = code->size();
+	}
+
+	expect(Token::Endif);
 }
 
 /********************************************************************************************//**
@@ -781,12 +802,13 @@ void PComp::ifStatement(int level) {
  *
  * @param	level 	The current block level
  ************************************************************************************************/
-void PComp::repeateStatement(int level) {
+void PComp::repeatStatement(int level) {
 	const size_t loop_pc = code->size();			// jump here until expr fails
-	statement(level);
+	statementList(level);
 	expect(Token::Until);
 	expression(level);
 	emitJNEQI(loop_pc);
+	expect(Token::Endloop);
 }
 
 /********************************************************************************************//**
@@ -821,6 +843,7 @@ void PComp::forStatement(int level) {
 
 	expect(Token::Do);					// "... do statement"
 	statement(level);
+	expect(Token::Endloop);
 
 	emit(OpCode::DUP);					// iterate
 	emit(OpCode::DUP);
@@ -1050,9 +1073,6 @@ void PComp::identStatement(int level, const string& id) {
  *          address!
  *
  * @param	level	The current block level.
- *
- * @bug	Does not handle arrays, as that would require some sort of tagged reference, which Datum
- *		lacks.
  ************************************************************************************************/
 void PComp::writeStmt(int level) {
 	ostringstream oss;
@@ -1201,9 +1221,11 @@ void PComp::statement(int level) {
 		next();
 		identStatement(level, id);
 
+#if 0
 	} else if (accept(Token::Begin)) {				// begin ... end
 		statementList(level);
 		expect(Token::End);
+#endif
 
 	} else if (accept(Token::If)) 					// if expr then stmt { then stmt... }
 		ifStatement(level);
@@ -1212,7 +1234,7 @@ void PComp::statement(int level) {
 		whileStatement(level);
 
 	else if (accept(Token::Repeat))					// "repeat" stmt until expr...
-		repeateStatement(level);
+		repeatStatement(level);
 
 	else if (accept(Token::For))					// 'for' var ':=' expr ( 'to' | 'downto') expr 'do' stmt...
 		forStatement(level);
@@ -1254,7 +1276,7 @@ void PComp::constDeclList(int level) {
  ************************************************************************************************/
 void PComp::typeDecl(int level, bool var) {
 	const auto ident = nameDecl(level);				// Copy the identifier
-	expect(Token::EQU);								// Consume the "="
+	expect(Token::Is);								// Consume the "is"
 	TDescPtr tdesc = type(level, var, ident);
 
 	if (verbose)
@@ -1896,16 +1918,14 @@ void PComp::progDecl(int level) {
 
 	(*code)[call_pc].value = addr;
 
-	expect(Token::Period);
+	expect(Token::SemiColon);
 }
 
 /********************************************************************************************//**
  ************************************************************************************************/
 void PComp::run()								{	progDecl(0);	}
 
-/************************************************************************************************
- * public:
- ************************************************************************************************/
+// public:
 
 /********************************************************************************************//**
  * Construct a new compilier with the token stream initially bound to std::cin.

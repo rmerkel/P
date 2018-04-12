@@ -271,7 +271,7 @@
   245: push 1
   246: push 0
   247: push 0
-# test/bitwise.p, 26: end .
+# test/bitwise.p, 26: end;
   248: push 2
   249: writeln
   250: ret

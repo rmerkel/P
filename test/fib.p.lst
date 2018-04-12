@@ -38,22 +38,23 @@
    29: pushvar 0, 3
    30: pushvar 0, -3
    31: eval 1
-# test/fib.p, 9: 	end ;
+# test/fib.p, 9: 		endif
    32: pushvar 0, -2
    33: eval 1
    34: add
    35: assign 1
+# test/fib.p, 10: 	end ;
    36: retf
-# test/fib.p, 10: 
-# test/fib.p, 11: begin
-# test/fib.p, 12: 	writeln(0);
+# test/fib.p, 11: 
+# test/fib.p, 12: begin
+# test/fib.p, 13: 	writeln(0);
    37: push 0
    38: push 1
    39: push 0
    40: push 0
    41: push 1
    42: writeln
-# test/fib.p, 13: 	writeln(fib(0, 1, 10))
+# test/fib.p, 14: 	writeln(fib(0, 1, 10))
    43: push 0
    44: push 1
    45: push 10
@@ -61,11 +62,11 @@
    47: push 1
    48: push 0
    49: push 0
-# test/fib.p, 14: end .
+# test/fib.p, 15: end ;
    50: push 1
    51: writeln
    52: ret
-# test/fib.p, 15: 
+# test/fib.p, 16: 
 
 0
 1

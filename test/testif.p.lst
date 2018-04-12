@@ -17,7 +17,7 @@
    10: push 3
    11: assign 1
 # test/testif.p, 7: 	{ set x to 2	}
-# test/testif.p, 8: 	if x = 1 then x := y else x := z;
+# test/testif.p, 8: 	if x = 1 then x := y else x := z endif;
    12: pushvar 0, 4
    13: eval 1
    14: push 1
@@ -42,7 +42,7 @@
    32: writeln
 # test/testif.p, 10: 
 # test/testif.p, 11: 	{ set x to  3	}
-# test/testif.p, 12: 	if x = y then x := z else x := y;
+# test/testif.p, 12: 	if x = y then x := z else x := y endif;
    33: pushvar 0, 4
    34: eval 1
    35: pushvar 0, 5
@@ -64,7 +64,7 @@
    50: push 1
    51: push 0
    52: push 0
-# test/testif.p, 14: end.
+# test/testif.p, 14: end;
    53: push 1
    54: writeln
    55: ret

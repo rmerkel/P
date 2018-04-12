@@ -23,7 +23,7 @@
    14: push 1
    15: push 0
    16: push 0
-# test/eval.p, 9: end .
+# test/eval.p, 9: end;
    17: push 1
    18: writeln
    19: ret

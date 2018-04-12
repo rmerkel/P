@@ -16,13 +16,13 @@ procedure factorial(n : integer)
 	begin
         p := 1;
 		writeln(p);
-        while n > 0 do begin
+        while n > 0 loop
             p := p * n;
             n := n - 1;
 			writeln(p)
-        end
+        endloop
     end;
 
 begin
     factorial(nFacts)
-end.
+end;

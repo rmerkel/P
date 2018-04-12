@@ -16,10 +16,10 @@ function factorial(n : integer) : integer
 	var p : integer;
 	begin
 		p := 1;
-		while n > 0 do begin
+		while n > 0 loop
 			p := p * n;
 			n := n - 1
-		end;
+		endloop;
 		factorial := p;
 	end;
 
@@ -27,4 +27,4 @@ begin
 	{ call with wrong number of parameters! }
     result := factorial(nFacts, nFacts);
 	writeln(result)
-end.
+end;

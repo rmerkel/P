@@ -1,11 +1,11 @@
 { Test records }
 program RecordTests()
 type
-	R = record 
+	R is record 
 		i1, i2 : integer;
 		r : real
 	end;
-	R2 = record
+	R2 is record
 		i1, i2 : integer;
 		r : real
 	end;
@@ -33,4 +33,4 @@ begin
 	z.i2 := 8;
 	z.r := 9.0;
 	writeln(x.i1, x.i2, x.r : 8 : 6)
-end .
+end;

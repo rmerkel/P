@@ -43,7 +43,7 @@
    26: pushvar 0, 4
    27: push 0.000000
    28: assign 1
-# test/fahr3.p, 17: 	while fahr <= UPPER do begin
+# test/fahr3.p, 17: 	while fahr <= UPPER loop
    29: pushvar 0, 4
    30: eval 1
    31: push 300.000000
@@ -81,8 +81,8 @@
    60: push 20.000000
    61: add
    62: assign 1
-# test/fahr3.p, 21: 	end
-# test/fahr3.p, 22:  end.
+# test/fahr3.p, 21: 	endloop
+# test/fahr3.p, 22:  end ;
    63: jumpi 29
    64: ret
 

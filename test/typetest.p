@@ -1,9 +1,9 @@
 { Test advanced types	}
 program typetest()
 type
-	int = integer;
-	rng = 1..10;
-	enum = (	one, two, three	);
+	int is integer;
+	rng is 1..10;
+	enum is (	one, two, three	);
 
 var
 	i : int;
@@ -18,18 +18,18 @@ begin
 	r := 1; r := r + 1;
 
 	i := 1;	{	fill a[] with its index	}
- 	while i < 11 do begin 
+ 	while i < 11 loop 
 		a[i] := i;
 		writeln(a[i]);
 		i := i + 1
-	end;
+	endloop;
 
 	r := 1;	{	multiply by 10			}
-	repeat begin
+	repeat
 		a[r] := a[r] * 10;
 		writeln(a[r]);
 		r := r + 1
-	end until r = 10;
+	until r = 10 endloop;
 
 	a2[one]	:= 1;
 	a2[two]	:= 2;
@@ -37,14 +37,14 @@ begin
 	writeln(a2[one], a2[two], a2[three]);
 
 	i := 0;	{	fill a3[] with it's index	}
-	while (i < 5) do begin
+	while (i < 5) loop
 		j := 0;
-		while (j < 5) do begin
+		while (j < 5) loop
 			a3[i][j] := 1.0 * (i + j);
 			write(a3[i][j] : 7 : 4);
 			j := j + 1
-		end;
+		endloop;
 		writeln;
 		i := i + 1
-	end
-end .
+	endloop
+end;

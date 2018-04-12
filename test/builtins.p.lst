@@ -6,7 +6,7 @@
 # test/builtins.p, 4: 	pi = 3.1415926;
 # test/builtins.p, 5: 
 # test/builtins.p, 6: type
-# test/builtins.p, 7: 	e = (zero, one, two, three);
+# test/builtins.p, 7: 	e is (zero, one, two, three);
 # test/builtins.p, 8: 
 # test/builtins.p, 9: begin
 # test/builtins.p, 10: 	writeln(1);				{ 1			}
@@ -235,7 +235,7 @@
   190: push 1
   191: writeln
 # test/builtins.p, 45: 	writeln
-# test/builtins.p, 46: end .
+# test/builtins.p, 46: end;
   192: push 0
   193: writeln
   194: ret

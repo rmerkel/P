@@ -6,10 +6,11 @@ program Fibonacci()
 			fib := fib(b, a+b, limit - 1)
 		else
 			fib := a + b
+		endif
 	end ;
 
 begin
 	writeln(0);
 	writeln(fib(0, 1, 10))
-end .
+end ;
 

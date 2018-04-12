@@ -32,7 +32,7 @@
    21: push 0
    22: push 1
    23: writeln
-# test/pointers.p, 11: 	if xp <> nil then begin
+# test/pointers.p, 11: 	if xp <> nil then
    24: pushvar 0, 4
    25: eval 1
    26: push 0
@@ -50,7 +50,7 @@
    36: push 1
    37: push 0
    38: push 0
-# test/pointers.p, 14: 	end;
+# test/pointers.p, 14: 	endif;
    39: push 1
    40: writeln
 # test/pointers.p, 15: 
@@ -63,7 +63,7 @@
    45: pushvar 0, 4
    46: eval 1
    47: dispose
-# test/pointers.p, 18: end .
+# test/pointers.p, 18: end;
    48: ret
 
 0

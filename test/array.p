@@ -1,6 +1,5 @@
 program CharTest()
-type
-	A = array [0..9] of character;
+type A is array [0..9] of character;
 
 var i : integer;
 	c : character;
@@ -22,4 +21,4 @@ begin
 	writeln(a1);
 							{	... a2 has not!					}
 	writeln(a2)
-end .
+end;

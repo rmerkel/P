@@ -23,7 +23,7 @@
    16: push 1
    17: push 0
    18: push 0
-# test/simple.p, 7: end .
+# test/simple.p, 7: end;
    19: push 2
    20: writeln
    21: ret

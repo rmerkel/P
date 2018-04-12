@@ -1,0 +1,69 @@
+# test/if.p, 1: program IfTest()
+# test/if.p, 2: var i : integer;
+    0: calli 0, 2
+    1: halt
+# test/if.p, 3: begin
+    2: enter 1
+# test/if.p, 4: 	i := 10;
+    3: pushvar 0, 4
+    4: push 10
+    5: assign 1
+# test/if.p, 5: 	if i > 10 then
+    6: pushvar 0, 4
+    7: eval 1
+    8: push 10
+    9: gt
+   10: jneqi 39
+# test/if.p, 6: 		writeln("i is greater than 10");
+   11: push 'i'
+   12: push ' '
+   13: push 'i'
+   14: push 's'
+   15: push ' '
+   16: push 'g'
+   17: push 'r'
+   18: push 'e'
+   19: push 'a'
+   20: push 't'
+   21: push 'e'
+   22: push 'r'
+   23: push ' '
+   24: push 't'
+   25: push 'h'
+   26: push 'a'
+   27: push 'n'
+   28: push ' '
+   29: push '1'
+   30: push '0'
+   31: push 20
+   32: push 0
+   33: push 0
+   34: push 1
+   35: writeln
+# test/if.p, 7: 		i := 1
+   36: pushvar 0, 4
+   37: push 1
+# test/if.p, 8: 	endif;
+   38: assign 1
+# test/if.p, 9: 
+# test/if.p, 10: 	writeln("i is ", i)
+   39: push 'i'
+   40: push ' '
+   41: push 'i'
+   42: push 's'
+   43: push ' '
+   44: push 5
+   45: push 0
+   46: push 0
+   47: pushvar 0, 4
+   48: eval 1
+   49: push 1
+   50: push 0
+   51: push 0
+# test/if.p, 11: end;
+   52: push 2
+   53: writeln
+   54: ret
+# test/if.p, 12: 
+
+i is  10

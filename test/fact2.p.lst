@@ -22,7 +22,7 @@
     3: pushvar 0, 4
     4: push 1
     5: assign 1
-# test/fact2.p, 19: 		while n > 0 do begin
+# test/fact2.p, 19: 		while n > 0 loop
     6: pushvar 0, -1
     7: eval 1
     8: push 0
@@ -43,7 +43,7 @@
    21: push 1
    22: sub
    23: assign 1
-# test/fact2.p, 22: 		end;
+# test/fact2.p, 22: 		endloop;
    24: jumpi 6
 # test/fact2.p, 23: 		factorial := p;
    25: pushvar 0, 3
@@ -67,7 +67,7 @@
    37: push 1
    38: push 0
    39: push 0
-# test/fact2.p, 30: end.
+# test/fact2.p, 30: end;
    40: push 1
    41: writeln
    42: ret

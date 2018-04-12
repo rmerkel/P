@@ -1,6 +1,6 @@
 program CharTest()
 type
-	A = array [0..9] of character;
+	A is array [0..9] of character;
 
 var i : integer;
 	c : character;
@@ -17,5 +17,4 @@ begin
 	a1 := "0123456788";		{	fill a1 with "0123..."			}
 	writeln(a1);			{	while a1 has changed...			}
 	writeln(a2)				{	... a2 has not!					}
-
-end .
+end;

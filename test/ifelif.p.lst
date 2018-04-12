@@ -1,0 +1,102 @@
+# test/ifelif.p, 1: program IfElifTest()
+# test/ifelif.p, 2: var i : integer;
+    0: calli 0, 2
+    1: halt
+# test/ifelif.p, 3: begin
+    2: enter 1
+# test/ifelif.p, 4: 	i := 10;
+    3: pushvar 0, 4
+    4: push 10
+    5: assign 1
+# test/ifelif.p, 5: 	if i > 10 then
+    6: pushvar 0, 4
+    7: eval 1
+    8: push 10
+    9: gt
+   10: jneqi 40
+# test/ifelif.p, 6: 		writeln("i is greater than 10");
+   11: push 'i'
+   12: push ' '
+   13: push 'i'
+   14: push 's'
+   15: push ' '
+   16: push 'g'
+   17: push 'r'
+   18: push 'e'
+   19: push 'a'
+   20: push 't'
+   21: push 'e'
+   22: push 'r'
+   23: push ' '
+   24: push 't'
+   25: push 'h'
+   26: push 'a'
+   27: push 'n'
+   28: push ' '
+   29: push '1'
+   30: push '0'
+   31: push 20
+   32: push 0
+   33: push 0
+   34: push 1
+   35: writeln
+# test/ifelif.p, 7: 		i := 1
+   36: pushvar 0, 4
+   37: push 1
+# test/ifelif.p, 8: 	elif i < 0 then
+   38: assign 1
+   39: jumpi 69
+   40: pushvar 0, 4
+   41: eval 1
+   42: push 0
+   43: lt
+   44: jneqi 69
+# test/ifelif.p, 9: 		writeln("i is less than 0");
+   45: push 'i'
+   46: push ' '
+   47: push 'i'
+   48: push 's'
+   49: push ' '
+   50: push 'l'
+   51: push 'e'
+   52: push 's'
+   53: push 's'
+   54: push ' '
+   55: push 't'
+   56: push 'h'
+   57: push 'a'
+   58: push 'n'
+   59: push ' '
+   60: push '0'
+   61: push 16
+   62: push 0
+   63: push 0
+   64: push 1
+   65: writeln
+# test/ifelif.p, 10: 		i := 2
+   66: pushvar 0, 4
+   67: push 2
+# test/ifelif.p, 11: 	endif;
+   68: assign 1
+# test/ifelif.p, 12: 
+# test/ifelif.p, 13: 	writeln("i is ", i)
+   69: push 'i'
+   70: push ' '
+   71: push 'i'
+   72: push 's'
+   73: push ' '
+   74: push 5
+   75: push 0
+   76: push 0
+   77: pushvar 0, 4
+   78: eval 1
+   79: push 1
+   80: push 0
+   81: push 0
+# test/ifelif.p, 14: end;
+   82: push 2
+   83: writeln
+   84: ret
+# test/ifelif.p, 15: 
+
+i is  10

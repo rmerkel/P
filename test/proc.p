@@ -7,4 +7,4 @@ procedure Proc(i : integer; r : real; b : boolean)
 
 begin
 	Proc(2.5, 3, false);
-end .
+end;

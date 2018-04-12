@@ -6,8 +6,8 @@ test/typefail.p: incompatable binary types near line 27
 # test/typefail.p, 3: type
     0: calli 0, 2
     1: halt
-# test/typefail.p, 4: 	rng = 0..9;
-# test/typefail.p, 5: 	enum = (	one, two, three	);
+# test/typefail.p, 4: 	rng is 0..9;
+# test/typefail.p, 5: 	enum is (	one, two, three	);
 # test/typefail.p, 6: 
 # test/typefail.p, 7: var
 # test/typefail.p, 8: 	i : integer;
@@ -28,7 +28,7 @@ test/typefail.p: incompatable binary types near line 27
     8: llimit 0
     9: ulimit 9
    10: assign 1
-# test/typefail.p, 17: 	while r < 10 do begin 	{	*** warning: condition might always be true	}
+# test/typefail.p, 17: 	while r < 10 loop 		{	*** warning: condition might always be true	}
    11: pushvar 0, 5
    12: eval 1
    13: push 10
@@ -49,7 +49,7 @@ test/typefail.p: incompatable binary types near line 27
    26: pushvar 0, 5
    27: eval 1
    28: push 1
-# test/typefail.p, 20: 	end;
+# test/typefail.p, 20: 	endloop;
    29: add
    30: llimit 0
    31: ulimit 9
@@ -105,7 +105,7 @@ test/typefail.p: incompatable binary types near line 27
    74: ulimit 2
    75: add
    76: push 3
-# test/typefail.p, 28: end .
+# test/typefail.p, 28: end;
    77: assign 1
    78: ret
 

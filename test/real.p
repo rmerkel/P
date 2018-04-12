@@ -8,4 +8,4 @@ begin
 	f := round(2.5);
 	f := 4;
 	f := 5.0;
-end .
+end;

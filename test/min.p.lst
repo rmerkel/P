@@ -1,6 +1,6 @@
 # test/min.p, 1: {	minimum P program	}
 # test/min.p, 2: program minimum()
-# test/min.p, 3: begin end.
+# test/min.p, 3: begin end;
     0: calli 0, 2
     1: halt
     2: ret
