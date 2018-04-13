@@ -2,14 +2,14 @@
  * @file grammer.h
  *
  * @page grammer The P EBNF grammer
- * @see https://en.wikipedia.org/wiki/Extended_Backus%E2%80%93Naur_form
+ * @see [Extended Backus Naur Form](https://en.wikipedia.org/wiki/Extended_Backus%E2%80%93Naur_form)
  *
  *             program = "program" identifier param-lst "is" block-decl "endprog" ;
- *          block-decl = [ const-decl-lst ';'   		]
- *                       [ type-decl-lst ';'    		]
- *                       [ var-decl-blk ';'     		]
- *                       [ sub-decl-lst ';'     		]
- *                       { "begin" statement-lst "end"	} ;
+ *          block-decl = [ const-decl-lst ';'           ]
+ *                       [ type-decl-lst ';'            ]
+ *                       [ var-decl-blk ';'             ]
+ *                       [ sub-decl-lst ';'             ]
+ *                       { "begin" statement-lst "end"  } ;
  *      const-decl-lst = "const" const-decl { ';' const-decl } ;
  *          const-decl = identifier '=' const-expr ;
  *       type-decl-lst = type-decl { ';' type-decl } ;
@@ -39,12 +39,12 @@
  *                       '^' identifier ;
  *       statement-lst = statement {';' statement }  ;
  *        if-statement = "if" expression "then" statement-lst
- *                       { "elif" expresson "then" statement-lst }
- *                       [ "else" statement-lst ]
- *                       "endif" ;
+ *                          { "elif" expresson "then" statement-lst }
+ *                          [ "else" statement-lst ]
+ *                          "endif" ;
  *      while-statement = "while" expression "loop" statement-lst "endloop" ;
  *        for-statement = "for" identifer ":=" expression
- *                              ( "to" | "downto" ) expression "do" statement "endloop" ;
+ *                          ( "to" | "downto" ) expression "loop" statement "endloop" ;
  *           statement = [  variable '=' expression                                         |
  *                          identifier '(' [ expression-lst ] ')'                           |
  *                          if-statement                                                    |

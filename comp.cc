@@ -724,145 +724,6 @@ void PComp::callStatement(int level, SymbolTableIter it) {
 }
 
 /********************************************************************************************//**
- * while expr do statement...
- *
- * @param	level	The current block level.
- ************************************************************************************************/
-void PComp::whileStatement(int level) {
-	const auto cond_pc = code->size();	// Start of while expr
-	expression(level);
-
-	// jump if expr is false...
-	const auto jmp_pc = emitJNEQI();
-	expect(Token::Loop);				// consume "loop"
-	statementList(level);
-	expect(Token::Endloop);
-
-	emitJumpI(cond_pc);					// Jump back to expr test...
-
-	if (verbose)
-		cout << prefix(progName) << "patching address at " << jmp_pc << " to " << code->size() << '\n';
-	(*code)[jmp_pc].value = code->size(); 
-}
-
-/********************************************************************************************//**
- * if expr then statement-lst [ else statement-lst ]
- *
- * @param	level 	The current block level
- ************************************************************************************************/
-void PComp::ifStatement(int level) {
-	vector<size_t> jmp_end;					// Jump to the end locations..
-
-	expression(level);						// Condition expression
-	size_t jmp_pc = emitJNEQI();			// Jump if condition is false
-	expect(Token::Then);					// Consume "then"
-	statementList(level);					// Statements...
-
-	while (accept(Token::Elif)) {			// 0 or more elif...
-		jmp_end.push_back(emitJumpI());		// Jump to the end...
-
-		if (verbose)						// jump here if above condition was false
-			cout << prefix(progName) << "patching address at " << jmp_pc << " to " << code->size() << '\n';
-		(*code)[jmp_pc].value = code->size();
-
-		expression(level);					// Condition expression
-		jmp_pc = emitJNEQI();				// Jump if condition is false
-		expect(Token::Then);				// Consume "then"
-		statementList(level);				// Statements...
-	}
-
-	if (accept(Token::Else)) {
-		jmp_end.push_back(emitJumpI());		// Jump to the end...
-
-		if (verbose)						// Jump here if above condition was false
-			cout << prefix(progName) << "patching address at " << jmp_pc << " to " << code->size() << '\n';
-		(*code)[jmp_pc].value = code->size();
-		jmp_pc = 0;
-
-		statementList(level);				// Statements...
-	}
-
-	if (jmp_pc) {
-		if (verbose)							// Final jump over to here...
-			cout << prefix(progName) << "patching address at " << jmp_pc << " to " << code->size() << '\n';
-		(*code)[jmp_pc].value = code->size();
-	}
-
-	for (size_t pc : jmp_end) {				// Patch jumps to here
-		if (verbose)
-			cout << prefix(progName) << "patching address at " << pc << " to " << code->size() << '\n';
-		(*code)[pc].value = code->size();
-	}
-
-	expect(Token::Endif);
-}
-
-/********************************************************************************************//**
- * repeat statement until expr
- *
- * @param	level 	The current block level
- ************************************************************************************************/
-void PComp::repeatStatement(int level) {
-	const size_t loop_pc = code->size();			// jump here until expr fails
-	statementList(level);
-	expect(Token::Until);
-	expression(level);
-	emitJNEQI(loop_pc);
-	expect(Token::Endloop);
-}
-
-/********************************************************************************************//**
- * for identifier := expresson ( to | downto ) condition do statement
- *
- * @param	level	The current block level.
- ************************************************************************************************/
-void PComp::forStatement(int level) {
-	expect(Token::Identifier, false);	// "for identifier := expression..."
-	const string id = ts.current().string_value;
-	next();
-	auto var = lookup(id);
-	if (var == symtbl.end())
-		return;
-	assignStatement(level, var, true);
-
-
-	int inc;							// "... ( to | downto ) ...|
-	if (accept(Token::To))
-		inc = 1;
-	else {
-		expect(Token::DownTo);
-		inc = -1;
-	}
-
-	const auto cond_pc = code->size();	// "... condition..."
-	emit(OpCode::DUP);
-	emit(OpCode::EVAL, 0, 1);
-	expression(level);
-	emit(OpCode::LTE);
-	const auto jmp_pc = emitJNEQI();
-
-	expect(Token::Do);					// "... do statement"
-	statement(level);
-	expect(Token::Endloop);
-
-	emit(OpCode::DUP);					// iterate
-	emit(OpCode::DUP);
-	emit(OpCode::EVAL, 0, 1);
-	emit(OpCode::PUSH, 0, inc);
-	emit(OpCode::ADD);
-	emit(OpCode::ASSIGN, 0, 1);
-	emitJumpI(cond_pc);
-
-	// pop the condition varaible off the stack...
-	const auto pop_pc = emit(OpCode::POP, 0, 1);
-
-	if (verbose)
-		cout << prefix(progName) << "patching address @ " << pop_pc << " to " << code->size() << '\n';
-
-	(*code)[jmp_pc].value = pop_pc;
-}
-
-/********************************************************************************************//**
  * statement { ; statement }
  *
  * @param	level		The current block level.
@@ -1047,30 +908,201 @@ void PComp::assignStatement(int level, SymbolTableIter it, bool dup) {
  * Emits code for an assignment statement, or a procedure call...
  *
  * @param	level	The current block level.
- * @param	id		The variable or prodecure identifier
+ *
+ * @return	true if	assignment or procedure call
  ************************************************************************************************/
-void PComp::identStatement(int level, const string& id) {
-	auto lhs = lookup(id);
-	if (lhs == symtbl.end())
-		return;							// id is unidentified
+bool PComp::identStatement(int level) {
+	if (accept(Token::Identifier, false)) {
+		const string id = ts.current().string_value;
+		next();
 
-	switch(lhs->second.kind()) {
-	case SymValue::Procedure:			// emit a procedure call
-		callStatement(level, lhs);
-		break;
+		auto lhs = lookup(id);
+		if (lhs != symtbl.end()) {			// id is unidentified?
+			switch(lhs->second.kind()) {
+			case SymValue::Procedure:		// emit a procedure call
+				callStatement(level, lhs);
+				break;
 
-	case SymValue::Function:			// emit reference to function return value
-	case SymValue::Variable:			// emit a reference to a variable, or array, value
-		assignStatement(level, lhs);
-		break;
+			case SymValue::Function:		// emit reference to function return value
+			case SymValue::Variable:		// emit a reference to a variable, or array, value
+				assignStatement(level, lhs);
+				break;
 
-	case SymValue::Constant:
-		error("Can't assign to a constant", lhs->first);
-		break;
+			case SymValue::Constant:
+				error("Can't assign to a constant", lhs->first);
+				break;
 
-	default:
-		error("expected variable, function return ref, or procedure call, got", lhs->first);
+			default:
+				error("expected variable, function return ref, or procedure call, got", lhs->first);
+			}
+		}
+
+		return true;
 	}
+
+	return false;
+}
+
+/********************************************************************************************//**
+ * if expr then statement-lst [ else statement-lst ]
+ *
+ * @param	level 	The current block level
+ ************************************************************************************************/
+bool PComp::ifStatement(int level) {
+	if (accept(Token::If)) {				// if expr then stmt { then stmt... }
+		vector<size_t> jmp_end;					// Jump to the end locations..
+
+		expression(level);						// Condition expression
+		size_t jmp_pc = emitJNEQI();			// Jump if condition is false
+		expect(Token::Then);					// Consume "then"
+		statementList(level);					// Statements...
+
+		while (accept(Token::Elif)) {			// 0 or more elif...
+			jmp_end.push_back(emitJumpI());		// Jump to the end...
+
+			if (verbose)						// jump here if above condition was false
+				cout << prefix(progName) << "patching address at " << jmp_pc << " to " << code->size() << '\n';
+			(*code)[jmp_pc].value = code->size();
+
+			expression(level);					// Condition expression
+			jmp_pc = emitJNEQI();				// Jump if condition is false
+			expect(Token::Then);				// Consume "then"
+			statementList(level);				// Statements...
+		}
+
+		if (accept(Token::Else)) {
+			jmp_end.push_back(emitJumpI());		// Jump to the end...
+
+			if (verbose)						// Jump here if above condition was false
+				cout << prefix(progName) << "patching address at " << jmp_pc << " to " << code->size() << '\n';
+			(*code)[jmp_pc].value = code->size();
+			jmp_pc = 0;
+
+			statementList(level);				// Statements...
+		}
+
+		if (jmp_pc) {
+			if (verbose)							// Final jump over to here...
+				cout << prefix(progName) << "patching address at " << jmp_pc << " to " << code->size() << '\n';
+			(*code)[jmp_pc].value = code->size();
+		}
+
+		for (size_t pc : jmp_end) {				// Patch jumps to here
+			if (verbose)
+				cout << prefix(progName) << "patching address at " << pc << " to " << code->size() << '\n';
+			(*code)[pc].value = code->size();
+		}
+
+		expect(Token::Endif);
+
+		return true;
+	}
+
+	return false;
+}
+
+/********************************************************************************************//**
+ * while expr do statement...
+ *
+ * @param	level	The current block level.
+ ************************************************************************************************/
+bool PComp::whileStatement(int level) {
+	if (accept(Token::While)) {
+		const auto cond_pc = code->size();	// Start of while expr
+		expression(level);
+
+		// jump if expr is false...
+		const auto jmp_pc = emitJNEQI();
+		expect(Token::Loop);				// consume "loop"
+		statementList(level);
+		expect(Token::Endloop);
+
+		emitJumpI(cond_pc);					// Jump back to expr test...
+
+		if (verbose)
+			cout << prefix(progName) << "patching address at " << jmp_pc << " to " << code->size() << '\n';
+		(*code)[jmp_pc].value = code->size(); 
+
+		return true;
+	}
+
+	return false;
+}
+
+/********************************************************************************************//**
+ * repeat statement until expr
+ *
+ * @param	level 	The current block level
+ ************************************************************************************************/
+bool PComp::repeatStatement(int level) {
+	if (accept(Token::Repeat)) {
+		const size_t loop_pc = code->size();			// jump here until expr fails
+		statementList(level);
+		expect(Token::Until);
+		expression(level);
+		emitJNEQI(loop_pc);
+		expect(Token::Endloop);
+
+		return true;
+	}
+
+	return false;
+}
+
+/********************************************************************************************//**
+ * for identifier := expresson ( to | downto ) condition do statement
+ *
+ * @param	level	The current block level.
+ ************************************************************************************************/
+bool PComp::forStatement(int level) {
+	if (accept(Token::For)) {
+		expect(Token::Identifier, false);	// "for identifier := expression..."
+		const string id = ts.current().string_value;
+		next();
+		auto var = lookup(id);
+		if (var == symtbl.end())
+			return true;
+		assignStatement(level, var, true);
+
+		int inc;							// "... ( to | downto ) ...|
+		if (accept(Token::To))
+			inc = 1;
+		else {
+			expect(Token::DownTo);
+			inc = -1;
+		}
+
+		const auto cond_pc = code->size();	// "... condition..."
+		emit(OpCode::DUP);
+		emit(OpCode::EVAL, 0, 1);
+		expression(level);
+		emit(OpCode::LTE);
+		const auto jmp_pc = emitJNEQI();
+
+		expect(Token::Loop);				// "... loop statements..." endloop
+		statementList(level);
+		expect(Token::Endloop);
+
+		emit(OpCode::DUP);					// iterate
+		emit(OpCode::DUP);
+		emit(OpCode::EVAL, 0, 1);
+		emit(OpCode::PUSH, 0, inc);
+		emit(OpCode::ADD);
+		emit(OpCode::ASSIGN, 0, 1);
+		emitJumpI(cond_pc);
+
+		// pop the condition varaible off the stack...
+		const auto pop_pc = emit(OpCode::POP, 0, 1);
+
+		if (verbose)
+			cout << prefix(progName) << "patching address @ " << pop_pc << " to " << code->size() << '\n';
+
+		(*code)[jmp_pc].value = pop_pc;
+
+		return true;
+	}
+
+	return false;
 }
 
 /********************************************************************************************//**
@@ -1224,24 +1256,16 @@ void PComp::statementProcs(int level) {
 void PComp::statement(int level) {
 	ostringstream oss;
 
-	if (accept(Token::Identifier, false)) {		// Assignment or procedure call
-		// Copy and then consume the l-value identifier...
-		const string id = ts.current().string_value;
-		next();
-		identStatement(level, id);
-
-	} else if (accept(Token::If)) 					// if expr then stmt { then stmt... }
-		ifStatement(level);
-
-	else if (accept(Token::While))					// while expr do stmt...
-		whileStatement(level);
-
-	else if (accept(Token::Repeat))					// "repeat" stmt until expr...
-		repeatStatement(level);
-
-	else if (accept(Token::For))					// 'for' var ':=' expr ( 'to' | 'downto') expr 'do' stmt...
-		forStatement(level);
-
+	if (identStatement(level)) 
+		;
+	else if (ifStatement(level))			// if expr then stmt { then stmt... }
+		;
+	else if (whileStatement(level))
+		;									// while expr do stmt...
+	else if (repeatStatement(level))
+		;									// "repeat" stmt until expr...
+	else if (forStatement(level))
+		;									// 'for' var ':=' expr ( 'to' | 'downto') expr 'do' stmt...
 	else
 		statementProcs(level);
 }

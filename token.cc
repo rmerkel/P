@@ -222,7 +222,6 @@ TokenStream::KeywordTable	TokenStream::keywords = {
 	{	"bit_xor",		Token::BitXor		},
 	{   "const",		Token::ConsDecl		},
 	{	"dispose",		Token::Dispose		},
-	{	"do",			Token::Do			},
 	{	"elif",			Token::Elif			},
 	{	"else",			Token::Else			},
 	{	"end",			Token::End			},
@@ -308,7 +307,6 @@ ostream& operator<<(std::ostream& os, const Token::Kind& kind) {
 	case Token::Elif:		os << "elif";			break;
 	case Token::Loop:		os << "loop";			break;
 	case Token::While:		os << "while";			break;
-	case Token::Do:			os << "do";				break;
 	case Token::Repeat:		os << "repeat";			break;
 	case Token::Until:		os << "until";			break;
 	case Token::For:		os << "for";			break;

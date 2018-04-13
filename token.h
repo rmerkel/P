@@ -61,7 +61,6 @@ struct Token {
 		Else,							///< "else"
 		Loop,							///< "loop"
 		While,							///< "while" ... "do"
-		Do,								///< "do"
 		Repeat,							///< "repeat" ... "until"
 		Until,							///< "until"
 		For,							///< "for"
