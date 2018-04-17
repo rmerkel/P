@@ -50,8 +50,7 @@ const OpCodeInfo::InfoMap OpCodeInfo::opInfoTbl {
 
 	// Builtin procedures
 
-	{ OpCode::WRITE,	OpCodeInfo{ "write",	1			} },
-	{ OpCode::WRITELN,	OpCodeInfo{ "writeln",	1			} },
+	{ OpCode::PUT,		OpCodeInfo{ "put",		4			} },
 	{ OpCode::NEW,		OpCodeInfo{ "new",		1			} },
 	{ OpCode::DISPOSE,	OpCodeInfo{ "dispose",	1			} },
 

@@ -45,17 +45,22 @@
    24: push 1
    25: push 8
    26: push 6
+   27: put
 # test/repeatst.p, 21: 	until n >= 10 endloop
-   27: push 1
-   28: writeln
-   29: pushvar 0, 4
-   30: eval 1
-   31: push 10
-   32: gte
-   33: jneqi 9
+   28: push '
+'
+   29: push 1
+   30: push 0
+   31: push 0
+   32: put
+   33: pushvar 0, 4
+   34: eval 1
+   35: push 10
+   36: gte
+   37: jneqi 9
 # test/repeatst.p, 22: endprog
 # test/repeatst.p, 23: 
-   34: ret
+   38: ret
 
        1
        2

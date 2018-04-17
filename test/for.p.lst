@@ -1,0 +1,55 @@
+# test/for.p, 1: { Simple for loop test	}
+# test/for.p, 2: program ForTest() is
+# test/for.p, 3: var
+    0: calli 0, 2
+    1: halt
+# test/for.p, 4: 	i : integer;
+# test/for.p, 5: 
+# test/for.p, 6: begin
+    2: enter 1
+# test/for.p, 7: 	for i in 0..9 loop
+    3: pushvar 0, 4
+    4: dup
+    5: push 0
+    6: assign 1
+    7: dup
+    8: eval 1
+    9: push 9
+   10: lte
+   11: jneqi 30
+# test/for.p, 8: 		writeln(i)
+   12: pushvar 0, 4
+   13: eval 1
+   14: push 1
+   15: push 0
+   16: push 0
+   17: put
+# test/for.p, 9: 	endloop
+   18: push '
+'
+   19: push 1
+   20: push 0
+   21: push 0
+   22: put
+# test/for.p, 10: endprog
+   23: dup
+   24: dup
+   25: eval 1
+   26: push 1
+   27: add
+   28: assign 1
+   29: jumpi 7
+   30: pop
+# test/for.p, 11: 
+   31: ret
+
+0
+1
+2
+3
+4
+5
+6
+7
+8
+9

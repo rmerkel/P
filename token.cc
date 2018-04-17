@@ -233,6 +233,7 @@ TokenStream::KeywordTable	TokenStream::keywords = {
 	{	"exp",			Token::Exp			},
 	{	"function",		Token::FuncDecl		},
 	{	"if",			Token::If			},
+	{	"in",			Token::In			},
 	{	"is",			Token::Is			},
 	{	"ln",			Token::Log			},
 	{	"loop",			Token::Loop			},
@@ -247,6 +248,7 @@ TokenStream::KeywordTable	TokenStream::keywords = {
 	{	"pred",			Token::Pred			},
 	{	"record",		Token::Record		},
 	{	"repeat",		Token::Repeat		},
+	{	"reverse",		Token::Reverse		},
 	{	"round",		Token::Round		},
 	{	"shift_left",	Token::ShiftLeft	},
 	{	"shift_right",	Token::ShiftRight	},
@@ -259,8 +261,6 @@ TokenStream::KeywordTable	TokenStream::keywords = {
 	{	"type",			Token::TypeDecl		},
 	{	"until",		Token::Until		},
 	{	"for",			Token::For			},
-	{	"to",			Token::To			},
-	{	"downto",		Token::DownTo,		},
 	{	"var",			Token::VarDecl		},
 	{	"while",		Token::While		},
 	{	"write",		Token::Write		},
@@ -302,16 +302,16 @@ ostream& operator<<(std::ostream& os, const Token::Kind& kind) {
 	case Token::Endproc:	os << "endproc";		break;
 	case Token::Endprog:	os << "endprog";		break;
 	case Token::If:			os << "if";				break;
+	case Token::In:			os << "in";				break;
 	case Token::Then:		os << "then";			break;
 	case Token::Else:		os << "else";			break;
 	case Token::Elif:		os << "elif";			break;
 	case Token::Loop:		os << "loop";			break;
 	case Token::While:		os << "while";			break;
 	case Token::Repeat:		os << "repeat";			break;
+	case Token::Reverse:	os << "reverse";		break;
 	case Token::Until:		os << "until";			break;
 	case Token::For:		os << "for";			break;
-	case Token::To:			os << "to";				break;
-	case Token::DownTo:		os << "downto";			break;
 	case Token::Is:			os << "is";				break;
 
 	case Token::Ellipsis:	os << "..";				break;

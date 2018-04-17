@@ -9,10 +9,15 @@
     4: push 1
     5: push 0
     6: push 0
+    7: put
 # test/predfail.p, 5: endprog
-    7: push 1
-    8: writeln
+    8: push '
+'
+    9: push 1
+   10: push 0
+   11: push 0
+   12: put
 # test/predfail.p, 6: 
-    9: ret
+   13: ret
 
 runtime error @pc 3, sp: 8: out-of-range

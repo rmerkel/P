@@ -67,10 +67,15 @@
    37: push 1
    38: push 0
    39: push 0
+   40: put
 # test/fact2.p, 30: endprog
-   40: push 1
-   41: writeln
+   41: push '
+'
+   42: push 1
+   43: push 0
+   44: push 0
+   45: put
 # test/fact2.p, 31: 
-   42: ret
+   46: ret
 
 3628800

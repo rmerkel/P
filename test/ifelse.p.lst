@@ -13,7 +13,7 @@
     7: eval 1
     8: push 10
     9: gt
-   10: jneqi 40
+   10: jneqi 44
 # test/ifelse.p, 6: 		writeln("i is greater than 10");
    11: push 'i'
    12: push ' '
@@ -38,56 +38,72 @@
    31: push 20
    32: push 0
    33: push 0
-   34: push 1
-   35: writeln
+   34: put
+   35: push '
+'
+   36: push 1
+   37: push 0
+   38: push 0
+   39: put
 # test/ifelse.p, 7: 		i := 1
-   36: pushvar 0, 4
-   37: push 1
+   40: pushvar 0, 4
+   41: push 1
 # test/ifelse.p, 8: 	else
-   38: assign 1
+   42: assign 1
 # test/ifelse.p, 9: 		writeln("i is <= 10");
-   39: jumpi 58
-   40: push 'i'
-   41: push ' '
-   42: push 'i'
-   43: push 's'
-   44: push ' '
-   45: push '<'
-   46: push '='
-   47: push ' '
-   48: push '1'
-   49: push '0'
-   50: push 10
-   51: push 0
-   52: push 0
-   53: push 1
-   54: writeln
+   43: jumpi 66
+   44: push 'i'
+   45: push ' '
+   46: push 'i'
+   47: push 's'
+   48: push ' '
+   49: push '<'
+   50: push '='
+   51: push ' '
+   52: push '1'
+   53: push '0'
+   54: push 10
+   55: push 0
+   56: push 0
+   57: put
+   58: push '
+'
+   59: push 1
+   60: push 0
+   61: push 0
+   62: put
 # test/ifelse.p, 10: 		i := 3
-   55: pushvar 0, 4
-   56: push 3
+   63: pushvar 0, 4
+   64: push 3
 # test/ifelse.p, 11: 	endif;
-   57: assign 1
+   65: assign 1
 # test/ifelse.p, 12: 
 # test/ifelse.p, 13: 	writeln("i is ", i)
-   58: push 'i'
-   59: push ' '
-   60: push 'i'
-   61: push 's'
-   62: push ' '
-   63: push 5
-   64: push 0
-   65: push 0
-   66: pushvar 0, 4
-   67: eval 1
-   68: push 1
-   69: push 0
-   70: push 0
+   66: push 'i'
+   67: push ' '
+   68: push 'i'
+   69: push 's'
+   70: push ' '
+   71: push 5
+   72: push 0
+   73: push 0
+   74: put
+   75: pushvar 0, 4
+   76: eval 1
+   77: push 1
+   78: push 0
+   79: push 0
+   80: put
 # test/ifelse.p, 14: endprog
-   71: push 2
-   72: writeln
+   81: push '
+'
+   82: push 1
+   83: push 0
+   84: push 0
+   85: put
 # test/ifelse.p, 15: 
 # test/ifelse.p, 16: 
-   73: ret
+   86: ret
 
 i is <= 10
-i is  3
+i is 3

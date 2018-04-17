@@ -28,7 +28,7 @@
    10: eval 1
    11: push 10
    12: lt
-   13: jneqi 35
+   13: jneqi 39
 # test/test.p, 18:       n := n + 1;
    14: pushvar 0, 4
    15: pushvar 0, 4
@@ -50,14 +50,19 @@
    29: push 1
    30: push 8
    31: push 6
+   32: put
 # test/test.p, 21:    endloop
-   32: push 1
-   33: writeln
+   33: push '
+'
+   34: push 1
+   35: push 0
+   36: push 0
+   37: put
 # test/test.p, 22: endprog
-   34: jumpi 9
+   38: jumpi 9
 # test/test.p, 23: 
 # test/test.p, 24: 
-   35: ret
+   39: ret
 
        1
        2

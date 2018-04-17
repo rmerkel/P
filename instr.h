@@ -57,8 +57,7 @@ enum class OpCode : unsigned char {
 	SQR,		///< SQR   - Square; push(stack[sp] * pop())
 	SQRT,		///< SQRT  - Square-root; push(Sqrt(pop()))
 
-	WRITE,		///< WRITE - Write values on standard output; for n=pop(); n>0; --n write pop()
-	WRITELN,	///< WRITELN - Write values followed by newline on standard output
+	PUT,		///< PUT - Write one value on standard output
 	NEW,		///< NEW   - Allocate dynamic store; n=pop(); allocate n dataums, push(addr) or zero if insufficient space
 	DISPOSE,	///< DISPOSE - Dispose of allocated dynamic store; free pop()
 

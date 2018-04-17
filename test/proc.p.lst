@@ -1,7 +1,7 @@
 test/proc.p: rounding real to fit in an integer near line 9
 # test/proc.p, 1: program ProcTest() is
 # test/proc.p, 2: var	i : integer;
-    0: calli 0, 20
+    0: calli 0, 26
     1: halt
 # test/proc.p, 3: procedure Proc(i : integer; r : real; b : boolean) is
 # test/proc.p, 4: 	begin
@@ -11,33 +11,40 @@ test/proc.p: rounding real to fit in an integer near line 9
     4: push 1
     5: push 0
     6: push 0
-    7: pushvar 0, -2
-    8: eval 1
-    9: push 1
-   10: push 0
+    7: put
+    8: pushvar 0, -2
+    9: eval 1
+   10: push 1
    11: push 0
-   12: pushvar 0, -1
-   13: eval 1
-   14: push 1
-   15: push 0
-   16: push 0
+   12: push 0
+   13: put
+   14: pushvar 0, -1
+   15: eval 1
+   16: push 1
+   17: push 0
+   18: push 0
+   19: put
 # test/proc.p, 6: 	endproc
-   17: push 3
-   18: writeln
+   20: push '
+'
+   21: push 1
+   22: push 0
+   23: push 0
+   24: put
 # test/proc.p, 7: 
 # test/proc.p, 8: begin
-   19: ret
-   20: enter 1
+   25: ret
+   26: enter 1
 # test/proc.p, 9: 	Proc(2.5, 3, false);
-   21: push 2.500000
-   22: round
-   23: push 3
-   24: itor
-   25: push 0
-   26: llimit 0
-   27: ulimit 1
-   28: calli 0, 2
+   27: push 2.500000
+   28: round
+   29: push 3
+   30: itor
+   31: push 0
+   32: llimit 0
+   33: ulimit 1
+   34: calli 0, 2
 # test/proc.p, 10: endprog
 # test/proc.p, 11: 
-   29: ret
+   35: ret
 

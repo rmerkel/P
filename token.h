@@ -56,16 +56,16 @@ struct Token {
 		Endproc,						///< "endproc"
 		Endprog,						///< "endprog"
 		If,								///< "if" condition "then" ...
+		In,								///< "for" ident "in" ...
 		Then,							///< "then"
 		Elif,							///< "elif"
 		Else,							///< "else"
 		Loop,							///< "loop"
 		While,							///< "while" ... "do"
 		Repeat,							///< "repeat" ... "until"
+		Reverse,						///< "for" ident "in" "reverse" ...
 		Until,							///< "until"
 		For,							///< "for"
-		To,								///< "to"
-		DownTo,							///< "downto"
 		Is,								///< "is"
 
 		Ellipsis,						///< ".."
@@ -138,8 +138,7 @@ struct Token {
 
 	};
 
-	/// A set of Token kinds
-	typedef std::set<Kind>	KindSet;
+	typedef std::set<Kind>	KindSet;	///< Set of Token kinds...
 
 	Kind			kind;				///< Token type
 	std::string		string_value;		///< kind == Identifier, or String or Character

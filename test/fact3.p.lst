@@ -69,9 +69,14 @@ test/fact3.p: passing 2 parameters, where 1 expected near line 28
    38: push 1
    39: push 0
    40: push 0
+   41: put
 # test/fact3.p, 30: endprog
-   41: push 1
-   42: writeln
+   42: push '
+'
+   43: push 1
+   44: push 0
+   45: push 0
+   46: put
 # test/fact3.p, 31: 
-   43: ret
+   47: ret
 

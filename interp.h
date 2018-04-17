@@ -61,7 +61,6 @@ protected:
 
 	/// Push value onto the stack
 	template<class T> void push(const T& value);
-	Result write1(unsigned index);			///< Write one expression on standard output...
 
 	typedef Result (PInterp::*InstrPtr)();	///< Pointer to an instruction
 	static InstrPtr instrTbl[];				///< Table of pointer to instructions, indexed by opcode
@@ -84,8 +83,7 @@ protected:
 	Result SQR();							///< Square
 	Result SQRT();							///< Square-root
 	Result SUCC();							///< Successor
-	Result WRITE();							///< Write on standard output
-	Result WRITELN();						///< Write on standard output
+	Result PUT();							///< Put on standard output
 	Result NEW();							///< Allocate space
 	Result DISPOSE();						///< Free space
 	Result ADD();							///< Addition

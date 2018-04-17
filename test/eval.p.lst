@@ -23,10 +23,15 @@
    14: push 1
    15: push 0
    16: push 0
+   17: put
 # test/eval.p, 9: endprog
-   17: push 1
-   18: writeln
+   18: push '
+'
+   19: push 1
+   20: push 0
+   21: push 0
+   22: put
 # test/eval.p, 10: 
-   19: ret
+   23: ret
 
 3.100000e+01

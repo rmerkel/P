@@ -13,7 +13,7 @@
     7: eval 1
     8: push 10
     9: gt
-   10: jneqi 40
+   10: jneqi 44
 # test/ifelifelse.p, 6: 		writeln("i is greater than 10");
    11: push 'i'
    12: push ' '
@@ -38,116 +38,139 @@
    31: push 20
    32: push 0
    33: push 0
-   34: push 1
-   35: writeln
+   34: put
+   35: push '
+'
+   36: push 1
+   37: push 0
+   38: push 0
+   39: put
 # test/ifelifelse.p, 7: 		i := 1
-   36: pushvar 0, 4
-   37: push 1
-# test/ifelifelse.p, 8: 	elif i < 0 then
-   38: assign 1
-   39: jumpi 115
    40: pushvar 0, 4
-   41: eval 1
-   42: push 0
-   43: lt
-   44: jneqi 70
+   41: push 1
+# test/ifelifelse.p, 8: 	elif i < 0 then
+   42: assign 1
+   43: jumpi 129
+   44: pushvar 0, 4
+   45: eval 1
+   46: push 0
+   47: lt
+   48: jneqi 78
 # test/ifelifelse.p, 9: 		writeln("i is less than 0");
-   45: push 'i'
-   46: push ' '
-   47: push 'i'
-   48: push 's'
-   49: push ' '
-   50: push 'l'
-   51: push 'e'
+   49: push 'i'
+   50: push ' '
+   51: push 'i'
    52: push 's'
-   53: push 's'
-   54: push ' '
-   55: push 't'
-   56: push 'h'
-   57: push 'a'
-   58: push 'n'
-   59: push ' '
-   60: push '0'
-   61: push 16
-   62: push 0
-   63: push 0
-   64: push 1
-   65: writeln
+   53: push ' '
+   54: push 'l'
+   55: push 'e'
+   56: push 's'
+   57: push 's'
+   58: push ' '
+   59: push 't'
+   60: push 'h'
+   61: push 'a'
+   62: push 'n'
+   63: push ' '
+   64: push '0'
+   65: push 16
+   66: push 0
+   67: push 0
+   68: put
+   69: push '
+'
+   70: push 1
+   71: push 0
+   72: push 0
+   73: put
 # test/ifelifelse.p, 10: 		i := 2
-   66: pushvar 0, 4
-   67: push 2
+   74: pushvar 0, 4
+   75: push 2
 # test/ifelifelse.p, 11: 	else
-   68: assign 1
-# test/ifelifelse.p, 12: 		writeln("i is between 1 and 10, inclusive", i);
-   69: jumpi 115
-   70: push 'i'
-   71: push ' '
-   72: push 'i'
-   73: push 's'
-   74: push ' '
-   75: push 'b'
-   76: push 'e'
-   77: push 't'
-   78: push 'w'
-   79: push 'e'
-   80: push 'e'
-   81: push 'n'
+   76: assign 1
+# test/ifelifelse.p, 12: 		writeln("i is between 1 and 10, inclusive ", i);
+   77: jumpi 129
+   78: push 'i'
+   79: push ' '
+   80: push 'i'
+   81: push 's'
    82: push ' '
-   83: push '1'
-   84: push ' '
-   85: push 'a'
-   86: push 'n'
-   87: push 'd'
-   88: push ' '
-   89: push '1'
-   90: push '0'
-   91: push ','
+   83: push 'b'
+   84: push 'e'
+   85: push 't'
+   86: push 'w'
+   87: push 'e'
+   88: push 'e'
+   89: push 'n'
+   90: push ' '
+   91: push '1'
    92: push ' '
-   93: push 'i'
+   93: push 'a'
    94: push 'n'
-   95: push 'c'
-   96: push 'l'
-   97: push 'u'
-   98: push 's'
-   99: push 'i'
-  100: push 'v'
-  101: push 'e'
-  102: push 32
-  103: push 0
-  104: push 0
-  105: pushvar 0, 4
-  106: eval 1
-  107: push 1
-  108: push 0
-  109: push 0
-  110: push 2
-  111: writeln
+   95: push 'd'
+   96: push ' '
+   97: push '1'
+   98: push '0'
+   99: push ','
+  100: push ' '
+  101: push 'i'
+  102: push 'n'
+  103: push 'c'
+  104: push 'l'
+  105: push 'u'
+  106: push 's'
+  107: push 'i'
+  108: push 'v'
+  109: push 'e'
+  110: push ' '
+  111: push 33
+  112: push 0
+  113: push 0
+  114: put
+  115: pushvar 0, 4
+  116: eval 1
+  117: push 1
+  118: push 0
+  119: push 0
+  120: put
+  121: push '
+'
+  122: push 1
+  123: push 0
+  124: push 0
+  125: put
 # test/ifelifelse.p, 13: 		i := 3
-  112: pushvar 0, 4
-  113: push 3
+  126: pushvar 0, 4
+  127: push 3
 # test/ifelifelse.p, 14: 	endif;
-  114: assign 1
+  128: assign 1
 # test/ifelifelse.p, 15: 
 # test/ifelifelse.p, 16: 	writeln("i is ", i)
-  115: push 'i'
-  116: push ' '
-  117: push 'i'
-  118: push 's'
-  119: push ' '
-  120: push 5
-  121: push 0
-  122: push 0
-  123: pushvar 0, 4
-  124: eval 1
-  125: push 1
-  126: push 0
-  127: push 0
+  129: push 'i'
+  130: push ' '
+  131: push 'i'
+  132: push 's'
+  133: push ' '
+  134: push 5
+  135: push 0
+  136: push 0
+  137: put
+  138: pushvar 0, 4
+  139: eval 1
+  140: push 1
+  141: push 0
+  142: push 0
+  143: put
 # test/ifelifelse.p, 17: endprog
-  128: push 2
-  129: writeln
+  144: push '
+'
+  145: push 1
+  146: push 0
+  147: push 0
+  148: put
 # test/ifelifelse.p, 18: 
 # test/ifelifelse.p, 19: 
-  130: ret
+  149: ret
 
 i is between 1 and 10, inclusive 10
-i is  3
+i is 3

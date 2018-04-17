@@ -143,80 +143,6 @@ void PInterp::pop(size_t n)	{
 		sp -= n;
 }
 
-/********************************************************************************************//**
- * Writes one expresson on the standard output stream. Index identifies a 4-tuple on the stack;
- * v:n:w:p the value to write, the number Datum's in the value, the width of the field to write
- * the value in, and the precision of the value. Note that if v isn't a Real, p is ignored.
- *
- * @note caller must consume the tuple-expression off of the stack.
- *
- * @param index	index into stack[] for the expr, width [, precision] tuple to print
- * @return false if width or precision is negative, true otherwise
- ************************************************************************************************/
-Result PInterp::write1(unsigned index) {
-	if (sp < 3)
-		return Result::stackUnderflow;
-
-	const Datum nValue = stack[index+1];
-	const Datum width = stack[index+2];
-	const Datum prec = stack[index+3];
-
-	size_t n = 1;							// default value of nValue
-	int w = 0;								// default value of width
-	int p = 0;								// defualt value of prec
-
-	Result r = Result::success;
-
-	if (nValue.kind() != Datum::Integer) {
-		cerr << "WRITE[LN] value count paramters is not an integer!" << endl;
-		r =  Result::badDataType;
-
-	} else if (nValue.integer() < 0) {
-		cerr << "WRITE[LN] value count paramters is negative!" << endl;
-		r =  Result::badDataType;
-
-	} else
-		n = nValue.integer();
-
-	if (width.kind() == Datum::Integer)
-		w = width.integer();
-	
-	else {
-		cerr << "WRITE[LN] width parameter is not an integer!" << endl;
-		r = Result::badDataType;
-	}
-	
-	if (prec.kind() == Datum::Integer)
-		p = prec.integer();
-	
-	else {
-		cerr << "WRITE[LN] precision parameter is not an integer!" << endl;
-		r =  Result::badDataType;
-	}
-
-	for (unsigned i = 0; i < n; ++i) {
-		const Datum value = stack[index-n+1+i];
-
-		switch(value.kind()) {
-		case Datum::Boolean:	cout << boolalpha << value.boolean();					break;
-		case Datum::Character:	cout << setw(w) << value.character();					break;
-		case Datum::Integer:	cout << setw(w) << setprecision(p) << value.integer();	break;
-		case Datum::Real:
-			if (p == 0)
-				cout << setw(w) << scientific << setprecision(6) << value.real();
-			else
-				cout << setw(w) << fixed << setprecision(p) << value.real();
-			break;
-
-		default:
-			cerr << "unknown datum type: " << static_cast<unsigned>(value.kind()) << endl;
-			r = Result::badDataType;
-		}
-	}
-
-	return r;
-}
-
 /************************************************************************************************
  * Instructions...
  ************************************************************************************************/
@@ -241,8 +167,7 @@ PInterp::InstrPtr PInterp::instrTbl[] = {
 	&PInterp::SIN,
 	&PInterp::SQR,
 	&PInterp::SQRT,
-	&PInterp::WRITE,
-	&PInterp::WRITELN,
+	&PInterp::PUT,
 	&PInterp::NEW,
 	&PInterp::DISPOSE,
 	&PInterp::ADD,
@@ -559,53 +484,77 @@ Result PInterp::SUCC() {
 }
 
 /********************************************************************************************//**
- * Writes zero or more elements on the standard output stream. Each element is described by a
- * 3-tuple in the form v:w:p for Value, field Width and Precision if value is a Real. TOS is the
- * number of 3-tuple elements preceeding it, with the last 3-tuple precieeding the count.
+ * Writes one expresson on the standard output stream. Index identifies a 4-tuple on the stack,
+ * (p;w;n;v);
  *
- * @note	Maybe add an element count to each tuple ; v:w:p:n where n is the number of elements
- *			in v, i.e., 1 for scalers, or the number of elements in an array.
+ * - n - the number of Datum's in the value
+ * - w - the width of the field to write the value in
+ * - p - the percision of the value
+ * - v - The values (n) to write...
  *
- * @return	BadDataType if TOS isn't an integer, stackUnderflow if the would underflow.
+ * @note if v isn't a Real, p is ignored.
+ *
+ * @note caller must consume the tuple-expression off of the stack.
+ *
+ * @return	Result::stackUnderflow if there was insufficient space on the stack,
+ * 			Result::badDataType if any of the parameters aren't integers.
  ************************************************************************************************/
-Result PInterp::WRITE() {
-	const	unsigned	tupleSz = 4;	// Each parameter is a 4-tuple
-			Result		r = Result::success;
-			size_t		nargs = 0;		// # of tuples to process...
-			Datum& 		TOS = tos();
+Result PInterp::PUT() {
+	if (sp < 3)
+		return Result::stackUnderflow;
 
-	if (TOS.kind() != Datum::Integer) {
-		cerr << "WRITE TOS is not an integer!" << endl;
+	Result r = Result::success;
+
+	int p = 0;								// defualt value of prec
+	const Datum prec = pop();
+	if (prec.kind() == Datum::Integer)
+		p = prec.integer();
+	else {
+		cerr << "PUT[LN] precision parameter is not an integer!" << endl;
 		r =  Result::badDataType;
-
-	} else {
-		nargs = TOS.integer();
-		if (nargs > sp) {
-			cerr << "Stack underflow @ pc " << pc << endl;
-			r = Result::stackUnderflow; 
-
-		} else if (nargs > 0) {
-			// Write each value in each 3-tuble on standard output, seperated by spaces
-			for (unsigned i = 0; i < nargs-1 && r == Result::success; ++i) {
-				r = write1(sp - (nargs * tupleSz) + (i * tupleSz));
-				cout << ' ';
-			}
-			r = write1(sp - tupleSz);
-		}
 	}
 
-	pop((nargs * tupleSz) + 1);			// Consume nargs plus nargs * tupleSz tubles
+	int w = 0;								// default value of width
+	const Datum width = pop();
+	if (width.kind() == Datum::Integer)
+		w = width.integer();
+	else {
+		cerr << "PUT[LN] width parameter is not an integer!" << endl;
+		r = Result::badDataType;
+	}
+	
+	size_t n = 1;							// default value of nValue
+	const Datum nValue = pop();
+	if (nValue.kind() != Datum::Integer) {
+		cerr << "PUT[LN] value count paramters is not an integer!" << endl;
+		r =  Result::badDataType;
+	} else if (nValue.integer() < 0) {
+		cerr << "PUT[LN] value count paramters is negative!" << endl;
+		r =  Result::badDataType;
+	} else
+		n = nValue.integer();
 
-	return r;
-}
+	for (unsigned i = 0; i < n; ++i) {
+		const Datum& value = stack[sp+i+1-n];
 
-/********************************************************************************************//**
- * Evaluates WRITE() and then writes a newline on the stardard output stream.
- * @return	BadDataType if TOS isn't an integer, stackUnderflow if the would underflow.
- ************************************************************************************************/
-Result PInterp::WRITELN() {
-	auto r = WRITE();
-	cout << '\n';
+		switch(value.kind()) {
+		case Datum::Boolean:	cout << boolalpha << value.boolean();					break;
+		case Datum::Character:	cout << setw(w) << value.character();					break;
+		case Datum::Integer:	cout << setw(w) << setprecision(p) << value.integer();	break;
+		case Datum::Real:
+			if (p == 0)
+				cout << setw(w) << scientific << setprecision(6) << value.real();
+			else
+				cout << setw(w) << fixed << setprecision(p) << value.real();
+			break;
+
+		default:
+			cerr << "unknown datum type: " << static_cast<unsigned>(value.kind()) << endl;
+			r = Result::badDataType;
+		}
+	}
+	pop(n);
+
 	return r;
 }
 

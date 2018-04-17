@@ -15,7 +15,8 @@
  * @example test/fact.p
  * @example test/fahr.p
  * @example test/fib.p
- * @example test/fortest.p
+ * @example test/for.p
+ * @example test/forrev.p
  * @example test/min.p
  * @example test/pointers.p
  * @example test/precedence.p
@@ -69,7 +70,7 @@ static void help() {
  * Print the version number as major.minor
  ************************************************************************************************/
 static void printVersion() {
-	cout << progName << ": verson: 0.36\n";
+	cout << progName << ": verson: 0.37\n";
 }
 
 /********************************************************************************************//** 

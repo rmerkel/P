@@ -26,10 +26,15 @@
    18: push 1
    19: push 0
    20: push 0
+   21: put
 # test/bool.p, 8: endprog
-   21: push 1
-   22: writeln
+   22: push '
+'
+   23: push 1
+   24: push 0
+   25: push 0
+   26: put
 # test/bool.p, 9: 
-   23: ret
+   27: ret
 
 false

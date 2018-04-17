@@ -42,9 +42,9 @@
  *                          { "elif" expresson "then" statement-lst }
  *                          [ "else" statement-lst ]
  *                          "endif" ;
- *      while-statement = "while" expression "loop" statement-lst "endloop" ;
- *        for-statement = "for" identifer ":=" expression
- *                          ( "to" | "downto" ) expression "loop" statement "endloop" ;
+ *     while-statement = "while" expression "loop" statement-lst "endloop" ;
+ *       for-statement = "for" identifer "in" [ "reverse" ] ordinal-type
+ *                          "loop" statement "endloop" ;
  *           statement = [  variable '=' expression                                         |
  *                          identifier '(' [ expression-lst ] ')'                           |
  *                          if-statement                                                    |
@@ -66,14 +66,14 @@
  *           character = nul | sox | .. | '}' | '`' | del
  *              string = '"' { character } '"'
  *              number = whole number | floting point value
- *       
+ *
  * Key:
  *
- *      {}  Repeat zero or more times
- *      []  Optional; zero or *one* times
- *      ()  Grouping
- *      |   One of ...
- *      ;   End of production
+ *      {} Repeat zero or more times
+ *      [] Optional; zero or *one* times
+ *      () Grouping
+ *       | One of ...
+ *       ; End of production
  *
  * @author Randy Merkel, Slowly but Surly Software.
  * @copyright  (c) 2017 Slowly but Surly Software. All rights reserved.

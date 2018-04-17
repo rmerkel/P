@@ -22,79 +22,104 @@
    10: push 1
    11: push 0
    12: push 0
-   13: push 1
-   14: writeln
+   13: put
+   14: push '
+'
+   15: push 1
+   16: push 0
+   17: push 0
+   18: put
 # test/array.p, 12: 
 # test/array.p, 13: 	a1 := "abcdefghij";		{	fill a1 with "abcd..."			}
-   15: pushvar 0, 6
-   16: push 'a'
-   17: push 'b'
-   18: push 'c'
-   19: push 'd'
-   20: push 'e'
-   21: push 'f'
-   22: push 'g'
-   23: push 'h'
-   24: push 'i'
-   25: push 'j'
-   26: assign 10
+   19: pushvar 0, 6
+   20: push 'a'
+   21: push 'b'
+   22: push 'c'
+   23: push 'd'
+   24: push 'e'
+   25: push 'f'
+   26: push 'g'
+   27: push 'h'
+   28: push 'i'
+   29: push 'j'
+   30: assign 10
 # test/array.p, 14:  	writeln(a1);
-   27: pushvar 0, 6
-   28: eval 10
-   29: push 10
-   30: push 0
-   31: push 0
-   32: push 1
-   33: writeln
+   31: pushvar 0, 6
+   32: eval 10
+   33: push 10
+   34: push 0
+   35: push 0
+   36: put
+   37: push '
+'
+   38: push 1
+   39: push 0
+   40: push 0
+   41: put
 # test/array.p, 15: 
 # test/array.p, 16: 	a2 := a1;				{	copies the contents of a1 to a2	}
-   34: pushvar 0, 16
-   35: pushvar 0, 6
-   36: eval 10
-   37: assign 10
+   42: pushvar 0, 16
+   43: pushvar 0, 6
+   44: eval 10
+   45: assign 10
 # test/array.p, 17: 	writeln(a2);
-   38: pushvar 0, 16
-   39: eval 10
-   40: push 10
-   41: push 0
-   42: push 0
-   43: push 1
-   44: writeln
+   46: pushvar 0, 16
+   47: eval 10
+   48: push 10
+   49: push 0
+   50: push 0
+   51: put
+   52: push '
+'
+   53: push 1
+   54: push 0
+   55: push 0
+   56: put
 # test/array.p, 18: 
 # test/array.p, 19: 	a1 := "0123456789";		{	fill a1 with "0123..."			}
-   45: pushvar 0, 6
-   46: push '0'
-   47: push '1'
-   48: push '2'
-   49: push '3'
-   50: push '4'
-   51: push '5'
-   52: push '6'
-   53: push '7'
-   54: push '8'
-   55: push '9'
-   56: assign 10
+   57: pushvar 0, 6
+   58: push '0'
+   59: push '1'
+   60: push '2'
+   61: push '3'
+   62: push '4'
+   63: push '5'
+   64: push '6'
+   65: push '7'
+   66: push '8'
+   67: push '9'
+   68: assign 10
 # test/array.p, 20: 							{	while a1 has changed...			}
 # test/array.p, 21: 	writeln(a1);
-   57: pushvar 0, 6
-   58: eval 10
-   59: push 10
-   60: push 0
-   61: push 0
-   62: push 1
-   63: writeln
+   69: pushvar 0, 6
+   70: eval 10
+   71: push 10
+   72: push 0
+   73: push 0
+   74: put
+   75: push '
+'
+   76: push 1
+   77: push 0
+   78: push 0
+   79: put
 # test/array.p, 22: 							{	... a2 has not!					}
 # test/array.p, 23: 	writeln(a2)
-   64: pushvar 0, 16
-   65: eval 10
-   66: push 10
-   67: push 0
-   68: push 0
+   80: pushvar 0, 16
+   81: eval 10
+   82: push 10
+   83: push 0
+   84: push 0
+   85: put
 # test/array.p, 24: endprog
-   69: push 1
-   70: writeln
+   86: push '
+'
+   87: push 1
+   88: push 0
+   89: push 0
+   90: put
 # test/array.p, 25: 
-   71: ret
+   91: ret
 
 x
 abcdefghij

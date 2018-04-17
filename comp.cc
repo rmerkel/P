@@ -666,10 +666,9 @@ pair<bool,Datum> PComp::constExpr() {
 
 	} else if (accept(Token::Identifier, false)) {
 		// Copy, and then, consume the identifier..
-		const string id = ts.current().string_value;
+		auto it = lookup(ts.current().string_value);
 		expect(Token::Identifier);
 
-		auto it = lookup(id);
 		if (it != symtbl.end()) {
 			if (it->second.kind() == SymValue::Constant)
 				value.second = Datum(sign) * it->second.value();
@@ -868,18 +867,16 @@ TDescPtr PComp::variable(int level, SymbolTableIter it) {
 }
 
 /********************************************************************************************//**
- * variable := expression 
- *
  * @param	level	The current block level.
  * @param	it		The variable, or function, identifier
  * @param	dup		Duplicate reference to the variable if true
  *
  * @return	Reference to the variable reference
  ************************************************************************************************/
-void PComp::assignStatement(int level, SymbolTableIter it, bool dup) {
-	auto type = it->second.type();		// Start with the lvalue type
+TDescPtr PComp::lvalueRef(int level, SymbolTableIter it, bool dup) {
+	TDescPtr type = it->second.type();		// Start with the lvalue type
 
-	// Emit the l-value, a variable or a function reference...
+	// Emit a variable or a function reference...
 	if (it->second.kind() == SymValue::Function) {
 		emit(OpCode::PUSHVAR, 0, FrameRetVal);
 		type = TypeDesc::newPointerDesc(type);
@@ -893,6 +890,20 @@ void PComp::assignStatement(int level, SymbolTableIter it, bool dup) {
 	if (dup)
 		emit(OpCode::DUP);
 
+	return type;
+}
+
+/********************************************************************************************//**
+ * variable := expression 
+ *
+ * @param	level	The current block level.
+ * @param	it		The variable, or function, identifier
+ * @param	dup		Duplicate reference to the variable if true
+ *
+ * @return	Reference to the variable reference
+ ************************************************************************************************/
+void PComp::assignStatement(int level, SymbolTableIter it, bool dup) {
+	auto type = lvalueRef(level, it, dup);
 	expect(Token::Assign);
 
 	// Emit the r-value and assignment...
@@ -913,11 +924,10 @@ void PComp::assignStatement(int level, SymbolTableIter it, bool dup) {
  ************************************************************************************************/
 bool PComp::identStatement(int level) {
 	if (accept(Token::Identifier, false)) {
-		const string id = ts.current().string_value;
+		auto lhs = lookup(ts.current().string_value);
 		next();
 
-		auto lhs = lookup(id);
-		if (lhs != symtbl.end()) {			// id is unidentified?
+		if (lhs != symtbl.end()) {			// unidentified identifier?
 			switch(lhs->second.kind()) {
 			case SymValue::Procedure:		// emit a procedure call
 				callStatement(level, lhs);
@@ -1056,48 +1066,73 @@ bool PComp::repeatStatement(int level) {
  ************************************************************************************************/
 bool PComp::forStatement(int level) {
 	if (accept(Token::For)) {
-		expect(Token::Identifier, false);	// "for identifier := expression..."
-		const string id = ts.current().string_value;
-		next();
-		auto var = lookup(id);
+		auto var = lookup(ts.current().string_value);
+		expect(Token::Identifier);			// consume the identifier...
 		if (var == symtbl.end())
-			return true;
-		assignStatement(level, var, true);
+			return true;					// give up if the identifier is undefined
+		auto lhs = lvalueRef(level, var, false);
+		emit(OpCode::DUP);					// dupliate the iternator reference
 
-		int inc;							// "... ( to | downto ) ...|
-		if (accept(Token::To))
-			inc = 1;
-		else {
-			expect(Token::DownTo);
-			inc = -1;
+		expect(Token::In);					// "for" identifier "in" ...
+
+		int inc = 1;						// default is to count up...
+		if (accept(Token::Reverse))
+			inc = -1;						// "for" identifier "in" "reverse"
+
+		auto range = type(level, false);
+		if (range.get() == 0) {
+			error("expected ordinal type");
+			return true;					// give up...
+
+		} else if (range->tclass() == TypeDesc::Array)
+			range = range->itype();			// use the arrays index type...
+
+		if (range.get() == 0 || !range->ordinal()) {
+			error("expected ordinal type");
+			return true;					// give up...
 		}
 
-		const auto cond_pc = code->size();	// "... condition..."
-		emit(OpCode::DUP);
-		emit(OpCode::EVAL, 0, 1);
-		expression(level);
-		emit(OpCode::LTE);
-		const auto jmp_pc = emitJNEQI();
+		if (inc == 1)
+			emit(OpCode::PUSH, 0, range->range().min());
+		else
+			emit(OpCode::PUSH, 0, range->range().max());
+			
+		emit(OpCode::ASSIGN, 0, lhs->size()); // initialize the iterator
 
-		expect(Token::Loop);				// "... loop statements..." endloop
+		const auto cond_pc = code->size();	// Condition check
+
+		emit(OpCode::DUP);					// dupliate the iternator reference, again
+			emit(OpCode::EVAL, 0, lhs->size());	// evaluate the iterator and compare to the limit
+
+		if (inc == 1) {
+			emit(OpCode::PUSH, 0, range->range().max());
+			emit(OpCode::LTE);					// is iterator <= the condition?
+
+		} else {
+			emit(OpCode::PUSH, 0, range->range().min());
+			emit(OpCode::GTE);					// is iterator <= the condition?
+		}
+
+		const auto jmp_pc = emitJNEQI();	// Jump to end of statement if not
+
+		expect(Token::Loop);				// ... loop statements...
 		statementList(level);
-		expect(Token::Endloop);
+		expect(Token::Endloop);				// ... endloop
 
-		emit(OpCode::DUP);					// iterate
-		emit(OpCode::DUP);
-		emit(OpCode::EVAL, 0, 1);
+		emit(OpCode::DUP);					// iterate; dupliate the iternator reference again
+		emit(OpCode::DUP);					// and one more time
+		emit(OpCode::EVAL, 0, 1);			// add (or subtract 1)
 		emit(OpCode::PUSH, 0, inc);
 		emit(OpCode::ADD);
-		emit(OpCode::ASSIGN, 0, 1);
-		emitJumpI(cond_pc);
+		emit(OpCode::ASSIGN, 0, 1);			// update the iterator
+		emitJumpI(cond_pc);					// jump back to check the condition again
 
 		// pop the condition varaible off the stack...
-		const auto pop_pc = emit(OpCode::POP, 0, 1);
+		const auto done_pc = emit(OpCode::POP, 0, 1);
 
 		if (verbose)
-			cout << prefix(progName) << "patching address @ " << pop_pc << " to " << code->size() << '\n';
-
-		(*code)[jmp_pc].value = pop_pc;
+			cout << prefix(progName) << "patching address @ " << done_pc << " to " << code->size() << '\n';
+		(*code)[jmp_pc].value = done_pc;
 
 		return true;
 	}
@@ -1115,11 +1150,10 @@ bool PComp::forStatement(int level) {
  *
  * @param	level	The current block level.
  ************************************************************************************************/
-void PComp::writeStmt(int level) {
+void PComp::writeStatement(int level) {
 	ostringstream oss;
 
-	int nargs = 0;								// Count arguments, as an integer!
-	if (accept(Token::OpenParen)) {				// process, and count, each expr-tuple..
+	if (accept(Token::OpenParen)) {				// process each expr-tuple..
 		do {
 			auto expr = expression(level); 		// value(s) to write
 			emit(OpCode::PUSH, 0, expr->size());
@@ -1146,24 +1180,12 @@ void PComp::writeStmt(int level) {
 				emit(OpCode::PUSH, 0, 0);
 			}
 
-			++nargs;
+			emit(OpCode::PUT);
 
 		} while (accept(Token::Comma));
 
 		expect(Token::CloseParen);
 	}
-
-	emit(OpCode::PUSH, 0, nargs);
-}
-
-/********************************************************************************************//**
- * write [ format-list ]
- *
- * @param	level	The current block level.
- ************************************************************************************************/
-void PComp::writeStatement(int level) {
-	writeStmt(level);
-	emit(OpCode::WRITE);
 }
 
 /********************************************************************************************//**
@@ -1172,8 +1194,13 @@ void PComp::writeStatement(int level) {
  * @param	level	The current block level.
  ************************************************************************************************/
 void PComp::writeLnStatement(int level) {
-	writeStmt(level);
-	emit(OpCode::WRITELN);
+	writeStatement(level);
+
+	emit(OpCode::PUSH, 0, '\n');
+	emit(OpCode::PUSH, 0, 1);
+	emit(OpCode::PUSH, 0, 0);
+	emit(OpCode::PUSH, 0, 0);
+	emit(OpCode::PUT);
 }
 
 /********************************************************************************************//**
@@ -1186,9 +1213,10 @@ void PComp::writeLnStatement(int level) {
 void PComp::statementNew(int level) {
 	expect(Token::OpenParen);
 
-	const string id = ts.current().string_value;
-	if (expect(Token::Identifier)) {
-		auto it = lookup(id);
+	if (expect(Token::Identifier, false)) {
+		auto it = lookup(ts.current().string_value);
+		next();								// consume the identifier
+
 		TDescPtr tdesc = TypeDesc::newIntDesc();
 		if (it != symtbl.end())
 			tdesc = variable(level, it);
@@ -1254,18 +1282,16 @@ void PComp::statementProcs(int level) {
  * @param	level	The current block level.
  ************************************************************************************************/
 void PComp::statement(int level) {
-	ostringstream oss;
-
 	if (identStatement(level)) 
 		;
-	else if (ifStatement(level))			// if expr then stmt { then stmt... }
+	else if (ifStatement(level))
 		;
 	else if (whileStatement(level))
-		;									// while expr do stmt...
+		;
 	else if (repeatStatement(level))
-		;									// "repeat" stmt until expr...
+		;
 	else if (forStatement(level))
-		;									// 'for' var ':=' expr ( 'to' | 'downto') expr 'do' stmt...
+		;
 	else
 		statementProcs(level);
 }
@@ -1495,9 +1521,9 @@ TDescPtr PComp::type(int level, bool var, const string& idprefix) {
 
 	if (accept(Token::Identifier, false)) { 	// previously defined type-name
 		const string id = ts.current().string_value;
-		next();
-
 		auto it = lookup(id);
+		next();									// Consume the identifier...
+
 		if (it == symtbl.end() || it->second.kind() != SymValue::Type)
 			error("expected type, got ", id);
 
@@ -1533,11 +1559,11 @@ TDescPtr PComp::simpleType(int level, bool var) {
 
 	if (accept(Token::Identifier, false)) {		// Previously defined type, including real!
 		const string id = ts.current().string_value;
-		next();
+		next();									// Consume the identifier
 
 		auto it = lookup(id);
 		if (it == symtbl.end() || it->second.kind() != SymValue::Type)
-			error("expected type, got ", it->first);
+			error("expected type, got ", id);
 
 		else if (!it->second.type()->ordinal())
 			error("expected ordinal type, got ", it->first);

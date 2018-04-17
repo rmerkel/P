@@ -32,11 +32,16 @@
    20: push 1
    21: push 0
    22: push 0
+   23: put
 # test/varparam.p, 12: endprog
-   23: push 1
-   24: writeln
+   24: push '
+'
+   25: push 1
+   26: push 0
+   27: push 0
+   28: put
 # test/varparam.p, 13: 
 # test/varparam.p, 14: 
-   25: ret
+   29: ret
 
 1

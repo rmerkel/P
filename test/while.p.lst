@@ -1,0 +1,55 @@
+# test/while.p, 1: { Simple while loop test }
+# test/while.p, 2: program ForTest() is
+# test/while.p, 3: var
+    0: calli 0, 2
+    1: halt
+# test/while.p, 4: 	i : integer;
+# test/while.p, 5: 
+# test/while.p, 6: begin
+    2: enter 1
+# test/while.p, 7: 	i := 0;
+    3: pushvar 0, 4
+    4: push 0
+    5: assign 1
+# test/while.p, 8: 	while (i <= 9) loop
+    6: pushvar 0, 4
+    7: eval 1
+    8: push 9
+    9: lte
+   10: jneqi 29
+# test/while.p, 9: 		writeln(i);
+   11: pushvar 0, 4
+   12: eval 1
+   13: push 1
+   14: push 0
+   15: push 0
+   16: put
+   17: push '
+'
+   18: push 1
+   19: push 0
+   20: push 0
+   21: put
+# test/while.p, 10: 		i := i + 1
+   22: pushvar 0, 4
+   23: pushvar 0, 4
+   24: eval 1
+   25: push 1
+# test/while.p, 11: 	endloop
+   26: add
+   27: assign 1
+# test/while.p, 12: endprog
+   28: jumpi 6
+# test/while.p, 13: 
+   29: ret
+
+0
+1
+2
+3
+4
+5
+6
+7
+8
+9

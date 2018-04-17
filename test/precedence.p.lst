@@ -13,25 +13,35 @@
     9: push 1
    10: push 0
    11: push 0
-   12: push 1
-   13: writeln
-# test/precedence.p, 4: 	writeln(-1 + 2 * 3 - 4)		{	s/b 1	}
+   12: put
+   13: push '
+'
    14: push 1
-   15: neg
-   16: push 2
-   17: push 3
-   18: mul
-   19: add
-   20: push 4
-   21: sub
-   22: push 1
-   23: push 0
-   24: push 0
+   15: push 0
+   16: push 0
+   17: put
+# test/precedence.p, 4: 	writeln(-1 + 2 * 3 - 4)		{	s/b 1	}
+   18: push 1
+   19: neg
+   20: push 2
+   21: push 3
+   22: mul
+   23: add
+   24: push 4
+   25: sub
+   26: push 1
+   27: push 0
+   28: push 0
+   29: put
 # test/precedence.p, 5: endprog
-   25: push 1
-   26: writeln
+   30: push '
+'
+   31: push 1
+   32: push 0
+   33: push 0
+   34: put
 # test/precedence.p, 6: 
-   27: ret
+   35: ret
 
 3
 1

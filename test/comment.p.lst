@@ -45,12 +45,17 @@
    30: push 1
    31: push 0
    32: push 0
-   33: push 1
-   34: writeln
+   33: put
+   34: push '
+'
+   35: push 1
+   36: push 0
+   37: push 0
+   38: put
 # test/comment.p, 15: endprog
 # test/comment.p, 16: 
 # test/comment.p, 17: {	unterminated comment, but we don't care as it follows the period!
 # test/comment.p, 18: 
-   35: ret
+   39: ret
 
 3628800

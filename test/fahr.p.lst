@@ -36,73 +36,84 @@
    21: push 18
    22: push 0
    23: push 0
-   24: push 1
-   25: writeln
+   24: put
+   25: push '
+'
+   26: push 1
+   27: push 0
+   28: push 0
+   29: put
 # test/fahr.p, 15: 
 # test/fahr.p, 16: 	fahr := LOWER;
-   26: pushvar 0, 4
-   27: push 0
-   28: itor
-   29: assign 1
-# test/fahr.p, 17: 	while fahr <= UPPER loop
    30: pushvar 0, 4
-   31: eval 1
-   32: push 300
-   33: itor
-   34: lte
-   35: jneqi 66
+   31: push 0
+   32: itor
+   33: assign 1
+# test/fahr.p, 17: 	while fahr <= UPPER loop
+   34: pushvar 0, 4
+   35: eval 1
+   36: push 300
+   37: itor
+   38: lte
+   39: jneqi 75
 # test/fahr.p, 18: 		celsius := 5.0 * (fahr-32.0) / 9.0;
-   36: pushvar 0, 5
-   37: push 5.000000
-   38: pushvar 0, 4
-   39: eval 1
-   40: push 32.000000
-   41: sub
-   42: mul
-   43: push 9.000000
-   44: div
-   45: assign 1
+   40: pushvar 0, 5
+   41: push 5.000000
+   42: pushvar 0, 4
+   43: eval 1
+   44: push 32.000000
+   45: sub
+   46: mul
+   47: push 9.000000
+   48: div
+   49: assign 1
 # test/fahr.p, 19: 		writeln(fahr : 9 : 1, celsius : 8 : 1);
-   46: pushvar 0, 4
-   47: eval 1
-   48: push 1
-   49: push 9
-   50: push 1
-   51: pushvar 0, 5
-   52: eval 1
-   53: push 1
-   54: push 8
-   55: push 1
-   56: push 2
-   57: writeln
+   50: pushvar 0, 4
+   51: eval 1
+   52: push 1
+   53: push 9
+   54: push 1
+   55: put
+   56: pushvar 0, 5
+   57: eval 1
+   58: push 1
+   59: push 8
+   60: push 1
+   61: put
+   62: push '
+'
+   63: push 1
+   64: push 0
+   65: push 0
+   66: put
 # test/fahr.p, 20: 		fahr := fahr + STEP;
-   58: pushvar 0, 4
-   59: pushvar 0, 4
-   60: eval 1
-   61: push 20
-   62: itor
-   63: add
-   64: assign 1
+   67: pushvar 0, 4
+   68: pushvar 0, 4
+   69: eval 1
+   70: push 20
+   71: itor
+   72: add
+   73: assign 1
 # test/fahr.p, 21: 	endloop
 # test/fahr.p, 22: endprog
-   65: jumpi 30
+   74: jumpi 34
 # test/fahr.p, 23: 
-   66: ret
+   75: ret
 
 Fahrenheit Celsius
-      0.0    -17.8
-     20.0     -6.7
-     40.0      4.4
-     60.0     15.6
-     80.0     26.7
-    100.0     37.8
-    120.0     48.9
-    140.0     60.0
-    160.0     71.1
-    180.0     82.2
-    200.0     93.3
-    220.0    104.4
-    240.0    115.6
-    260.0    126.7
-    280.0    137.8
-    300.0    148.9
+      0.0   -17.8
+     20.0    -6.7
+     40.0     4.4
+     60.0    15.6
+     80.0    26.7
+    100.0    37.8
+    120.0    48.9
+    140.0    60.0
+    160.0    71.1
+    180.0    82.2
+    200.0    93.3
+    220.0   104.4
+    240.0   115.6
+    260.0   126.7
+    280.0   137.8
+    300.0   148.9

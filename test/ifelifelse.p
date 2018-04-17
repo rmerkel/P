@@ -9,7 +9,7 @@ begin
 		writeln("i is less than 0");
 		i := 2
 	else
-		writeln("i is between 1 and 10, inclusive", i);
+		writeln("i is between 1 and 10, inclusive ", i);
 		i := 3
 	endif;
 

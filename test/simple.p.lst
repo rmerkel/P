@@ -18,15 +18,21 @@
    11: push 1
    12: push 0
    13: push 0
-   14: pushvar 0, 5
-   15: eval 1
-   16: push 1
-   17: push 0
+   14: put
+   15: pushvar 0, 5
+   16: eval 1
+   17: push 1
    18: push 0
+   19: push 0
+   20: put
 # test/simple.p, 7: endprog
-   19: push 2
-   20: writeln
+   21: push '
+'
+   22: push 1
+   23: push 0
+   24: push 0
+   25: put
 # test/simple.p, 8: 
-   21: ret
+   26: ret
 
-0 1
+01
