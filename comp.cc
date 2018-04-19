@@ -1606,7 +1606,7 @@ TDescPtr PComp::ordinalType(int level, bool var) {
 
 		int value = 0;							// Each enumeration gets a value...
 		for (auto id : ids) {
-			enums.push_back( { id, TypeDesc::newIntDesc() } );
+			enums.push_back( { id, type } );
 			symtbl.insert(	{ id, SymValue::makeConst(level, Datum(value), type) }	);
 			if (verbose)
 				cout << prefix(progName) << "enumeration '" << id << "' = " << value << ", " << level << '\n';
