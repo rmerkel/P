@@ -4,5 +4,5 @@ var
 begin
 	b := true;
 	if (b) then b := false endif;
-	writeln(b)
+	put_line(b)
 endprog

@@ -21,7 +21,7 @@
     3: pushvar 0, 4
     4: push 1
     5: assign 1
-# test/fact.p, 18: 		writeln(p);
+# test/fact.p, 18: 		put_line(p);
     6: pushvar 0, 4
     7: eval 1
     8: push 1
@@ -55,7 +55,7 @@
    32: push 1
    33: sub
    34: assign 1
-# test/fact.p, 22: 			writeln(p)
+# test/fact.p, 22: 			put_line(p)
    35: pushvar 0, 4
    36: eval 1
    37: push 1

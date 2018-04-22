@@ -17,7 +17,7 @@
     5: llimit 0
     6: ulimit 127
     7: assign 1
-# test/character.p, 12: 	writeln(c);	
+# test/character.p, 12: 	put_line(c);	
     8: pushvar 0, 5
     9: eval 1
    10: push 1
@@ -43,7 +43,7 @@
    28: push 'i'
    29: push 'j'
    30: assign 10
-# test/character.p, 14:  	writeln(a1);
+# test/character.p, 14:  	put_line(a1);
    31: pushvar 0, 6
    32: eval 10
    33: push 10
@@ -61,7 +61,7 @@
    43: pushvar 0, 6
    44: eval 10
    45: assign 10
-# test/character.p, 16: 	writeln(a2);
+# test/character.p, 16: 	put_line(a2);
    46: pushvar 0, 16
    47: eval 10
    48: push 10
@@ -87,7 +87,7 @@
    66: push '8'
    67: push '8'
    68: assign 10
-# test/character.p, 18: 	writeln(a1);			{	while a1 has changed...			}
+# test/character.p, 18: 	put_line(a1);			{	while a1 has changed...			}
    69: pushvar 0, 6
    70: eval 10
    71: push 10
@@ -100,7 +100,7 @@
    77: push 0
    78: push 0
    79: put
-# test/character.p, 19: 	writeln(a2)				{	... a2 has not!					}
+# test/character.p, 19: 	put_line(a2)			{	... a2 has not!					}
    80: pushvar 0, 16
    81: eval 10
    82: push 10

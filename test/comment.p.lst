@@ -39,7 +39,7 @@
    25: mul
    26: assign 1
    27: jumpi 9
-# test/comment.p, 14:    writeln(f);
+# test/comment.p, 14:    put_line(f);
    28: pushvar 0, 5
    29: eval 1
    30: push 1

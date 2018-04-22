@@ -17,7 +17,7 @@
     9: push 0
    10: gte
    11: jneqi 30
-# test/forrev.p, 8: 		writeln(i)
+# test/forrev.p, 8: 		put_line(i)
    12: pushvar 0, 4
    13: eval 1
    14: push 1

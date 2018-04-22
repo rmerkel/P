@@ -44,7 +44,7 @@
    24: eval 1
    25: mul
    26: assign 1
-# test/test.p, 20: 	  writeln(f : 8 : 6)
+# test/test.p, 20: 	  put_line(f, 8, 6)
    27: pushvar 0, 5
    28: eval 1
    29: push 1

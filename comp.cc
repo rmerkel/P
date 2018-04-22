@@ -1141,50 +1141,47 @@ bool PComp::forStatement(int level) {
 }
 
 /********************************************************************************************//**
- * write or writeln[ format-list ]
+ * write or writeln( [ expression [',' width [ ',' precision ]]] )
  *
  * Process write and writeln parameters, up to, but not including, emitteing the final op-code.
- *
- * @note	Write argument count must be a signed int, otherwise it will be interpeted as an 
- *          address!
  *
  * @param	level	The current block level.
  ************************************************************************************************/
 void PComp::writeStatement(int level) {
-	ostringstream oss;
+	const int defaultWidth = 0;
+	const int defaultPrec = 0;
 
-	if (accept(Token::OpenParen)) {				// process each expr-tuple..
-		do {
-			auto expr = expression(level); 		// value(s) to write
+	ostringstream oss;
+	if (accept(Token::OpenParen)) {			// process each expr-tuple..
+		if (!accept(Token::CloseParen)) {	// handle no parameters
+			auto expr = expression(level); 	// value(s) to write
 			emit(OpCode::PUSH, 0, expr->size());
 
-			if (accept(Token::Colon)) {			// [ ':' width [ ':' precision ]]
+			if (accept(Token::Comma)) {		// [ ',' width [ ',' precision ]]
 				auto width = expression(level);
 				if (width->tclass() != TypeDesc::Integer) {
 					oss << "expeced integer width parameter, got: " << width->tclass();
 					error(oss.str());
 				}
 
-				if (accept(Token::Colon)) {		//	[ ':' precision ]
+				if (accept(Token::Comma)) {	//	[ ',' precision ]
 					auto prec = expression(level);
 					if (prec->tclass() != TypeDesc::Integer) {
 						oss << "expeced integer width parameter, got: " << width->tclass();
 						error(oss.str());
 					}
 
-				} else
-					emit(OpCode::PUSH, 0, 0);	// push default precision
+				} else						// push default precision
+					emit(OpCode::PUSH, 0, defaultPrec);	// push default precision
 						
-			} else {							// push default width & precision
-				emit(OpCode::PUSH, 0, 0);
-				emit(OpCode::PUSH, 0, 0);
+			} else {						// push default width & precision
+				emit(OpCode::PUSH, 0, defaultWidth);
+				emit(OpCode::PUSH, 0, defaultPrec);
 			}
 
 			emit(OpCode::PUT);
-
-		} while (accept(Token::Comma));
-
-		expect(Token::CloseParen);
+			expect(Token::CloseParen);
+		}
 	}
 }
 
@@ -1247,10 +1244,10 @@ void PComp::statementNew(int level) {
 void PComp::statementProcs(int level) {
 	ostringstream oss;
 
-	if (accept(Token::Write))						// write [ '(' expr-tuple { ',' expr-tuple } ')' ]
+	if (accept(Token::Put))							// put 	[ '(' expr-tuple { ',' expr-tuple } ')' ]
 		writeStatement(level);
 
-	else if (accept(Token::Writeln))				// writeln [ '(' expr-tuple { ',' expr-tuple } ')' ]
+	else if (accept(Token::Putln))					// putln [ '(' expr-tuple { ',' expr-tuple } ')' ]
 		writeLnStatement(level);
 
 	else if (accept(Token::New))					// 'New (' id ')'

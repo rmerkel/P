@@ -4,13 +4,13 @@ var
 
 begin
 	xp := nil;
-	writeln(xp);
+	put_line(xp);
 
 	new(xp);
-	writeln(xp);
+	put_line(xp);
 	if xp <> nil then
 		xp^ := 2048;
-		writeln(xp^)
+		put_line(xp^)
 	endif;
 
 	xp^ := 0;

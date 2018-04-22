@@ -96,18 +96,19 @@ struct Token {
 
 		Add,							///< Addition
 		Subtract,						///< Subtraction
-		Multiply /*	= '*' */,			///< Multiplication
-		Divide 	/*	= '/' */,			///< Division
+		Multiply,						///< Multiplication
+		Divide,							///< Division
 
 		OpenParen,						///< Opening parentheses
 		CloseParen,						///< Closing parentheses
 		OpenBrkt,						///< Opening bracket
 		CloseBrkt,						///< Closing bracket
 
-		Comma,							///< Decl separator
-		Period,							///< Period
+		Comma,							///< ',' - Decl separator
+		Period,							///< '.'
 		Colon,							///< Identifier ':' type
-		SemiColon,						///< Statement separator
+		SemiColon,						///< ';' - Statement separator
+		Tick,							///< '`' - Attribute selector
 
 		// built-in functions...
 
@@ -125,8 +126,8 @@ struct Token {
 		Sqrt,							///< Square root of value
 		Succ,							///< Next ordinal of value
 
-		Write,							///< Write on standard output
-		Writeln,						///< Write on standard output, plus newline
+		Put,							///< Write on standard output
+		Putln,							///< Write on standard output, plus newline
 		New,							///< Allocate dynamic store
 		Dispose,						///< Free allocated dynamic store
 

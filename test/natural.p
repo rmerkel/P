@@ -2,9 +2,9 @@ program Natural() is
 var	n : natural;
 begin
 	n := 0;
-	writeln(n);
+	put_line(n);
 	n := 1;
-	writeln(n);
+	put_line(n);
 	n := -1;
-	writeln(n)
+	put_line(n)
 endprog

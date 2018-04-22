@@ -14,7 +14,7 @@
     8: push 10
     9: gt
    10: jneqi 44
-# test/ifelse.p, 6: 		writeln("i is greater than 10");
+# test/ifelse.p, 6: 		put_line("i is greater than 10");
    11: push 'i'
    12: push ' '
    13: push 'i'
@@ -50,7 +50,7 @@
    41: push 1
 # test/ifelse.p, 8: 	else
    42: assign 1
-# test/ifelse.p, 9: 		writeln("i is <= 10");
+# test/ifelse.p, 9: 		put_line("i is <= 10");
    43: jumpi 66
    44: push 'i'
    45: push ' '
@@ -78,7 +78,7 @@
 # test/ifelse.p, 11: 	endif;
    65: assign 1
 # test/ifelse.p, 12: 
-# test/ifelse.p, 13: 	writeln("i is ", i)
+# test/ifelse.p, 13: 	put("i is ");
    66: push 'i'
    67: push ' '
    68: push 'i'
@@ -88,21 +88,22 @@
    72: push 0
    73: push 0
    74: put
+# test/ifelse.p, 14: 	put_line(i)
    75: pushvar 0, 4
    76: eval 1
    77: push 1
    78: push 0
    79: push 0
    80: put
-# test/ifelse.p, 14: endprog
+# test/ifelse.p, 15: endprog
    81: push '
 '
    82: push 1
    83: push 0
    84: push 0
    85: put
-# test/ifelse.p, 15: 
 # test/ifelse.p, 16: 
+# test/ifelse.p, 17: 
    86: ret
 
 i is <= 10

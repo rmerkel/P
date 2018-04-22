@@ -17,7 +17,7 @@
     8: push 9
     9: lte
    10: jneqi 29
-# test/while.p, 9: 		writeln(i);
+# test/while.p, 9: 		put_line(i);
    11: pushvar 0, 4
    12: eval 1
    13: push 1

@@ -16,7 +16,7 @@
     5: llimit 0
     6: ulimit 127
     7: assign 1
-# test/array.p, 11: 	writeln(c);	
+# test/array.p, 11: 	put_line(c);	
     8: pushvar 0, 5
     9: eval 1
    10: push 1
@@ -43,7 +43,7 @@
    28: push 'i'
    29: push 'j'
    30: assign 10
-# test/array.p, 14:  	writeln(a1);
+# test/array.p, 14:  	put_line(a1);
    31: pushvar 0, 6
    32: eval 10
    33: push 10
@@ -62,7 +62,7 @@
    43: pushvar 0, 6
    44: eval 10
    45: assign 10
-# test/array.p, 17: 	writeln(a2);
+# test/array.p, 17: 	put_line(a2);
    46: pushvar 0, 16
    47: eval 10
    48: push 10
@@ -90,7 +90,7 @@
    67: push '9'
    68: assign 10
 # test/array.p, 20: 							{	while a1 has changed...			}
-# test/array.p, 21: 	writeln(a1);
+# test/array.p, 21: 	put_line(a1);
    69: pushvar 0, 6
    70: eval 10
    71: push 10
@@ -104,7 +104,7 @@
    78: push 0
    79: put
 # test/array.p, 22: 							{	... a2 has not!					}
-# test/array.p, 23: 	writeln(a2)
+# test/array.p, 23: 	put_line(a2)
    80: pushvar 0, 16
    81: eval 10
    82: push 10

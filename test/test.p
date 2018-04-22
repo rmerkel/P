@@ -17,7 +17,7 @@ begin
    while n < nFacts loop
       n := n + 1;
       f := f * n;
-	  writeln(f : 8 : 6)
+	  put_line(f, 8, 6)
    endloop
 endprog
 

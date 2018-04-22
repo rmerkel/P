@@ -32,7 +32,7 @@
    23: pushvar 0, 6
    24: eval 1
    25: assign 1
-# test/testif.p, 9: 	writeln(x);
+# test/testif.p, 9: 	put_line(x);
    26: pushvar 0, 4
    27: eval 1
    28: push 1
@@ -63,7 +63,7 @@
    49: pushvar 0, 5
    50: eval 1
    51: assign 1
-# test/testif.p, 13: 	writeln(x)
+# test/testif.p, 13: 	put_line(x)
    52: pushvar 0, 4
    53: eval 1
    54: push 1

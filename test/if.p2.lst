@@ -14,7 +14,7 @@
     8: push 10
     9: gt
    10: jneqi 37
-# if.p, 6: 		writeln("i is greater than 10")
+# if.p, 6: 		put_line("i is greater than 10")
    11: push 'i'
    12: push ' '
    13: push 'i'
@@ -40,14 +40,14 @@
    33: push 0
 # if.p, 7: 	end else if i < 0 then begin
    34: push 1
-   35: writeln
+   35: put_line
    36: jumpi 78
    37: pushvar 0, 4
    38: eval 1
    39: push 0
    40: lt
    41: jneqi 64
-# if.p, 8: 		writeln("i is less than 0")
+# if.p, 8: 		put_line("i is less than 0")
    42: push 'i'
    43: push ' '
    44: push 'i'
@@ -69,9 +69,9 @@
    60: push 0
 # if.p, 9: 	end else begin
    61: push 1
-   62: writeln
+   62: put_line
    63: jumpi 78
-# if.p, 10: 		writeln("i is", i)
+# if.p, 10: 		put_line("i is", i)
    64: push 'i'
    65: push ' '
    66: push 'i'
@@ -86,7 +86,7 @@
    75: push 0
 # if.p, 11: 	end
    76: push 2
-   77: writeln
+   77: put_line
 # if.p, 12: endprog
 # if.p, 13: 
 # if.p, 14: 

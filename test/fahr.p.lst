@@ -14,7 +14,7 @@
 # test/fahr.p, 12: 
 # test/fahr.p, 13: begin
     2: enter 2
-# test/fahr.p, 14: 	writeln("Fahrenheit Celsius");
+# test/fahr.p, 14: 	put_line("Fahrenheit Celsius");
     3: push 'F'
     4: push 'a'
     5: push 'h'
@@ -67,13 +67,14 @@
    47: push 9.000000
    48: div
    49: assign 1
-# test/fahr.p, 19: 		writeln(fahr : 9 : 1, celsius : 8 : 1);
+# test/fahr.p, 19: 		put(fahr, 9, 1);
    50: pushvar 0, 4
    51: eval 1
    52: push 1
    53: push 9
    54: push 1
    55: put
+# test/fahr.p, 20: 		put_line(celsius, 8, 1);
    56: pushvar 0, 5
    57: eval 1
    58: push 1
@@ -86,7 +87,7 @@
    64: push 0
    65: push 0
    66: put
-# test/fahr.p, 20: 		fahr := fahr + STEP;
+# test/fahr.p, 21: 		fahr := fahr + STEP;
    67: pushvar 0, 4
    68: pushvar 0, 4
    69: eval 1
@@ -94,10 +95,10 @@
    71: itor
    72: add
    73: assign 1
-# test/fahr.p, 21: 	endloop
-# test/fahr.p, 22: endprog
+# test/fahr.p, 22: 	endloop
+# test/fahr.p, 23: endprog
    74: jumpi 34
-# test/fahr.p, 23: 
+# test/fahr.p, 24: 
    75: ret
 
 Fahrenheit Celsius

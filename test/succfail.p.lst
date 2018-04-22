@@ -3,7 +3,7 @@
     0: calli 0, 2
     1: halt
 # test/succfail.p, 3: begin
-# test/succfail.p, 4: 	writeln(succ(four))
+# test/succfail.p, 4: 	put_line(succ(four))
     2: push 4
     3: succ 4
     4: push 1

@@ -65,6 +65,7 @@ Token TokenStream::get() {
 	case ']': return ct.kind = Token::CloseBrkt;	break;
 	case ',': return ct.kind = Token::Comma;		break;
 	case ';': return ct.kind = Token::SemiColon;	break;
+	case '`': return ct.kind = Token::Tick;			break;
 	case '^': return ct.kind = Token::Caret;		break;
 
 	case '>':								// >, or >=?
@@ -263,8 +264,8 @@ TokenStream::KeywordTable	TokenStream::keywords = {
 	{	"for",			Token::For			},
 	{	"var",			Token::VarDecl		},
 	{	"while",		Token::While		},
-	{	"write",		Token::Write		},
-	{	"writeln",		Token::Writeln		}
+	{	"put",			Token::Put			},
+	{	"put_line",		Token::Putln		}
 };
 
 // operators
@@ -352,6 +353,7 @@ ostream& operator<<(std::ostream& os, const Token::Kind& kind) {
 	case Token::Period:		os << ".";				break;
 	case Token::Colon:		os << ":";				break;
 	case Token::SemiColon:	os << ";";				break;
+	case Token::Tick:		os << "`";				break;
 	case Token::Assign:		os << ":=";				break;
 
 	case Token::Round:		os << "round";			break;
@@ -366,8 +368,8 @@ ostream& operator<<(std::ostream& os, const Token::Kind& kind) {
 	case Token::Sqr:		os << "sqr";			break;
 	case Token::Sqrt:		os << "sqrt";			break;
 	case Token::Succ:		os << "succ";			break;
-	case Token::Write:		os << "write";			break;
-	case Token::Writeln:	os << "writeln";		break;
+	case Token::Put:		os << "put";			break;
+	case Token::Putln:		os << "put_line";		break;
 	case Token::New:		os << "new";			break;
 	case Token::Dispose:	os << "dispose";		break;
 

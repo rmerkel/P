@@ -20,31 +20,33 @@ begin
 	i := 1;	{	fill a[] with its index	}
  	while i < 11 loop 
 		a[i] := i;
-		writeln(a[i]);
+		put_line(a[i]);
 		i := i + 1
 	endloop;
 
 	r := 1;	{	multiply by 10			}
 	repeat
 		a[r] := a[r] * 10;
-		writeln(a[r]);
+		put_line(a[r]);
 		r := r + 1
 	until r = 10 endloop;
 
 	a2[one]	:= 1;
 	a2[two]	:= 2;
 	a2[three] := 3;
-	writeln(a2[one], a2[two], a2[three]);
+	put(a2[one]);
+	put(a2[two]);
+	put_line(a2[three]);
 
 	i := 0;	{	fill a3[] with it's index	}
 	while (i < 5) loop
 		j := 0;
 		while (j < 5) loop
 			a3[i][j] := 1.0 * (i + j);
-			write(a3[i][j] : 7 : 4);
+			put(a3[i][j], 7, 4);
 			j := j + 1
 		endloop;
-		writeln;
+		put_line();
 		i := i + 1
 	endloop
 endprog

@@ -26,5 +26,5 @@ function factorial(n : integer) : integer is
 begin
 	{ call with wrong number of parameters! }
     result := factorial(nFacts, nFacts);
-	writeln(result)
+	put_line(result)
 endprog

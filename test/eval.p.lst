@@ -17,7 +17,7 @@
     9: itor2
    10: add
    11: assign 1
-# test/eval.p, 8: 	writeln(r)
+# test/eval.p, 8: 	put_line(r)
    12: pushvar 0, 4
    13: eval 1
    14: push 1

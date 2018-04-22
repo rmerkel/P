@@ -3,7 +3,7 @@
     0: calli 0, 41
     1: halt
 # test/fib.p, 3: 	begin
-# test/fib.p, 4: 		writeln(b);
+# test/fib.p, 4: 		put_line(b);
     2: pushvar 0, -2
     3: eval 1
     4: push 1
@@ -52,7 +52,7 @@
 # test/fib.p, 11: 
 # test/fib.p, 12: begin
    40: retf
-# test/fib.p, 13: 	writeln(0);
+# test/fib.p, 13: 	put_line(0);
    41: push 0
    42: push 1
    43: push 0
@@ -64,7 +64,7 @@
    48: push 0
    49: push 0
    50: put
-# test/fib.p, 14: 	writeln(fib(0, 1, 10))
+# test/fib.p, 14: 	put_line(fib(0, 1, 10))
    51: push 0
    52: push 1
    53: push 10

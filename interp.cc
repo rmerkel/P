@@ -42,7 +42,7 @@ void PInterp::dump() {
 	};
 	auto it = labels.begin();
 
-	// Dump the current  activation frame, followed by locals and temps...
+	// Dump the current activation frame, followed by locals and temps...
 
 	assert(sp >= fp);
 	cout    << "fp: " 	<< setw(5)	<< fp << ": "

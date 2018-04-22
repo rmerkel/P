@@ -14,7 +14,7 @@
     8: push 10
     9: gt
    10: jneqi 43
-# test/if.p, 6: 		writeln("i is greater than 10");
+# test/if.p, 6: 		put_line("i is greater than 10");
    11: push 'i'
    12: push ' '
    13: push 'i'
@@ -51,7 +51,7 @@
 # test/if.p, 8: 	endif;
    42: assign 1
 # test/if.p, 9: 
-# test/if.p, 10: 	writeln("i is ", i)
+# test/if.p, 10: 	put("i is ");
    43: push 'i'
    44: push ' '
    45: push 'i'
@@ -61,21 +61,22 @@
    49: push 0
    50: push 0
    51: put
+# test/if.p, 11: 	put_line(i)
    52: pushvar 0, 4
    53: eval 1
    54: push 1
    55: push 0
    56: push 0
    57: put
-# test/if.p, 11: endprog
+# test/if.p, 12: endprog
    58: push '
 '
    59: push 1
    60: push 0
    61: push 0
    62: put
-# test/if.p, 12: 
 # test/if.p, 13: 
+# test/if.p, 14: 
    63: ret
 
 i is 10

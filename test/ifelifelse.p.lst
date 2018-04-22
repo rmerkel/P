@@ -14,7 +14,7 @@
     8: push 10
     9: gt
    10: jneqi 44
-# test/ifelifelse.p, 6: 		writeln("i is greater than 10");
+# test/ifelifelse.p, 6: 		put_line("i is greater than 10");
    11: push 'i'
    12: push ' '
    13: push 'i'
@@ -56,7 +56,7 @@
    46: push 0
    47: lt
    48: jneqi 78
-# test/ifelifelse.p, 9: 		writeln("i is less than 0");
+# test/ifelifelse.p, 9: 		put_line("i is less than 0");
    49: push 'i'
    50: push ' '
    51: push 'i'
@@ -88,7 +88,7 @@
    75: push 2
 # test/ifelifelse.p, 11: 	else
    76: assign 1
-# test/ifelifelse.p, 12: 		writeln("i is between 1 and 10, inclusive ", i);
+# test/ifelifelse.p, 12: 		put("i is between 1 and 10, inclusive ");
    77: jumpi 129
    78: push 'i'
    79: push ' '
@@ -127,6 +127,7 @@
   112: push 0
   113: push 0
   114: put
+# test/ifelifelse.p, 13: 		put_line(i);
   115: pushvar 0, 4
   116: eval 1
   117: push 1
@@ -139,13 +140,13 @@
   123: push 0
   124: push 0
   125: put
-# test/ifelifelse.p, 13: 		i := 3
+# test/ifelifelse.p, 14: 		i := 3
   126: pushvar 0, 4
   127: push 3
-# test/ifelifelse.p, 14: 	endif;
+# test/ifelifelse.p, 15: 	endif;
   128: assign 1
-# test/ifelifelse.p, 15: 
-# test/ifelifelse.p, 16: 	writeln("i is ", i)
+# test/ifelifelse.p, 16: 
+# test/ifelifelse.p, 17: 	put("i is ");
   129: push 'i'
   130: push ' '
   131: push 'i'
@@ -155,21 +156,22 @@
   135: push 0
   136: push 0
   137: put
+# test/ifelifelse.p, 18: 	put_line(i)
   138: pushvar 0, 4
   139: eval 1
   140: push 1
   141: push 0
   142: push 0
   143: put
-# test/ifelifelse.p, 17: endprog
+# test/ifelifelse.p, 19: endprog
   144: push '
 '
   145: push 1
   146: push 0
   147: push 0
   148: put
-# test/ifelifelse.p, 18: 
-# test/ifelifelse.p, 19: 
+# test/ifelifelse.p, 20: 
+# test/ifelifelse.p, 21: 
   149: ret
 
 i is between 1 and 10, inclusive 10

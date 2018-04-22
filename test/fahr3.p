@@ -11,12 +11,13 @@ var
 	fahr : real ; celsius : integer;
 
 begin
-	writeln("Fahrenheit Celsius");
+	put_line("Fahrenheit Celsius");
 
 	fahr := LOWER;
 	while fahr <= UPPER loop
 		celsius := round(5.0 * (fahr-32.0) / 9.0);
-		writeln(fahr : 8 : 1, celsius : 9 : 1);
+		put(fahr, 8, 1);
+		put_line(celsius, 9, 1);
 		fahr := fahr + STEP;
 	endloop
 endprog
