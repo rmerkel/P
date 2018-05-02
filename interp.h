@@ -83,6 +83,7 @@ protected:
 	Result SQR();							///< Square
 	Result SQRT();							///< Square-root
 	Result SUCC();							///< Successor
+	Result GET();							///< Get from standard input
 	Result PUT();							///< Put on standard output
 	Result NEW();							///< Allocate space
 	Result DISPOSE();						///< Free space

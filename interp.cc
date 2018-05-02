@@ -167,6 +167,7 @@ PInterp::InstrPtr PInterp::instrTbl[] = {
 	&PInterp::SIN,
 	&PInterp::SQR,
 	&PInterp::SQRT,
+	&PInterp::GET,
 	&PInterp::PUT,
 	&PInterp::NEW,
 	&PInterp::DISPOSE,
@@ -484,13 +485,63 @@ Result PInterp::SUCC() {
 }
 
 /********************************************************************************************//**
- * Writes one expresson on the standard output stream. Index identifies a 4-tuple on the stack,
- * (p;w;n;v);
+ * Read one value from the standard input stream.
  *
+ * Stack must contain a lvalue reference in the form (n;v), where;
+ * - n - the number of Datum's in the value
+ * - v - The values (n) to read...
+ *
+ * @return	Result::stackUnderflow if there was insufficient space on the stack,
+ * 			Result::badDataType if any of the parameters aren't integers.
+ ************************************************************************************************/
+Result PInterp::GET() {
+	if (sp < 3)
+		return Result::stackUnderflow;
+
+	Result r = Result::success;
+
+	size_t n = 1;							// default value of nValue
+	const Datum nValue = pop();
+	if (nValue.kind() != Datum::Integer) {
+		cerr << "GET[LN] value count paramters is not an integer!" << endl;
+		r =  Result::badDataType;
+	} else if (nValue.integer() < 0) {
+		cerr << "GET[LN] value count paramters is negative!" << endl;
+		r =  Result::badDataType;
+	} else
+		n = nValue.integer();
+
+	for (unsigned i = 0; i < n; ++i) {
+		Datum& value = stack[sp+i+1-n];
+		if (value.kind() != Datum::Integer || value.integer() < 0) {
+			cerr << "GET[LN] destination is an illegal address!" << endl;
+			r =  Result::badDataType;
+
+		} else {
+			switch(value.kind()) {
+			case Datum::Boolean:	{	bool b = false; cin >> b; value = b;	} break;
+			case Datum::Character:	{	char c = ' '; cin >> c; value = c;		} break;
+			case Datum::Integer:	{	int i = 0; cin >> i; value = i; break;	} break;
+			case Datum::Real:		{	double d = 0.0; cin >> d; value = d;	} break;
+			default:
+				cerr << "unknown datum type: " << static_cast<unsigned>(value.kind()) << endl;
+				push(0);
+				r = Result::badDataType;
+			}
+		}
+	}
+	pop(n);
+
+	return r;
+}
+
+/********************************************************************************************//**
+ * Writes one expresson on the standard output stream. Expects a 4-tuple on the stack, (p;w;n;v);
+ *
+ * - v - The values (n) to write...
  * - n - the number of Datum's in the value
  * - w - the width of the field to write the value in
  * - p - the percision of the value
- * - v - The values (n) to write...
  *
  * @note if v isn't a Real, p is ignored.
  *
