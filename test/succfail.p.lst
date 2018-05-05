@@ -3,21 +3,15 @@
     0: calli 0, 2
     1: halt
 # test/succfail.p, 3: begin
-# test/succfail.p, 4: 	put_line(succ(four))
+# test/succfail.p, 4: 	writeln(succ(four))
     2: push 4
     3: succ 4
     4: push 1
     5: push 0
     6: push 0
-    7: put
 # test/succfail.p, 5: endprog
-    8: push '
-'
-    9: push 1
-   10: push 0
-   11: push 0
-   12: put
+    7: writeln
 # test/succfail.p, 6: 
-   13: ret
+    8: ret
 
 runtime error @pc 3, sp: 8: out-of-range

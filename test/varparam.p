@@ -8,6 +8,6 @@ var	i : integer;
 begin
 	i := 0;
 	inc(i);
-    put_line(i)				{	s/b 1, not zero	}
+    writeln(i)				{	s/b 1, not zero	}
 endprog
 

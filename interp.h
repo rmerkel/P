@@ -65,6 +65,8 @@ protected:
 	typedef Result (PInterp::*InstrPtr)();	///< Pointer to an instruction
 	static InstrPtr instrTbl[];				///< Table of pointer to instructions, indexed by opcode
 
+	Result write1();						///< Process a WRITE or WRITELN
+
 	// The instructions...
 
 	Result NEG();							///< Negative
@@ -83,7 +85,8 @@ protected:
 	Result SQR();							///< Square
 	Result SQRT();							///< Square-root
 	Result SUCC();							///< Successor
-	Result PUT();							///< Put on standard output
+	Result WRITE();							///< Write expression on standard output
+	Result WRITELN();						///< Write expression, followed by newline, on standard output
 	Result NEW();							///< Allocate space
 	Result DISPOSE();						///< Free space
 	Result ADD();							///< Addition

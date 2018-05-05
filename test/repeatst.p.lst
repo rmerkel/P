@@ -39,28 +39,22 @@
    19: eval 1
    20: mul
    21: assign 1
-# test/repeatst.p, 20: 		put_line(f, 8, 6)
+# test/repeatst.p, 20: 		writeln(f, 8, 6)
    22: pushvar 0, 5
    23: eval 1
    24: push 1
    25: push 8
    26: push 6
-   27: put
 # test/repeatst.p, 21: 	until n >= 10 endloop
-   28: push '
-'
-   29: push 1
-   30: push 0
-   31: push 0
-   32: put
-   33: pushvar 0, 4
-   34: eval 1
-   35: push 10
-   36: gte
-   37: jneqi 9
+   27: writeln
+   28: pushvar 0, 4
+   29: eval 1
+   30: push 10
+   31: gte
+   32: jneqi 9
 # test/repeatst.p, 22: endprog
 # test/repeatst.p, 23: 
-   38: ret
+   33: ret
 
        1
        2

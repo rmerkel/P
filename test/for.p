@@ -5,6 +5,6 @@ var
 
 begin
 	for i in 0..9 loop
-		put_line(i)
+		writeln(i)
 	endloop
 endprog

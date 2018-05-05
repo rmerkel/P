@@ -16,32 +16,26 @@
     8: eval 1
     9: push 0
    10: gte
-   11: jneqi 30
-# test/forrev.p, 8: 		put_line(i)
+   11: jneqi 25
+# test/forrev.p, 8: 		writeln(i)
    12: pushvar 0, 4
    13: eval 1
    14: push 1
    15: push 0
    16: push 0
-   17: put
 # test/forrev.p, 9: 	endloop
-   18: push '
-'
-   19: push 1
-   20: push 0
-   21: push 0
-   22: put
+   17: writeln
 # test/forrev.p, 10: endprog
-   23: dup
-   24: dup
-   25: eval 1
-   26: push -1
-   27: add
-   28: assign 1
-   29: jumpi 7
-   30: pop
+   18: dup
+   19: dup
+   20: eval 1
+   21: push -1
+   22: add
+   23: assign 1
+   24: jumpi 7
+   25: pop
 # test/forrev.p, 11: 
-   31: ret
+   26: ret
 
 9
 8

@@ -167,7 +167,8 @@ PInterp::InstrPtr PInterp::instrTbl[] = {
 	&PInterp::SIN,
 	&PInterp::SQR,
 	&PInterp::SQRT,
-	&PInterp::PUT,
+	&PInterp::WRITE,
+	&PInterp::WRITELN,
 	&PInterp::NEW,
 	&PInterp::DISPOSE,
 	&PInterp::ADD,
@@ -484,22 +485,17 @@ Result PInterp::SUCC() {
 }
 
 /********************************************************************************************//**
- * Writes one expresson on the standard output stream. Index identifies a 4-tuple on the stack,
- * (p;w;n;v);
+ * Writes one expresson on the standard output stream. TOS is an 4-tuple -- (p;w;n;v):
  *
  * - n - the number of Datum's in the value
  * - w - the width of the field to write the value in
- * - p - the percision of the value
+ * - p - the percision of the value. Ignored if v isn't a Real
  * - v - The values (n) to write...
- *
- * @note if v isn't a Real, p is ignored.
- *
- * @note caller must consume the tuple-expression off of the stack.
  *
  * @return	Result::stackUnderflow if there was insufficient space on the stack,
  * 			Result::badDataType if any of the parameters aren't integers.
  ************************************************************************************************/
-Result PInterp::PUT() {
+Result PInterp::write1() {
 	if (sp < 3)
 		return Result::stackUnderflow;
 
@@ -510,7 +506,7 @@ Result PInterp::PUT() {
 	if (prec.kind() == Datum::Integer)
 		p = prec.integer();
 	else {
-		cerr << "PUT[LN] precision parameter is not an integer!" << endl;
+		cerr << "WRITE[LN] precision parameter is not an integer!" << endl;
 		r =  Result::badDataType;
 	}
 
@@ -519,17 +515,17 @@ Result PInterp::PUT() {
 	if (width.kind() == Datum::Integer)
 		w = width.integer();
 	else {
-		cerr << "PUT[LN] width parameter is not an integer!" << endl;
+		cerr << "WRITE[LN] width parameter is not an integer!" << endl;
 		r = Result::badDataType;
 	}
 	
 	size_t n = 1;							// default value of nValue
 	const Datum nValue = pop();
 	if (nValue.kind() != Datum::Integer) {
-		cerr << "PUT[LN] value count paramters is not an integer!" << endl;
+		cerr << "WRITE[LN] value count paramters is not an integer!" << endl;
 		r =  Result::badDataType;
 	} else if (nValue.integer() < 0) {
-		cerr << "PUT[LN] value count paramters is negative!" << endl;
+		cerr << "WRITE[LN] value count paramters is negative!" << endl;
 		r =  Result::badDataType;
 	} else
 		n = nValue.integer();
@@ -555,6 +551,30 @@ Result PInterp::PUT() {
 	}
 	pop(n);
 
+	return r;
+}
+
+/********************************************************************************************//**
+ * Writes one expresson on the standard output stream.
+ *
+ * @see write1() for TOS
+ *
+ * @return	write1();
+ ************************************************************************************************/
+Result PInterp::WRITE() {
+	return write1();
+}
+
+/********************************************************************************************//**
+ * Writes one expresson, followed by a newline, on the standard output stream.
+ *
+ * @see write1() for TOS
+ *
+ * @return	write1();
+ ************************************************************************************************/
+Result PInterp::WRITELN() {
+	const Result r = write1();
+	cout << '\n';
 	return r;
 }
 

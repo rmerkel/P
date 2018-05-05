@@ -1141,19 +1141,24 @@ bool PComp::forStatement(int level) {
 }
 
 /********************************************************************************************//**
- * write or writeln( [ expression [',' width [ ',' precision ]]] )
+ * write or write[ln]( [ expression [',' width [ ',' precision ]]] )
  *
  * Process write and writeln parameters, up to, but not including, emitteing the final op-code.
  *
  * @param	level	The current block level.
  ************************************************************************************************/
-void PComp::writeStatement(int level) {
+void PComp::write(int level) {
 	const int defaultWidth = 0;
 	const int defaultPrec = 0;
 
 	ostringstream oss;
 	if (accept(Token::OpenParen)) {			// process each expr-tuple..
-		if (!accept(Token::CloseParen)) {	// handle no parameters
+		if (accept(Token::CloseParen)) {	// handle no parameters
+			emit(OpCode::PUSH, 0, 0);		// size
+			emit(OpCode::PUSH, 0, defaultWidth);
+			emit(OpCode::PUSH, 0, defaultPrec);
+
+		} else {
 			auto expr = expression(level); 	// value(s) to write
 			emit(OpCode::PUSH, 0, expr->size());
 
@@ -1179,10 +1184,21 @@ void PComp::writeStatement(int level) {
 				emit(OpCode::PUSH, 0, defaultPrec);
 			}
 
-			emit(OpCode::PUT);
 			expect(Token::CloseParen);
 		}
 	}
+}
+
+/********************************************************************************************//**
+ * write or writeln( [ expression [',' width [ ',' precision ]]] )
+ *
+ * Process write and writeln parameters, up to, but not including, emitteing the final op-code.
+ *
+ * @param	level	The current block level.
+ ************************************************************************************************/
+void PComp::writeStatement(int level) {
+	write(level);
+	emit(OpCode::WRITE);
 }
 
 /********************************************************************************************//**
@@ -1191,13 +1207,8 @@ void PComp::writeStatement(int level) {
  * @param	level	The current block level.
  ************************************************************************************************/
 void PComp::writeLnStatement(int level) {
-	writeStatement(level);
-
-	emit(OpCode::PUSH, 0, '\n');
-	emit(OpCode::PUSH, 0, 1);
-	emit(OpCode::PUSH, 0, 0);
-	emit(OpCode::PUSH, 0, 0);
-	emit(OpCode::PUT);
+	write(level);
+	emit(OpCode::WRITELN);
 }
 
 /********************************************************************************************//**
@@ -1244,16 +1255,16 @@ void PComp::statementNew(int level) {
 void PComp::statementProcs(int level) {
 	ostringstream oss;
 
-	if (accept(Token::Put))							// put 	[ '(' expr-tuple { ',' expr-tuple } ')' ]
+	if (accept(Token::Write))				// write [ '(' expr-tuple { ',' expr-tuple } ')' ]
 		writeStatement(level);
 
-	else if (accept(Token::Putln))					// putln [ '(' expr-tuple { ',' expr-tuple } ')' ]
+	else if (accept(Token::Writeln))		// writeln [ '(' expr-tuple { ',' expr-tuple } ')' ]
 		writeLnStatement(level);
 
-	else if (accept(Token::New))					// 'New (' id ')'
+	else if (accept(Token::New))			// 'New (' id ')'
 		statementNew(level);
 
-	else if (accept(Token::Dispose)) {				// 'Dispose (' expr ')'
+	else if (accept(Token::Dispose)) {		// 'Dispose (' expr ')'
 		expect(Token::OpenParen);
 		auto tdesc = expression(level);
 		if (tdesc->tclass() != TypeDesc::Pointer) {

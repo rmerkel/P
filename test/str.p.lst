@@ -30,7 +30,7 @@
    17: eval 10
    18: assign 10
 # test/str.p, 13: 
-# test/str.p, 14: 	put_line("for i in 0..9...");
+# test/str.p, 14: 	writeln("for i in 0..9...");
    19: push 'f'
    20: push 'o'
    21: push 'r'
@@ -50,114 +50,90 @@
    35: push 16
    36: push 0
    37: push 0
-   38: put
-   39: push '
-'
-   40: push 1
+   38: writeln
+# test/str.p, 15: 	for i in 0..9 loop writeln(a2[i]) endloop;
+   39: pushvar 0, 24
+   40: dup
    41: push 0
-   42: push 0
-   43: put
-# test/str.p, 15: 	for i in 0..9 loop put_line(a2[i]) endloop;
-   44: pushvar 0, 24
-   45: dup
-   46: push 0
-   47: assign 1
-   48: dup
-   49: eval 1
-   50: push 9
-   51: lte
-   52: jneqi 76
-   53: pushvar 0, 14
-   54: pushvar 0, 24
-   55: eval 1
-   56: llimit 0
-   57: ulimit 9
-   58: add
-   59: eval 1
-   60: push 1
-   61: push 0
-   62: push 0
-   63: put
-   64: push '
-'
-   65: push 1
-   66: push 0
-   67: push 0
-   68: put
-   69: dup
-   70: dup
-   71: eval 1
-   72: push 1
-   73: add
-   74: assign 1
-   75: jumpi 48
-   76: pop
+   42: assign 1
+   43: dup
+   44: eval 1
+   45: push 9
+   46: lte
+   47: jneqi 66
+   48: pushvar 0, 14
+   49: pushvar 0, 24
+   50: eval 1
+   51: llimit 0
+   52: ulimit 9
+   53: add
+   54: eval 1
+   55: push 1
+   56: push 0
+   57: push 0
+   58: writeln
+   59: dup
+   60: dup
+   61: eval 1
+   62: push 1
+   63: add
+   64: assign 1
+   65: jumpi 43
+   66: pop
 # test/str.p, 16: 
-# test/str.p, 17: 	put_line("for i in A...");
-   77: push 'f'
-   78: push 'o'
-   79: push 'r'
-   80: push ' '
-   81: push 'i'
-   82: push ' '
-   83: push 'i'
-   84: push 'n'
-   85: push ' '
-   86: push 'A'
-   87: push '.'
-   88: push '.'
-   89: push '.'
-   90: push 13
-   91: push 0
-   92: push 0
-   93: put
-   94: push '
-'
-   95: push 1
-   96: push 0
-   97: push 0
-   98: put
-# test/str.p, 18: 	for i in A loop put_line(a1[i]) endloop	{	;
-   99: pushvar 0, 24
-  100: dup
+# test/str.p, 17: 	writeln("for i in A...");
+   67: push 'f'
+   68: push 'o'
+   69: push 'r'
+   70: push ' '
+   71: push 'i'
+   72: push ' '
+   73: push 'i'
+   74: push 'n'
+   75: push ' '
+   76: push 'A'
+   77: push '.'
+   78: push '.'
+   79: push '.'
+   80: push 13
+   81: push 0
+   82: push 0
+   83: writeln
+# test/str.p, 18: 	for i in A loop writeln(a1[i]) endloop	{	;
+   84: pushvar 0, 24
+   85: dup
+   86: push 0
+   87: assign 1
+   88: dup
+   89: eval 1
+   90: push 9
+   91: lte
+   92: jneqi 111
+   93: pushvar 0, 4
+   94: pushvar 0, 24
+   95: eval 1
+   96: llimit 0
+   97: ulimit 9
+   98: add
+   99: eval 1
+  100: push 1
   101: push 0
-  102: assign 1
-  103: dup
-  104: eval 1
-  105: push 9
-  106: lte
-  107: jneqi 131
-  108: pushvar 0, 4
-  109: pushvar 0, 24
-  110: eval 1
-  111: llimit 0
-  112: ulimit 9
-  113: add
-  114: eval 1
-  115: push 1
-  116: push 0
-  117: push 0
-  118: put
-  119: push '
-'
-  120: push 1
-  121: push 0
-  122: push 0
-  123: put
+  102: push 0
+  103: writeln
 # test/str.p, 19: 
-# test/str.p, 20: 	put_line("for i in a1...");
-# test/str.p, 21: 	for i in a1 loop put_line(a1[i]) endloop	}
+# test/str.p, 20: 	writeln("for i in a1...");
+# test/str.p, 21: 	for i in a1 loop writeln(a1[i]) endloop	}
 # test/str.p, 22: endprog
-  124: dup
-  125: dup
-  126: eval 1
-  127: push 1
-  128: add
-  129: assign 1
-  130: jumpi 103
-  131: pop
+  104: dup
+  105: dup
+  106: eval 1
+  107: push 1
+  108: add
+  109: assign 1
+  110: jumpi 88
+  111: pop
 # test/str.p, 23: 
-  132: ret
+  112: ret
 
 for i in 0..9...
 a

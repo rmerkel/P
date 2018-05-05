@@ -39,23 +39,17 @@
    25: mul
    26: assign 1
    27: jumpi 9
-# test/comment.p, 14:    put_line(f);
+# test/comment.p, 14:    writeln(f);
    28: pushvar 0, 5
    29: eval 1
    30: push 1
    31: push 0
    32: push 0
-   33: put
-   34: push '
-'
-   35: push 1
-   36: push 0
-   37: push 0
-   38: put
+   33: writeln
 # test/comment.p, 15: endprog
 # test/comment.p, 16: 
 # test/comment.p, 17: {	unterminated comment, but we don't care as it follows the period!
 # test/comment.p, 18: 
-   39: ret
+   34: ret
 
 3628800

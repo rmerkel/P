@@ -3,6 +3,6 @@ var x, y : integer;
 begin
 	x := 0;
 	y := 1;
-	put(x);
-	put_line(y)
+	write(x);
+	writeln(y)
 endprog

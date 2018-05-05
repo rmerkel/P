@@ -12,28 +12,22 @@
     6: pushvar 0, 5
     7: push 1
     8: assign 1
-# test/simple.p, 6: 	put(x);
+# test/simple.p, 6: 	write(x);
     9: pushvar 0, 4
    10: eval 1
    11: push 1
    12: push 0
    13: push 0
-   14: put
-# test/simple.p, 7: 	put_line(y)
+   14: write
+# test/simple.p, 7: 	writeln(y)
    15: pushvar 0, 5
    16: eval 1
    17: push 1
    18: push 0
    19: push 0
-   20: put
 # test/simple.p, 8: endprog
-   21: push '
-'
-   22: push 1
-   23: push 0
-   24: push 0
-   25: put
+   20: writeln
 # test/simple.p, 9: 
-   26: ret
+   21: ret
 
 01

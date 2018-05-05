@@ -6,7 +6,7 @@ var
 begin
 	i := 0;
 	while (i <= 9) loop
-		put_line(i);
+		writeln(i);
 		i := i + 1
 	endloop
 endprog

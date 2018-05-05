@@ -31,7 +31,7 @@ public:
 		Boolean,							///< Boolean value
 		Character,							///< Character (ASCII) value
 		Integer,							///< Signed integer
-		Real,								///< Floating point
+		Real								///< Floating point
 	};
 
 	Datum();								///< Default constructor...

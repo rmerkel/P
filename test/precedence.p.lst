@@ -2,7 +2,7 @@
 # test/precedence.p, 2: begin
     0: calli 0, 2
     1: halt
-# test/precedence.p, 3: 	put_line( 1 + 2 * 3 - 4);	{	s/b 3	}
+# test/precedence.p, 3: 	writeln( 1 + 2 * 3 - 4);	{	s/b 3	}
     2: push 1
     3: push 2
     4: push 3
@@ -13,35 +13,23 @@
     9: push 1
    10: push 0
    11: push 0
-   12: put
-   13: push '
-'
-   14: push 1
-   15: push 0
-   16: push 0
-   17: put
-# test/precedence.p, 4: 	put_line(-1 + 2 * 3 - 4)	{	s/b 1	}
-   18: push 1
-   19: neg
-   20: push 2
-   21: push 3
-   22: mul
-   23: add
-   24: push 4
-   25: sub
-   26: push 1
-   27: push 0
-   28: push 0
-   29: put
+   12: writeln
+# test/precedence.p, 4: 	writeln(-1 + 2 * 3 - 4)		{	s/b 1	}
+   13: push 1
+   14: neg
+   15: push 2
+   16: push 3
+   17: mul
+   18: add
+   19: push 4
+   20: sub
+   21: push 1
+   22: push 0
+   23: push 0
 # test/precedence.p, 5: endprog
-   30: push '
-'
-   31: push 1
-   32: push 0
-   33: push 0
-   34: put
+   24: writeln
 # test/precedence.p, 6: 
-   35: ret
+   25: ret
 
 3
 1

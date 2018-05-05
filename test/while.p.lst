@@ -16,32 +16,26 @@
     7: eval 1
     8: push 9
     9: lte
-   10: jneqi 29
-# test/while.p, 9: 		put_line(i);
+   10: jneqi 24
+# test/while.p, 9: 		writeln(i);
    11: pushvar 0, 4
    12: eval 1
    13: push 1
    14: push 0
    15: push 0
-   16: put
-   17: push '
-'
-   18: push 1
-   19: push 0
-   20: push 0
-   21: put
+   16: writeln
 # test/while.p, 10: 		i := i + 1
-   22: pushvar 0, 4
-   23: pushvar 0, 4
-   24: eval 1
-   25: push 1
+   17: pushvar 0, 4
+   18: pushvar 0, 4
+   19: eval 1
+   20: push 1
 # test/while.p, 11: 	endloop
-   26: add
-   27: assign 1
+   21: add
+   22: assign 1
 # test/while.p, 12: endprog
-   28: jumpi 6
+   23: jumpi 6
 # test/while.p, 13: 
-   29: ret
+   24: ret
 
 0
 1

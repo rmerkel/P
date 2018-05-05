@@ -20,21 +20,15 @@
    13: llimit 0
    14: ulimit 1
    15: assign 1
-# test/bool.p, 7: 	put_line(b)
+# test/bool.p, 7: 	writeln(b)
    16: pushvar 0, 4
    17: eval 1
    18: push 1
    19: push 0
    20: push 0
-   21: put
 # test/bool.p, 8: endprog
-   22: push '
-'
-   23: push 1
-   24: push 0
-   25: push 0
-   26: put
+   21: writeln
 # test/bool.p, 9: 
-   27: ret
+   22: ret
 
 false

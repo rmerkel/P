@@ -51,7 +51,6 @@ necessary.
 * No interactive mode for debugging; just automatic single stepping (-v)
 
 ## Design notes and goals
-
  * Single quotes for character literals, double for strings.
  * There is just one basic integer type, the signed Integer. 
  * Unsigned integers (Natural), is a built-in subrange of Integer; 0..maxint, 
@@ -73,6 +72,18 @@ necessary.
  * Add object attributes, similar to ADA.
  * Bit operators in place of Pascal sets; bit_and, bit_or, ..., shift_left,
    shift_right.
+
+## Configuration
+* Configure cc/c++ as clang:
+```
+	sudo update-alternatives --install /usr/bin/cc cc /usr/bin/clang 100
+	sudo update-alternatives --install /usr/bin/c++ c++ /usr/bin/clang++ 100
+```
+* Configure cc/C++ as gcc:
+```
+	sudo update-alternatives --install /usr/bin/cc cc /usr/bin/gcc 100
+	sudo update-alternatives --install /usr/bin/c++ c++ /usr/bin/g++ 100
+```
 
 ## Author
     Randy Merkel, Slowly but Surly Software.

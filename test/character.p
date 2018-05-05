@@ -9,12 +9,12 @@ var i : integer;
 
 begin
 	c := 'x';
-	put_line(c);	
+	writeln(c);	
 	a1 := "abcdefghij";		{	fill a1 with "abcd..."			}
- 	put_line(a1);
+ 	writeln(a1);
 	a2 := a1;				{	copies the contents of a1 to a2	}
-	put_line(a2);
+	writeln(a2);
 	a1 := "0123456788";		{	fill a1 with "0123..."			}
-	put_line(a1);			{	while a1 has changed...			}
-	put_line(a2)			{	... a2 has not!					}
+	writeln(a1);			{	while a1 has changed...			}
+	writeln(a2)				{	... a2 has not!					}
 endprog

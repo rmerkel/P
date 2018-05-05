@@ -9,365 +9,215 @@
 # test/builtins.p, 7: 	e is (zero, one, two, three);
 # test/builtins.p, 8: 
 # test/builtins.p, 9: begin
-# test/builtins.p, 10: 	put_line(1);				{ 1			}
+# test/builtins.p, 10: 	writeln(1);					{ 1			}
     2: push 1
     3: push 1
     4: push 0
     5: push 0
-    6: put
-    7: push '
-'
-    8: push 1
-    9: push 0
+    6: writeln
+# test/builtins.p, 11: 	writeln(round(2.0));		{ 2			}
+    7: push 2.000000
+    8: round
+    9: push 1
    10: push 0
-   11: put
-# test/builtins.p, 11: 	put_line(round(2.0));		{ 2			}
-   12: push 2.000000
-   13: round
-   14: push 1
-   15: push 0
+   11: push 0
+   12: writeln
+# test/builtins.p, 12: 	writeln(round(2.5));		{ 3 		}
+   13: push 2.500000
+   14: round
+   15: push 1
    16: push 0
-   17: put
-   18: push '
-'
-   19: push 1
-   20: push 0
-   21: push 0
-   22: put
-# test/builtins.p, 12: 	put_line(round(2.5));		{ 3 		}
-   23: push 2.500000
-   24: round
-   25: push 1
-   26: push 0
-   27: push 0
-   28: put
-   29: push '
-'
-   30: push 1
-   31: push 0
-   32: push 0
-   33: put
-# test/builtins.p, 13: 	put_line(trunc(4.0));		{ 4 		}
-   34: push 4.000000
-   35: trunc
-   36: push 1
-   37: push 0
-   38: push 0
-   39: put
-   40: push '
-'
-   41: push 1
-   42: push 0
-   43: push 0
-   44: put
-# test/builtins.p, 14: 	put_line(trunc(5.9));		{ 5 		}
-   45: push 5.900000
-   46: trunc
-   47: push 1
-   48: push 0
-   49: push 0
-   50: put
-   51: push '
-'
-   52: push 1
-   53: push 0
-   54: push 0
-   55: put
-# test/builtins.p, 15: 	put_line(maxint);			{ 2,147,483,647	}
-   56: push 2147483647
-   57: push 1
-   58: push 0
-   59: push 0
-   60: put
-   61: push '
-'
-   62: push 1
-   63: push 0
-   64: push 0
-   65: put
+   17: push 0
+   18: writeln
+# test/builtins.p, 13: 	writeln(trunc(4.0));		{ 4 		}
+   19: push 4.000000
+   20: trunc
+   21: push 1
+   22: push 0
+   23: push 0
+   24: writeln
+# test/builtins.p, 14: 	writeln(trunc(5.9));		{ 5 		}
+   25: push 5.900000
+   26: trunc
+   27: push 1
+   28: push 0
+   29: push 0
+   30: writeln
+# test/builtins.p, 15: 	writeln(maxint);			{ 2,147,483,647	}
+   31: push 2147483647
+   32: push 1
+   33: push 0
+   34: push 0
+   35: writeln
 # test/builtins.p, 16: 	
-# test/builtins.p, 17: 	put_line(abs(1));			{ 1			}
-   66: push 1
-   67: abs
-   68: push 1
-   69: push 0
-   70: push 0
-   71: put
-   72: push '
-'
-   73: push 1
-   74: push 0
-   75: push 0
-   76: put
-# test/builtins.p, 18: 	put_line(abs(-1));			{ 1			}
-   77: push 1
-   78: neg
-   79: abs
-   80: push 1
-   81: push 0
-   82: push 0
-   83: put
-   84: push '
-'
-   85: push 1
-   86: push 0
-   87: push 0
-   88: put
-# test/builtins.p, 19: 	put_line(abs(1.5));			{ 1.5		}
-   89: push 1.500000
-   90: abs
-   91: push 1
-   92: push 0
-   93: push 0
-   94: put
-   95: push '
-'
-   96: push 1
-   97: push 0
-   98: push 0
-   99: put
-# test/builtins.p, 20: 	put_line(abs(-1.5));		{ 1.5		}
-  100: push 1.500000
-  101: neg
-  102: abs
-  103: push 1
-  104: push 0
-  105: push 0
-  106: put
-  107: push '
-'
-  108: push 1
-  109: push 0
-  110: push 0
-  111: put
+# test/builtins.p, 17: 	writeln(abs(1));			{ 1			}
+   36: push 1
+   37: abs
+   38: push 1
+   39: push 0
+   40: push 0
+   41: writeln
+# test/builtins.p, 18: 	writeln(abs(-1));			{ 1			}
+   42: push 1
+   43: neg
+   44: abs
+   45: push 1
+   46: push 0
+   47: push 0
+   48: writeln
+# test/builtins.p, 19: 	writeln(abs(1.5));			{ 1.5		}
+   49: push 1.500000
+   50: abs
+   51: push 1
+   52: push 0
+   53: push 0
+   54: writeln
+# test/builtins.p, 20: 	writeln(abs(-1.5));			{ 1.5		}
+   55: push 1.500000
+   56: neg
+   57: abs
+   58: push 1
+   59: push 0
+   60: push 0
+   61: writeln
 # test/builtins.p, 21: 
-# test/builtins.p, 22: 	put_line(ord(three));		{ 3			}
-  112: push 3
-  113: push 1
-  114: push 0
-  115: push 0
-  116: put
-  117: push '
-'
-  118: push 1
-  119: push 0
-  120: push 0
-  121: put
-# test/builtins.p, 23: 	put_line(ord(3-1));			{ 2			}
-  122: push 3
-  123: push 1
-  124: sub
-  125: push 1
-  126: push 0
-  127: push 0
-  128: put
-  129: push '
-'
-  130: push 1
-  131: push 0
-  132: push 0
-  133: put
+# test/builtins.p, 22: 	writeln(ord(three));		{ 3			}
+   62: push 3
+   63: push 1
+   64: push 0
+   65: push 0
+   66: writeln
+# test/builtins.p, 23: 	writeln(ord(3-1));			{ 2			}
+   67: push 3
+   68: push 1
+   69: sub
+   70: push 1
+   71: push 0
+   72: push 0
+   73: writeln
 # test/builtins.p, 24: 
-# test/builtins.p, 25: {	put_line(ord(1.2));		error: ordinal value expected	}
+# test/builtins.p, 25: {	writeln(ord(1.2));		error: ordinal value expected	}
 # test/builtins.p, 26: 
-# test/builtins.p, 27: 	put_line(arctan(1));		{ 0.785398	}
-  134: push 1
-  135: atan
-  136: push 1
-  137: push 0
-  138: push 0
-  139: put
-  140: push '
-'
-  141: push 1
-  142: push 0
-  143: push 0
-  144: put
-# test/builtins.p, 28: 	put_line(arctan(1.0));		{ 0.785398	}
-  145: push 1.000000
-  146: atan
-  147: push 1
-  148: push 0
-  149: push 0
-  150: put
-  151: push '
-'
-  152: push 1
-  153: push 0
-  154: push 0
-  155: put
+# test/builtins.p, 27: 	writeln(arctan(1));			{ 0.785398	}
+   74: push 1
+   75: atan
+   76: push 1
+   77: push 0
+   78: push 0
+   79: writeln
+# test/builtins.p, 28: 	writeln(arctan(1.0));		{ 0.785398	}
+   80: push 1.000000
+   81: atan
+   82: push 1
+   83: push 0
+   84: push 0
+   85: writeln
 # test/builtins.p, 29: 
-# test/builtins.p, 30: 	put_line(exp(1));			{ 2.718282	}
-  156: push 1
-  157: exp
-  158: push 1
-  159: push 0
-  160: push 0
-  161: put
-  162: push '
-'
-  163: push 1
-  164: push 0
-  165: push 0
-  166: put
-# test/builtins.p, 31: 	put_line(exp(1.0));			{ 2.718282	}
-  167: push 1.000000
-  168: exp
-  169: push 1
-  170: push 0
-  171: push 0
-  172: put
-  173: push '
-'
-  174: push 1
-  175: push 0
-  176: push 0
-  177: put
+# test/builtins.p, 30: 	writeln(exp(1));			{ 2.718282	}
+   86: push 1
+   87: exp
+   88: push 1
+   89: push 0
+   90: push 0
+   91: writeln
+# test/builtins.p, 31: 	writeln(exp(1.0));			{ 2.718282	}
+   92: push 1.000000
+   93: exp
+   94: push 1
+   95: push 0
+   96: push 0
+   97: writeln
 # test/builtins.p, 32: 
-# test/builtins.p, 33: 	put_line(ln(1));			{ 0.0		}
-  178: push 1
-  179: log
-  180: push 1
-  181: push 0
-  182: push 0
-  183: put
-  184: push '
-'
-  185: push 1
-  186: push 0
-  187: push 0
-  188: put
-# test/builtins.p, 34: 	put_line(ln(1.0));			{ 0.0		}
-  189: push 1.000000
-  190: log
-  191: push 1
-  192: push 0
-  193: push 0
-  194: put
-  195: push '
-'
-  196: push 1
-  197: push 0
-  198: push 0
-  199: put
+# test/builtins.p, 33: 	writeln(ln(1));				{ 0.0		}
+   98: push 1
+   99: log
+  100: push 1
+  101: push 0
+  102: push 0
+  103: writeln
+# test/builtins.p, 34: 	writeln(ln(1.0));			{ 0.0		}
+  104: push 1.000000
+  105: log
+  106: push 1
+  107: push 0
+  108: push 0
+  109: writeln
 # test/builtins.p, 35: 
-# test/builtins.p, 36: 	put_line(odd(10));			{ false		}
-  200: push 10
-  201: Odd
-  202: push 1
-  203: push 0
-  204: push 0
-  205: put
-  206: push '
-'
-  207: push 1
-  208: push 0
-  209: push 0
-  210: put
-# test/builtins.p, 37: 	put_line(odd(10+1));		{ true		}
-  211: push 10
-  212: push 1
-  213: add
-  214: Odd
-  215: push 1
-  216: push 0
-  217: push 0
-  218: put
-  219: push '
-'
-  220: push 1
-  221: push 0
-  222: push 0
-  223: put
+# test/builtins.p, 36: 	writeln(odd(10));			{ false		}
+  110: push 10
+  111: Odd
+  112: push 1
+  113: push 0
+  114: push 0
+  115: writeln
+# test/builtins.p, 37: 	writeln(odd(10+1));			{ true		}
+  116: push 10
+  117: push 1
+  118: add
+  119: Odd
+  120: push 1
+  121: push 0
+  122: push 0
+  123: writeln
 # test/builtins.p, 38: 
-# test/builtins.p, 39: 	put_line(sin(-3*pi/4));		{ -0.707107	}
-  224: push 3
-  225: push 3.141593
-  226: itor2
-  227: mul
-  228: push 4
-  229: itor
-  230: div
-  231: neg
-  232: sin
-  233: push 1
-  234: push 0
-  235: push 0
-  236: put
-  237: push '
-'
-  238: push 1
-  239: push 0
-  240: push 0
-  241: put
-# test/builtins.p, 40: 	put_line(sqr(10));			{ 100		}
-  242: push 10
-  243: sqr
-  244: push 1
-  245: push 0
-  246: push 0
-  247: put
-  248: push '
-'
-  249: push 1
-  250: push 0
-  251: push 0
-  252: put
-# test/builtins.p, 41: 	put_line(sqrt(2));			{ 1.41421	}
-  253: push 2
-  254: sqrt
-  255: push 1
-  256: push 0
-  257: push 0
-  258: put
-  259: push '
-'
-  260: push 1
-  261: push 0
-  262: push 0
-  263: put
+# test/builtins.p, 39: 	writeln(sin(-3*pi/4));		{ -0.707107	}
+  124: push 3
+  125: push 3.141593
+  126: itor2
+  127: mul
+  128: push 4
+  129: itor
+  130: div
+  131: neg
+  132: sin
+  133: push 1
+  134: push 0
+  135: push 0
+  136: writeln
+# test/builtins.p, 40: 	writeln(sqr(10));			{ 100		}
+  137: push 10
+  138: sqr
+  139: push 1
+  140: push 0
+  141: push 0
+  142: writeln
+# test/builtins.p, 41: 	writeln(sqrt(2));			{ 1.41421	}
+  143: push 2
+  144: sqrt
+  145: push 1
+  146: push 0
+  147: push 0
+  148: writeln
 # test/builtins.p, 42: 
-# test/builtins.p, 43: 	put(100);
-  264: push 100
-  265: push 1
-  266: push 0
-  267: push 0
-  268: put
-# test/builtins.p, 44: 	put(1.41421);
-  269: push 1.414210
-  270: push 1
-  271: push 0
-  272: push 0
-  273: put
-# test/builtins.p, 45: 	put_line(pi);
-  274: push 3.141593
-  275: push 1
-  276: push 0
-  277: push 0
-  278: put
-  279: push '
-'
-  280: push 1
-  281: push 0
-  282: push 0
-  283: put
+# test/builtins.p, 43: 	write(100);
+  149: push 100
+  150: push 1
+  151: push 0
+  152: push 0
+  153: write
+# test/builtins.p, 44: 	write(1.41421);
+  154: push 1.414210
+  155: push 1
+  156: push 0
+  157: push 0
+  158: write
+# test/builtins.p, 45: 	writeln(pi);
+  159: push 3.141593
+  160: push 1
+  161: push 0
+  162: push 0
+  163: writeln
 # test/builtins.p, 46: 
-# test/builtins.p, 47: 	put_line(pi, 7, 5)
-  284: push 3.141593
-  285: push 1
-  286: push 7
-  287: push 5
-  288: put
+# test/builtins.p, 47: 	writeln(pi, 7, 5)
+  164: push 3.141593
+  165: push 1
+  166: push 7
+  167: push 5
 # test/builtins.p, 48: endprog
-  289: push '
-'
-  290: push 1
-  291: push 0
-  292: push 0
-  293: put
+  168: writeln
 # test/builtins.p, 49: 
 # test/builtins.p, 50: 
-  294: ret
+  169: ret
 
 1
 2

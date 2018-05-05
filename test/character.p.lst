@@ -17,105 +17,75 @@
     5: llimit 0
     6: ulimit 127
     7: assign 1
-# test/character.p, 12: 	put_line(c);	
+# test/character.p, 12: 	writeln(c);	
     8: pushvar 0, 5
     9: eval 1
    10: push 1
    11: push 0
    12: push 0
-   13: put
-   14: push '
-'
-   15: push 1
-   16: push 0
-   17: push 0
-   18: put
+   13: writeln
 # test/character.p, 13: 	a1 := "abcdefghij";		{	fill a1 with "abcd..."			}
-   19: pushvar 0, 6
-   20: push 'a'
-   21: push 'b'
-   22: push 'c'
-   23: push 'd'
-   24: push 'e'
-   25: push 'f'
-   26: push 'g'
-   27: push 'h'
-   28: push 'i'
-   29: push 'j'
-   30: assign 10
-# test/character.p, 14:  	put_line(a1);
-   31: pushvar 0, 6
-   32: eval 10
-   33: push 10
-   34: push 0
-   35: push 0
-   36: put
-   37: push '
-'
-   38: push 1
+   14: pushvar 0, 6
+   15: push 'a'
+   16: push 'b'
+   17: push 'c'
+   18: push 'd'
+   19: push 'e'
+   20: push 'f'
+   21: push 'g'
+   22: push 'h'
+   23: push 'i'
+   24: push 'j'
+   25: assign 10
+# test/character.p, 14:  	writeln(a1);
+   26: pushvar 0, 6
+   27: eval 10
+   28: push 10
+   29: push 0
+   30: push 0
+   31: writeln
+# test/character.p, 15: 	a2 := a1;				{	copies the contents of a1 to a2	}
+   32: pushvar 0, 16
+   33: pushvar 0, 6
+   34: eval 10
+   35: assign 10
+# test/character.p, 16: 	writeln(a2);
+   36: pushvar 0, 16
+   37: eval 10
+   38: push 10
    39: push 0
    40: push 0
-   41: put
-# test/character.p, 15: 	a2 := a1;				{	copies the contents of a1 to a2	}
-   42: pushvar 0, 16
-   43: pushvar 0, 6
-   44: eval 10
-   45: assign 10
-# test/character.p, 16: 	put_line(a2);
-   46: pushvar 0, 16
-   47: eval 10
-   48: push 10
-   49: push 0
-   50: push 0
-   51: put
-   52: push '
-'
-   53: push 1
-   54: push 0
-   55: push 0
-   56: put
+   41: writeln
 # test/character.p, 17: 	a1 := "0123456788";		{	fill a1 with "0123..."			}
-   57: pushvar 0, 6
-   58: push '0'
-   59: push '1'
-   60: push '2'
-   61: push '3'
-   62: push '4'
-   63: push '5'
-   64: push '6'
-   65: push '7'
-   66: push '8'
-   67: push '8'
-   68: assign 10
-# test/character.p, 18: 	put_line(a1);			{	while a1 has changed...			}
-   69: pushvar 0, 6
-   70: eval 10
-   71: push 10
-   72: push 0
-   73: push 0
-   74: put
-   75: push '
-'
-   76: push 1
-   77: push 0
-   78: push 0
-   79: put
-# test/character.p, 19: 	put_line(a2)			{	... a2 has not!					}
-   80: pushvar 0, 16
-   81: eval 10
-   82: push 10
-   83: push 0
-   84: push 0
-   85: put
+   42: pushvar 0, 6
+   43: push '0'
+   44: push '1'
+   45: push '2'
+   46: push '3'
+   47: push '4'
+   48: push '5'
+   49: push '6'
+   50: push '7'
+   51: push '8'
+   52: push '8'
+   53: assign 10
+# test/character.p, 18: 	writeln(a1);			{	while a1 has changed...			}
+   54: pushvar 0, 6
+   55: eval 10
+   56: push 10
+   57: push 0
+   58: push 0
+   59: writeln
+# test/character.p, 19: 	writeln(a2)				{	... a2 has not!					}
+   60: pushvar 0, 16
+   61: eval 10
+   62: push 10
+   63: push 0
+   64: push 0
 # test/character.p, 20: endprog
-   86: push '
-'
-   87: push 1
-   88: push 0
-   89: push 0
-   90: put
+   65: writeln
 # test/character.p, 21: 
-   91: ret
+   66: ret
 
 x
 abcdefghij

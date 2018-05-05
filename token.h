@@ -126,8 +126,8 @@ struct Token {
 		Sqrt,							///< Square root of value
 		Succ,							///< Next ordinal of value
 
-		Put,							///< Write on standard output
-		Putln,							///< Write on standard output, plus newline
+		Write,							///< Write on standard output
+		Writeln,						///< Write on standard output, plus newline
 		New,							///< Allocate dynamic store
 		Dispose,						///< Free allocated dynamic store
 
