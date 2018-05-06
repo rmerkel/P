@@ -5,28 +5,28 @@ test/proc.p: rounding real to fit in an integer near line 11
     1: halt
 # test/proc.p, 3: procedure Proc(i : integer; r : real; b : boolean) is
 # test/proc.p, 4: 	begin
-# test/proc.p, 5: 		write(i);
+# test/proc.p, 5: 		put(i);
     2: pushvar 0, -3
     3: eval 1
     4: push 1
     5: push 0
     6: push 0
-    7: write
-# test/proc.p, 6: 		write(r);
+    7: put
+# test/proc.p, 6: 		put(r);
     8: pushvar 0, -2
     9: eval 1
    10: push 1
    11: push 0
    12: push 0
-   13: write
-# test/proc.p, 7: 		writeln(b)
+   13: put
+# test/proc.p, 7: 		putln(b)
    14: pushvar 0, -1
    15: eval 1
    16: push 1
    17: push 0
    18: push 0
 # test/proc.p, 8: 	endproc
-   19: writeln
+   19: putln
 # test/proc.p, 9: 
 # test/proc.p, 10: begin
    20: ret

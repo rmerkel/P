@@ -1,7 +1,7 @@
 program Fibonacci() is
 	function fib(a, b, limit : integer) : integer is
 	begin
-		writeln(b);
+		putln(b);
 		if limit > 0 then
 			fib := fib(b, a+b, limit - 1)
 		else
@@ -10,7 +10,7 @@ program Fibonacci() is
 	endfunc
 
 begin
-	writeln(0);
-	writeln(fib(0, 1, 10))
+	putln(0);
+	putln(fib(0, 1, 10))
 endprog
 

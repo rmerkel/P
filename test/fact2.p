@@ -26,5 +26,5 @@ function factorial(n : integer) : integer is
 begin
 	{ The result is the 10th factorial; 3,628,000	}
     result := factorial(nFacts);
-	writeln(result)
+	putln(result)
 endprog

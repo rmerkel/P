@@ -7,24 +7,26 @@
 # test/array.p, 5: 	c : character;
 # test/array.p, 6:  	a1 : A;
 # test/array.p, 7:  	a2 : A;
-# test/array.p, 8: 
-# test/array.p, 9: begin
-    2: enter 22
-# test/array.p, 10: 	c := 'x';
+# test/array.p, 8: 	ai : array [0..9] of integer;
+# test/array.p, 9: 	ar : array [0..9] of real;
+# test/array.p, 10: 
+# test/array.p, 11: begin
+    2: enter 42
+# test/array.p, 12: 	c := 'x';
     3: pushvar 0, 5
     4: push 'x'
     5: llimit 0
     6: ulimit 127
     7: assign 1
-# test/array.p, 11: 	writeln(c);	
+# test/array.p, 13: 	putln(c);	
     8: pushvar 0, 5
     9: eval 1
    10: push 1
    11: push 0
    12: push 0
-   13: writeln
-# test/array.p, 12: 
-# test/array.p, 13: 	a1 := "abcdefghij";		{	fill a1 with "abcd..."			}
+   13: putln
+# test/array.p, 14: 
+# test/array.p, 15: 	a1 := "abcdefghij";		{	fill a1 with "abcd..."			}
    14: pushvar 0, 6
    15: push 'a'
    16: push 'b'
@@ -37,28 +39,28 @@
    23: push 'i'
    24: push 'j'
    25: assign 10
-# test/array.p, 14:  	writeln(a1);
+# test/array.p, 16:  	putln(a1);
    26: pushvar 0, 6
    27: eval 10
    28: push 10
    29: push 0
    30: push 0
-   31: writeln
-# test/array.p, 15: 
-# test/array.p, 16: 	a2 := a1;				{	copies the contents of a1 to a2	}
+   31: putln
+# test/array.p, 17: 
+# test/array.p, 18: 	a2 := a1;				{	copies the contents of a1 to a2	}
    32: pushvar 0, 16
    33: pushvar 0, 6
    34: eval 10
    35: assign 10
-# test/array.p, 17: 	writeln(a2);
+# test/array.p, 19: 	putln(a2);
    36: pushvar 0, 16
    37: eval 10
    38: push 10
    39: push 0
    40: push 0
-   41: writeln
-# test/array.p, 18: 
-# test/array.p, 19: 	a1 := "0123456789";		{	fill a1 with "0123..."			}
+   41: putln
+# test/array.p, 20: 
+# test/array.p, 21: 	a1 := "0123456789";		{	fill a1 with "0123..."			}
    42: pushvar 0, 6
    43: push '0'
    44: push '1'
@@ -71,28 +73,115 @@
    51: push '8'
    52: push '9'
    53: assign 10
-# test/array.p, 20: 							{	while a1 has changed...			}
-# test/array.p, 21: 	writeln(a1);
+# test/array.p, 22: 							{	while a1 has changed...			}
+# test/array.p, 23: 	putln(a1);
    54: pushvar 0, 6
    55: eval 10
    56: push 10
    57: push 0
    58: push 0
-   59: writeln
-# test/array.p, 22: 							{	... a2 has not!					}
-# test/array.p, 23: 	writeln(a2)
+   59: putln
+# test/array.p, 24: 							{	... a2 has not!					}
+# test/array.p, 25: 	putln(a2);
    60: pushvar 0, 16
    61: eval 10
    62: push 10
    63: push 0
    64: push 0
-# test/array.p, 24: endprog
-   65: writeln
-# test/array.p, 25: 
-   66: ret
+   65: putln
+# test/array.p, 26: 
+# test/array.p, 27: 	for i in 0..9 loop
+   66: pushvar 0, 4
+   67: dup
+   68: push 0
+   69: assign 1
+   70: dup
+   71: eval 1
+   72: push 9
+   73: lte
+   74: jneqi 91
+# test/array.p, 28: 		ai[i] := i
+   75: pushvar 0, 26
+   76: pushvar 0, 4
+   77: eval 1
+   78: llimit 0
+   79: ulimit 9
+   80: add
+# test/array.p, 29: 	endloop;
+   81: pushvar 0, 4
+   82: eval 1
+   83: assign 1
+   84: dup
+   85: dup
+   86: eval 1
+   87: push 1
+   88: add
+   89: assign 1
+   90: jumpi 70
+   91: pop
+# test/array.p, 30: 	putln(ai);
+   92: pushvar 0, 26
+   93: eval 10
+   94: push 10
+   95: push 0
+   96: push 0
+   97: putln
+# test/array.p, 31: 
+# test/array.p, 32: 	for i in 0..9 loop
+   98: pushvar 0, 4
+   99: dup
+  100: push 0
+  101: assign 1
+  102: dup
+  103: eval 1
+  104: push 9
+  105: lte
+  106: jneqi 126
+# test/array.p, 33: 		ar[i] := i * 1.1;
+  107: pushvar 0, 36
+  108: pushvar 0, 4
+  109: eval 1
+  110: llimit 0
+  111: ulimit 9
+  112: add
+  113: pushvar 0, 4
+  114: eval 1
+  115: push 1.100000
+  116: itor2
+  117: mul
+  118: assign 1
+# test/array.p, 34: 	endloop;
+  119: dup
+  120: dup
+  121: eval 1
+  122: push 1
+  123: add
+  124: assign 1
+  125: jumpi 102
+  126: pop
+# test/array.p, 35: 	putln(ar);
+  127: pushvar 0, 36
+  128: eval 10
+  129: push 10
+  130: push 0
+  131: push 0
+  132: putln
+# test/array.p, 36: 	putln(ar,4,1)
+  133: pushvar 0, 36
+  134: eval 10
+  135: push 10
+  136: push 4
+  137: push 1
+# test/array.p, 37: endprog
+  138: putln
+# test/array.p, 38: 
+  139: ret
 
 x
 abcdefghij
 abcdefghij
 0123456789
 abcdefghij
+[0,1,2,3,4,5,6,7,8,9]
+[0.000000e+00,1.100000e+00,2.200000e+00,3.300000e+00,4.400000e+00,5.500000e+00,6.600000e+00,7.700000e+00,8.800000e+00,9.900000e+00]
+[ 0.0, 1.1, 2.2, 3.3, 4.4, 5.5, 6.6, 7.7, 8.8, 9.9]

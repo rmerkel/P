@@ -17,13 +17,13 @@
     8: push 9
     9: lte
    10: jneqi 24
-# test/while.p, 9: 		writeln(i);
+# test/while.p, 9: 		putln(i);
    11: pushvar 0, 4
    12: eval 1
    13: push 1
    14: push 0
    15: push 0
-   16: writeln
+   16: putln
 # test/while.p, 10: 		i := i + 1
    17: pushvar 0, 4
    18: pushvar 0, 4

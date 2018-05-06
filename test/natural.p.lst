@@ -10,26 +10,26 @@
     5: llimit 0
     6: ulimit 2147483647
     7: assign 1
-# test/natural.p, 5: 	writeln(n);
+# test/natural.p, 5: 	putln(n);
     8: pushvar 0, 4
     9: eval 1
    10: push 1
    11: push 0
    12: push 0
-   13: writeln
+   13: putln
 # test/natural.p, 6: 	n := 1;
    14: pushvar 0, 4
    15: push 1
    16: llimit 0
    17: ulimit 2147483647
    18: assign 1
-# test/natural.p, 7: 	writeln(n);
+# test/natural.p, 7: 	putln(n);
    19: pushvar 0, 4
    20: eval 1
    21: push 1
    22: push 0
    23: push 0
-   24: writeln
+   24: putln
 # test/natural.p, 8: 	n := -1;
    25: pushvar 0, 4
    26: push 1
@@ -37,14 +37,14 @@
    28: llimit 0
    29: ulimit 2147483647
    30: assign 1
-# test/natural.p, 9: 	writeln(n)
+# test/natural.p, 9: 	putln(n)
    31: pushvar 0, 4
    32: eval 1
    33: push 1
    34: push 0
    35: push 0
 # test/natural.p, 10: endprog
-   36: writeln
+   36: putln
 # test/natural.p, 11: 
    37: ret
 

@@ -21,13 +21,13 @@
     3: pushvar 0, 4
     4: push 1
     5: assign 1
-# test/fact.p, 18: 		writeln(p);
+# test/fact.p, 18: 		putln(p);
     6: pushvar 0, 4
     7: eval 1
     8: push 1
     9: push 0
    10: push 0
-   11: writeln
+   11: putln
 # test/fact.p, 19:         while n > 0 loop
    12: pushvar 0, -1
    13: eval 1
@@ -49,14 +49,14 @@
    27: push 1
    28: sub
    29: assign 1
-# test/fact.p, 22: 			writeln(p)
+# test/fact.p, 22: 			putln(p)
    30: pushvar 0, 4
    31: eval 1
    32: push 1
    33: push 0
    34: push 0
 # test/fact.p, 23:         endloop
-   35: writeln
+   35: putln
 # test/fact.p, 24:     endproc
    36: jumpi 12
 # test/fact.p, 25: 

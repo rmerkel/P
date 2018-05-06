@@ -30,7 +30,7 @@
    17: eval 10
    18: assign 10
 # test/str.p, 13: 
-# test/str.p, 14: 	writeln("for i in 0..9...");
+# test/str.p, 14: 	putln("for i in 0..9...");
    19: push 'f'
    20: push 'o'
    21: push 'r'
@@ -50,8 +50,8 @@
    35: push 16
    36: push 0
    37: push 0
-   38: writeln
-# test/str.p, 15: 	for i in 0..9 loop writeln(a2[i]) endloop;
+   38: putln
+# test/str.p, 15: 	for i in 0..9 loop putln(a2[i]) endloop;
    39: pushvar 0, 24
    40: dup
    41: push 0
@@ -71,7 +71,7 @@
    55: push 1
    56: push 0
    57: push 0
-   58: writeln
+   58: putln
    59: dup
    60: dup
    61: eval 1
@@ -81,7 +81,7 @@
    65: jumpi 43
    66: pop
 # test/str.p, 16: 
-# test/str.p, 17: 	writeln("for i in A...");
+# test/str.p, 17: 	putln("for i in A...");
    67: push 'f'
    68: push 'o'
    69: push 'r'
@@ -98,8 +98,8 @@
    80: push 13
    81: push 0
    82: push 0
-   83: writeln
-# test/str.p, 18: 	for i in A loop writeln(a1[i]) endloop	{	;
+   83: putln
+# test/str.p, 18: 	for i in A loop putln(a1[i]) endloop	{	;
    84: pushvar 0, 24
    85: dup
    86: push 0
@@ -119,10 +119,10 @@
   100: push 1
   101: push 0
   102: push 0
-  103: writeln
+  103: putln
 # test/str.p, 19: 
-# test/str.p, 20: 	writeln("for i in a1...");
-# test/str.p, 21: 	for i in a1 loop writeln(a1[i]) endloop	}
+# test/str.p, 20: 	putln("for i in a1...");
+# test/str.p, 21: 	for i in a1 loop putln(a1[i]) endloop	}
 # test/str.p, 22: endprog
   104: dup
   105: dup

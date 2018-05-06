@@ -39,14 +39,14 @@
    19: eval 1
    20: mul
    21: assign 1
-# test/repeatst.p, 20: 		writeln(f, 8, 6)
+# test/repeatst.p, 20: 		putln(f, 8, 6)
    22: pushvar 0, 5
    23: eval 1
    24: push 1
    25: push 8
    26: push 6
 # test/repeatst.p, 21: 	until n >= 10 endloop
-   27: writeln
+   27: putln
    28: pushvar 0, 4
    29: eval 1
    30: push 10

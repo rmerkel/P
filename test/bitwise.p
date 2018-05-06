@@ -3,30 +3,30 @@ var	x, y, z : integer ;
 begin
 	x := 15;
 	y := 1;
-	write("x = "); writeln(x);
-	write("y = "); writeln(y);
+	put("x = "); putln(x);
+	put("y = "); putln(y);
 
 	z := x bit_and y;
-	write("z := x bit_and y = ");
-	writeln(z);
+	put("z := x bit_and y = ");
+	putln(z);
 
 	z := 10 bit_or z;
-	write("z :+ 10 bit_or z = ");
-	writeln(z);
+	put("z :+ 10 bit_or z = ");
+	putln(z);
 
 	z := x bit_xor y;
-	write("z := x bit_xor y = ");
-	writeln(z);
+	put("z := x bit_xor y = ");
+	putln(z);
 
 	z := bit_not z;
-	write("bit_not z = ");
-	writeln(z);
+	put("bit_not z = ");
+	putln(z);
 
 	z := x shift_left y;
-	write("z := x shift_left y = ");
-	writeln(z);
+	put("z := x shift_left y = ");
+	putln(z);
 
 	z := x shift_right y;
-	write("z := x shift_right y = ");
-	writeln(z)
+	put("z := x shift_right y = ");
+	putln(z)
 endprog

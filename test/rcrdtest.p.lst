@@ -38,14 +38,14 @@
    13: add
    14: push 3.000000
    15: assign 1
-# test/rcrdtest.p, 25: 	write(x.i1);
+# test/rcrdtest.p, 25: 	put(x.i1);
    16: pushvar 0, 4
    17: eval 1
    18: push 1
    19: push 0
    20: push 0
-   21: write
-# test/rcrdtest.p, 26: 	write(x.i2);
+   21: put
+# test/rcrdtest.p, 26: 	put(x.i2);
    22: pushvar 0, 4
    23: push 1
    24: add
@@ -53,8 +53,8 @@
    26: push 1
    27: push 0
    28: push 0
-   29: write
-# test/rcrdtest.p, 27: 	writeln(x.r, 8, 6);
+   29: put
+# test/rcrdtest.p, 27: 	putln(x.r, 8, 6);
    30: pushvar 0, 4
    31: push 2
    32: add
@@ -62,7 +62,7 @@
    34: push 1
    35: push 8
    36: push 6
-   37: writeln
+   37: putln
 # test/rcrdtest.p, 28: 
 # test/rcrdtest.p, 29: 	y.i1 := 4;
    38: pushvar 0, 7
@@ -80,14 +80,14 @@
    48: add
    49: push 6.000000
    50: assign 1
-# test/rcrdtest.p, 32: 	write(x.i1);
+# test/rcrdtest.p, 32: 	put(x.i1);
    51: pushvar 0, 4
    52: eval 1
    53: push 1
    54: push 0
    55: push 0
-   56: write
-# test/rcrdtest.p, 33: 	write(x.i2);
+   56: put
+# test/rcrdtest.p, 33: 	put(x.i2);
    57: pushvar 0, 4
    58: push 1
    59: add
@@ -95,8 +95,8 @@
    61: push 1
    62: push 0
    63: push 0
-   64: write
-# test/rcrdtest.p, 34: 	writeln(x.r, 8, 6);
+   64: put
+# test/rcrdtest.p, 34: 	putln(x.r, 8, 6);
    65: pushvar 0, 4
    66: push 2
    67: add
@@ -104,7 +104,7 @@
    69: push 1
    70: push 8
    71: push 6
-   72: writeln
+   72: putln
 # test/rcrdtest.p, 35: 
 # test/rcrdtest.p, 36: 	z.i1 := 7;
    73: pushvar 0, 10
@@ -122,14 +122,14 @@
    83: add
    84: push 9.000000
    85: assign 1
-# test/rcrdtest.p, 39: 	write(x.i1);
+# test/rcrdtest.p, 39: 	put(x.i1);
    86: pushvar 0, 4
    87: eval 1
    88: push 1
    89: push 0
    90: push 0
-   91: write
-# test/rcrdtest.p, 40: 	write(x.i2);
+   91: put
+# test/rcrdtest.p, 40: 	put(x.i2);
    92: pushvar 0, 4
    93: push 1
    94: add
@@ -137,8 +137,8 @@
    96: push 1
    97: push 0
    98: push 0
-   99: write
-# test/rcrdtest.p, 41: 	writeln(x.r, 8, 6)
+   99: put
+# test/rcrdtest.p, 41: 	putln(x.r, 8, 6)
   100: pushvar 0, 4
   101: push 2
   102: add
@@ -147,7 +147,7 @@
   105: push 8
   106: push 6
 # test/rcrdtest.p, 42: endprog
-  107: writeln
+  107: putln
 # test/rcrdtest.p, 43: 
   108: ret
 

@@ -7,43 +7,43 @@ type
 	e is (zero, one, two, three);
 
 begin
-	writeln(1);					{ 1			}
-	writeln(round(2.0));		{ 2			}
-	writeln(round(2.5));		{ 3 		}
-	writeln(trunc(4.0));		{ 4 		}
-	writeln(trunc(5.9));		{ 5 		}
-	writeln(maxint);			{ 2,147,483,647	}
+	putln(1);					{ 1			}
+	putln(round(2.0));			{ 2			}
+	putln(round(2.5));			{ 3 		}
+	putln(trunc(4.0));			{ 4 		}
+	putln(trunc(5.9));			{ 5 		}
+	putln(maxint);				{ 2,147,483,647	}
 	
-	writeln(abs(1));			{ 1			}
-	writeln(abs(-1));			{ 1			}
-	writeln(abs(1.5));			{ 1.5		}
-	writeln(abs(-1.5));			{ 1.5		}
+	putln(abs(1));				{ 1			}
+	putln(abs(-1));				{ 1			}
+	putln(abs(1.5));			{ 1.5		}
+	putln(abs(-1.5));			{ 1.5		}
 
-	writeln(ord(three));		{ 3			}
-	writeln(ord(3-1));			{ 2			}
+	putln(ord(three));			{ 3			}
+	putln(ord(3-1));			{ 2			}
 
-{	writeln(ord(1.2));		error: ordinal value expected	}
+{	putln(ord(1.2));		error: ordinal value expected	}
 
-	writeln(arctan(1));			{ 0.785398	}
-	writeln(arctan(1.0));		{ 0.785398	}
+	putln(arctan(1));			{ 0.785398	}
+	putln(arctan(1.0));			{ 0.785398	}
 
-	writeln(exp(1));			{ 2.718282	}
-	writeln(exp(1.0));			{ 2.718282	}
+	putln(exp(1));				{ 2.718282	}
+	putln(exp(1.0));			{ 2.718282	}
 
-	writeln(ln(1));				{ 0.0		}
-	writeln(ln(1.0));			{ 0.0		}
+	putln(ln(1));				{ 0.0		}
+	putln(ln(1.0));				{ 0.0		}
 
-	writeln(odd(10));			{ false		}
-	writeln(odd(10+1));			{ true		}
+	putln(odd(10));				{ false		}
+	putln(odd(10+1));			{ true		}
 
-	writeln(sin(-3*pi/4));		{ -0.707107	}
-	writeln(sqr(10));			{ 100		}
-	writeln(sqrt(2));			{ 1.41421	}
+	putln(sin(-3*pi/4));		{ -0.707107	}
+	putln(sqr(10));				{ 100		}
+	putln(sqrt(2));				{ 1.41421	}
 
-	write(100);
-	write(1.41421);
-	writeln(pi);
+	put(100);
+	put(1.41421);
+	putln(pi);
 
-	writeln(pi, 7, 5)
+	putln(pi, 7, 5)
 endprog
 

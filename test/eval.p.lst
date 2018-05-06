@@ -17,14 +17,14 @@
     9: itor2
    10: add
    11: assign 1
-# test/eval.p, 8: 	writeln(r)
+# test/eval.p, 8: 	putln(r)
    12: pushvar 0, 4
    13: eval 1
    14: push 1
    15: push 0
    16: push 0
 # test/eval.p, 9: endprog
-   17: writeln
+   17: putln
 # test/eval.p, 10: 
    18: ret
 

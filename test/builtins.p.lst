@@ -9,148 +9,148 @@
 # test/builtins.p, 7: 	e is (zero, one, two, three);
 # test/builtins.p, 8: 
 # test/builtins.p, 9: begin
-# test/builtins.p, 10: 	writeln(1);					{ 1			}
+# test/builtins.p, 10: 	putln(1);					{ 1			}
     2: push 1
     3: push 1
     4: push 0
     5: push 0
-    6: writeln
-# test/builtins.p, 11: 	writeln(round(2.0));		{ 2			}
+    6: putln
+# test/builtins.p, 11: 	putln(round(2.0));			{ 2			}
     7: push 2.000000
     8: round
     9: push 1
    10: push 0
    11: push 0
-   12: writeln
-# test/builtins.p, 12: 	writeln(round(2.5));		{ 3 		}
+   12: putln
+# test/builtins.p, 12: 	putln(round(2.5));			{ 3 		}
    13: push 2.500000
    14: round
    15: push 1
    16: push 0
    17: push 0
-   18: writeln
-# test/builtins.p, 13: 	writeln(trunc(4.0));		{ 4 		}
+   18: putln
+# test/builtins.p, 13: 	putln(trunc(4.0));			{ 4 		}
    19: push 4.000000
    20: trunc
    21: push 1
    22: push 0
    23: push 0
-   24: writeln
-# test/builtins.p, 14: 	writeln(trunc(5.9));		{ 5 		}
+   24: putln
+# test/builtins.p, 14: 	putln(trunc(5.9));			{ 5 		}
    25: push 5.900000
    26: trunc
    27: push 1
    28: push 0
    29: push 0
-   30: writeln
-# test/builtins.p, 15: 	writeln(maxint);			{ 2,147,483,647	}
+   30: putln
+# test/builtins.p, 15: 	putln(maxint);				{ 2,147,483,647	}
    31: push 2147483647
    32: push 1
    33: push 0
    34: push 0
-   35: writeln
+   35: putln
 # test/builtins.p, 16: 	
-# test/builtins.p, 17: 	writeln(abs(1));			{ 1			}
+# test/builtins.p, 17: 	putln(abs(1));				{ 1			}
    36: push 1
    37: abs
    38: push 1
    39: push 0
    40: push 0
-   41: writeln
-# test/builtins.p, 18: 	writeln(abs(-1));			{ 1			}
+   41: putln
+# test/builtins.p, 18: 	putln(abs(-1));				{ 1			}
    42: push 1
    43: neg
    44: abs
    45: push 1
    46: push 0
    47: push 0
-   48: writeln
-# test/builtins.p, 19: 	writeln(abs(1.5));			{ 1.5		}
+   48: putln
+# test/builtins.p, 19: 	putln(abs(1.5));			{ 1.5		}
    49: push 1.500000
    50: abs
    51: push 1
    52: push 0
    53: push 0
-   54: writeln
-# test/builtins.p, 20: 	writeln(abs(-1.5));			{ 1.5		}
+   54: putln
+# test/builtins.p, 20: 	putln(abs(-1.5));			{ 1.5		}
    55: push 1.500000
    56: neg
    57: abs
    58: push 1
    59: push 0
    60: push 0
-   61: writeln
+   61: putln
 # test/builtins.p, 21: 
-# test/builtins.p, 22: 	writeln(ord(three));		{ 3			}
+# test/builtins.p, 22: 	putln(ord(three));			{ 3			}
    62: push 3
    63: push 1
    64: push 0
    65: push 0
-   66: writeln
-# test/builtins.p, 23: 	writeln(ord(3-1));			{ 2			}
+   66: putln
+# test/builtins.p, 23: 	putln(ord(3-1));			{ 2			}
    67: push 3
    68: push 1
    69: sub
    70: push 1
    71: push 0
    72: push 0
-   73: writeln
+   73: putln
 # test/builtins.p, 24: 
-# test/builtins.p, 25: {	writeln(ord(1.2));		error: ordinal value expected	}
+# test/builtins.p, 25: {	putln(ord(1.2));		error: ordinal value expected	}
 # test/builtins.p, 26: 
-# test/builtins.p, 27: 	writeln(arctan(1));			{ 0.785398	}
+# test/builtins.p, 27: 	putln(arctan(1));			{ 0.785398	}
    74: push 1
    75: atan
    76: push 1
    77: push 0
    78: push 0
-   79: writeln
-# test/builtins.p, 28: 	writeln(arctan(1.0));		{ 0.785398	}
+   79: putln
+# test/builtins.p, 28: 	putln(arctan(1.0));			{ 0.785398	}
    80: push 1.000000
    81: atan
    82: push 1
    83: push 0
    84: push 0
-   85: writeln
+   85: putln
 # test/builtins.p, 29: 
-# test/builtins.p, 30: 	writeln(exp(1));			{ 2.718282	}
+# test/builtins.p, 30: 	putln(exp(1));				{ 2.718282	}
    86: push 1
    87: exp
    88: push 1
    89: push 0
    90: push 0
-   91: writeln
-# test/builtins.p, 31: 	writeln(exp(1.0));			{ 2.718282	}
+   91: putln
+# test/builtins.p, 31: 	putln(exp(1.0));			{ 2.718282	}
    92: push 1.000000
    93: exp
    94: push 1
    95: push 0
    96: push 0
-   97: writeln
+   97: putln
 # test/builtins.p, 32: 
-# test/builtins.p, 33: 	writeln(ln(1));				{ 0.0		}
+# test/builtins.p, 33: 	putln(ln(1));				{ 0.0		}
    98: push 1
    99: log
   100: push 1
   101: push 0
   102: push 0
-  103: writeln
-# test/builtins.p, 34: 	writeln(ln(1.0));			{ 0.0		}
+  103: putln
+# test/builtins.p, 34: 	putln(ln(1.0));				{ 0.0		}
   104: push 1.000000
   105: log
   106: push 1
   107: push 0
   108: push 0
-  109: writeln
+  109: putln
 # test/builtins.p, 35: 
-# test/builtins.p, 36: 	writeln(odd(10));			{ false		}
+# test/builtins.p, 36: 	putln(odd(10));				{ false		}
   110: push 10
   111: Odd
   112: push 1
   113: push 0
   114: push 0
-  115: writeln
-# test/builtins.p, 37: 	writeln(odd(10+1));			{ true		}
+  115: putln
+# test/builtins.p, 37: 	putln(odd(10+1));			{ true		}
   116: push 10
   117: push 1
   118: add
@@ -158,9 +158,9 @@
   120: push 1
   121: push 0
   122: push 0
-  123: writeln
+  123: putln
 # test/builtins.p, 38: 
-# test/builtins.p, 39: 	writeln(sin(-3*pi/4));		{ -0.707107	}
+# test/builtins.p, 39: 	putln(sin(-3*pi/4));		{ -0.707107	}
   124: push 3
   125: push 3.141593
   126: itor2
@@ -173,48 +173,48 @@
   133: push 1
   134: push 0
   135: push 0
-  136: writeln
-# test/builtins.p, 40: 	writeln(sqr(10));			{ 100		}
+  136: putln
+# test/builtins.p, 40: 	putln(sqr(10));				{ 100		}
   137: push 10
   138: sqr
   139: push 1
   140: push 0
   141: push 0
-  142: writeln
-# test/builtins.p, 41: 	writeln(sqrt(2));			{ 1.41421	}
+  142: putln
+# test/builtins.p, 41: 	putln(sqrt(2));				{ 1.41421	}
   143: push 2
   144: sqrt
   145: push 1
   146: push 0
   147: push 0
-  148: writeln
+  148: putln
 # test/builtins.p, 42: 
-# test/builtins.p, 43: 	write(100);
+# test/builtins.p, 43: 	put(100);
   149: push 100
   150: push 1
   151: push 0
   152: push 0
-  153: write
-# test/builtins.p, 44: 	write(1.41421);
+  153: put
+# test/builtins.p, 44: 	put(1.41421);
   154: push 1.414210
   155: push 1
   156: push 0
   157: push 0
-  158: write
-# test/builtins.p, 45: 	writeln(pi);
+  158: put
+# test/builtins.p, 45: 	putln(pi);
   159: push 3.141593
   160: push 1
   161: push 0
   162: push 0
-  163: writeln
+  163: putln
 # test/builtins.p, 46: 
-# test/builtins.p, 47: 	writeln(pi, 7, 5)
+# test/builtins.p, 47: 	putln(pi, 7, 5)
   164: push 3.141593
   165: push 1
   166: push 7
   167: push 5
 # test/builtins.p, 48: endprog
-  168: writeln
+  168: putln
 # test/builtins.p, 49: 
 # test/builtins.p, 50: 
   169: ret

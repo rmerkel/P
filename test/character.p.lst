@@ -17,13 +17,13 @@
     5: llimit 0
     6: ulimit 127
     7: assign 1
-# test/character.p, 12: 	writeln(c);	
+# test/character.p, 12: 	putln(c);	
     8: pushvar 0, 5
     9: eval 1
    10: push 1
    11: push 0
    12: push 0
-   13: writeln
+   13: putln
 # test/character.p, 13: 	a1 := "abcdefghij";		{	fill a1 with "abcd..."			}
    14: pushvar 0, 6
    15: push 'a'
@@ -37,25 +37,25 @@
    23: push 'i'
    24: push 'j'
    25: assign 10
-# test/character.p, 14:  	writeln(a1);
+# test/character.p, 14:  	putln(a1);
    26: pushvar 0, 6
    27: eval 10
    28: push 10
    29: push 0
    30: push 0
-   31: writeln
+   31: putln
 # test/character.p, 15: 	a2 := a1;				{	copies the contents of a1 to a2	}
    32: pushvar 0, 16
    33: pushvar 0, 6
    34: eval 10
    35: assign 10
-# test/character.p, 16: 	writeln(a2);
+# test/character.p, 16: 	putln(a2);
    36: pushvar 0, 16
    37: eval 10
    38: push 10
    39: push 0
    40: push 0
-   41: writeln
+   41: putln
 # test/character.p, 17: 	a1 := "0123456788";		{	fill a1 with "0123..."			}
    42: pushvar 0, 6
    43: push '0'
@@ -69,21 +69,21 @@
    51: push '8'
    52: push '8'
    53: assign 10
-# test/character.p, 18: 	writeln(a1);			{	while a1 has changed...			}
+# test/character.p, 18: 	putln(a1);				{	while a1 has changed...			}
    54: pushvar 0, 6
    55: eval 10
    56: push 10
    57: push 0
    58: push 0
-   59: writeln
-# test/character.p, 19: 	writeln(a2)				{	... a2 has not!					}
+   59: putln
+# test/character.p, 19: 	putln(a2)				{	... a2 has not!					}
    60: pushvar 0, 16
    61: eval 10
    62: push 10
    63: push 0
    64: push 0
 # test/character.p, 20: endprog
-   65: writeln
+   65: putln
 # test/character.p, 21: 
    66: ret
 

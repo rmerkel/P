@@ -61,14 +61,14 @@
    32: push 10
    33: calli 0, 2
    34: assign 1
-# test/fact2.p, 29: 	writeln(result)
+# test/fact2.p, 29: 	putln(result)
    35: pushvar 0, 4
    36: eval 1
    37: push 1
    38: push 0
    39: push 0
 # test/fact2.p, 30: endprog
-   40: writeln
+   40: putln
 # test/fact2.p, 31: 
    41: ret
 

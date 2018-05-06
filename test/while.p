@@ -6,7 +6,7 @@ var
 begin
 	i := 0;
 	while (i <= 9) loop
-		writeln(i);
+		putln(i);
 		i := i + 1
 	endloop
 endprog

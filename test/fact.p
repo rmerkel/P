@@ -15,11 +15,11 @@ procedure factorial(n : integer) is
 	var p : integer;
 	begin
         p := 1;
-		writeln(p);
+		putln(p);
         while n > 0 loop
             p := p * n;
             n := n - 1;
-			writeln(p)
+			putln(p)
         endloop
     endproc
 

@@ -1141,13 +1141,13 @@ bool PComp::forStatement(int level) {
 }
 
 /********************************************************************************************//**
- * write or write[ln]( [ expression [',' width [ ',' precision ]]] )
+ * put or put[ln]( [ expression [',' width [ ',' precision ]]] )
  *
- * Process write and writeln parameters, up to, but not including, emitteing the final op-code.
+ * Process put and putln parameters, up to, but not including, emitteing the final op-code.
  *
  * @param	level	The current block level.
  ************************************************************************************************/
-void PComp::write(int level) {
+void PComp::put(int level) {
 	const int defaultWidth = 0;
 	const int defaultPrec = 0;
 
@@ -1159,7 +1159,7 @@ void PComp::write(int level) {
 			emit(OpCode::PUSH, 0, defaultPrec);
 
 		} else {
-			auto expr = expression(level); 	// value(s) to write
+			auto expr = expression(level); 	// value(s) to put
 			emit(OpCode::PUSH, 0, expr->size());
 
 			if (accept(Token::Comma)) {		// [ ',' width [ ',' precision ]]
@@ -1190,25 +1190,25 @@ void PComp::write(int level) {
 }
 
 /********************************************************************************************//**
- * write or writeln( [ expression [',' width [ ',' precision ]]] )
+ * put or putln( [ expression [',' width [ ',' precision ]]] )
  *
- * Process write and writeln parameters, up to, but not including, emitteing the final op-code.
+ * Process put and putln parameters, up to, but not including, emitteing the final op-code.
  *
  * @param	level	The current block level.
  ************************************************************************************************/
-void PComp::writeStatement(int level) {
-	write(level);
-	emit(OpCode::WRITE);
+void PComp::putStatement(int level) {
+	put(level);
+	emit(OpCode::PUT);
 }
 
 /********************************************************************************************//**
- * writeln [ format-list ]
+ * putln [ format-list ]
  *
  * @param	level	The current block level.
  ************************************************************************************************/
-void PComp::writeLnStatement(int level) {
-	write(level);
-	emit(OpCode::WRITELN);
+void PComp::putLnStatement(int level) {
+	put(level);
+	emit(OpCode::PUTLN);
 }
 
 /********************************************************************************************//**
@@ -1255,11 +1255,11 @@ void PComp::statementNew(int level) {
 void PComp::statementProcs(int level) {
 	ostringstream oss;
 
-	if (accept(Token::Write))				// write [ '(' expr-tuple { ',' expr-tuple } ')' ]
-		writeStatement(level);
+	if (accept(Token::Put))					// put [ '(' expr-tuple { ',' expr-tuple } ')' ]
+		putStatement(level);
 
-	else if (accept(Token::Writeln))		// writeln [ '(' expr-tuple { ',' expr-tuple } ')' ]
-		writeLnStatement(level);
+	else if (accept(Token::Putln))			// putln [ '(' expr-tuple { ',' expr-tuple } ')' ]
+		putLnStatement(level);
 
 	else if (accept(Token::New))			// 'New (' id ')'
 		statementNew(level);
