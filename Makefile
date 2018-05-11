@@ -115,4 +115,5 @@ pr:
 
 test: all
 	./xp.sh
+	./xp2.sh
 

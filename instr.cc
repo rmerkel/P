@@ -50,6 +50,11 @@ const OpCodeInfo::InfoMap OpCodeInfo::opInfoTbl {
 
 	// Builtin procedures
 
+	{ OpCode::GETB,		OpCodeInfo{ "get.b",	2			} },
+	{ OpCode::GETC,		OpCodeInfo{ "get.c",	2			} },
+	{ OpCode::GETI,		OpCodeInfo{ "get.i",	2			} },
+	{ OpCode::GETR,		OpCodeInfo{ "get.r",	2			} },
+	{ OpCode::GETLN,	OpCodeInfo{ "getln",	2			} },
 	{ OpCode::PUT,		OpCodeInfo{ "put",		4			} },
 	{ OpCode::PUTLN,	OpCodeInfo{ "putln",	4			} },
 	{ OpCode::NEW,		OpCodeInfo{ "new",		1			} },

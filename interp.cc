@@ -167,6 +167,11 @@ PInterp::InstrPtr PInterp::instrTbl[] = {
 	&PInterp::SIN,
 	&PInterp::SQR,
 	&PInterp::SQRT,
+	&PInterp::GETB,
+	&PInterp::GETC,
+	&PInterp::GETI,
+	&PInterp::GETR,
+	&PInterp::GETLN,
 	&PInterp::PUT,
 	&PInterp::PUTLN,
 	&PInterp::NEW,
@@ -485,29 +490,65 @@ Result PInterp::SUCC() {
 }
 
 /********************************************************************************************//**
+ * Read boolean values from standard input. TOS is (n,addr) where, n is the number of values
+ * to read, and addr is the starting address of the destination.
+ *
+ * @return	Result::stackUnderflow if there was insufficient space on the stack, or [addr,addr+n)
+ *			isn't a valid location. Result::badDataType if n or a isn't a natural.
+ ************************************************************************************************/
+Result PInterp::GETB()	{	return get<bool>();	}
+
+/********************************************************************************************//**
+ * Read character values from standard input. TOS is (n,addr) where, n is the number of values
+ * to read, and addr is the starting address of the destination.
+ *
+ * @return	Result::stackUnderflow if there was insufficient space on the stack, or [addr,addr+n)
+ *			isn't a valid location. Result::badDataType if n or a isn't a natural.
+ ************************************************************************************************/
+Result PInterp::GETC()	{	return get<char>();	}
+
+/********************************************************************************************//**
+ * Read integer values from standard input. TOS is (n,addr) where, n is the number of values to
+ * read, and addr is the starting address of the destination.
+ *
+ * @return	Result::stackUnderflow if there was insufficient space on the stack, or [addr,addr+n)
+ *			isn't a valid location. Result::badDataType if n or a isn't a natural.
+ ************************************************************************************************/
+Result PInterp::GETI()	{	return get<int>();	}
+
+/********************************************************************************************//**
+ * Read real values from standard input. TOS is (n,addr) where, n is the number of values to
+ * read, and addr is the starting address of the destination.
+ *
+ * @return	Result::stackUnderflow if there was insufficient space on the stack, or [addr,addr+n)
+ *			isn't a valid location. Result::badDataType if n or a isn't a natural.
+ ************************************************************************************************/
+Result PInterp::GETR() {	return get<double>();	}
+
+/********************************************************************************************//**
  * Writes one expresson on the standard output stream. TOS is an 4-tuple -- (p,w,n,v):
  *
+ * - p - the percision of the value(s). Ignored if v isn't a Real.
+ * - w - the width of the field to write the value(s) in.
+ * - v - The values(n) to write...
  * - n - the number of Datum's in the value. If greater than 1, v is treated as an array, where
  *   an array of characters is treated as a string.
- * - w - the width of the field to write the value(s) in.
- * - p - the percision of the value(s). Ignored if v isn't a Real.
- * - v - The values(n) to write...
  *
  * @return	Result::stackUnderflow if there was insufficient space on the stack,
  * 			Result::badDataType if any of the parameters aren't integers.
  ************************************************************************************************/
-Result PInterp::put1() {
+Result PInterp::put() {
 	if (sp < 3)
 		return Result::stackUnderflow;
 
 	Result r = Result::success;
 
-	int p = 0;								// defualt value of prec
+	int p = 0;								// default value of prec
 	const Datum prec = pop();
 	if (prec.kind() == Datum::Integer)
 		p = prec.integer();
 	else {
-		cerr << "PUT[LN] precision parameter is not an integer!" << endl;
+		cerr << "PUTx precision parameter is not an integer!" << endl;
 		r =  Result::badDataType;
 	}
 
@@ -516,17 +557,17 @@ Result PInterp::put1() {
 	if (width.kind() == Datum::Integer)
 		w = width.integer();
 	else {
-		cerr << "PUT[LN] width parameter is not an integer!" << endl;
+		cerr << "PUTx width parameter is not an integer!" << endl;
 		r = Result::badDataType;
 	}
 	
 	size_t n = 1;							// default value of nValue
 	const Datum nValue = pop();
 	if (nValue.kind() != Datum::Integer) {
-		cerr << "PUT[LN] value count paramters is not an integer!" << endl;
+		cerr << "PUTx value count paramters is not an integer!" << endl;
 		r =  Result::badDataType;
 	} else if (nValue.integer() < 0) {
-		cerr << "PUT[LN] value count paramters is negative!" << endl;
+		cerr << "PUTx value count paramters is negative!" << endl;
 		r =  Result::badDataType;
 	} else
 		n = nValue.integer();
@@ -565,25 +606,32 @@ Result PInterp::put1() {
 }
 
 /********************************************************************************************//**
- * Writes one expresson on the standard output stream.
+ * Writes one expresson, followed by a newline, on the standard output stream.
  *
- * @see put1() for TOS
+ * @see put() for TOS
  *
- * @return	put1();
+ * @return	put();
  ************************************************************************************************/
-Result PInterp::PUT() {
-	return put1();
+Result PInterp::GETLN() {
+	return Result::unknownInstr;
 }
 
 /********************************************************************************************//**
- * Writes one expresson, followed by a newline, on the standard output stream.
+ * @see put() for TOS
  *
- * @see put1() for TOS
+ * @return	put();
+ ************************************************************************************************/
+Result PInterp::PUT() {
+	return put();
+}
+
+/********************************************************************************************//**
+ * @see put() for TOS
  *
- * @return	put1();
+ * @return	put();
  ************************************************************************************************/
 Result PInterp::PUTLN() {
-	const Result r = put1();
+	const Result r = put();
 	cout << '\n';
 	return r;
 }

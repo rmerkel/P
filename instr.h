@@ -57,8 +57,13 @@ enum class OpCode : unsigned char {
 	SQR,		///< SQR   - Square; push(stack[sp] * pop())
 	SQRT,		///< SQRT  - Square-root; push(Sqrt(pop()))
 
-	PUT,		///< PUT - Write one value on standard output
-	PUTLN,		///< PUTLN - Write one value, followed by a newline, on standard output
+	GETB,		///< GETB - Read boolean values from standard input
+	GETC,		///< GETC - Read character values from standard input
+	GETI,		///< GETI - Read integer values from standard input
+	GETR,		///< GETR - Read real values from standard input
+	GETLN,		///< GETLN - Read one line from standard input
+	PUT,		///< PUT - Write one or more values on standard output
+	PUTLN,		///< PUTLN - Write one or more values, followed by a newline, on standard output
 	NEW,		///< NEW   - Allocate dynamic store; n=pop(); allocate n dataums, push(addr) or zero if insufficient space
 	DISPOSE,	///< DISPOSE - Dispose of allocated dynamic store; free pop()
 

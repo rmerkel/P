@@ -6,27 +6,27 @@ begin
 	put("x = "); putln(x);
 	put("y = "); putln(y);
 
-	z := x bit_and y;
-	put("z := x bit_and y = ");
+	z := x band y;
+	put("z := x band y = ");
 	putln(z);
 
-	z := 10 bit_or z;
-	put("z :+ 10 bit_or z = ");
+	z := 10 bor z;
+	put("z :+ 10 bor z = ");
 	putln(z);
 
-	z := x bit_xor y;
-	put("z := x bit_xor y = ");
+	z := x bxor y;
+	put("z := x bxor y = ");
 	putln(z);
 
-	z := bit_not z;
-	put("bit_not z = ");
+	z := bnot z;
+	put("bnot z = ");
 	putln(z);
 
-	z := x shift_left y;
-	put("z := x shift_left y = ");
+	z := x sleft y;
+	put("z := x sleft y = ");
 	putln(z);
 
-	z := x shift_right y;
-	put("z := x shift_right y = ");
+	z := x sright y;
+	put("z := x sright y = ");
 	putln(z)
 endprog

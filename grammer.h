@@ -54,10 +54,10 @@
  *          const-expr = [ '+' | '-' ] number | identifier | character | string ;
  *      expression-lst = expression { ',' expression } ;
  *          expression = simple-expr { '<' | "<=" | '=' | ">=" | '>' | "<>" simple-expr } ;
- *         simple-expr = [ '+' | '-' | "bit_not" ] terminal { simple-expr-op terminal } ;
- *      simple-expr-op = '+' | '-' | "bit_or" | "bit_xor" | "shift_left" | "shift_right" | "or' ;
+ *         simple-expr = [ '+' | '-' | "bnot" ] terminal { simple-expr-op terminal } ;
+ *      simple-expr-op = '+' | '-' | "bor" | "bxor" | "sleft" | "sright" | "or' ;
  *            terminal = factor { term_op  factor } ;
- *             term_op = '*' | '/' | "rem" | "bit_and" | | "and" ;
+ *             term_op = '*' | '/' | "rem" | "band" | | "and" ;
  *              factor = variable | character | string                                      |
  *                       identifier '(' [ expression-lst ] ')'                              |
  *                       "round" '(' expression ')'                                         |

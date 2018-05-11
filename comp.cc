@@ -190,12 +190,17 @@ TDescPtr PComp::identFactor(int level, const string& id, bool var) {
 			type = variable(level, it);
 			assert(type.get() != 0);
 			assert(type->base().get() != 0);
-			type = type->base();
+#pragma message "why are variable types dereferenced?"
+			type = type->base();		// ??
 			assert(type.get() != 0);
-			if (!var)
+			if (!var) {
+//				type = type->base();	// ??
 				emit(OpCode::EVAL, 0, type->size());
-			if (type->ref())
+			}
+			if (type->ref()) {
+//				type = type->base();	//	??
 				emit(OpCode::EVAL, 0, type->size());
+			}
 			break;
 
 		case SymValue::Function:
@@ -402,11 +407,13 @@ TDescPtr PComp::factor(int level, bool var) {
 
 	} else if (accept(Token::IntegerNum, false)) {
 		int value = ts.current().integer_value;
+		if (var) error("can't take reference of a literal");
 		emit(OpCode::PUSH, 0, value);
 		expect(Token::IntegerNum);
 		type = TypeDesc::newIntDesc();
 
 	} else if (accept(Token::RealNum, false)) {
+		if (var) error("can't take reference of a literal");
 		emit(OpCode::PUSH, 0, ts.current().real_value);
 		expect(Token::RealNum);
 		type = TypeDesc::newRealDesc();
@@ -1141,6 +1148,40 @@ bool PComp::forStatement(int level) {
 }
 
 /********************************************************************************************//**
+ * get ( expression )
+ *
+ * TOS
+ * @param	level	The current block level.
+ ************************************************************************************************/
+void PComp::getStatement(int level) {
+	TDescPtr type;
+	if (accept(Token::OpenParen)) {			// process each expr-tuple..
+		TDescPtr type = expression(level, true); // lvalue(s) to put
+		emit(OpCode::PUSH, 0, type->size());
+		expect(Token::CloseParen);
+
+		switch(type->tclass()) {
+		case TypeDesc::Array:
+			switch(type->base()->tclass()) {
+			case TypeDesc::Boolean:		emit(OpCode::GETB);						break;
+			case TypeDesc::Character:	emit(OpCode::GETC);						break;
+			case TypeDesc::Integer:		emit(OpCode::GETI);						break;
+			case TypeDesc::Real:		emit(OpCode::GETR);						break;
+			default:	error("unsupported get parameter");
+			}
+			break;
+
+		case TypeDesc::Boolean:		emit(OpCode::GETB);							break;
+		case TypeDesc::Character:	emit(OpCode::GETC);							break;
+		case TypeDesc::Integer:		emit(OpCode::GETI);							break;
+		case TypeDesc::Real:		emit(OpCode::GETR);							break;
+		default:
+			error("unsupported get parameter");
+		}
+	}
+}
+
+/********************************************************************************************//**
  * put or put[ln]( [ expression [',' width [ ',' precision ]]] )
  *
  * Process put and putln parameters, up to, but not including, emitteing the final op-code.
@@ -1151,7 +1192,6 @@ void PComp::put(int level) {
 	const int defaultWidth = 0;
 	const int defaultPrec = 0;
 
-	ostringstream oss;
 	if (accept(Token::OpenParen)) {			// process each expr-tuple..
 		if (accept(Token::CloseParen)) {	// handle no parameters
 			emit(OpCode::PUSH, 0, 0);		// size
@@ -1163,6 +1203,8 @@ void PComp::put(int level) {
 			emit(OpCode::PUSH, 0, expr->size());
 
 			if (accept(Token::Comma)) {		// [ ',' width [ ',' precision ]]
+				ostringstream oss;
+
 				auto width = expression(level);
 				if (width->tclass() != TypeDesc::Integer) {
 					oss << "expeced integer width parameter, got: " << width->tclass();
@@ -1255,7 +1297,10 @@ void PComp::statementNew(int level) {
 void PComp::statementProcs(int level) {
 	ostringstream oss;
 
-	if (accept(Token::Put))					// put [ '(' expr-tuple { ',' expr-tuple } ')' ]
+	if (accept(Token::Get))					// get '(' expr-tuple { ',' expr-tuple } ')'
+		getStatement(level);
+
+	else if (accept(Token::Put))					// put '(' expr-tuple { ',' expr-tuple } ')'
 		putStatement(level);
 
 	else if (accept(Token::Putln))			// putln [ '(' expr-tuple { ',' expr-tuple } ')' ]

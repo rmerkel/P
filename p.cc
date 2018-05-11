@@ -35,6 +35,7 @@
  * @example test/typetest.p
  * @example test/unknown.p
  * @example test/varparam.p
+ * @example test2/get.p
  ************************************************************************************************/
 
 #include "comp.h"

@@ -217,10 +217,10 @@ TokenStream::KeywordTable	TokenStream::keywords = {
 	{	"array",		Token::Array		},
 	{	"arctan",		Token::Atan			},
 	{	"begin",		Token::Begin		},
-	{	"bit_and",		Token::BitAnd		},
-	{	"bit_not",		Token::BitNot		},
-	{	"bit_or",		Token::BitOr		},
-	{	"bit_xor",		Token::BitXor		},
+	{	"band",			Token::BitAnd		},
+	{	"bnot",			Token::BitNot		},
+	{	"bor",			Token::BitOr		},
+	{	"bxor",			Token::BitXor		},
 	{   "const",		Token::ConsDecl		},
 	{	"dispose",		Token::Dispose		},
 	{	"elif",			Token::Elif			},
@@ -233,6 +233,7 @@ TokenStream::KeywordTable	TokenStream::keywords = {
 	{	"endprog",		Token::Endprog		},
 	{	"exp",			Token::Exp			},
 	{	"function",		Token::FuncDecl		},
+	{	"get",			Token::Get			},
 	{	"if",			Token::If			},
 	{	"in",			Token::In			},
 	{	"is",			Token::Is			},
@@ -251,8 +252,8 @@ TokenStream::KeywordTable	TokenStream::keywords = {
 	{	"repeat",		Token::Repeat		},
 	{	"reverse",		Token::Reverse		},
 	{	"round",		Token::Round		},
-	{	"shift_left",	Token::ShiftLeft	},
-	{	"shift_right",	Token::ShiftRight	},
+	{	"sleft",		Token::ShiftLeft	},
+	{	"sright",		Token::ShiftRight	},
 	{	"sin",			Token::Sin			},
 	{	"sqr",			Token::Sqr			},
 	{	"sqrt",			Token::Sqrt			},
@@ -332,13 +333,13 @@ ostream& operator<<(std::ostream& os, const Token::Kind& kind) {
 	case Token::Or:			os << "or";				break;
 	case Token::And:		os << "and";			break;
 
-	case Token::BitNot:		os << "bit_not";		break;
-	case Token::BitAnd:		os << "bit_and";		break;
-	case Token::BitOr:		os << "bit_or";			break;
-	case Token::BitXor:		os << "bit_xor";		break;
+	case Token::BitNot:		os << "bnot";			break;
+	case Token::BitAnd:		os << "band";			break;
+	case Token::BitOr:		os << "bor";			break;
+	case Token::BitXor:		os << "bxor";			break;
 
-	case Token::ShiftLeft:	os << "shift_left";		break;
-	case Token::ShiftRight:	os << "shift_right";	break;
+	case Token::ShiftLeft:	os << "sleft";			break;
+	case Token::ShiftRight:	os << "sleft";			break;
 
 	case Token::Add:		os << "+";				break;
 	case Token::Subtract:	os << "-";				break;
@@ -368,6 +369,7 @@ ostream& operator<<(std::ostream& os, const Token::Kind& kind) {
 	case Token::Sqr:		os << "sqr";			break;
 	case Token::Sqrt:		os << "sqrt";			break;
 	case Token::Succ:		os << "succ";			break;
+	case Token::Get:		os << "get";			break;
 	case Token::Put:		os << "put";			break;
 	case Token::Putln:		os << "putln";			break;
 	case Token::New:		os << "new";			break;

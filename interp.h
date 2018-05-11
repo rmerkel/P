@@ -65,7 +65,8 @@ protected:
 	typedef Result (PInterp::*InstrPtr)();	///< Pointer to an instruction
 	static InstrPtr instrTbl[];				///< Table of pointer to instructions, indexed by opcode
 
-	Result put1();							///< Process a PUT or PUTLN
+	template <class T> Result get();		///< Read a value from standard input
+	Result put();							///< Process PUTx instructions
 
 	// The instructions...
 
@@ -85,6 +86,11 @@ protected:
 	Result SQR();							///< Square
 	Result SQRT();							///< Square-root
 	Result SUCC();							///< Successor
+	Result GETB();							///< Read boolean value(s) from standard input
+	Result GETC();							///< Read character value(s) from standard input
+	Result GETI();							///< Read integer value(s) from standard input
+	Result GETR();							///< Read real value(s) from standard input
+	Result GETLN();							///< Read line from standard input
 	Result PUT();							///< Write expression on standard output
 	Result PUTLN();							///< Write expression, followed by newline, on standard output
 	Result NEW();							///< Allocate space
@@ -177,6 +183,64 @@ template <class T> void PInterp::push(const T& value) {
 		throw Result::outOfRange;
 	else
 		stack[++sp] = Datum(value);
+}
+
+/********************************************************************************************//**
+ * Read an integer value from standard input. TOS is (n,addr) where, n is the number of values to
+ * read, and addr is the starting address of the destination.
+ *
+ * @return	Result::stackUnderflow if there was insufficient space on the stack, or [addr,addr+n)
+ *			isn't a valid location. Result::badDataType if n or a isn't a natural.
+ ************************************************************************************************/
+template <class T> Result PInterp::get() {
+	Result r = Result::success;
+
+	if (sp < 2)
+		r =  Result::stackUnderflow;
+
+	else {
+		const Datum nValue = pop();
+		const Datum addrValue = pop();
+
+		size_t n = 1;							// number of values to read
+		unsigned addr = 0;						// starting address of the destination
+
+		if (nValue.kind() != Datum::Integer) {
+			std::cerr << "get value count paramters is not an integer!" << std::endl;
+			r =  Result::badDataType;
+
+		} else if (nValue.integer() < 0) {
+			std::cerr << "get value count paramters is negative!" << std::endl;
+			r =  Result::badDataType;
+
+		} else if (addrValue.kind() != Datum::Integer) {
+			std::cerr << "get address is not an integer!" << std::endl;
+			r =  Result::badDataType;
+
+		} else if (addrValue.integer() < 0) {
+			std::cerr << "get address is negative!" << std::endl;
+			r =  Result::badDataType;
+
+		} else {
+			n = nValue.integer();
+			addr = addrValue.natural();
+
+			if (!rangeCheck(addr, addr+n)) {
+				std::cerr << "Stack underflow evaluating " << n << "Datums \n";
+				r = Result::stackUnderflow;
+
+			} else {
+				for (unsigned i = 0; i < n && r == Result::success; ++i) {
+					Datum& value = stack[addr++];
+					T v = T();							// last value read...
+					std::cin >> v;
+					value = v;
+				}
+			}
+		}
+	}
+
+	return r;
 }
 
 #endif
