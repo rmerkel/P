@@ -22,3 +22,6 @@ p
 *.o
 *.d
 *.lst
+
+# CMake build files
+build
