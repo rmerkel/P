@@ -1,0 +1,52 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            
+            "label": "make",
+            "command": "make",
+            "group": "build",
+            "type": "shell",
+            "problemMatcher": { 
+                "base": "$gcc",
+                "fileLocation": ["relative", "%{workspaceRoot}"]
+            }
+        },
+        {
+            
+            "label": "clean",
+            "command": "make",
+            "args": ["clean"],
+            "group": "build",
+            "type": "shell",
+            "problemMatcher": { 
+                "base": "$gcc",
+                "fileLocation": ["relative", "%{workspaceRoot}"]
+            }
+        },
+        {
+            
+            "label": "cleanall",
+            "command": "make",
+            "args": ["cleanall"],
+            "group": "build",
+            "type": "shell",
+            "problemMatcher": { 
+                "base": "$gcc",
+                "fileLocation": ["relative", "%{workspaceRoot}"]
+            }
+        },
+        {
+            
+            "label": "test",
+            "command": "make",
+            "args": ["test"],
+            "group": "test",
+            "type": "shell",
+            "problemMatcher": { 
+                "base": "$gcc",
+                "fileLocation": ["relative", "%{workspaceRoot}"]
+            }
+        }
+    ]
+}
