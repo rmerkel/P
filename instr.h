@@ -53,14 +53,11 @@ enum class OpCode : unsigned char {
 	PRED,		///< PRED ,limit - Predecessor; push(pop() - 1); OutOfRange if TOS was <= limit
 	SUCC,		///< SUCC ,limit - Successor; push(pop() + 1); OutOfRange if TOS was >= limit
 
-	SIN,		///< SIN   - Sine; push(Sin(pop()))
-	SQR,		///< SQR   - Square; push(stack[sp] * pop())
-	SQRT,		///< SQRT  - Square-root; push(Sqrt(pop()))
+	SIN,		///< SIN  - Sine; push(Sin(pop()))
+	SQR,		///< SQR  - Square; push(stack[sp] * pop())
+	SQRT,		///< SQRT - Square-root; push(Sqrt(pop()))
 
-	GETB,		///< GETB - Read boolean values from standard input
-	GETC,		///< GETC - Read character values from standard input
-	GETI,		///< GETI - Read integer values from standard input
-	GETR,		///< GETR - Read real values from standard input
+	GET,		///< GET ,type - Read values from standard input
 	GETLN,		///< GETLN - Read one line from standard input
 	PUT,		///< PUT - Write one or more values on standard output
 	PUTLN,		///< PUTLN - Write one or more values, followed by a newline, on standard output

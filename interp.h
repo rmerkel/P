@@ -86,10 +86,7 @@ protected:
 	Result SQR();							///< Square
 	Result SQRT();							///< Square-root
 	Result SUCC();							///< Successor
-	Result GETB();							///< Read boolean value(s) from standard input
-	Result GETC();							///< Read character value(s) from standard input
-	Result GETI();							///< Read integer value(s) from standard input
-	Result GETR();							///< Read real value(s) from standard input
+	Result GET();							///< Read value(s) from standard input
 	Result GETLN();							///< Read line from standard input
 	Result PUT();							///< Write expression on standard output
 	Result PUTLN();							///< Write expression, followed by newline, on standard output

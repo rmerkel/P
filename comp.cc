@@ -190,17 +190,12 @@ TDescPtr PComp::identFactor(int level, const string& id, bool var) {
 			type = variable(level, it);
 			assert(type.get() != 0);
 			assert(type->base().get() != 0);
-#pragma message "why are variable types dereferenced?"
-			type = type->base();		// ??
+			type = type->base();
 			assert(type.get() != 0);
-			if (!var) {
-//				type = type->base();	// ??
+			if (!var)
 				emit(OpCode::EVAL, 0, type->size());
-			}
-			if (type->ref()) {
-//				type = type->base();	//	??
+			if (type->ref())
 				emit(OpCode::EVAL, 0, type->size());
-			}
 			break;
 
 		case SymValue::Function:
@@ -841,7 +836,7 @@ TDescPtr PComp::varSelector(SymbolTableIter it, TDescPtr type) {
  * variable		  = identifier [ composite-desc { composite-desc } ] ;
  * composite-desc = '[' expression-lst ']' | '.' identifier ;
  *
- * Emits a variable reference, optionally with array indexes.
+ * Emits a variable reference, i.e., a pointer type, optionally with array indexes.
  *
  * @param	id		The variable or array identifier
  * @param	level	The current block level.
@@ -1163,18 +1158,18 @@ void PComp::getStatement(int level) {
 		switch(type->tclass()) {
 		case TypeDesc::Array:
 			switch(type->base()->tclass()) {
-			case TypeDesc::Boolean:		emit(OpCode::GETB);						break;
-			case TypeDesc::Character:	emit(OpCode::GETC);						break;
-			case TypeDesc::Integer:		emit(OpCode::GETI);						break;
-			case TypeDesc::Real:		emit(OpCode::GETR);						break;
+			case TypeDesc::Boolean:		emit(OpCode::GET, 0, Datum::Boolean);		break;
+			case TypeDesc::Character:	emit(OpCode::GET, 0, Datum::Character);		break;
+			case TypeDesc::Integer:		emit(OpCode::GET, 0, Datum::Integer);		break;
+			case TypeDesc::Real:		emit(OpCode::GET, 0, Datum::Real);			break;
 			default:	error("unsupported get parameter");
 			}
 			break;
 
-		case TypeDesc::Boolean:		emit(OpCode::GETB);							break;
-		case TypeDesc::Character:	emit(OpCode::GETC);							break;
-		case TypeDesc::Integer:		emit(OpCode::GETI);							break;
-		case TypeDesc::Real:		emit(OpCode::GETR);							break;
+		case TypeDesc::Boolean:		emit(OpCode::GET, 0, Datum::Boolean);			break;
+		case TypeDesc::Character:	emit(OpCode::GET, 0, Datum::Character);			break;
+		case TypeDesc::Integer:		emit(OpCode::GET, 0, Datum::Integer);			break;
+		case TypeDesc::Real:		emit(OpCode::GET, 0, Datum::Real);				break;
 		default:
 			error("unsupported get parameter");
 		}

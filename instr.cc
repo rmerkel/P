@@ -50,10 +50,7 @@ const OpCodeInfo::InfoMap OpCodeInfo::opInfoTbl {
 
 	// Builtin procedures
 
-	{ OpCode::GETB,		OpCodeInfo{ "get.b",	2			} },
-	{ OpCode::GETC,		OpCodeInfo{ "get.c",	2			} },
-	{ OpCode::GETI,		OpCodeInfo{ "get.i",	2			} },
-	{ OpCode::GETR,		OpCodeInfo{ "get.r",	2			} },
+	{ OpCode::GET,		OpCodeInfo{ "get",		2			} },
 	{ OpCode::GETLN,	OpCodeInfo{ "getln",	2			} },
 	{ OpCode::PUT,		OpCodeInfo{ "put",		4			} },
 	{ OpCode::PUTLN,	OpCodeInfo{ "putln",	4			} },
@@ -155,6 +152,7 @@ unsigned disasm(ostream& out, unsigned loc, const Instr& instr, const string lab
 	case OpCode::COPY:
 	case OpCode::ENTER:
 	case OpCode::EVAL:
+	case OpCode::GET:
 	case OpCode::LLIMIT:
 	case OpCode::ULIMIT:
 	case OpCode::PRED:

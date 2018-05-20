@@ -167,10 +167,7 @@ PInterp::InstrPtr PInterp::instrTbl[] = {
 	&PInterp::SIN,
 	&PInterp::SQR,
 	&PInterp::SQRT,
-	&PInterp::GETB,
-	&PInterp::GETC,
-	&PInterp::GETI,
-	&PInterp::GETR,
+	&PInterp::GET,
 	&PInterp::GETLN,
 	&PInterp::PUT,
 	&PInterp::PUTLN,
@@ -491,39 +488,33 @@ Result PInterp::SUCC() {
 
 /********************************************************************************************//**
  * Read boolean values from standard input. TOS is (n,addr) where, n is the number of values
- * to read, and addr is the starting address of the destination.
+ * to read, addr is the starting address of the destination, and finally ir.addr is the ordinal
+ * of the Datum::Kind to read.
  *
  * @return	Result::stackUnderflow if there was insufficient space on the stack, or [addr,addr+n)
  *			isn't a valid location. Result::badDataType if n or a isn't a natural.
  ************************************************************************************************/
-Result PInterp::GETB()	{	return get<bool>();	}
+Result PInterp::GET() {
+	Result r = Result::success;
 
-/********************************************************************************************//**
- * Read character values from standard input. TOS is (n,addr) where, n is the number of values
- * to read, and addr is the starting address of the destination.
- *
- * @return	Result::stackUnderflow if there was insufficient space on the stack, or [addr,addr+n)
- *			isn't a valid location. Result::badDataType if n or a isn't a natural.
- ************************************************************************************************/
-Result PInterp::GETC()	{	return get<char>();	}
+	if (ir.value.kind() != Datum::Integer) {
+		std::cerr << "get value is not an integer!" << std::endl;
+		r =  Result::badDataType;
 
-/********************************************************************************************//**
- * Read integer values from standard input. TOS is (n,addr) where, n is the number of values to
- * read, and addr is the starting address of the destination.
- *
- * @return	Result::stackUnderflow if there was insufficient space on the stack, or [addr,addr+n)
- *			isn't a valid location. Result::badDataType if n or a isn't a natural.
- ************************************************************************************************/
-Result PInterp::GETI()	{	return get<int>();	}
+	} else {
+		switch(ir.value.natural()) {
+		case Datum::Boolean:	r = get<bool>();	break;
+		case Datum::Character:	r = get<char>();	break;
+		case Datum::Integer:	r = get<int>();		break;
+		case Datum::Real:		r = get<double>();	break;
+		default:
+			cerr << "GET unsupported type: " << ir.value << endl;
+			r =  Result::badDataType;
+		}
+	}
 
-/********************************************************************************************//**
- * Read real values from standard input. TOS is (n,addr) where, n is the number of values to
- * read, and addr is the starting address of the destination.
- *
- * @return	Result::stackUnderflow if there was insufficient space on the stack, or [addr,addr+n)
- *			isn't a valid location. Result::badDataType if n or a isn't a natural.
- ************************************************************************************************/
-Result PInterp::GETR() {	return get<double>();	}
+	return r;
+}
 
 /********************************************************************************************//**
  * Writes one expresson on the standard output stream. TOS is an 4-tuple -- (p,w,n,v):
