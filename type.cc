@@ -115,8 +115,8 @@ TypeDesc::TypeDesc(
 
 // public static
 
-const Subrange TypeDesc::maxRange = Subrange::maxRange;
 const Subrange TypeDesc::charRange(0, 127);
+const Subrange TypeDesc::maxRange(numeric_limits<int>::min(), numeric_limits<int>::max());
 
 /********************************************************************************************//**
  * @param	range		The type sub-range range. Defaults to Subrange().

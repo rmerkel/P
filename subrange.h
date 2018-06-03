@@ -18,8 +18,6 @@ class Subrange {
 	int	maximum;						///< The Sub-ranges maximum value
 
 public:
-	static Subrange	maxRange;			///< Maximum possbile range
-
 	Subrange(int min = 0, int max = 0);	///< Constructor
 	virtual ~Subrange() {}				///< Destructor
 

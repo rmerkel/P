@@ -3,7 +3,6 @@
  ****************************************************************************/
 
 #include <cassert>
-#include <limits>
 #include "type.h"
 
 #include "results.h"
@@ -12,11 +11,6 @@
 using namespace std;
 
 // public
-
-/********************************************************************************************//**
- * Maximum possible rnage for an interger
- ************************************************************************************************/
-Subrange	Subrange::maxRange(numeric_limits<int>::min(), numeric_limits<int>::max());
 
 /********************************************************************************************//**
  * @throws	Result::outOfRange if minimum > maximum

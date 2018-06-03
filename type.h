@@ -103,8 +103,8 @@ public:
 
 	// useful constants
 
-	static const Subrange maxRange;			///< Largest possible range
 	static const Subrange charRange;		///< Range of ASCII characters
+	static const Subrange maxRange;			///< Largest possible range
 
 	/// Create, and return, a TDescPtr to a new IntDesc
 	static TDescPtr newIntDesc(const Subrange& range = maxRange, bool ref = false);
