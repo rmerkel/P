@@ -133,7 +133,7 @@
   110: jumpi 88
   111: pop
 # test/str.p, 23: 
-  112: ret
+  112: ret 0
 
 for i in 0..9...
 a

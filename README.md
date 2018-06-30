@@ -58,10 +58,10 @@ necessary.
    Likewise, Positive is 1..maxint.
  * Boolean is a built-in enumeration of false, true [0, 1]
  * Character is a subrange of 0..127.
- * Subrange checking is accomplished via the limit check instructions, LLIMIT and
-   ULIMIT when for assignments from a ordinal value with a wider range to a
-   narrower one. This should be omitted in the case of constant expressions where
-   the range of the value is know... but currently isn't.
+ * Subrange checking is accomplished via the limit check instructions, LLIMIT
+   and ULIMIT when for assignments from a ordinal value with a wider range to a
+   narrower one. This should be omitted in the case of constant expressions
+   where the range of the value is know... but currently isn't.
  * Variables do not have default values; they must be explicitly initialized by
    via assignment, otherwise, the compiler would have to emit initialization
    instructions on entry to every new block.
@@ -72,6 +72,12 @@ necessary.
  * Add object attributes, similar to ADA.
  * Bit operators in place of Pascal sets; bit_and, bit_or, ..., shift_left,
    shift_right.
+ * Return statement is similar to pascals to func := expr, followed by return 
+   instruction. For functions, this would replace the default RETF instruction 
+   generated at the end of the function, but need to detect functions with no 
+   return statements. Likewise, one can return early from a procedure, resulting
+   in two RET statements, e.g, "procedure foo() begin ... return endproc." 
+ * Expand built-in functions to include first(), last(), range, span().
 
 ## Configuration
 * Configure cc/c++ as clang:

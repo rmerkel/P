@@ -17,7 +17,7 @@
     9: add
    10: assign 1
 # test/varparam.p, 8: begin
-   11: ret
+   11: ret 1
    12: enter 1
 # test/varparam.p, 9: 	i := 0;
    13: pushvar 0, 4
@@ -36,6 +36,6 @@
    23: putln
 # test/varparam.p, 13: 
 # test/varparam.p, 14: 
-   24: ret
+   24: ret 0
 
 1

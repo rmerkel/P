@@ -13,5 +13,5 @@ test/unknown.p: expected 'endprog' got 'bad comment' near line 6
     5: assign 1
 # test/unknown.p, 5: endprog
 # test/unknown.p, 6: 
-    6: ret
+    6: ret 0
 

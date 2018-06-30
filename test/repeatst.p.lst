@@ -54,7 +54,7 @@
    32: jneqi 9
 # test/repeatst.p, 22: endprog
 # test/repeatst.p, 23: 
-   33: ret
+   33: ret 0
 
        1
        2

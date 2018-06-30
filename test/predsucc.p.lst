@@ -31,7 +31,7 @@
    23: putln
 # test/predsucc.p, 8: endprog
 # test/predsucc.p, 9: 
-   24: ret
+   24: ret 0
 
 0
 1

@@ -149,7 +149,7 @@
 # test/rcrdtest.p, 42: endprog
   107: putln
 # test/rcrdtest.p, 43: 
-  108: ret
+  108: ret 0
 
 123.000000
 123.000000

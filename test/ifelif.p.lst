@@ -97,6 +97,6 @@
    81: putln
 # test/ifelif.p, 16: 
 # test/ifelif.p, 17: 
-   82: ret
+   82: ret 0
 
 i is 10

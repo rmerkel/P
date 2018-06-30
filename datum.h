@@ -16,13 +16,15 @@
 
 /********************************************************************************************//**
  * A Data Value
- *  
- * Datums contain either a boolean, character, signed interger, floating point value.
+ * 
+ * A Datum is a discriminated union, containing either a boolean, character, signed integer or
+ * a floating point (real) value.
+ * 
+ * The discriminator is set by the constructors and overwritten via assignement, but enforced by
+ * the other operators, e.g, throws a Datum::Error on bitwise operators on Real vlaues.
+ * 
  * Convertsion between types is limited to signed and unsigned intergers, as long as signed
  * values are limited from 0..std::numeric_limits<int>::max().
- *  
- * A discriminator (kind()), which is initialized by the constructors, and enforced by the
- * operators, which throw a Datum::Error, i.e., bitwise operators on Real values are illegal.
  ************************************************************************************************/
 class Datum {
 public:

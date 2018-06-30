@@ -728,8 +728,9 @@ void PComp::callStatement(int level, SymbolTableIter it) {
  * statement { ; statement }
  *
  * @param	level		The current block level.
+ * @param	it			The enclosing subroutine context
  ************************************************************************************************/
-void PComp::statementList(int level) {
+void PComp::statementList(int level, const SymbolTableEntry& context) {
 	static const Token::KindSet stops {
 		Token::End,
 		Token::Endfunc,
@@ -740,7 +741,7 @@ void PComp::statementList(int level) {
 	do {
 		if (oneOf(stops))
 			break;
-		statement(level);
+		statement(level, context);
 	} while (accept(Token::SemiColon));
 }
 
@@ -935,7 +936,6 @@ bool PComp::identStatement(int level) {
 				callStatement(level, lhs);
 				break;
 
-			case SymValue::Function:		// emit reference to function return value
 			case SymValue::Variable:		// emit a reference to a variable, or array, value
 				assignStatement(level, lhs);
 				break;
@@ -960,14 +960,14 @@ bool PComp::identStatement(int level) {
  *
  * @param	level 	The current block level
  ************************************************************************************************/
-bool PComp::ifStatement(int level) {
+bool PComp::ifStatement(int level, const SymbolTableEntry& context) {
 	if (accept(Token::If)) {				// if expr then stmt { then stmt... }
 		vector<size_t> jmp_end;					// Jump to the end locations..
 
 		expression(level);						// Condition expression
 		size_t jmp_pc = emitJNEQI();			// Jump if condition is false
 		expect(Token::Then);					// Consume "then"
-		statementList(level);					// Statements...
+		statementList(level, context);			// Statements...
 
 		while (accept(Token::Elif)) {			// 0 or more elif...
 			jmp_end.push_back(emitJumpI());		// Jump to the end...
@@ -979,7 +979,7 @@ bool PComp::ifStatement(int level) {
 			expression(level);					// Condition expression
 			jmp_pc = emitJNEQI();				// Jump if condition is false
 			expect(Token::Then);				// Consume "then"
-			statementList(level);				// Statements...
+			statementList(level, context);		// Statements...
 		}
 
 		if (accept(Token::Else)) {
@@ -990,7 +990,7 @@ bool PComp::ifStatement(int level) {
 			(*code)[jmp_pc].value = code->size();
 			jmp_pc = 0;
 
-			statementList(level);				// Statements...
+			statementList(level, context);		// Statements...
 		}
 
 		if (jmp_pc) {
@@ -1017,8 +1017,9 @@ bool PComp::ifStatement(int level) {
  * while expr do statement...
  *
  * @param	level	The current block level.
+ * @param	context	The enclosing subroutine context
  ************************************************************************************************/
-bool PComp::whileStatement(int level) {
+bool PComp::whileStatement(int level, const SymbolTableEntry& context) {
 	if (accept(Token::While)) {
 		const auto cond_pc = code->size();	// Start of while expr
 		expression(level);
@@ -1026,7 +1027,7 @@ bool PComp::whileStatement(int level) {
 		// jump if expr is false...
 		const auto jmp_pc = emitJNEQI();
 		expect(Token::Loop);				// consume "loop"
-		statementList(level);
+		statementList(level, context);
 		expect(Token::Endloop);
 
 		emitJumpI(cond_pc);					// Jump back to expr test...
@@ -1045,11 +1046,12 @@ bool PComp::whileStatement(int level) {
  * repeat statement until expr
  *
  * @param	level 	The current block level
+ * @param	context	The enclosing subroutine context
  ************************************************************************************************/
-bool PComp::repeatStatement(int level) {
+bool PComp::repeatStatement(int level, const SymbolTableEntry& context) {
 	if (accept(Token::Repeat)) {
 		const size_t loop_pc = code->size();			// jump here until expr fails
-		statementList(level);
+		statementList(level, context);
 		expect(Token::Until);
 		expression(level);
 		emitJNEQI(loop_pc);
@@ -1065,8 +1067,9 @@ bool PComp::repeatStatement(int level) {
  * for identifier := expresson ( to | downto ) condition do statement
  *
  * @param	level	The current block level.
+ * @param	context	The enclosing subroutine context
  ************************************************************************************************/
-bool PComp::forStatement(int level) {
+bool PComp::forStatement(int level, const SymbolTableEntry& context) {
 	if (accept(Token::For)) {
 		auto var = lookup(ts.current().string_value);
 		expect(Token::Identifier);			// consume the identifier...
@@ -1118,7 +1121,7 @@ bool PComp::forStatement(int level) {
 		const auto jmp_pc = emitJNEQI();	// Jump to end of statement if not
 
 		expect(Token::Loop);				// ... loop statements...
-		statementList(level);
+		statementList(level, context);
 		expect(Token::Endloop);				// ... endloop
 
 		emit(OpCode::DUP);					// iterate; dupliate the iternator reference again
@@ -1137,6 +1140,42 @@ bool PComp::forStatement(int level) {
 		(*code)[jmp_pc].value = done_pc;
 
 		return true;
+	}
+
+	return false;
+}
+
+/********************************************************************************************//**
+ * return [ expression ];
+ *
+ * @param	level	The current block level.
+ * @param	context	The enclosing subroutine context
+ *
+ * @return	true if a return statement was processed
+ ************************************************************************************************/
+bool PComp::returnStatement(int level, const SymbolTableEntry& context) {
+	if (accept(Token::Return)) {
+		if (context.second.kind() == SymValue::Function) {
+			emit(OpCode::PUSHVAR, 0, FrameRetVal);
+			TDescPtr type = TypeDesc::newPointerDesc(context.second.type());
+
+			// Emit the r-value and assign to the function return in the frame
+
+			TDescPtr rtype = expression(level);
+			assignPromote(type->base(), rtype);
+			emit(OpCode::ASSIGN, 0, type->base()->size());
+
+			emit(OpCode::RETF, 0, context.second.params().size());
+			return true;
+
+		} else if (context.second.kind() == SymValue::Procedure) {
+			emit(OpCode::RET);
+			return true;
+
+		} else {
+			error("Attempt to return from a non-subroutine");
+			return false;
+		}
 	}
 
 	return false;
@@ -1328,17 +1367,20 @@ void PComp::statementProcs(int level) {
  *   stmt-block ]
  *
  * @param	level	The current block level.
+ * @param	context	The enclosing subroutine contest
  ************************************************************************************************/
-void PComp::statement(int level) {
+void PComp::statement(int level, const SymbolTableEntry& context) {
 	if (identStatement(level)) 
 		;
-	else if (ifStatement(level))
+	else if (ifStatement(level, context))
 		;
-	else if (whileStatement(level))
+	else if (whileStatement(level, context))
 		;
-	else if (repeatStatement(level))
+	else if (repeatStatement(level, context))
 		;
-	else if (forStatement(level))
+	else if (forStatement(level, context))
+		;
+	else if (returnStatement(level, context))
 		;
 	else
 		statementProcs(level);
@@ -1884,13 +1926,11 @@ void PComp::paramDeclList(
  * @param 	kind	The type of subroutine, e.g., procedure or fuction
  * @return	subrountine's symbol table entry
  ************************************************************************************************/
-SymValue& PComp::subRoutineDecl(int level, SymValue::Kind kind) {
-	SymbolTableIter	it;						// Will point to the new symbol table entry...
-
+SymbolTableIter PComp::subroutineDecl(int level, SymValue::Kind kind) {
 	auto ident = nameDecl(level);			// insert the name into the symbol table
-	it = symtbl.insert( { ident, SymValue::makeSbr(kind, level)	} );
+	SymbolTableIter	it = symtbl.insert( { ident, SymValue::makeSbr(kind, level)	} );
 	if (verbose)
-		cout << prefix(progName) << "subRoutineDecl " << ident << ": " << level << ", 0\n";
+		cout << prefix(progName) << "subroutineDecl " << ident << ": " << level << ", 0\n";
 
 	if (expect(Token::OpenParen)) {			// Process the formal arguments, if any...
 		FieldVec	idents;					// vector of name/type pairs.
@@ -1904,7 +1944,7 @@ SymValue& PComp::subRoutineDecl(int level, SymValue::Kind kind) {
 			it->second.params().push_back(id.type());
 	}
 
-	return it->second;
+	return it;
 }
 
 /********************************************************************************************//**
@@ -1913,9 +1953,10 @@ SymValue& PComp::subRoutineDecl(int level, SymValue::Kind kind) {
  * @param	level	The current block level.
  ************************************************************************************************/
 void PComp::procDecl(int level) {
-	auto& val = subRoutineDecl(level, SymValue::Procedure);
+	SymbolTableIter it = subroutineDecl(level, SymValue::Procedure);
 	expect(Token::Is);
-	blockDecl(val, level + 1, Token::Endproc);
+	blockDecl(*it, level + 1, Token::Endproc);
+	emit(OpCode::RET, 0, it->second.params().size());
 }
 
 /********************************************************************************************//**
@@ -1924,11 +1965,16 @@ void PComp::procDecl(int level) {
  * @param	level	The current block level.
  ************************************************************************************************/
 void PComp::funcDecl(int level) {
-	auto& val = subRoutineDecl(level, SymValue::Function);
+	SymbolTableIter it = subroutineDecl(level, SymValue::Function);
 	expect(Token::Colon);
-	val.type(type(level, false, ""));
+	it->second.type(type(level, false, ""));
 	expect(Token::Is);
-	blockDecl(val, level + 1, Token::Endfunc);
+	blockDecl(*it, level + 1, Token::Endfunc);
+#if 1
+#pragma message	"need to test if dropped out of a function without a return!"
+#else
+	emit(OpCode::RETF, 0, it->second.params().size());
+#endif
 }
 
 /********************************************************************************************//**
@@ -1962,13 +2008,13 @@ void PComp::subDeclList(int level) {
  * [ sub-decl-lst   ]
  * [ stmt-block     }
  *
- * @param	val		The blocks (procedures) symbol table entry value
- * @param	level	The current block level.
- * @param	end		End of block token
+ * @param	context		The blocks (procedures) symbol table entry value
+ * @param	level		The current block level.
+ * @param	end			End of block token
  *
  * @return 	Entry point address
  ************************************************************************************************/
-size_t PComp::blockDecl(SymValue& val, int level, Token::Kind end) {
+size_t PComp::blockDecl(SymbolTableEntry& context, int level, Token::Kind end) {
 	LogLevel lvl;
 
 	constDeclList(level);						// declaractions...
@@ -1983,19 +2029,12 @@ size_t PComp::blockDecl(SymValue& val, int level, Token::Kind end) {
 	 */
 
 	const size_t addr = dx > 0 ? emit(OpCode::ENTER, 0, dx) : code->size();
-	val.value(Datum(addr));
+	context.second.value(Datum(addr));
 
 	if (expect(Token::Begin)) {					// "begin" statements... "end"
-		statementList(level);
+		statementList(level, context);
 		expect(end);
 	}
-
-	// block postfix...
-	const auto sz = val.params().size();
-	if (SymValue::Function == val.kind())
-		emit(OpCode::RETF, 0, sz);	// function...
-	else
-		emit(OpCode::RET, 0, sz);	// procedure...
 
 	purge(level);								// Remove symbols only visible at this level
 
@@ -2009,7 +2048,7 @@ void PComp::progDecl(int level) {
 	next();										// Fetch the 1st token
 
 	expect(Token::ProgDecl);					// Program heading...
-	auto& val = subRoutineDecl(level, SymValue::Procedure);
+	SymbolTableIter it = subroutineDecl(level, SymValue::Procedure);
 	expect(Token::Is);
 
 	// Emit a call to the main procedure, followed by a halt
@@ -2017,7 +2056,9 @@ void PComp::progDecl(int level) {
 	emit(OpCode::HALT);
 
 	// Emit the first block...
-	const size_t addr = blockDecl(val, level, Token::Endprog);
+	const size_t addr = blockDecl(*it, level, Token::Endprog);
+	emit(OpCode::RET, 0, it->second.params().size());
+
 	if (verbose)
 		cout << prefix(progName) << "patching call to program at " << call_pc << " to " << addr  << '\n';
 	(*code)[call_pc].value = addr;

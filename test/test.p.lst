@@ -56,7 +56,7 @@
    33: jumpi 9
 # test/test.p, 23: 
 # test/test.p, 24: 
-   34: ret
+   34: ret 0
 
        1
        2

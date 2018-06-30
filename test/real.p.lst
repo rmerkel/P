@@ -33,5 +33,5 @@ test/real.p: rounding real to fit in an integer near line 7
    21: assign 1
 # test/real.p, 11: endprog
 # test/real.p, 12: 
-   22: ret
+   22: ret 0
 

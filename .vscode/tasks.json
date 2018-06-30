@@ -2,7 +2,7 @@
     "version": "2.0.0",
     "tasks": [
         {
-            
+            // makes the default target (all)
             "label": "make",
             "command": "make",
             "group": "build",
@@ -13,7 +13,7 @@
             }
         },
         {
-            
+            // makes the clean target
             "label": "clean",
             "command": "make",
             "args": ["clean"],
@@ -25,7 +25,7 @@
             }
         },
         {
-            
+            // makes the cleanll target
             "label": "cleanall",
             "command": "make",
             "args": ["cleanall"],
@@ -37,7 +37,7 @@
             }
         },
         {
-            
+            // makes the test target
             "label": "test",
             "command": "make",
             "args": ["test"],

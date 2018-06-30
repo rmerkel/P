@@ -160,6 +160,8 @@ unsigned disasm(ostream& out, unsigned loc, const Instr& instr, const string lab
 	case OpCode::SUCC:
 	case OpCode::JUMPI:
 	case OpCode::JNEQI:
+	case OpCode::RET:
+	case OpCode::RETF:
 		out << " " << instr.value;
 		break;
 

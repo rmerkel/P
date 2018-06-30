@@ -1,11 +1,12 @@
 /********************************************************************************************//**
  *	@file	token.h
  *
- *  The P Language scanner.
+ * The P Language scanner.
  *
- * Started life as the Token and TokenStream classes for the calulator example from The C++
- * Programming Language, 4th Edition, by Stroustrup, modified in an initial port of Wirth's PL/0
- * compilier, and then transformed to use more C/C++ operands yielding the Pascal scanner.
+ * The scanner started life as the Token and TokenStream classes for the calulator example from
+ * The C++ Programming Language, 4th Edition, by Stroustrup, modified in an initial port of
+ * Wirth's PL/0 compilier, and then transformed to use more C/C++ operands yielding the Pascal 
+ * scanner and the the P scanner.
  *
  * @author Randy Merkel, Slowly but Surly Software.
  * @copyright  (c) 2017 Slowly but Surly Software. All rights reserved.
@@ -27,9 +28,9 @@
 struct Token {
 	/** Token kinds
 	 *
-	 *  Token kinds are divided up into keywords, operators, identifiers and
-	 *  numbers. Built-in types, such as "integer" or "real" are installed directly into the 
-	 *  symbol table, and thus don't have a Token Kind.
+	 * Token kinds are divided up into keywords, operators, identifiers and numbers. Built-in
+	 * types, such as "integer" or "real" are installed directly into the symbol table, and thus 
+	 * don't have a Token Kind.
 	 */
 	enum Kind {
 		Unknown,						///< Unknown token kind; (integer_value)
@@ -63,6 +64,7 @@ struct Token {
 		Loop,							///< "loop"
 		While,							///< "while" ... "do"
 		Repeat,							///< "repeat" ... "until"
+		Return,							///< "return" expr
 		Reverse,						///< "for" ident "in" "reverse" ...
 		Until,							///< "until"
 		For,							///< "for"
@@ -155,12 +157,11 @@ struct Token {
 /********************************************************************************************//**
  * A restartiable stream of tokens
  *
- *	Maintains the last Token read from the input stream.
+ * Maintains the last Token read from the input stream.
  *
- *	Token streams may span multiple inputs; when the end of one input is seen,
- *	the current Token is equal to end of stream (Kind::end), a new input source
- *	maybe set via set_input(); get() will return the first Token of the new
- *	input.
+ * Token streams may span multiple inputs; when the end of one input is seen, the current Token
+ * is equal to end of stream (Kind::end), a new input source maybe set via set_input(); get()
+ * will return the first Token of the new input.
  ************************************************************************************************/
 class TokenStream {
 public:
@@ -175,7 +176,7 @@ public:
 	/// Destructor
 	virtual ~TokenStream()				{	close();	}
 
-	/// Return the next character from the stream. Sets eof in *ip and return *ip
+	/// Return the next character from the stream.
 	std::istream& getch(char& c);
 	std::istream& unget();				///< Return last character to the stream
 

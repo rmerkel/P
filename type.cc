@@ -28,16 +28,12 @@ Field::Field(const std::string& name, TDescPtr type)
 /********************************************************************************************//**
  * @return my fields name
  ************************************************************************************************/
-const std::string& Field::name() const {
-	return _name;
-}
+const std::string& Field::name() const			{	return _name;	}
 
 /********************************************************************************************//**
  * @return my fields type
  ************************************************************************************************/
-TDescPtr Field::type() const {
-	return _type;
-}
+TDescPtr Field::type() const					{	return _type;	}
 
 // operators
 

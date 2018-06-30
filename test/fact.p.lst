@@ -61,13 +61,13 @@
    36: jumpi 12
 # test/fact.p, 25: 
 # test/fact.p, 26: begin
-   37: ret
+   37: ret 1
 # test/fact.p, 27:     factorial(nFacts)
    38: push 10
 # test/fact.p, 28: endprog
    39: calli 0, 2
 # test/fact.p, 29: 
-   40: ret
+   40: ret 0
 
 1
 10

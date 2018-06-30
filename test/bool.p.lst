@@ -29,6 +29,6 @@
 # test/bool.p, 8: endprog
    21: putln
 # test/bool.p, 9: 
-   22: ret
+   22: ret 0
 
 false

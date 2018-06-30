@@ -1,6 +1,6 @@
 # test/fib.p, 1: program Fibonacci() is
 # test/fib.p, 2: 	function fib(a, b, limit : integer) : integer is
-    0: calli 0, 36
+    0: calli 0, 37
     1: halt
 # test/fib.p, 3: 	begin
 # test/fib.p, 4: 		putln(b);
@@ -15,8 +15,8 @@
     9: eval 1
    10: push 0
    11: gt
-   12: jneqi 28
-# test/fib.p, 6: 			fib := fib(b, a+b, limit - 1)
+   12: jneqi 29
+# test/fib.p, 6: 			return fib(b, a+b, limit - 1)
    13: pushvar 0, 3
    14: pushvar 0, -2
    15: eval 1
@@ -32,39 +32,40 @@
 # test/fib.p, 7: 		else
    25: calli 1, 2
    26: assign 1
-# test/fib.p, 8: 			fib := a + b
-   27: jumpi 35
-   28: pushvar 0, 3
-   29: pushvar 0, -3
-   30: eval 1
+   27: retf 3
+# test/fib.p, 8: 			return a + b
+   28: jumpi 37
+   29: pushvar 0, 3
+   30: pushvar 0, -3
+   31: eval 1
 # test/fib.p, 9: 		endif
-   31: pushvar 0, -2
-   32: eval 1
-   33: add
-   34: assign 1
+   32: pushvar 0, -2
+   33: eval 1
+   34: add
+   35: assign 1
+   36: retf 3
 # test/fib.p, 10: 	endfunc
 # test/fib.p, 11: 
 # test/fib.p, 12: begin
-   35: retf
 # test/fib.p, 13: 	putln(0);
-   36: push 0
-   37: push 1
-   38: push 0
+   37: push 0
+   38: push 1
    39: push 0
-   40: putln
+   40: push 0
+   41: putln
 # test/fib.p, 14: 	putln(fib(0, 1, 10))
-   41: push 0
-   42: push 1
-   43: push 10
-   44: calli 0, 2
-   45: push 1
-   46: push 0
+   42: push 0
+   43: push 1
+   44: push 10
+   45: calli 0, 2
+   46: push 1
    47: push 0
+   48: push 0
 # test/fib.p, 15: endprog
-   48: putln
+   49: putln
 # test/fib.p, 16: 
 # test/fib.p, 17: 
-   49: ret
+   50: ret 0
 
 0
 1

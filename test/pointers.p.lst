@@ -62,7 +62,7 @@
    44: dispose
 # test/pointers.p, 18: endprog
 # test/pointers.p, 19: 
-   45: ret
+   45: ret 0
 
 0
 1024

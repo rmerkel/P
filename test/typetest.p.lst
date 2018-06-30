@@ -291,7 +291,7 @@
 # test/typetest.p, 52: endprog
   239: jumpi 169
 # test/typetest.p, 53: 
-  240: ret
+  240: ret 0
 
 1
 2

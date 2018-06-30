@@ -217,7 +217,7 @@
   168: putln
 # test/builtins.p, 49: 
 # test/builtins.p, 50: 
-  169: ret
+  169: ret 0
 
 1
 2

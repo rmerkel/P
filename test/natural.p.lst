@@ -46,7 +46,7 @@
 # test/natural.p, 10: endprog
    36: putln
 # test/natural.p, 11: 
-   37: ret
+   37: ret 0
 
 0
 1

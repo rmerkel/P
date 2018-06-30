@@ -35,7 +35,7 @@
    24: jumpi 7
    25: pop
 # test/forrev.p, 11: 
-   26: ret
+   26: ret 0
 
 9
 8

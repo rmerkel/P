@@ -35,7 +35,7 @@
 # test/while.p, 12: endprog
    23: jumpi 6
 # test/while.p, 13: 
-   24: ret
+   24: ret 0
 
 0
 1
