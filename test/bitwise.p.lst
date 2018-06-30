@@ -259,7 +259,7 @@
 # test/bitwise.p, 32: endprog
   227: putln
 # test/bitwise.p, 33: 
-  228: ret
+  228: ret 0
 
 x = 15
 y = 1

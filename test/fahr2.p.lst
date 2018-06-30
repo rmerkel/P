@@ -84,7 +84,7 @@
 # test/fahr2.p, 23: endprog
    61: jumpi 28
 # test/fahr2.p, 24: 
-   62: ret
+   62: ret 0
 
 Fahrenheit Celsius
       0.0   -17.8

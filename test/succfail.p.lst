@@ -12,6 +12,6 @@
 # test/succfail.p, 5: endprog
     7: putln
 # test/succfail.p, 6: 
-    8: ret
+    8: ret 0
 
 runtime error @pc 3, sp: 8: out-of-range

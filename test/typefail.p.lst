@@ -108,5 +108,5 @@ test/typefail.p: incompatable binary types near line 27
 # test/typefail.p, 28: endprog
    77: assign 1
 # test/typefail.p, 29: 
-   78: ret
+   78: ret 0
 

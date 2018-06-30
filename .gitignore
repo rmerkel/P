@@ -16,6 +16,7 @@ RemoteSystemsTempFiles
 
 # Project files
 docs
+objs
 Debug
 Release
 p

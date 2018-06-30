@@ -45,15 +45,15 @@
    22: sub
    23: assign 1
    24: jumpi 6
-# test/fact2.p, 23: 		factorial := p
+# test/fact2.p, 23: 		return p
    25: pushvar 0, 3
 # test/fact2.p, 24: 	endfunc
    26: pushvar 0, 4
    27: eval 1
    28: assign 1
+   29: retf 1
 # test/fact2.p, 25: 
 # test/fact2.p, 26: begin
-   29: retf
    30: enter 1
 # test/fact2.p, 27: 	{ The result is the 10th factorial; 3,628,000	}
 # test/fact2.p, 28:     result := factorial(nFacts);
@@ -70,6 +70,6 @@
 # test/fact2.p, 30: endprog
    40: putln
 # test/fact2.p, 31: 
-   41: ret
+   41: ret 0
 
 3628800

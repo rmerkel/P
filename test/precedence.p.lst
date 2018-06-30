@@ -29,7 +29,7 @@
 # test/precedence.p, 5: endprog
    24: putln
 # test/precedence.p, 6: 
-   25: ret
+   25: ret 0
 
 3
 1

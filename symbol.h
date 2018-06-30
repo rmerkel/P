@@ -88,4 +88,9 @@ typedef std::multimap<std::string, SymValue> SymbolTable;
  ************************************************************************************************/
 typedef SymbolTable::iterator	SymbolTableIter;
 
+/********************************************************************************************//**
+ * A SymbolTable entry
+ ************************************************************************************************/
+typedef SymbolTable::value_type	SymbolTableEntry;
+
 #endif

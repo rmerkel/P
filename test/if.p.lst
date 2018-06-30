@@ -65,6 +65,6 @@
    52: putln
 # test/if.p, 13: 
 # test/if.p, 14: 
-   53: ret
+   53: ret 0
 
 i is 10

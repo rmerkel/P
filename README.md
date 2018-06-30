@@ -73,7 +73,16 @@ necessary.
  * Bit operators in place of Pascal sets; bit_and, bit_or, ..., shift_left,
    shift_right.
  * Automatically generate *type*_min, max, in place of attributes.
- 
+ * Return statement is similar to pascals to func := expr, followed by return 
+   instruction. 
+   * For functions, this would replace the default RETF instruction generated at
+     the end of the function, but introduces the need to detect functions with
+     no return statements. Otherwise the function might "fall out" of the
+     function.
+   * Likewise, one can return early from a procedure, resulting in two RET 
+     statements, e.g, "procedure foo() begin ... return endproc." However, that
+     won't result in an erroneous program.
+
 ## Configuration
 * Configure cc/c++ as clang:
 ```

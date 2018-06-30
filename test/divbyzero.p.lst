@@ -32,7 +32,7 @@
    21: assign 1
 # test/divbyzero.p, 11: 
 # test/divbyzero.p, 12: 
-   22: ret
+   22: ret 0
 
 Attempt to divide by zero @ pc (20)!
 runtime error @pc 20, sp: 12: divide-by-zero

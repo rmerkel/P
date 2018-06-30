@@ -45,12 +45,14 @@
  *     while-statement = "while" expression "loop" statement-lst "endloop" ;
  *       for-statement = "for" identifer "in" [ "reverse" ] ordinal-type
  *                          "loop" statement "endloop" ;
+ *    return-statement = "return" expression ;
  *           statement = [  variable '=' expression                                         |
  *                          identifier '(' [ expression-lst ] ')'                           |
  *                          if-statement                                                    |
  *                          while-statement                                                 |
  *                          "repeat" statement "until" expression endloop                   |
- *                          for-statement ] ;
+ *                          for-statement                                                   |
+ *                          return-statement ] ;
  *          const-expr = [ '+' | '-' ] number | identifier | character | string ;
  *      expression-lst = expression { ',' expression } ;
  *          expression = simple-expr { '<' | "<=" | '=' | ">=" | '>' | "<>" simple-expr } ;

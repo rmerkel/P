@@ -46,15 +46,15 @@ test/fact3.p: passing 2 parameters, where 1 expected near line 28
    22: sub
    23: assign 1
    24: jumpi 6
-# test/fact3.p, 23: 		factorial := p
+# test/fact3.p, 23: 		return p
    25: pushvar 0, 3
 # test/fact3.p, 24: 	endfunc
    26: pushvar 0, 4
    27: eval 1
    28: assign 1
+   29: retf 1
 # test/fact3.p, 25: 
 # test/fact3.p, 26: begin
-   29: retf
    30: enter 1
 # test/fact3.p, 27: 	{ call with wrong number of parameters! }
 # test/fact3.p, 28:     result := factorial(nFacts, nFacts);
@@ -72,5 +72,5 @@ test/fact3.p: passing 2 parameters, where 1 expected near line 28
 # test/fact3.p, 30: endprog
    41: putln
 # test/fact3.p, 31: 
-   42: ret
+   42: ret 0
 

@@ -284,7 +284,7 @@
   223: putln
 # test/builtins.p, 61: 
 # test/builtins.p, 62: 
-  224: ret
+  224: ret 0
 
 1
 2

@@ -1,12 +1,13 @@
-/**	@file	token.cc
+/********************************************************************************************//**
+ * @file	token.cc
  *
  * TokenStream implementation. Started life as the Token and TokenStream classes from The C++
- * Programming Language, 4th Edition, by Stroustrup, and then modified to work on the integer based
- * P machine.
+ * Programming Language, 4th Edition, by Stroustrup, and then modified to work on the integer
+ * based P machine.
  *
  * @author Randy Merkel, Slowly but Surly Software.
  * @copyright  (c) 2017 Slowly but Surly Software. All rights reserved.
- */
+ ************************************************************************************************/
 
 #include "token.h"
 
@@ -21,6 +22,7 @@ using namespace std;
 
 // private:
 
+/// 'c' is unmodified if EOF is encounted on the input stream.
 std::istream& TokenStream::getch(char& c) {
 	if (col == line.size()) {
 		col = 0;
@@ -40,7 +42,7 @@ std::istream& TokenStream::unget() {
 	return *ip;
 }
 
-/// Read and return the next token
+/// Read and return the next token from the input stream
 Token TokenStream::get() {
 	char ch = 0;
 
@@ -250,6 +252,7 @@ TokenStream::KeywordTable	TokenStream::keywords = {
 	{	"pred",			Token::Pred			},
 	{	"record",		Token::Record		},
 	{	"repeat",		Token::Repeat		},
+	{	"return",		Token::Return		},
 	{	"reverse",		Token::Reverse		},
 	{	"round",		Token::Round		},
 	{	"sleft",		Token::ShiftLeft	},
@@ -311,6 +314,7 @@ ostream& operator<<(std::ostream& os, const Token::Kind& kind) {
 	case Token::Loop:		os << "loop";			break;
 	case Token::While:		os << "while";			break;
 	case Token::Repeat:		os << "repeat";			break;
+	case Token::Return:		os << "return";			break;
 	case Token::Reverse:	os << "reverse";		break;
 	case Token::Until:		os << "until";			break;
 	case Token::For:		os << "for";			break;

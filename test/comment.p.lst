@@ -50,6 +50,6 @@
 # test/comment.p, 16: 
 # test/comment.p, 17: {	unterminated comment, but we don't care as it follows the period!
 # test/comment.p, 18: 
-   34: ret
+   34: ret 0
 
 3628800

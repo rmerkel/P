@@ -85,7 +85,7 @@
 # test/character.p, 20: endprog
    65: putln
 # test/character.p, 21: 
-   66: ret
+   66: ret 0
 
 x
 abcdefghij

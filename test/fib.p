@@ -3,9 +3,9 @@ program Fibonacci() is
 	begin
 		putln(b);
 		if limit > 0 then
-			fib := fib(b, a+b, limit - 1)
+			return fib(b, a+b, limit - 1)
 		else
-			fib := a + b
+			return a + b
 		endif
 	endfunc
 

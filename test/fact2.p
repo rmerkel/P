@@ -20,7 +20,7 @@ function factorial(n : integer) : integer is
 			p := p * n;
 			n := n - 1
 		endloop;
-		factorial := p
+		return p
 	endfunc
 
 begin

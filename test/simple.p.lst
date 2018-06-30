@@ -28,6 +28,6 @@
 # test/simple.p, 8: endprog
    20: putln
 # test/simple.p, 9: 
-   21: ret
+   21: ret 0
 
 01

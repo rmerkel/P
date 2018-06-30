@@ -86,7 +86,7 @@
    70: putln
 # test/ifelse.p, 16: 
 # test/ifelse.p, 17: 
-   71: ret
+   71: ret 0
 
 i is <= 10
 i is 3

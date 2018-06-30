@@ -148,7 +148,7 @@
   128: putln
 # test/ifelifelse.p, 20: 
 # test/ifelifelse.p, 21: 
-  129: ret
+  129: ret 0
 
 i is between 1 and 10, inclusive 10
 i is 3

@@ -175,7 +175,7 @@
 # test/array.p, 37: endprog
   138: putln
 # test/array.p, 38: 
-  139: ret
+  139: ret 0
 
 x
 abcdefghij
