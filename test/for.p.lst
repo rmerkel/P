@@ -1,42 +1,164 @@
 # test/for.p, 1: { Simple for loop test	}
 # test/for.p, 2: program ForTest() is
-# test/for.p, 3: var
+# test/for.p, 3: type R is 0..9;
     0: calli 0, 2
     1: halt
-# test/for.p, 4: 	i : integer;
-# test/for.p, 5: 
-# test/for.p, 6: begin
+# test/for.p, 4: var i : R;
+# test/for.p, 5: begin
     2: enter 1
-# test/for.p, 7: 	for i in 0..9 loop
-    3: pushvar 0, 4
-    4: dup
-    5: push 0
-    6: assign 1
-    7: dup
-    8: eval 1
-    9: push 9
-   10: lte
-   11: jneqi 25
-# test/for.p, 8: 		putln(i)
-   12: pushvar 0, 4
-   13: eval 1
-   14: push 1
-   15: push 0
-   16: push 0
-# test/for.p, 9: 	endloop
-   17: putln
-# test/for.p, 10: endprog
-   18: dup
-   19: dup
-   20: eval 1
-   21: push 1
-   22: add
-   23: assign 1
-   24: jumpi 7
-   25: pop
+# test/for.p, 6: 	put("first: ");
+    3: push 'f'
+    4: push 'i'
+    5: push 'r'
+    6: push 's'
+    7: push 't'
+    8: push ':'
+    9: push ' '
+   10: push 7
+   11: push 0
+   12: push 0
+   13: put
+# test/for.p, 7: 	putln(first(i));
+   14: pushvar 0, 4
+   15: eval 1
+   16: pop 1
+   17: push 0
+   18: push 1
+   19: push 0
+   20: push 0
+   21: putln
+# test/for.p, 8: 
+# test/for.p, 9: 	put("last: ");
+   22: push 'l'
+   23: push 'a'
+   24: push 's'
+   25: push 't'
+   26: push ':'
+   27: push ' '
+   28: push 6
+   29: push 0
+   30: push 0
+   31: put
+# test/for.p, 10: 	putln(last(i));
+   32: pushvar 0, 4
+   33: eval 1
+   34: pop 1
+   35: push 9
+   36: push 1
+   37: push 0
+   38: push 0
+   39: putln
 # test/for.p, 11: 
-   26: ret
+# test/for.p, 12: 	putln("for i in 0..9...");
+   40: push 'f'
+   41: push 'o'
+   42: push 'r'
+   43: push ' '
+   44: push 'i'
+   45: push ' '
+   46: push 'i'
+   47: push 'n'
+   48: push ' '
+   49: push '0'
+   50: push '.'
+   51: push '.'
+   52: push '9'
+   53: push '.'
+   54: push '.'
+   55: push '.'
+   56: push 16
+   57: push 0
+   58: push 0
+   59: putln
+# test/for.p, 13: 	for i in 0..9 loop
+   60: pushvar 0, 4
+   61: dup
+   62: push 0
+   63: assign 1
+   64: dup
+   65: eval 1
+   66: push 9
+   67: lte
+   68: jneqi 82
+# test/for.p, 14: 		putln(i)
+   69: pushvar 0, 4
+   70: eval 1
+   71: push 1
+   72: push 0
+   73: push 0
+# test/for.p, 15: 	endloop;
+   74: putln
+   75: dup
+   76: dup
+   77: eval 1
+   78: push 1
+   79: add
+   80: assign 1
+   81: jumpi 64
+   82: pop 1
+# test/for.p, 16: 
+# test/for.p, 17: 	putln("for i in R...");
+   83: push 'f'
+   84: push 'o'
+   85: push 'r'
+   86: push ' '
+   87: push 'i'
+   88: push ' '
+   89: push 'i'
+   90: push 'n'
+   91: push ' '
+   92: push 'R'
+   93: push '.'
+   94: push '.'
+   95: push '.'
+   96: push 13
+   97: push 0
+   98: push 0
+   99: putln
+# test/for.p, 18: 	for i in R loop
+  100: pushvar 0, 4
+  101: dup
+  102: push 0
+  103: assign 1
+  104: dup
+  105: eval 1
+  106: push 9
+  107: lte
+  108: jneqi 122
+# test/for.p, 19: 		putln(i)
+  109: pushvar 0, 4
+  110: eval 1
+  111: push 1
+  112: push 0
+  113: push 0
+# test/for.p, 20: 	endloop
+  114: putln
+# test/for.p, 21: endprog
+  115: dup
+  116: dup
+  117: eval 1
+  118: push 1
+  119: add
+  120: assign 1
+  121: jumpi 104
+  122: pop 1
+# test/for.p, 22: 
+  123: ret
 
+first: 0
+last: 9
+for i in 0..9...
+0
+1
+2
+3
+4
+5
+6
+7
+8
+9
+for i in R...
 0
 1
 2

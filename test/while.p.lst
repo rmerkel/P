@@ -1,42 +1,170 @@
 # test/while.p, 1: { Simple while loop test }
 # test/while.p, 2: program ForTest() is
-# test/while.p, 3: var
+# test/while.p, 3: type R is 0..9;
     0: calli 0, 2
     1: halt
-# test/while.p, 4: 	i : integer;
-# test/while.p, 5: 
-# test/while.p, 6: begin
+# test/while.p, 4: var i : R;
+# test/while.p, 5: begin
     2: enter 1
+# test/while.p, 6: 	putln("i := 0, i <= 9, i := i + 1");
+    3: push 'i'
+    4: push ' '
+    5: push ':'
+    6: push '='
+    7: push ' '
+    8: push '0'
+    9: push ','
+   10: push ' '
+   11: push 'i'
+   12: push ' '
+   13: push '<'
+   14: push '='
+   15: push ' '
+   16: push '9'
+   17: push ','
+   18: push ' '
+   19: push 'i'
+   20: push ' '
+   21: push ':'
+   22: push '='
+   23: push ' '
+   24: push 'i'
+   25: push ' '
+   26: push '+'
+   27: push ' '
+   28: push '1'
+   29: push 26
+   30: push 0
+   31: push 0
+   32: putln
 # test/while.p, 7: 	i := 0;
-    3: pushvar 0, 4
-    4: push 0
-    5: assign 1
-# test/while.p, 8: 	while (i <= 9) loop
-    6: pushvar 0, 4
-    7: eval 1
-    8: push 9
-    9: lte
-   10: jneqi 24
+   33: pushvar 0, 4
+   34: push 0
+   35: llimit 0
+   36: ulimit 9
+   37: assign 1
+# test/while.p, 8: 	while (i < 9) loop
+   38: pushvar 0, 4
+   39: eval 1
+   40: push 9
+   41: lt
+   42: jneqi 58
 # test/while.p, 9: 		putln(i);
-   11: pushvar 0, 4
-   12: eval 1
-   13: push 1
-   14: push 0
-   15: push 0
-   16: putln
+   43: pushvar 0, 4
+   44: eval 1
+   45: push 1
+   46: push 0
+   47: push 0
+   48: putln
 # test/while.p, 10: 		i := i + 1
-   17: pushvar 0, 4
-   18: pushvar 0, 4
-   19: eval 1
-   20: push 1
-# test/while.p, 11: 	endloop
-   21: add
-   22: assign 1
-# test/while.p, 12: endprog
-   23: jumpi 6
+   49: pushvar 0, 4
+   50: pushvar 0, 4
+   51: eval 1
+   52: push 1
+# test/while.p, 11: 	endloop;
+   53: add
+   54: llimit 0
+   55: ulimit 9
+   56: assign 1
+   57: jumpi 38
+# test/while.p, 12: 	putln(i);
+   58: pushvar 0, 4
+   59: eval 1
+   60: push 1
+   61: push 0
+   62: push 0
+   63: putln
 # test/while.p, 13: 
-   24: ret
+# test/while.p, 14: 	putln("first(i), last(i), succ(i)");
+   64: push 'f'
+   65: push 'i'
+   66: push 'r'
+   67: push 's'
+   68: push 't'
+   69: push '('
+   70: push 'i'
+   71: push ')'
+   72: push ','
+   73: push ' '
+   74: push 'l'
+   75: push 'a'
+   76: push 's'
+   77: push 't'
+   78: push '('
+   79: push 'i'
+   80: push ')'
+   81: push ','
+   82: push ' '
+   83: push 's'
+   84: push 'u'
+   85: push 'c'
+   86: push 'c'
+   87: push '('
+   88: push 'i'
+   89: push ')'
+   90: push 26
+   91: push 0
+   92: push 0
+   93: putln
+# test/while.p, 15: 	i := first(i);
+   94: pushvar 0, 4
+   95: pushvar 0, 4
+   96: eval 1
+   97: pop 1
+   98: push 0
+   99: llimit 0
+  100: ulimit 9
+  101: assign 1
+# test/while.p, 16: 	while (i < last(i)) loop
+  102: pushvar 0, 4
+  103: eval 1
+  104: pushvar 0, 4
+  105: eval 1
+  106: pop 1
+  107: push 9
+  108: lt
+  109: jneqi 124
+# test/while.p, 17: 		putln(i);
+  110: pushvar 0, 4
+  111: eval 1
+  112: push 1
+  113: push 0
+  114: push 0
+  115: putln
+# test/while.p, 18: 		i := succ(i);
+  116: pushvar 0, 4
+  117: pushvar 0, 4
+  118: eval 1
+  119: succ 9
+  120: llimit 0
+  121: ulimit 9
+  122: assign 1
+# test/while.p, 19: 	endloop;
+  123: jumpi 102
+# test/while.p, 20: 	putln(i)
+  124: pushvar 0, 4
+  125: eval 1
+  126: push 1
+  127: push 0
+  128: push 0
+# test/while.p, 21: 
+# test/while.p, 22: endprog
+  129: putln
+# test/while.p, 23: 
+  130: ret
 
+i := 0, i <= 9, i := i + 1
+0
+1
+2
+3
+4
+5
+6
+7
+8
+9
+first(i), last(i), succ(i)
 0
 1
 2

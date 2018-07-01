@@ -232,6 +232,8 @@ TokenStream::KeywordTable	TokenStream::keywords = {
 	{	"endproc",		Token::Endproc		},
 	{	"endprog",		Token::Endprog		},
 	{	"exp",			Token::Exp			},
+	{	"first",		Token::First		},
+	{	"last",			Token::Last			},
 	{	"function",		Token::FuncDecl		},
 	{	"get",			Token::Get			},
 	{	"if",			Token::If			},
@@ -362,6 +364,8 @@ ostream& operator<<(std::ostream& os, const Token::Kind& kind) {
 	case Token::Abs:		os << "abs";			break;
 	case Token::Atan:		os << "arctan";			break;
 	case Token::Exp:		os << "exp";			break;
+	case Token::First:		os << "first";			break;
+	case Token::Last:		os << "last";			break;
 	case Token::Log:		os << "ln";				break;
 	case Token::Odd:		os << "odd";			break;
 	case Token::Pred:		os << "pred";			break;

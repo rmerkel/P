@@ -118,7 +118,7 @@
    88: add
    89: assign 1
    90: jumpi 70
-   91: pop
+   91: pop 1
 # test/array.p, 30: 	putln(ai);
    92: pushvar 0, 26
    93: eval 10
@@ -158,7 +158,7 @@
   123: add
   124: assign 1
   125: jumpi 102
-  126: pop
+  126: pop 1
 # test/array.p, 35: 	putln(ar);
   127: pushvar 0, 36
   128: eval 10

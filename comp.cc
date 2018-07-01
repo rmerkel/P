@@ -285,6 +285,20 @@ TDescPtr PComp::builtInFunc(int level)
 			oss << "expeced integer, or real value, got: " << current();
 		emit(OpCode::EXP);
 
+	} else if (accept(Token::First)) {	// Repace TOS with its first legal value
+		expect(Token::OpenParen);
+		type = expression(level);
+		expect(Token::CloseParen);	
+		emit(OpCode::POP, 0, 1);
+		emit(OpCode::PUSH, 0, type->range().min());
+
+	} else if (accept(Token::Last)) {	// Repace TOS with its last legal value
+		expect(Token::OpenParen);
+		type = expression(level);
+		expect(Token::CloseParen);	
+		emit(OpCode::POP, 0, 1);
+		emit(OpCode::PUSH, 0, type->range().max());
+
 	} else if (accept(Token::Log)) {	// Replace TOS with log(TOS)
 		expect(Token::OpenParen);
 		type = expression(level);
@@ -347,7 +361,7 @@ TDescPtr PComp::builtInFunc(int level)
 			oss << "expeced integer, or real value, got: " << current();
 		emit(OpCode::SQRT);
 
-	} else if (accept(Token::Succ)) {	// Replace TOS with is TOS odd?
+	} else if (accept(Token::Succ)) {	// Replace TOS with its successor
 		expect(Token::OpenParen);
 		type = expression(level);
 		expect(Token::CloseParen);	

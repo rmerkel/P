@@ -9,7 +9,7 @@
 {	 9	  362,880	}
 {	10	3,628,800	}
 
-program repeatst() is
+program RepeatTest() is
 var n, f : integer;
 begin
 	n := 0;

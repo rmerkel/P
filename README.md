@@ -72,7 +72,8 @@ necessary.
  * Add object attributes, similar to ADA.
  * Bit operators in place of Pascal sets; bit_and, bit_or, ..., shift_left,
    shift_right.
-
+ * Expand built-in functions to include first(), last(), range, span().
+ 
 ## Configuration
 * Configure cc/c++ as clang:
 ```

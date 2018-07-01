@@ -155,6 +155,7 @@ unsigned disasm(ostream& out, unsigned loc, const Instr& instr, const string lab
 	case OpCode::GET:
 	case OpCode::LLIMIT:
 	case OpCode::ULIMIT:
+	case OpCode::POP:
 	case OpCode::PRED:
 	case OpCode::PUSH:
 	case OpCode::SUCC:

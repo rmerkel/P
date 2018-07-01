@@ -117,6 +117,8 @@ struct Token {
 		Abs,							///< Absolute value
 		Atan,							///< Arc tangent
 		Exp,							///< e to the given power 
+		First,							///< Return first ordinal value
+		Last,							///< Return last ordinal value
 		Log,							///< natural log
 		Odd,							///< Evenly divisable by 2?
 		Pred,							///< Previous ordinal of value
