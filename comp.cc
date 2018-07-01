@@ -221,7 +221,7 @@ TDescPtr PComp::identFactor(int level, const string& id, bool var) {
  ************************************************************************************************/
 TDescPtr PComp::builtInFunc(int level)
 {
-	auto type = TypeDesc::newIntDesc();			// Factor data type
+	auto type = TypeDesc::newIntDesc();	// Factor data type
 	ostringstream oss;
 
 	if (accept(Token::Round))  {		// round(expr) to an integer
@@ -347,7 +347,7 @@ TDescPtr PComp::builtInFunc(int level)
 			oss << "expeced integer, or real value, got: " << current();
 		emit(OpCode::SQRT);
 
-	} else if (accept(Token::Succ)) {	// Replace TOS with is TOS odd?
+	} else if (accept(Token::Succ)) {	// Replace TOS with its successor
 		expect(Token::OpenParen);
 		type = expression(level);
 		expect(Token::CloseParen);	
@@ -1376,14 +1376,24 @@ void PComp::constDeclList(int level) {
  * @param	var		True if type is a var parameter
  ************************************************************************************************/
 void PComp::typeDecl(int level, bool var) {
-	const auto ident = nameDecl(level);				// Copy the identifier
+	const string ident = nameDecl(level);			// Copy the identifier
 	expect(Token::Is);								// Consume the "is"
 	TDescPtr tdesc = type(level, var, ident);
 
 	if (verbose)
 		cout << prefix(progName) << "type " << ident << " = " << tdesc->tclass() << '\n';
 
-	symtbl.insert(	{ ident, SymValue::makeType(level, tdesc) }	);
+	symtbl.insert(	{ ident, SymValue::makeType(level, tdesc)	} );
+	symtbl.insert(	{ ident + "_min",
+					  SymValue::makeConst(
+						  level,
+						  Datum(tdesc->range().min()),
+						  tdesc)								} );
+	symtbl.insert(	{ ident + "_max",
+					  SymValue::makeConst(
+						  level,
+						  Datum(tdesc->range().max()),
+						  tdesc)								} );
 }
 
 /********************************************************************************************//**
@@ -2049,33 +2059,79 @@ void PComp::run()								{	progDecl(0);	}
  * Construct a new compilier with the token stream initially bound to std::cin.
  ************************************************************************************************/
 PComp::PComp() : Compilier () {
-	TDescPtr boolean = TypeDesc::newBoolDesc();
-	TDescPtr integer = TypeDesc::newIntDesc();
-	TDescPtr natural = TypeDesc::newIntDesc(Subrange(0, TypeDesc::maxRange.max()));
+	TDescPtr boolean	= TypeDesc::newBoolDesc();
+	TDescPtr character	= TypeDesc::newCharDesc();
+	TDescPtr integer	= TypeDesc::newIntDesc();
+	TDescPtr natural	= TypeDesc::newIntDesc(Subrange(0, TypeDesc::maxRange.max()));
+	TDescPtr positive	= TypeDesc::newIntDesc(Subrange(1, TypeDesc::maxRange.max()));
+	TDescPtr real		= TypeDesc::newRealDesc();
 
 	// Insert built-in types into the symbol table
 
 	symtbl.insert( { "boolean",		SymValue::makeType(0, boolean)					} );
 	symtbl.insert( { "integer",		SymValue::makeType(0, integer)					} );
-	symtbl.insert( { "real",		SymValue::makeType(0, TypeDesc::newRealDesc())	} );
+	symtbl.insert( { "real",		SymValue::makeType(0, real)						} );
 
 	// Built-in subrange types
 
-	symtbl.insert( { "character",	SymValue::makeType(0, TypeDesc::newCharDesc())	} );
+	symtbl.insert( { "character",	SymValue::makeType(0, character)				} );
 	symtbl.insert( { "natural",		SymValue::makeType(0, natural) 					} );
-	symtbl.insert( { "positive",	SymValue::makeType(1, natural) 					} );
+	symtbl.insert( { "positive",	SymValue::makeType(0, positive) 				} );
 
 	// Built-in constants into the symbol table; id, level (always zero), and value
 
-	symtbl.insert({"maxint", 		SymValue::makeConst(
+	symtbl.insert({"true",   		SymValue::makeConst(0, Datum(true), boolean)	} );
+	symtbl.insert({"false",  		SymValue::makeConst(0, Datum(false), boolean)	} );
+	symtbl.insert({"boolean_min",   SymValue::makeConst(0, Datum(false), boolean)	} );
+	symtbl.insert({"boolean_max",  	SymValue::makeConst(0, Datum(true), boolean)	} );
+	symtbl.insert({"integer_min",	SymValue::makeConst(
+										0,
+										Datum(TypeDesc::maxRange.min()),
+										integer)									} );
+	symtbl.insert({"integer_max",	SymValue::makeConst(
 										0,
 										Datum(TypeDesc::maxRange.max()),
-										integer)									});
+										integer)									} );
+
+	symtbl.insert({"real_min",		SymValue::makeConst(
+										0,
+										Datum(numeric_limits<double>::min()),
+										real)										} );
+	symtbl.insert({"real_max",		SymValue::makeConst(
+										0,
+										Datum(numeric_limits<double>::max()),
+										real)										} );
+
+	symtbl.insert({"character_min",	SymValue::makeConst(
+										0,
+										Datum(0),
+										character)									} );
+	symtbl.insert({"character_max",	SymValue::makeConst(
+										0,
+										Datum(character->range().max()),
+										character)									} );
+
+	symtbl.insert({"natural_min",	SymValue::makeConst(
+										0,
+										Datum(0),
+										natural)									} );
+	symtbl.insert({"natural_max",	SymValue::makeConst(
+										0,
+										Datum(natural->range().max()),
+										natural)									} );
+
+	symtbl.insert({"positive_min",	SymValue::makeConst(
+										0,
+										Datum(positive->range().min()),
+										positive)									} );
+	symtbl.insert({"positive_max",	SymValue::makeConst(
+										0,
+										Datum(positive->range().max()),
+										positive)									} );
+
 	symtbl.insert({"nil",    		SymValue::makeConst(
 										0,
 										Datum(0),
-										TypeDesc::newPointerDesc(integer))			});
-	symtbl.insert({"true",   		SymValue::makeConst(0, Datum(true), boolean)	});
-	symtbl.insert({"false",  		SymValue::makeConst(0, Datum(false), boolean)	});
+										TypeDesc::newPointerDesc(integer))			} );
 }
 

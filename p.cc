@@ -25,7 +25,7 @@
  * @example test/proc.p
  * @example test/rcrdtest.p
  * @example test/real.p
- * @example test/repeatst.p
+ * @example test/repeat.p
  * @example test/simple.p
  * @example test/str.p
  * @example test/succfail.p
@@ -35,6 +35,7 @@
  * @example test/typetest.p
  * @example test/unknown.p
  * @example test/varparam.p
+ * eexample test/while.p
  * @example test2/get.p
  ************************************************************************************************/
 

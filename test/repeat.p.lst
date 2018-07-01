@@ -1,0 +1,68 @@
+# test/repeat.p, 1: { Calculate 11 (0..10) factorials
+# test/repeat.p, 2: {	 n		    n!	}
+# test/repeat.p, 3: {  ---  ---------	}
+# test/repeat.p, 4: {	 0		    0	}
+# test/repeat.p, 5: {	 1		    1	}
+# test/repeat.p, 6: {	 2		    2	}
+# test/repeat.p, 7: {	 3		    6	}
+# test/repeat.p, 8: {	...				}
+# test/repeat.p, 9: {	 9	  362,880	}
+# test/repeat.p, 10: {	10	3,628,800	}
+# test/repeat.p, 11: 
+# test/repeat.p, 12: program RepeatTest() is
+# test/repeat.p, 13: var n, f : integer;
+    0: calli 0, 2
+    1: halt
+# test/repeat.p, 14: begin
+    2: enter 2
+# test/repeat.p, 15: 	n := 0;
+    3: pushvar 0, 4
+    4: push 0
+    5: assign 1
+# test/repeat.p, 16: 	f := 1;
+    6: pushvar 0, 5
+    7: push 1
+    8: assign 1
+# test/repeat.p, 17: 	repeat
+# test/repeat.p, 18: 		n := n + 1;
+    9: pushvar 0, 4
+   10: pushvar 0, 4
+   11: eval 1
+   12: push 1
+   13: add
+   14: assign 1
+# test/repeat.p, 19: 		f := f * n;
+   15: pushvar 0, 5
+   16: pushvar 0, 5
+   17: eval 1
+   18: pushvar 0, 4
+   19: eval 1
+   20: mul
+   21: assign 1
+# test/repeat.p, 20: 		putln(f, 8, 6)
+   22: pushvar 0, 5
+   23: eval 1
+   24: push 1
+   25: push 8
+   26: push 6
+# test/repeat.p, 21: 	until n >= 10 endloop
+   27: putln
+   28: pushvar 0, 4
+   29: eval 1
+   30: push 10
+   31: gte
+   32: jneqi 9
+# test/repeat.p, 22: endprog
+# test/repeat.p, 23: 
+   33: ret
+
+       1
+       2
+       6
+      24
+     120
+     720
+    5040
+   40320
+  362880
+ 3628800

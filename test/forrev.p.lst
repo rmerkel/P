@@ -33,7 +33,7 @@
    22: add
    23: assign 1
    24: jumpi 7
-   25: pop
+   25: pop 1
 # test/forrev.p, 11: 
    26: ret
 

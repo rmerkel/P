@@ -79,7 +79,7 @@
    63: add
    64: assign 1
    65: jumpi 43
-   66: pop
+   66: pop 1
 # test/str.p, 16: 
 # test/str.p, 17: 	putln("for i in A...");
    67: push 'f'
@@ -131,7 +131,7 @@
   108: add
   109: assign 1
   110: jumpi 88
-  111: pop
+  111: pop 1
 # test/str.p, 23: 
   112: ret
 

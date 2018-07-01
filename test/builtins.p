@@ -12,7 +12,19 @@ begin
 	putln(round(2.5));			{ 3 		}
 	putln(trunc(4.0));			{ 4 		}
 	putln(trunc(5.9));			{ 5 		}
-	putln(maxint);				{ 2,147,483,647	}
+
+	putln(true);				{ true				}
+	putln(false);				{ false				}
+	putln(character_min);		{ 0					}
+ 	putln(character_max);		{ 127				}
+	putln(integer_min);			{ -2,147,483,648	}
+	putln(integer_max);			{ 2,147,483,647		}
+	putln(natural_min);			{ 0					}
+	putln(natural_max);			{ 2,147,483,647		}
+	putln(positive_min);		{ 1					}
+	putln(positive_max);		{ 2,147,483,647		}
+	putln(real_min);			{ 2.225074e-308		}
+	putln(real_max);			{ 1.797693e+308		}
 	
 	putln(abs(1));				{ 1			}
 	putln(abs(-1));				{ 1			}
