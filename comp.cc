@@ -1553,7 +1553,7 @@ vector<string> PComp::identifierList(int level, const string& idprefix) {
 }
 
 /********************************************************************************************//**
- * simple-type | structured-type | pointer-type ;
+ * type = simple-type | structured-type | pointer-type ;
  *
  * Previously defined types, as well as  built-in types such as "Integer" and "Real" will have
  * Token::Type, thus we only need to look for new type declaractions, e.g., "array...".
@@ -1593,7 +1593,7 @@ TDescPtr PComp::type(int level, bool var, const string& idprefix) {
 }
 
 /********************************************************************************************//**
- * integer' | '(' ident-list ')' | const-expr '..' const-expr
+ * simple-type = "real" | ordinal-type ;
  *
  * @note Needs to handle previously defined simple-types
  * 
@@ -1605,16 +1605,16 @@ TDescPtr PComp::type(int level, bool var, const string& idprefix) {
 TDescPtr PComp::simpleType(int level, bool var) {
 	TDescPtr type;
 
-	if (accept(Token::Identifier, false)) {		// Previously defined type, including real!
+	if (accept(Token::Identifier, false)) {		// Previously defined type, including real
 		const string id = ts.current().string_value;
 		next();									// Consume the identifier
 
 		auto it = lookup(id);
 		if (it == symtbl.end() || it->second.kind() != SymValue::Type)
-			error("expected type, got ", id);
+			error("expected real, got ", id);
 
-		else if (!it->second.type()->ordinal())
-			error("expected ordinal type, got ", it->first);
+		else if (it->second.type()->tclass() != TypeDesc::Real)
+			error("expected real, got ", id);
 
 		else {
 			type = it->second.type();
@@ -1625,6 +1625,24 @@ TDescPtr PComp::simpleType(int level, bool var) {
 		type = ordinalType(level, var);
 
 	return type;
+}
+
+/********************************************************************************************//**
+ * ordinal-type-lst: ordinal-type { ',' ordinal-type } ;
+ *
+ * @param	level	The current block level. 
+ * @param	var		True if parameter is a var parameter
+ *
+ * @return type description.
+ ************************************************************************************************/
+TDescPtrVec PComp::ordinalTypeList(int level, bool var) {
+	TDescPtrVec tdescs;
+
+	do {
+		tdescs.push_back(ordinalType(level, var));
+	} while (accept(Token::Comma));
+
+	return tdescs;
 }
 
 /********************************************************************************************//**
@@ -1642,7 +1660,23 @@ TDescPtr PComp::simpleType(int level, bool var) {
 TDescPtr PComp::ordinalType(int level, bool var) {
 	TDescPtr type;
 
-	if (accept(Token::OpenParen)) {		// Enumeration
+	if (accept(Token::Identifier, false)) { 	// previously defined type-name
+		const string id = ts.current().string_value;
+		auto it = lookup(id);
+		next();									// Consume the identifier...
+
+		if (it == symtbl.end() || it->second.kind() != SymValue::Type)
+			error("expected type, got ", id);
+
+		else if (!it->second.type()->ordinal())
+			error("expected ordinal type, got ", it->first);
+
+		else {
+			type = TypeDesc::clone(it->second.type());
+			type->ref(var);
+		}
+
+	} else if (accept(Token::OpenParen)) {		// Enumeration
 		FieldVec		enums;
 
 		const auto ids = identifierList(level, "");
@@ -1713,7 +1747,7 @@ TDescPtr PComp::subRangeType(bool var) {
 }
 
 /********************************************************************************************//**
- * 'array' '[' simple-type-list ']' 'of' type | 'record' field-list 'end' ;
+ * structured-type = "array" '[' ordinal-type-lst ']' "of" type | "record" field-lst 'end' ;
  *
  * @param	level	The current block level. 
  * @param	previx	Optional identifier prefix
@@ -1728,7 +1762,7 @@ TDescPtr PComp::structuredType(int level, const string& idprefix, bool var) {
 		expect(Token::OpenBrkt);				// "["
 
 		TDescPtr tp;
-		TDescPtrVec indexes = simpleTypeList(level, var);
+		TDescPtrVec indexes = ordinalTypeList(level, var);
 		for (auto index : indexes) {
 			const Subrange r = index->range();
 			tdesc = TypeDesc::newArrayDesc(r.span(), r, index, TDescPtr(), var);
@@ -1782,24 +1816,6 @@ void PComp::fieldList(int level, const string& idprefix, FieldVec& fields) {
 			fld.name(name.erase(0, n+1));
 		}
 	}
-}
-
-/********************************************************************************************//**
- * simple-type-lst: simple-type { ',' simple-type } ;
- *
- * @param	level	The current block level. 
- * @param	var		True if parameter is a var parameter
- *
- * @return type description.
- ************************************************************************************************/
-TDescPtrVec PComp::simpleTypeList(int level, bool var) {
-	TDescPtrVec tdescs;
-
-	do {
-		tdescs.push_back(simpleType(level, var));
-	} while (accept(Token::Comma));
-
-	return tdescs;
 }
 
 /********************************************************************************************//**

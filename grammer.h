@@ -19,13 +19,13 @@
  *            var-decl = identifier-lst : type ;
  *                type = simple-type | structured-type | pointer-type ;
  *         simple-type = "real" | ordinal-type ;
+ *    ordinal-type-lst =  ordinal-type { ',' ordinal-type } ;
  *        ordinal-type = '(' identifier-lst ')' | const-expr ".." const-expr                |
  *                       "boolean" | "integer" | "natual" | "positive" | "character" ;
- *     structured-type = "array" '[' simple-type-list ']' "of" type                         |
+ *     structured-type = "array" '[' ordinal-type-lst ']' "of" type                          |
  *                       "record" field-lst "end" ;
  *           field-lst = var-decl-lst ;
  *        pointer-type = '^' identifier ;
- *     simple-type-lst = simple-type { ',' simple-type } ;
  *        sub-decl-lst = func-decl | proc-decl ;
  *           proc-decl = "procedure" identifier param-lst "is" block-decl "endproc" ;
  *           func-decl = "function"  identifier param-lst ':' type "is" block-decl "endfunc" ; 

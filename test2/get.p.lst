@@ -187,7 +187,7 @@
 # test2/get.p, 34: endprog
   153: putln
 # test2/get.p, 35: 
-  154: ret 0
+  154: ret
 
 5 integers: 
 [1,2,3,4,5]

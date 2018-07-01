@@ -137,6 +137,9 @@ private:
 	/// simple-type productions...
 	TDescPtr simpleType(int level, bool var);
 
+	/// ordinal-type-list productions...
+	TDescPtrVec ordinalTypeList(int level, bool);
+
 	/// ordinal type productions...
 	TDescPtr ordinalType(int level, bool var);
 
@@ -151,9 +154,6 @@ private:
 	void fieldList(		int					level,
 				const	std::string&		idprefix,
 						FieldVec&			idents);
-
-	/// simple-type-list productions...
-	TDescPtrVec simpleTypeList(int level, bool);
 
 	/// variable-declaration-list production...
 	void paramDeclList(	int					level,
