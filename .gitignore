@@ -19,6 +19,4 @@ docs
 Debug
 Release
 p
-*.o
-*.d
-*.lst
+objs
