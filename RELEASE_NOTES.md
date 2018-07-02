@@ -36,4 +36,5 @@ Version | Description
  0.40   | Add GET()
  0.41   | GETB, GETC... -> GET()
  0.42   | Fixed array decls; indexed by ordinals, not simple types.
+ 0.43   | Add *type*_min, max as pseudo attributes
 
