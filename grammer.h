@@ -45,8 +45,8 @@
  *     while-statement = "while" expression "loop" statement-lst "endloop" ;
  *       for-statement = "for" identifer "in" [ "reverse" ] ordinal-type
  *                          "loop" statement "endloop" ;
- *    return-statement = "return" expression ;
- *           statement = [  variable '=' expression                                         |
+ *    return-statement = "return" [ expression ] ;
+ *           statement = [  variable ':=' expression                                        |
  *                          identifier '(' [ expression-lst ] ')'                           |
  *                          if-statement                                                    |
  *                          while-statement                                                 |

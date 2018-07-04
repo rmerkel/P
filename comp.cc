@@ -947,7 +947,7 @@ bool PComp::identStatement(int level) {
 				break;
 
 			default:
-				error("expected variable, function return ref, or procedure call, got", lhs->first);
+				error("expected variable or procedure call, got", lhs->first);
 			}
 		}
 
