@@ -905,7 +905,7 @@ TDescPtr PComp::lvalueRef(int level, SymbolTableIter it, bool dup) {
  * @return	Reference to the variable reference
  ************************************************************************************************/
 void PComp::assignStatement(int level, SymbolTableIter it, bool dup) {
-	auto type = lvalueRef(level, it, dup);
+	TDescPtr type = lvalueRef(level, it, dup);
 	expect(Token::Assign);
 
 	// Emit the r-value and assignment...
@@ -913,6 +913,8 @@ void PComp::assignStatement(int level, SymbolTableIter it, bool dup) {
 	auto rtype = expression(level);
 	assignPromote(type->base(), rtype);
 	emit(OpCode::ASSIGN, 0, type->base()->size());
+	if (it->second.kind() == SymValue::Function)
+		it->second.returned(true);
 }
 
 /********************************************************************************************//**
@@ -1910,13 +1912,13 @@ void PComp::paramDeclList(
  * @param 	kind	The type of subroutine, e.g., procedure or fuction
  * @return	subrountine's symbol table entry
  ************************************************************************************************/
-SymValue& PComp::subRoutineDecl(int level, SymValue::Kind kind) {
+SymValue& PComp::subroutineDecl(int level, SymValue::Kind kind) {
 	SymbolTableIter	it;						// Will point to the new symbol table entry...
 
 	auto ident = nameDecl(level);			// insert the name into the symbol table
 	it = symtbl.insert( { ident, SymValue::makeSbr(kind, level)	} );
 	if (verbose)
-		cout << prefix(progName) << "subRoutineDecl " << ident << ": " << level << ", 0\n";
+		cout << prefix(progName) << "subroutineDecl " << ident << ": " << level << ", 0\n";
 
 	if (expect(Token::OpenParen)) {			// Process the formal arguments, if any...
 		FieldVec	idents;					// vector of name/type pairs.
@@ -1939,7 +1941,7 @@ SymValue& PComp::subRoutineDecl(int level, SymValue::Kind kind) {
  * @param	level	The current block level.
  ************************************************************************************************/
 void PComp::procDecl(int level) {
-	auto& val = subRoutineDecl(level, SymValue::Procedure);
+	SymValue& val = subroutineDecl(level, SymValue::Procedure);
 	expect(Token::Is);
 	blockDecl(val, level + 1, Token::Endproc);
 }
@@ -1950,11 +1952,13 @@ void PComp::procDecl(int level) {
  * @param	level	The current block level.
  ************************************************************************************************/
 void PComp::funcDecl(int level) {
-	auto& val = subRoutineDecl(level, SymValue::Function);
+	SymValue& val = subroutineDecl(level, SymValue::Function);
 	expect(Token::Colon);
 	val.type(type(level, false, ""));
 	expect(Token::Is);
 	blockDecl(val, level + 1, Token::Endfunc);
+	if (!val.returned())
+		error("Funcation has no return statement");
 }
 
 /********************************************************************************************//**
@@ -2035,7 +2039,7 @@ void PComp::progDecl(int level) {
 	next();										// Fetch the 1st token
 
 	expect(Token::ProgDecl);					// Program heading...
-	auto& val = subRoutineDecl(level, SymValue::Procedure);
+	SymValue& val = subroutineDecl(level, SymValue::Procedure);
 	expect(Token::Is);
 
 	// Emit a call to the main procedure, followed by a halt

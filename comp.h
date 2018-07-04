@@ -162,7 +162,7 @@ private:
 						FieldVec&			idents);
 
 	/// Subroutine-declaration production...
-	SymValue& subRoutineDecl(int			level,
+	SymValue& subroutineDecl(int			level,
 							SymValue::Kind	kind);
 
 	void procDecl(int level);				///< procedure-declaration production...

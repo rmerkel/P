@@ -1,0 +1,60 @@
+test/funcnoreturn.p: Funcation has no return statement near line 15
+# test/funcnoreturn.p, 1: program FunctionNoReturn() is
+# test/funcnoreturn.p, 2: const nFacts = 10;
+    0: calli 0, 26
+    1: halt
+# test/funcnoreturn.p, 3: var result : integer;
+# test/funcnoreturn.p, 4: function factorial(n : integer) : integer is
+# test/funcnoreturn.p, 5: 	var p : integer;
+# test/funcnoreturn.p, 6: 	begin
+    2: enter 1
+# test/funcnoreturn.p, 7: 		p := 1;
+    3: pushvar 0, 4
+    4: push 1
+    5: assign 1
+# test/funcnoreturn.p, 8: 		while n > 0 loop
+    6: pushvar 0, -1
+    7: eval 1
+    8: push 0
+    9: gt
+   10: jneqi 25
+# test/funcnoreturn.p, 9: 			p := p * n;
+   11: pushvar 0, 4
+   12: pushvar 0, 4
+   13: eval 1
+   14: pushvar 0, -1
+   15: eval 1
+   16: mul
+   17: assign 1
+# test/funcnoreturn.p, 10: 			n := n - 1
+   18: pushvar 0, -1
+   19: pushvar 0, -1
+   20: eval 1
+   21: push 1
+# test/funcnoreturn.p, 11: 		endloop;
+   22: sub
+   23: assign 1
+   24: jumpi 6
+# test/funcnoreturn.p, 12: {		factorial := p			Omit any return statement!	}
+# test/funcnoreturn.p, 13: 	endfunc
+# test/funcnoreturn.p, 14: 
+# test/funcnoreturn.p, 15: begin
+   25: retf
+   26: enter 1
+# test/funcnoreturn.p, 16: 	{ The result is the 10th factorial; 3,628,000	}
+# test/funcnoreturn.p, 17:     result := factorial(nFacts);
+   27: pushvar 0, 4
+   28: push 10
+   29: calli 0, 2
+   30: assign 1
+# test/funcnoreturn.p, 18: 	putln(result)
+   31: pushvar 0, 4
+   32: eval 1
+   33: push 1
+   34: push 0
+   35: push 0
+# test/funcnoreturn.p, 19: endprog
+   36: putln
+# test/funcnoreturn.p, 20: 
+   37: ret
+

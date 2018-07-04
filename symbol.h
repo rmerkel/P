@@ -55,6 +55,9 @@ public:
 	Kind kind() const;							///< Return my kind
 	int level() const;							///< Return my activation frame level
 
+	bool returned(bool r);						///< Set, and return, my returned value
+	bool returned() const;						///< Return my returned value
+
 	Datum value(Datum value);					///< Set, and return, my value
 	Datum value() const;						///< Return my value
 
@@ -66,8 +69,9 @@ public:
 
 private:
 	Kind			_kind;						///< None, Variable, Procedure, Function or Type
+	bool			_returned;					///< Did the function return a value?
 	int				_level;						///< Block level (scope) for all types
-	Datum			_value;						///< Variable frame offset, Constant value or subroutine address
+	Datum			_value;						///< Variable frame offset, Constant value or Subroutine address
 	TDescPtr		_type;						///< Type, n/a for Procedures
 	TDescPtrVec		_params;					///< Subroutine parameter kinds
 };

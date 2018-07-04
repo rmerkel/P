@@ -81,7 +81,7 @@ SymValue SymValue::makeType(int level, TDescPtr type) {
 /********************************************************************************************//**
  * @note kind() == None, i.e., a place holder for a real symbol
  ************************************************************************************************/
-SymValue::SymValue() : _kind{Kind::None}, _level{0} {}
+SymValue::SymValue() : _kind{Kind::None}, _returned(false), _level{0} {}
 
 /********************************************************************************************//**
  * @brief Construct a symbol value from it's components
@@ -93,7 +93,7 @@ SymValue::SymValue() : _kind{Kind::None}, _level{0} {}
  * @param params	SubRoutine parameter type array
  ************************************************************************************************/
 SymValue::SymValue(Kind kind, int level, const Datum& value, TDescPtr type, const TDescPtrVec& params)
-	: _kind{kind}, _level{level}, _value{value}, _type{type}, _params{params}
+	: _kind{kind}, _returned(false), _level{level}, _value{value}, _type{type}, _params{params}
 {
 }
 
@@ -106,6 +106,16 @@ SymValue::Kind SymValue::kind() const				{	return _kind;  			}
  * @return my current activation frame lavel
  ************************************************************************************************/
 int SymValue::level() const							{	return _level; 			}
+
+/********************************************************************************************//**
+ * @return ny new returned value
+ ************************************************************************************************/
+bool SymValue::returned(bool r)						{	return _returned = r;	}
+
+/********************************************************************************************//**
+ * @return my current returned value
+ ************************************************************************************************/
+bool SymValue::returned() const						{	return _returned;		}
 
 /********************************************************************************************//**
  * @param value	New value
