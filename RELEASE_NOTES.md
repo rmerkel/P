@@ -38,3 +38,5 @@ Version | Description
  0.42   | Fixed array decls; indexed by ordinals, not simple types.
  0.43   | Add *type*_min, max as pseudo attributes
  0.44   | Add check for functions with no return statements
+ 0.45   | Add return statement
+
