@@ -16,6 +16,7 @@
 #define TOKEN_H
 
 #include "datum.h"
+#include "streams.h"
 
 #include <iostream>
 #include <map>
@@ -155,7 +156,7 @@ struct Token {
 };
 
 /********************************************************************************************//**
- * A restartiable stream of tokens
+ * A restartiable Stream of tokens
  *
  * Maintains the last Token read from the input stream.
  *
@@ -163,21 +164,20 @@ struct Token {
  * is equal to end of stream (Kind::end), a new input source maybe set via set_input(); get()
  * will return the first Token of the new input.
  ************************************************************************************************/
-class TokenStream {
+class TokenStream : public InputStream {
 public:
 	size_t			lineNum;			///< Line # of the current stream
 
 	/// Initialize with an input stream which this does not own
-	TokenStream(std::istream& s) : lineNum{1}, ip{&s}, owns{false}, col{0}	{}
+	TokenStream(std::istream& s) : Stream<std::istream>{s}, lineNum{1}, col{0}	{}
 
 	/// Initialize with an input stream which this does own
-	TokenStream(std::istream* s) : lineNum{1}, ip{s}, owns{true}, col{0}	{}
+	TokenStream(std::istream* s) : Stream<std::istream>{s}, lineNum{1}, col{0}	{}
 
 	/// Destructor
 	virtual ~TokenStream()				{	close();	}
 
-	/// Return the next character from the stream.
-	std::istream& getch(char& c);
+	std::istream& getch(char& c);		///< Return the next character from the stream.
 	std::istream& unget();				///< Return last character to the stream
 
 	Token get();
@@ -193,16 +193,11 @@ private:								/// A map of keywords to their 'kind'
 
 	static	KeywordTable	keywords;	///< The keyword table
 
-	std::istream*	ip;					///< Pointer to an input stream
-	bool			owns;				///< Does *this* own ip?
 	size_t 			col;				///< Index into line for next character
 	std::string 	line;				///< last line read from the stream
 
 	/// The current token
 	Token 			ct { Token::EOS };
-
-	/// If *this* owns ip, delete it.
-	void close()						{	if (owns) delete ip;	}
 };
 
 /********************************************************************************************//**

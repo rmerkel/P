@@ -22,24 +22,24 @@ using namespace std;
 
 // private:
 
-/// 'c' is unmodified if EOF is encounted on the input stream.
-std::istream& TokenStream::getch(char& c) {
+/// @note 'c' is unmodified if EOF is encounted on the input stream.
+istream& TokenStream::getch(char& c) {
 	if (col == line.size()) {
 		col = 0;
 		line.clear();
-		if (getline(*ip, line))
+		if (getline(*stream, line))
 			line.push_back('\n');
 	}
 
 	if (col < line.size())
 		c = line[col++];
 
-	return *ip;
+	return *stream;
 }
 
-std::istream& TokenStream::unget() {
+istream& TokenStream::unget() {
 	if (col > 0) --col;
-	return *ip;
+	return *stream;
 }
 
 /// Read and return the next token from the input stream
@@ -194,9 +194,7 @@ Token TokenStream::get() {
  * @param	s	The new input stream
  */
 void TokenStream::set_input(std::istream& s) {
-	close();
-	ip = &s;
-	owns = false;
+	set_stream(s);
 	lineNum = 1;
 }
 
@@ -205,9 +203,7 @@ void TokenStream::set_input(std::istream& s) {
  * @param	p	The new input stream
  */
 void TokenStream::set_input(std::istream* p) {
-	close();
-	ip = p;
-	owns = true;
+	set_stream(p);
 	lineNum = 1;
 }
 

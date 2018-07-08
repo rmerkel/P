@@ -95,7 +95,9 @@ TBD
    evaluation instruction, which would require storing the attribute Datum 
    somewhere. One possibility is to add "typeof(expr)," which yeilds the type of
    expr without emitting any code to evaluate the expr.
- 
+ * Files, in the form of class Unix file system calls, e.g., open, create (but 
+   with a second an e), close()... Overload get, put in place of read/write.
+
 ## Configuration
 * Configure cc/c++ as clang:
 ```
