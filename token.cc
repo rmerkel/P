@@ -42,7 +42,6 @@ istream& TokenStream::unget() {
 	return *stream;
 }
 
-/// Read and return the next token from the input stream
 Token TokenStream::get() {
 	char ch = 0;
 
@@ -50,7 +49,7 @@ Token TokenStream::get() {
 		if (!getch(ch))
 			return ct = { Token::EOS };
 
-		if ('\n' == ch) ++lineNum;			// Count lines
+		if ('\n' == ch) ++lnum;				// Count lines
 
 	} while (isspace(ch));
 
@@ -90,7 +89,7 @@ Token TokenStream::get() {
 		return ct;
 
 	case '{':								// comment; { ... }
-		ct.integer_value = lineNum;			// remember where the comment stated...
+		ct.integer_value = lnum;			// remember where the comment stated...
 		do {								// eat everthhing up to the closing '}'
 			if (!getch(ch)) {
 				ct.kind = Token::BadComment;
@@ -98,7 +97,7 @@ Token TokenStream::get() {
 			}
 
 			if ('\n' == ch)
-				++lineNum;					// keep counting lines...
+				++lnum;						// keep counting lines...
 
 		} while ('}' != ch);
 		return get();						// restart the scan..
@@ -195,7 +194,7 @@ Token TokenStream::get() {
  */
 void TokenStream::set_input(std::istream& s) {
 	set_stream(s);
-	lineNum = 1;
+	lnum = 1;
 }
 
 /**
@@ -204,7 +203,15 @@ void TokenStream::set_input(std::istream& s) {
  */
 void TokenStream::set_input(std::istream* p) {
 	set_stream(p);
-	lineNum = 1;
+	lnum = 1;
+}
+
+size_t TokenStream::column() const {
+	return col;
+}
+
+size_t TokenStream::lineNum() const {
+	return lnum;
 }
 
 // privite static

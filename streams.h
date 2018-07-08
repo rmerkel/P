@@ -1,7 +1,7 @@
 /********************************************************************************************//**
  * @file streams.h
  *
- * class Stream<T>, a retargitable stream. InputStream and OutputStream.
+ * class template Stream<T>, a retargetable stream. Clases InputStream and OutputStream.
  *
  * @author Randy Merkel, Slowly but Surly Software.
  * @copyright  (c) 2017 Slowly but Surly Software. All rights reserved.
@@ -14,7 +14,7 @@
 #include <ostream>
 
 /********************************************************************************************//**
- * Either a std::istream, or a std::ostream.
+ * A retargetable stream handle, either a std::istream, or a std::ostream. 
  *
  * Contains either a weak referance, such as std::cin, or a strong refernce such as a
  * std::ofstream.
@@ -43,8 +43,8 @@ private:
 };
 
 /**
- * Set the input stream to a reference to s.
- * @param	s	The new input stream
+ * Set the stream reference to s, but does not take ownership of that stream.
+ * @param	s	The new input stream,
  */
 template<class T> void Stream<T>::set_stream(T& s) {
 	close();
@@ -53,7 +53,7 @@ template<class T> void Stream<T>::set_stream(T& s) {
 }
 
 /**
- * Set th input stream to p, taking ownership of that stream.
+ * Set the stream reference to p, taking ownership of that stream.
  * @param	p	The new input stream
  */
 template<class T> void Stream<T>::set_stream(T* p) {
@@ -62,10 +62,10 @@ template<class T> void Stream<T>::set_stream(T* p) {
 	owns = true;
 }
 
-/// An input stream; std::cin or a std::ifstream
+/// An input stream
 typedef Stream<std::istream>	InputStream;
 
-/// An output stream; std::cout, std::cerr or an std::ofstream
+/// An output stream
 typedef	Stream<std::ostream>	OutputStream;
 
 #endif

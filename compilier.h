@@ -142,7 +142,7 @@ template <class T> size_t Compilier::emit(const OpCode op, int8_t level, const T
 			<< addr << "\n";
 
 	code->push_back({op, level, Datum(addr)});
-	indextbl.push_back(ts.lineNum);			// update the cross index
+	indextbl.push_back(ts.lineNum());		// update the cross index
 
 	return code->size() - 1;				// so it's the address of just emitted instruction
 }

@@ -156,7 +156,7 @@ struct Token {
 };
 
 /********************************************************************************************//**
- * A restartiable Stream of tokens
+ * A restartiable InputStream of P tokens
  *
  * Maintains the last Token read from the input stream.
  *
@@ -165,14 +165,22 @@ struct Token {
  * will return the first Token of the new input.
  ************************************************************************************************/
 class TokenStream : public InputStream {
-public:
-	size_t			lineNum;			///< Line # of the current stream
+	/// A map of keywords to their 'kind'
+	typedef	std::map<std::string, Token::Kind> KeywordTable;
 
+	static	KeywordTable	keywords;	///< The keyword table
+
+	size_t 			col;				///< Index into line for next character
+	size_t			lnum;				///< Line # of the current stream
+	std::string 	line;				///< last line read from the stream
+	Token 			ct { Token::EOS };	///< The current token
+
+public:
 	/// Initialize with an input stream which this does not own
-	TokenStream(std::istream& s) : Stream<std::istream>{s}, lineNum{1}, col{0}	{}
+	TokenStream(std::istream& s) : InputStream{s}, col{0}, lnum{1} {}
 
 	/// Initialize with an input stream which this does own
-	TokenStream(std::istream* s) : Stream<std::istream>{s}, lineNum{1}, col{0}	{}
+	TokenStream(std::istream* s) : InputStream{s}, col{0}, lnum{1}	{}
 
 	/// Destructor
 	virtual ~TokenStream()				{	close();	}
@@ -180,7 +188,7 @@ public:
 	std::istream& getch(char& c);		///< Return the next character from the stream.
 	std::istream& unget();				///< Return last character to the stream
 
-	Token get();
+	Token get();						///< Read and return the next token from the input stream
 
 	/// The current token
 	Token& current() 					{	return ct;	}
@@ -188,16 +196,9 @@ public:
 	void set_input(std::istream& s);	///< Set the input stream to s
 	void set_input(std::istream* p);	///< Set the input stream to p
 
-private:								/// A map of keywords to their 'kind'
-	typedef	std::map<std::string, Token::Kind> KeywordTable;
+	size_t column() const;				///< Return the current column in the current line
+	size_t lineNum() const;				///< Return the current line # in the curren steram
 
-	static	KeywordTable	keywords;	///< The keyword table
-
-	size_t 			col;				///< Index into line for next character
-	std::string 	line;				///< last line read from the stream
-
-	/// The current token
-	Token 			ct { Token::EOS };
 };
 
 /********************************************************************************************//**

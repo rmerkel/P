@@ -76,7 +76,7 @@ std::ostream& operator<<(std::ostream& oss, LogPrefix p) {
  * @param msg The error message
  ************************************************************************************************/
 void Compilier::error(const std::string& msg) {
-	cerr << progName << ": " << msg << " near line " << ts.lineNum << endl;
+	cerr << progName << ": " << msg << " near line " << ts.lineNum() << endl;
 	++nErrors;
 }
 
