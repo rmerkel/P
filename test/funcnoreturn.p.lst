@@ -53,7 +53,8 @@ test/funcnoreturn.p: Funcation has no return statement near line 15
    33: push 0
    34: push 0
 # test/funcnoreturn.p, 19: endprog
-   35: putln
+   35: push 1
+   36: putln
 # test/funcnoreturn.p, 20: 
-   36: ret 0
+   37: ret 0
 

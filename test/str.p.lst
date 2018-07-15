@@ -50,90 +50,94 @@
    35: push 16
    36: push 0
    37: push 0
-   38: putln
+   38: push 1
+   39: putln
 # test/str.p, 15: 	for i in 0..9 loop putln(a2[i]) endloop;
-   39: pushvar 0, 24
-   40: dup
-   41: push 0
-   42: assign 1
-   43: dup
-   44: eval 1
-   45: push 9
-   46: lte
-   47: jneqi 66
-   48: pushvar 0, 14
-   49: pushvar 0, 24
-   50: eval 1
-   51: llimit 0
-   52: ulimit 9
-   53: add
-   54: eval 1
-   55: push 1
-   56: push 0
+   40: pushvar 0, 24
+   41: dup
+   42: push 0
+   43: assign 1
+   44: dup
+   45: eval 1
+   46: push 9
+   47: lte
+   48: jneqi 68
+   49: pushvar 0, 14
+   50: pushvar 0, 24
+   51: eval 1
+   52: llimit 0
+   53: ulimit 9
+   54: add
+   55: eval 1
+   56: push 1
    57: push 0
-   58: putln
-   59: dup
-   60: dup
-   61: eval 1
-   62: push 1
-   63: add
-   64: assign 1
-   65: jumpi 43
-   66: pop 1
+   58: push 0
+   59: push 1
+   60: putln
+   61: dup
+   62: dup
+   63: eval 1
+   64: push 1
+   65: add
+   66: assign 1
+   67: jumpi 44
+   68: pop 1
 # test/str.p, 16: 
 # test/str.p, 17: 	putln("for i in A...");
-   67: push 'f'
-   68: push 'o'
-   69: push 'r'
-   70: push ' '
-   71: push 'i'
+   69: push 'f'
+   70: push 'o'
+   71: push 'r'
    72: push ' '
    73: push 'i'
-   74: push 'n'
-   75: push ' '
-   76: push 'A'
-   77: push '.'
-   78: push '.'
+   74: push ' '
+   75: push 'i'
+   76: push 'n'
+   77: push ' '
+   78: push 'A'
    79: push '.'
-   80: push 13
-   81: push 0
-   82: push 0
-   83: putln
+   80: push '.'
+   81: push '.'
+   82: push 13
+   83: push 0
+   84: push 0
+   85: push 1
+   86: putln
 # test/str.p, 18: 	for i in A loop putln(a1[i]) endloop	{	;
-   84: pushvar 0, 24
-   85: dup
-   86: push 0
-   87: assign 1
+   87: pushvar 0, 24
    88: dup
-   89: eval 1
-   90: push 9
-   91: lte
-   92: jneqi 111
-   93: pushvar 0, 4
-   94: pushvar 0, 24
-   95: eval 1
-   96: llimit 0
-   97: ulimit 9
-   98: add
-   99: eval 1
-  100: push 1
-  101: push 0
-  102: push 0
-  103: putln
+   89: push 0
+   90: assign 1
+   91: dup
+   92: eval 1
+   93: push 9
+   94: lte
+   95: jneqi 115
+   96: pushvar 0, 4
+   97: pushvar 0, 24
+   98: eval 1
+   99: llimit 0
+  100: ulimit 9
+  101: add
+  102: eval 1
+  103: push 1
+  104: push 0
+  105: push 0
+  106: push 1
+  107: putln
 # test/str.p, 19: 
 # test/str.p, 20: 	putln("for i in a1...");
 # test/str.p, 21: 	for i in a1 loop putln(a1[i]) endloop	}
 # test/str.p, 22: endprog
-  104: dup
-  105: dup
-  106: eval 1
-  107: push 1
-  108: add
-  109: assign 1
-  110: jumpi 88
-  111: pop 1
+  108: dup
+  109: dup
+  110: eval 1
+  111: push 1
+  112: add
+  113: assign 1
+  114: jumpi 91
+  115: pop 1
 # test/str.p, 23: 
-  112: ret 0
+  116: ret 0
 
 for i in 0..9...
 a

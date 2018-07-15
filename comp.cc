@@ -1293,43 +1293,44 @@ void PComp::put(int level) {
 	const int defaultWidth = 0;
 	const int defaultPrec = 0;
 
-	if (accept(Token::OpenParen)) {			// process each expr-tuple..
-		if (accept(Token::CloseParen)) {	// handle no parameters
-			emit(OpCode::PUSH, 0, 0);		// size
-			emit(OpCode::PUSH, 0, defaultWidth);
-			emit(OpCode::PUSH, 0, defaultPrec);
+	expect(Token::OpenParen);
+	if (accept(Token::CloseParen)) {		// handle no parameters
+		emit(OpCode::PUSH, 0, 0);			// size
+		emit(OpCode::PUSH, 0, defaultWidth);
+		emit(OpCode::PUSH, 0, defaultPrec);
 
-		} else {
-			auto expr = expression(level); 	// value(s) to put
-			emit(OpCode::PUSH, 0, expr->size());
+	} else {
+		auto expr = expression(level); 		// value(s) to put
+		emit(OpCode::PUSH, 0, expr->size());
 
-			if (accept(Token::Comma)) {		// [ ',' width [ ',' precision ]]
-				ostringstream oss;
+		if (accept(Token::Comma)) {			// [ ',' width [ ',' precision ]]
+			ostringstream oss;
 
-				auto width = expression(level);
-				if (width->tclass() != TypeDesc::Integer) {
+			auto width = expression(level);
+			if (width->tclass() != TypeDesc::Integer) {
+				oss << "expeced integer width parameter, got: " << width->tclass();
+				error(oss.str());
+			}
+
+			if (accept(Token::Comma)) {		//	[ ',' precision ]
+				auto prec = expression(level);
+				if (prec->tclass() != TypeDesc::Integer) {
 					oss << "expeced integer width parameter, got: " << width->tclass();
 					error(oss.str());
 				}
 
-				if (accept(Token::Comma)) {	//	[ ',' precision ]
-					auto prec = expression(level);
-					if (prec->tclass() != TypeDesc::Integer) {
-						oss << "expeced integer width parameter, got: " << width->tclass();
-						error(oss.str());
-					}
-
-				} else						// push default precision
-					emit(OpCode::PUSH, 0, defaultPrec);	// push default precision
-						
-			} else {						// push default width & precision
-				emit(OpCode::PUSH, 0, defaultWidth);
-				emit(OpCode::PUSH, 0, defaultPrec);
-			}
-
-			expect(Token::CloseParen);
+			} else							// push default precision
+				emit(OpCode::PUSH, 0, defaultPrec);	// push default precision
+					
+		} else {							// push default width & precision
+			emit(OpCode::PUSH, 0, defaultWidth);
+			emit(OpCode::PUSH, 0, defaultPrec);
 		}
+
+		expect(Token::CloseParen);
 	}
+
+	emit(OpCode::PUSH, 0, 1);				// Standard output file descriptor
 }
 
 /********************************************************************************************//**

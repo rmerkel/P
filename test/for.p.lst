@@ -26,81 +26,85 @@
    19: push 16
    20: push 0
    21: push 0
-   22: putln
+   22: push 1
+   23: putln
 # test/for.p, 7: 	for i in 0..9 loop
-   23: pushvar 0, 4
-   24: dup
-   25: push 0
-   26: assign 1
-   27: dup
-   28: eval 1
-   29: push 9
-   30: lte
-   31: jneqi 45
+   24: pushvar 0, 4
+   25: dup
+   26: push 0
+   27: assign 1
+   28: dup
+   29: eval 1
+   30: push 9
+   31: lte
+   32: jneqi 47
 # test/for.p, 8: 		putln(i)
-   32: pushvar 0, 4
-   33: eval 1
-   34: push 1
-   35: push 0
+   33: pushvar 0, 4
+   34: eval 1
+   35: push 1
    36: push 0
+   37: push 0
 # test/for.p, 9: 	endloop;
-   37: putln
-   38: dup
-   39: dup
-   40: eval 1
-   41: push 1
-   42: add
-   43: assign 1
-   44: jumpi 27
-   45: pop 1
+   38: push 1
+   39: putln
+   40: dup
+   41: dup
+   42: eval 1
+   43: push 1
+   44: add
+   45: assign 1
+   46: jumpi 28
+   47: pop 1
 # test/for.p, 10: 
 # test/for.p, 11: 	putln("for i in R...");
-   46: push 'f'
-   47: push 'o'
-   48: push 'r'
-   49: push ' '
-   50: push 'i'
+   48: push 'f'
+   49: push 'o'
+   50: push 'r'
    51: push ' '
    52: push 'i'
-   53: push 'n'
-   54: push ' '
-   55: push 'R'
-   56: push '.'
-   57: push '.'
+   53: push ' '
+   54: push 'i'
+   55: push 'n'
+   56: push ' '
+   57: push 'R'
    58: push '.'
-   59: push 13
-   60: push 0
-   61: push 0
-   62: putln
+   59: push '.'
+   60: push '.'
+   61: push 13
+   62: push 0
+   63: push 0
+   64: push 1
+   65: putln
 # test/for.p, 12: 	for i in R loop
-   63: pushvar 0, 4
-   64: dup
-   65: push 0
-   66: assign 1
+   66: pushvar 0, 4
    67: dup
-   68: eval 1
-   69: push 9
-   70: lte
-   71: jneqi 85
+   68: push 0
+   69: assign 1
+   70: dup
+   71: eval 1
+   72: push 9
+   73: lte
+   74: jneqi 89
 # test/for.p, 13: 		putln(i)
-   72: pushvar 0, 4
-   73: eval 1
-   74: push 1
-   75: push 0
-   76: push 0
+   75: pushvar 0, 4
+   76: eval 1
+   77: push 1
+   78: push 0
+   79: push 0
 # test/for.p, 14: 	endloop
-   77: putln
+   80: push 1
+   81: putln
 # test/for.p, 15: endprog
-   78: dup
-   79: dup
-   80: eval 1
-   81: push 1
-   82: add
-   83: assign 1
-   84: jumpi 67
-   85: pop 1
+   82: dup
+   83: dup
+   84: eval 1
+   85: push 1
+   86: add
+   87: assign 1
+   88: jumpi 70
+   89: pop 1
 # test/for.p, 16: 
-   86: ret 0
+   90: ret 0
 
 for i in 0..9...
 0

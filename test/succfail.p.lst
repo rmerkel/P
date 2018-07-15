@@ -10,8 +10,9 @@
     5: push 0
     6: push 0
 # test/succfail.p, 5: endprog
-    7: putln
+    7: push 1
+    8: putln
 # test/succfail.p, 6: 
-    8: ret 0
+    9: ret 0
 
 runtime error @pc 3, sp: 8: out-of-range

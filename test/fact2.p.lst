@@ -68,8 +68,9 @@
    38: push 0
    39: push 0
 # test/fact2.p, 30: endprog
-   40: putln
+   40: push 1
+   41: putln
 # test/fact2.p, 31: 
-   41: ret 0
+   42: ret 0
 
 3628800

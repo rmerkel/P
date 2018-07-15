@@ -16,38 +16,41 @@
    10: push 1
    11: push 0
    12: push 0
-   13: putln
+   13: push 1
+   14: putln
 # test/natural.p, 6: 	n := 1;
-   14: pushvar 0, 4
-   15: push 1
-   16: llimit 0
-   17: ulimit 2147483647
-   18: assign 1
+   15: pushvar 0, 4
+   16: push 1
+   17: llimit 0
+   18: ulimit 2147483647
+   19: assign 1
 # test/natural.p, 7: 	putln(n);
-   19: pushvar 0, 4
-   20: eval 1
-   21: push 1
-   22: push 0
+   20: pushvar 0, 4
+   21: eval 1
+   22: push 1
    23: push 0
-   24: putln
+   24: push 0
+   25: push 1
+   26: putln
 # test/natural.p, 8: 	n := -1;
-   25: pushvar 0, 4
-   26: push 1
-   27: neg
-   28: llimit 0
-   29: ulimit 2147483647
-   30: assign 1
+   27: pushvar 0, 4
+   28: push 1
+   29: neg
+   30: llimit 0
+   31: ulimit 2147483647
+   32: assign 1
 # test/natural.p, 9: 	putln(n)
-   31: pushvar 0, 4
-   32: eval 1
-   33: push 1
-   34: push 0
-   35: push 0
+   33: pushvar 0, 4
+   34: eval 1
+   35: push 1
+   36: push 0
+   37: push 0
 # test/natural.p, 10: endprog
-   36: putln
+   38: push 1
+   39: putln
 # test/natural.p, 11: 
-   37: ret 0
+   40: ret 0
 
 0
 1
-runtime error @pc 28, sp: 10: out-of-range
+runtime error @pc 30, sp: 10: out-of-range

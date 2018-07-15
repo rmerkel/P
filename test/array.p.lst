@@ -24,158 +24,166 @@
    10: push 1
    11: push 0
    12: push 0
-   13: putln
+   13: push 1
+   14: putln
 # test/array.p, 14: 
 # test/array.p, 15: 	a1 := "abcdefghij";		{	fill a1 with "abcd..."			}
-   14: pushvar 0, 6
-   15: push 'a'
-   16: push 'b'
-   17: push 'c'
-   18: push 'd'
-   19: push 'e'
-   20: push 'f'
-   21: push 'g'
-   22: push 'h'
-   23: push 'i'
-   24: push 'j'
-   25: assign 10
+   15: pushvar 0, 6
+   16: push 'a'
+   17: push 'b'
+   18: push 'c'
+   19: push 'd'
+   20: push 'e'
+   21: push 'f'
+   22: push 'g'
+   23: push 'h'
+   24: push 'i'
+   25: push 'j'
+   26: assign 10
 # test/array.p, 16:  	putln(a1);
-   26: pushvar 0, 6
-   27: eval 10
-   28: push 10
-   29: push 0
+   27: pushvar 0, 6
+   28: eval 10
+   29: push 10
    30: push 0
-   31: putln
+   31: push 0
+   32: push 1
+   33: putln
 # test/array.p, 17: 
 # test/array.p, 18: 	a2 := a1;				{	copies the contents of a1 to a2	}
-   32: pushvar 0, 16
-   33: pushvar 0, 6
-   34: eval 10
-   35: assign 10
+   34: pushvar 0, 16
+   35: pushvar 0, 6
+   36: eval 10
+   37: assign 10
 # test/array.p, 19: 	putln(a2);
-   36: pushvar 0, 16
-   37: eval 10
-   38: push 10
-   39: push 0
-   40: push 0
-   41: putln
+   38: pushvar 0, 16
+   39: eval 10
+   40: push 10
+   41: push 0
+   42: push 0
+   43: push 1
+   44: putln
 # test/array.p, 20: 
 # test/array.p, 21: 	a1 := "0123456789";		{	fill a1 with "0123..."			}
-   42: pushvar 0, 6
-   43: push '0'
-   44: push '1'
-   45: push '2'
-   46: push '3'
-   47: push '4'
-   48: push '5'
-   49: push '6'
-   50: push '7'
-   51: push '8'
-   52: push '9'
-   53: assign 10
+   45: pushvar 0, 6
+   46: push '0'
+   47: push '1'
+   48: push '2'
+   49: push '3'
+   50: push '4'
+   51: push '5'
+   52: push '6'
+   53: push '7'
+   54: push '8'
+   55: push '9'
+   56: assign 10
 # test/array.p, 22: 							{	while a1 has changed...			}
 # test/array.p, 23: 	putln(a1);
-   54: pushvar 0, 6
-   55: eval 10
-   56: push 10
-   57: push 0
-   58: push 0
-   59: putln
+   57: pushvar 0, 6
+   58: eval 10
+   59: push 10
+   60: push 0
+   61: push 0
+   62: push 1
+   63: putln
 # test/array.p, 24: 							{	... a2 has not!					}
 # test/array.p, 25: 	putln(a2);
-   60: pushvar 0, 16
-   61: eval 10
-   62: push 10
-   63: push 0
-   64: push 0
-   65: putln
+   64: pushvar 0, 16
+   65: eval 10
+   66: push 10
+   67: push 0
+   68: push 0
+   69: push 1
+   70: putln
 # test/array.p, 26: 
 # test/array.p, 27: 	for i in 0..9 loop
-   66: pushvar 0, 4
-   67: dup
-   68: push 0
-   69: assign 1
-   70: dup
-   71: eval 1
-   72: push 9
-   73: lte
-   74: jneqi 91
+   71: pushvar 0, 4
+   72: dup
+   73: push 0
+   74: assign 1
+   75: dup
+   76: eval 1
+   77: push 9
+   78: lte
+   79: jneqi 96
 # test/array.p, 28: 		ai[i] := i
-   75: pushvar 0, 26
-   76: pushvar 0, 4
-   77: eval 1
-   78: llimit 0
-   79: ulimit 9
-   80: add
-# test/array.p, 29: 	endloop;
+   80: pushvar 0, 26
    81: pushvar 0, 4
    82: eval 1
-   83: assign 1
-   84: dup
-   85: dup
-   86: eval 1
-   87: push 1
-   88: add
-   89: assign 1
-   90: jumpi 70
-   91: pop 1
+   83: llimit 0
+   84: ulimit 9
+   85: add
+# test/array.p, 29: 	endloop;
+   86: pushvar 0, 4
+   87: eval 1
+   88: assign 1
+   89: dup
+   90: dup
+   91: eval 1
+   92: push 1
+   93: add
+   94: assign 1
+   95: jumpi 75
+   96: pop 1
 # test/array.p, 30: 	putln(ai);
-   92: pushvar 0, 26
-   93: eval 10
-   94: push 10
-   95: push 0
-   96: push 0
-   97: putln
+   97: pushvar 0, 26
+   98: eval 10
+   99: push 10
+  100: push 0
+  101: push 0
+  102: push 1
+  103: putln
 # test/array.p, 31: 
 # test/array.p, 32: 	for i in 0..9 loop
-   98: pushvar 0, 4
-   99: dup
-  100: push 0
-  101: assign 1
-  102: dup
-  103: eval 1
-  104: push 9
-  105: lte
-  106: jneqi 126
-# test/array.p, 33: 		ar[i] := i * 1.1;
-  107: pushvar 0, 36
-  108: pushvar 0, 4
+  104: pushvar 0, 4
+  105: dup
+  106: push 0
+  107: assign 1
+  108: dup
   109: eval 1
-  110: llimit 0
-  111: ulimit 9
-  112: add
-  113: pushvar 0, 4
-  114: eval 1
-  115: push 1.100000
-  116: itor2
-  117: mul
-  118: assign 1
-# test/array.p, 34: 	endloop;
-  119: dup
-  120: dup
-  121: eval 1
-  122: push 1
-  123: add
+  110: push 9
+  111: lte
+  112: jneqi 132
+# test/array.p, 33: 		ar[i] := i * 1.1;
+  113: pushvar 0, 36
+  114: pushvar 0, 4
+  115: eval 1
+  116: llimit 0
+  117: ulimit 9
+  118: add
+  119: pushvar 0, 4
+  120: eval 1
+  121: push 1.100000
+  122: itor2
+  123: mul
   124: assign 1
-  125: jumpi 102
-  126: pop 1
+# test/array.p, 34: 	endloop;
+  125: dup
+  126: dup
+  127: eval 1
+  128: push 1
+  129: add
+  130: assign 1
+  131: jumpi 108
+  132: pop 1
 # test/array.p, 35: 	putln(ar);
-  127: pushvar 0, 36
-  128: eval 10
-  129: push 10
-  130: push 0
-  131: push 0
-  132: putln
-# test/array.p, 36: 	putln(ar,4,1)
   133: pushvar 0, 36
   134: eval 10
   135: push 10
-  136: push 4
-  137: push 1
+  136: push 0
+  137: push 0
+  138: push 1
+  139: putln
+# test/array.p, 36: 	putln(ar,4,1)
+  140: pushvar 0, 36
+  141: eval 10
+  142: push 10
+  143: push 4
+  144: push 1
 # test/array.p, 37: endprog
-  138: putln
+  145: push 1
+  146: putln
 # test/array.p, 38: 
-  139: ret 0
+  147: ret 0
 
 x
 abcdefghij

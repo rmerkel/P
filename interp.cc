@@ -517,13 +517,25 @@ Result PInterp::GET() {
 }
 
 /********************************************************************************************//**
- * Writes one expresson on the standard output stream. TOS is an 4-tuple -- (p,w,n,v):
- *
+ * Write one expression on a stream.
+ * 
+ * The expression is described by a 4-tuple (p,w,n,v):
  * - p - the percision of the value(s). Ignored if v isn't a Real.
  * - w - the width of the field to write the value(s) in.
  * - v - The values(n) to write...
  * - n - the number of Datum's in the value. If greater than 1, v is treated as an array, where
  *   an array of characters is treated as a string.
+ * 
+ * Each stream is described by a file descriptor, a small integer. By default 0 is standard input, * 1 is standard output and 2 is standard error.
+ * 
+ * Stack layout:
+ * TOS  - stream (file descriptor)
+ * TOS-1 - p
+ * TOS-2 - w
+ * TOS-3 - n
+ * TOS-4 - v[0]
+ * ...
+ * TOS-4-n - v[n]
  *
  * @return	Result::stackUnderflow if there was insufficient space on the stack,
  * 			Result::badDataType if any of the parameters aren't integers.
@@ -533,6 +545,20 @@ Result PInterp::put() {
 		return Result::stackUnderflow;
 
 	Result r = Result::success;
+
+	int fd = 1;								// default value of pred
+	const Datum fileDesc = pop();
+	if (fileDesc.kind() == Datum::Integer)
+		fd = fileDesc.integer();
+	else {
+		cerr << "PUTx stream file descriptor is not an integer!" << endl;
+		r = Result::badDataType;
+	}
+
+	if (fd != 1) {							// Temp - make sure stream is standard output
+		cerr << "PUTx stream is not standard output!" << endl;
+		r = Result::badDataType;
+	}
 
 	int p = 0;								// default value of prec
 	const Datum prec = pop();

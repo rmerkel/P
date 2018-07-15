@@ -36,58 +36,61 @@
    21: push 18
    22: push 0
    23: push 0
-   24: putln
+   24: push 1
+   25: putln
 # test/fahr.p, 15: 
 # test/fahr.p, 16: 	fahr := LOWER;
-   25: pushvar 0, 4
-   26: push 0
-   27: itor
-   28: assign 1
+   26: pushvar 0, 4
+   27: push 0
+   28: itor
+   29: assign 1
 # test/fahr.p, 17: 	while fahr <= UPPER loop
-   29: pushvar 0, 4
-   30: eval 1
-   31: push 300
-   32: itor
-   33: lte
-   34: jneqi 65
+   30: pushvar 0, 4
+   31: eval 1
+   32: push 300
+   33: itor
+   34: lte
+   35: jneqi 68
 # test/fahr.p, 18: 		celsius := 5.0 * (fahr-32.0) / 9.0;
-   35: pushvar 0, 5
-   36: push 5.000000
-   37: pushvar 0, 4
-   38: eval 1
-   39: push 32.000000
-   40: sub
-   41: mul
-   42: push 9.000000
-   43: div
-   44: assign 1
+   36: pushvar 0, 5
+   37: push 5.000000
+   38: pushvar 0, 4
+   39: eval 1
+   40: push 32.000000
+   41: sub
+   42: mul
+   43: push 9.000000
+   44: div
+   45: assign 1
 # test/fahr.p, 19: 		put(fahr, 9, 1);
-   45: pushvar 0, 4
-   46: eval 1
-   47: push 1
-   48: push 9
-   49: push 1
-   50: put
+   46: pushvar 0, 4
+   47: eval 1
+   48: push 1
+   49: push 9
+   50: push 1
+   51: push 1
+   52: put
 # test/fahr.p, 20: 		putln(celsius, 8, 1);
-   51: pushvar 0, 5
-   52: eval 1
-   53: push 1
-   54: push 8
+   53: pushvar 0, 5
+   54: eval 1
    55: push 1
-   56: putln
+   56: push 8
+   57: push 1
+   58: push 1
+   59: putln
 # test/fahr.p, 21: 		fahr := fahr + STEP;
-   57: pushvar 0, 4
-   58: pushvar 0, 4
-   59: eval 1
-   60: push 20
-   61: itor
-   62: add
-   63: assign 1
+   60: pushvar 0, 4
+   61: pushvar 0, 4
+   62: eval 1
+   63: push 20
+   64: itor
+   65: add
+   66: assign 1
 # test/fahr.p, 22: 	endloop
 # test/fahr.p, 23: endprog
-   64: jumpi 29
+   67: jumpi 30
 # test/fahr.p, 24: 
-   65: ret 0
+   68: ret 0
 
 Fahrenheit Celsius
       0.0   -17.8

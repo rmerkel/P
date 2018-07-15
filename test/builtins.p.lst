@@ -14,44 +14,43 @@
     3: push 1
     4: push 0
     5: push 0
-    6: putln
+    6: push 1
+    7: putln
 # test/builtins.p, 11: 	putln(round(2.0));			{ 2			}
-    7: push 2.000000
-    8: round
-    9: push 1
-   10: push 0
+    8: push 2.000000
+    9: round
+   10: push 1
    11: push 0
-   12: putln
+   12: push 0
+   13: push 1
+   14: putln
 # test/builtins.p, 12: 	putln(round(2.5));			{ 3 		}
-   13: push 2.500000
-   14: round
-   15: push 1
-   16: push 0
-   17: push 0
-   18: putln
+   15: push 2.500000
+   16: round
+   17: push 1
+   18: push 0
+   19: push 0
+   20: push 1
+   21: putln
 # test/builtins.p, 13: 	putln(trunc(4.0));			{ 4 		}
-   19: push 4.000000
-   20: trunc
-   21: push 1
-   22: push 0
-   23: push 0
-   24: putln
-# test/builtins.p, 14: 	putln(trunc(5.9));			{ 5 		}
-   25: push 5.900000
-   26: trunc
+   22: push 4.000000
+   23: trunc
+   24: push 1
+   25: push 0
+   26: push 0
    27: push 1
-   28: push 0
-   29: push 0
-   30: putln
+   28: putln
+# test/builtins.p, 14: 	putln(trunc(5.9));			{ 5 		}
+   29: push 5.900000
+   30: trunc
+   31: push 1
+   32: push 0
+   33: push 0
+   34: push 1
+   35: putln
 # test/builtins.p, 15: 
 # test/builtins.p, 16: 	putln(true);				{ true				}
-   31: push 1
-   32: push 1
-   33: push 0
-   34: push 0
-   35: putln
-# test/builtins.p, 17: 	putln(false);				{ false				}
-   36: push 0
+   36: push 1
    37: push 1
    38: push 0
    39: push 0
@@ -84,7 +83,7 @@
    61: push 0
    62: push 1
    63: push 0
-   64: push 0
+   64: push 1
    65: putln
 # test/builtins.p, 23: 	putln(natural`max);			{ 2,147,483,647		}
    66: push 2147483647
@@ -119,172 +118,214 @@
 # test/builtins.p, 28: 	
 # test/builtins.p, 29: 	putln(abs(1));				{ 1			}
    91: push 1
-   92: abs
-   93: push 1
-   94: push 0
-   95: push 0
-   96: putln
-# test/builtins.p, 30: 	putln(abs(-1));				{ 1			}
+   92: push 0
+   93: push 0
+   94: push 1
+   95: putln
+# test/builtins.p, 26: 	putln(real_min);			{ 2.225074e-308		}
+   96: push 0.000000
    97: push 1
-   98: neg
-   99: abs
+   98: push 0
+   99: push 0
   100: push 1
-  101: push 0
-  102: push 0
-  103: putln
-# test/builtins.p, 31: 	putln(abs(1.5));			{ 1.5		}
-  104: push 1.500000
-  105: abs
+  101: putln
+# test/builtins.p, 27: 	putln(real_max);			{ 1.797693e+308		}
+  102: push 179769313486231570814527423731704356798070567525844996598917476803157260780028538760589558632766878171540458953514382464234321326889464182768467546703537516986049910576551282076245490090389328944075868508455133942304583236903222948165808559332123348274797826204144723168738177180919299881250404026184124858368.000000
+  103: push 1
+  104: push 0
+  105: push 0
   106: push 1
-  107: push 0
-  108: push 0
-  109: putln
-# test/builtins.p, 32: 	putln(abs(-1.5));			{ 1.5		}
-  110: push 1.500000
-  111: neg
-  112: abs
+  107: putln
+# test/builtins.p, 28: 	
+# test/builtins.p, 29: 	putln(abs(1));				{ 1			}
+  108: push 1
+  109: abs
+  110: push 1
+  111: push 0
+  112: push 0
   113: push 1
-  114: push 0
-  115: push 0
-  116: putln
-# test/builtins.p, 33: 
-# test/builtins.p, 34: 	putln(ord(three));			{ 3			}
-  117: push 3
+  114: putln
+# test/builtins.p, 30: 	putln(abs(-1));				{ 1			}
+  115: push 1
+  116: neg
+  117: abs
   118: push 1
   119: push 0
   120: push 0
-  121: putln
-# test/builtins.p, 35: 	putln(ord(3-1));			{ 2			}
-  122: push 3
-  123: push 1
-  124: sub
+  121: push 1
+  122: putln
+# test/builtins.p, 31: 	putln(abs(1.5));			{ 1.5		}
+  123: push 1.500000
+  124: abs
   125: push 1
   126: push 0
   127: push 0
-  128: putln
+  128: push 1
+  129: putln
+# test/builtins.p, 32: 	putln(abs(-1.5));			{ 1.5		}
+  130: push 1.500000
+  131: neg
+  132: abs
+  133: push 1
+  134: push 0
+  135: push 0
+  136: push 1
+  137: putln
+# test/builtins.p, 33: 
+# test/builtins.p, 34: 	putln(ord(three));			{ 3			}
+  138: push 3
+  139: push 1
+  140: push 0
+  141: push 0
+  142: push 1
+  143: putln
+# test/builtins.p, 35: 	putln(ord(3-1));			{ 2			}
+  144: push 3
+  145: push 1
+  146: sub
+  147: push 1
+  148: push 0
+  149: push 0
+  150: push 1
+  151: putln
 # test/builtins.p, 36: 
 # test/builtins.p, 37: {	putln(ord(1.2));		error: ordinal value expected	}
 # test/builtins.p, 38: 
 # test/builtins.p, 39: 	putln(arctan(1));			{ 0.785398	}
-  129: push 1
-  130: atan
-  131: push 1
-  132: push 0
-  133: push 0
-  134: putln
-# test/builtins.p, 40: 	putln(arctan(1.0));			{ 0.785398	}
-  135: push 1.000000
-  136: atan
-  137: push 1
-  138: push 0
-  139: push 0
-  140: putln
-# test/builtins.p, 41: 
-# test/builtins.p, 42: 	putln(exp(1));				{ 2.718282	}
-  141: push 1
-  142: exp
-  143: push 1
-  144: push 0
-  145: push 0
-  146: putln
-# test/builtins.p, 43: 	putln(exp(1.0));			{ 2.718282	}
-  147: push 1.000000
-  148: exp
-  149: push 1
-  150: push 0
-  151: push 0
-  152: putln
-# test/builtins.p, 44: 
-# test/builtins.p, 45: 	putln(ln(1));				{ 0.0		}
-  153: push 1
-  154: log
-  155: push 1
+  152: push 1
+  153: atan
+  154: push 1
+  155: push 0
   156: push 0
-  157: push 0
+  157: push 1
   158: putln
-# test/builtins.p, 46: 	putln(ln(1.0));				{ 0.0		}
+# test/builtins.p, 40: 	putln(arctan(1.0));			{ 0.785398	}
   159: push 1.000000
-  160: log
+  160: atan
   161: push 1
   162: push 0
   163: push 0
-  164: putln
-# test/builtins.p, 47: 
-# test/builtins.p, 48: 	putln(odd(10));				{ false		}
-  165: push 10
-  166: Odd
-  167: push 1
-  168: push 0
+  164: push 1
+  165: putln
+# test/builtins.p, 41: 
+# test/builtins.p, 42: 	putln(exp(1));				{ 2.718282	}
+  166: push 1
+  167: exp
+  168: push 1
   169: push 0
-  170: putln
-# test/builtins.p, 49: 	putln(odd(10+1));			{ true		}
-  171: push 10
-  172: push 1
-  173: add
-  174: Odd
+  170: push 0
+  171: push 1
+  172: putln
+# test/builtins.p, 43: 	putln(exp(1.0));			{ 2.718282	}
+  173: push 1.000000
+  174: exp
   175: push 1
   176: push 0
   177: push 0
-  178: putln
-# test/builtins.p, 50: 
-# test/builtins.p, 51: 	putln(sin(-3*pi/4));		{ -0.707107	}
-  179: push 3
-  180: push 3.141593
-  181: itor2
-  182: mul
-  183: push 4
-  184: itor
-  185: div
-  186: neg
-  187: sin
-  188: push 1
-  189: push 0
+  178: push 1
+  179: putln
+# test/builtins.p, 44: 
+# test/builtins.p, 45: 	putln(ln(1));				{ 0.0		}
+  180: push 1
+  181: log
+  182: push 1
+  183: push 0
+  184: push 0
+  185: push 1
+  186: putln
+# test/builtins.p, 46: 	putln(ln(1.0));				{ 0.0		}
+  187: push 1.000000
+  188: log
+  189: push 1
   190: push 0
-  191: putln
-# test/builtins.p, 52: 	putln(sqr(10));				{ 100		}
-  192: push 10
-  193: sqr
-  194: push 1
-  195: push 0
-  196: push 0
-  197: putln
-# test/builtins.p, 53: 	putln(sqrt(2));				{ 1.41421	}
-  198: push 2
-  199: sqrt
-  200: push 1
-  201: push 0
-  202: push 0
-  203: putln
-# test/builtins.p, 54: 
-# test/builtins.p, 55: 	put(100);
-  204: push 100
+  191: push 0
+  192: push 1
+  193: putln
+# test/builtins.p, 47: 
+# test/builtins.p, 48: 	putln(odd(10));				{ false		}
+  194: push 10
+  195: Odd
+  196: push 1
+  197: push 0
+  198: push 0
+  199: push 1
+  200: putln
+# test/builtins.p, 49: 	putln(odd(10+1));			{ true		}
+  201: push 10
+  202: push 1
+  203: add
+  204: Odd
   205: push 1
   206: push 0
   207: push 0
-  208: put
+  208: push 1
+  209: putln
+# test/builtins.p, 50: 
+# test/builtins.p, 51: 	putln(sin(-3*pi/4));		{ -0.707107	}
+  210: push 3
+  211: push 3.141593
+  212: itor2
+  213: mul
+  214: push 4
+  215: itor
+  216: div
+  217: neg
+  218: sin
+  219: push 1
+  220: push 0
+  221: push 0
+  222: push 1
+  223: putln
+# test/builtins.p, 52: 	putln(sqr(10));				{ 100		}
+  224: push 10
+  225: sqr
+  226: push 1
+  227: push 0
+  228: push 0
+  229: push 1
+  230: putln
+# test/builtins.p, 53: 	putln(sqrt(2));				{ 1.41421	}
+  231: push 2
+  232: sqrt
+  233: push 1
+  234: push 0
+  235: push 0
+  236: push 1
+  237: putln
+# test/builtins.p, 54: 
+# test/builtins.p, 55: 	put(100);
+  238: push 100
+  239: push 1
+  240: push 0
+  241: push 0
+  242: push 1
+  243: put
 # test/builtins.p, 56: 	put(1.41421);
-  209: push 1.414210
-  210: push 1
-  211: push 0
-  212: push 0
-  213: put
+  244: push 1.414210
+  245: push 1
+  246: push 0
+  247: push 0
+  248: push 1
+  249: put
 # test/builtins.p, 57: 	putln(pi);
-  214: push 3.141593
-  215: push 1
-  216: push 0
-  217: push 0
-  218: putln
+  250: push 3.141593
+  251: push 1
+  252: push 0
+  253: push 0
+  254: push 1
+  255: putln
 # test/builtins.p, 58: 
 # test/builtins.p, 59: 	putln(pi, 7, 5)
-  219: push 3.141593
-  220: push 1
-  221: push 7
-  222: push 5
+  256: push 3.141593
+  257: push 1
+  258: push 7
+  259: push 5
 # test/builtins.p, 60: endprog
-  223: putln
+  260: push 1
+  261: putln
 # test/builtins.p, 61: 
 # test/builtins.p, 62: 
-  224: ret 0
+  262: ret 0
 
 1
 2
