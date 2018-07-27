@@ -105,7 +105,7 @@ private:
 /********************************************************************************************//**
  * A vector of Datums
  ************************************************************************************************/
-typedef	std::vector<Datum>	DatumVector;
+typedef	std::vector <Datum>	DatumVector;
 
 std::ostream& operator<<(std::ostream& os, const Datum::Kind& kind);
 std::ostream& operator<<(std::ostream& os, const Datum& value);

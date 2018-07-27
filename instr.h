@@ -61,6 +61,8 @@ enum class OpCode : unsigned char {
 	GETLN,		///< GETLN - Read one line from standard input
 	PUT,		///< PUT - Write one or more values on standard output
 	PUTLN,		///< PUTLN - Write one or more values, followed by a newline, on standard output
+	PUTF,		///< PUTF - Write one or more values on a file stream
+	PUTFLN,		///< PUTFLN - Write one or more values, followed by a newline, on a file stream
 	NEW,		///< NEW   - Allocate dynamic store; n=pop(); allocate n dataums, push(addr) or zero if insufficient space
 	DISPOSE,	///< DISPOSE - Dispose of allocated dynamic store; free pop()
 

@@ -33,10 +33,9 @@
    21: push 0
    22: push 0
 # test/varparam.p, 12: endprog
-   23: push 1
-   24: putln
+   23: putln
 # test/varparam.p, 13: 
 # test/varparam.p, 14: 
-   25: ret 0
+   24: ret 0
 
 1

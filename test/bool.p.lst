@@ -27,9 +27,8 @@
    19: push 0
    20: push 0
 # test/bool.p, 8: endprog
-   21: push 1
-   22: putln
+   21: putln
 # test/bool.p, 9: 
-   23: ret 0
+   22: ret 0
 
 false

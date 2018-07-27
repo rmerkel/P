@@ -1329,8 +1329,6 @@ void PComp::put(int level) {
 
 		expect(Token::CloseParen);
 	}
-
-	emit(OpCode::PUSH, 0, 1);				// Standard output file descriptor
 }
 
 /********************************************************************************************//**
@@ -1402,7 +1400,7 @@ void PComp::statementProcs(int level) {
 	if (accept(Token::Get))					// get '(' expr-tuple { ',' expr-tuple } ')'
 		getStatement(level);
 
-	else if (accept(Token::Put))					// put '(' expr-tuple { ',' expr-tuple } ')'
+	else if (accept(Token::Put))			// put '(' expr-tuple { ',' expr-tuple } ')'
 		putStatement(level);
 
 	else if (accept(Token::Putln))			// putln [ '(' expr-tuple { ',' expr-tuple } ')' ]

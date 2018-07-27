@@ -8,34 +8,30 @@
     3: push 1
     4: push 0
     5: push 0
-    6: push 1
-    7: putln
+    6: putln
 # test/predsucc.p, 5: 	putln(pred(two));
-    8: push 2
-    9: pred 0
-   10: push 1
+    7: push 2
+    8: pred 0
+    9: push 1
+   10: push 0
    11: push 0
-   12: push 0
-   13: push 1
-   14: putln
+   12: putln
 # test/predsucc.p, 6: 	putln(two);
-   15: push 2
-   16: push 1
-   17: push 0
-   18: push 0
-   19: push 1
-   20: putln
+   13: push 2
+   14: push 1
+   15: push 0
+   16: push 0
+   17: putln
 # test/predsucc.p, 7: 	putln(succ(two));
-   21: push 2
-   22: succ 4
-   23: push 1
-   24: push 0
-   25: push 0
-   26: push 1
-   27: putln
+   18: push 2
+   19: succ 4
+   20: push 1
+   21: push 0
+   22: push 0
+   23: putln
 # test/predsucc.p, 8: endprog
 # test/predsucc.p, 9: 
-   28: ret 0
+   24: ret 0
 
 0
 1

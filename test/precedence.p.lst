@@ -13,25 +13,23 @@
     9: push 1
    10: push 0
    11: push 0
-   12: push 1
-   13: putln
+   12: putln
 # test/precedence.p, 4: 	putln(-1 + 2 * 3 - 4)		{	s/b 1	}
-   14: push 1
-   15: neg
-   16: push 2
-   17: push 3
-   18: mul
-   19: add
-   20: push 4
-   21: sub
-   22: push 1
+   13: push 1
+   14: neg
+   15: push 2
+   16: push 3
+   17: mul
+   18: add
+   19: push 4
+   20: sub
+   21: push 1
+   22: push 0
    23: push 0
-   24: push 0
 # test/precedence.p, 5: endprog
-   25: push 1
-   26: putln
+   24: putln
 # test/precedence.p, 6: 
-   27: ret 0
+   25: ret 0
 
 3
 1

@@ -13,7 +13,7 @@
     7: eval 1
     8: push 10
     9: gt
-   10: jneqi 40
+   10: jneqi 39
 # test/ifelif.p, 6: 		putln("i is greater than 10");
    11: push 'i'
    12: push ' '
@@ -38,69 +38,65 @@
    31: push 20
    32: push 0
    33: push 0
-   34: push 1
-   35: putln
+   34: putln
 # test/ifelif.p, 7: 		i := 1
-   36: pushvar 0, 4
-   37: push 1
+   35: pushvar 0, 4
+   36: push 1
 # test/ifelif.p, 8: 	elif i < 0 then
-   38: assign 1
-   39: jumpi 69
-   40: pushvar 0, 4
-   41: eval 1
-   42: push 0
-   43: lt
-   44: jneqi 69
+   37: assign 1
+   38: jumpi 67
+   39: pushvar 0, 4
+   40: eval 1
+   41: push 0
+   42: lt
+   43: jneqi 67
 # test/ifelif.p, 9: 		putln("i is less than 0");
-   45: push 'i'
-   46: push ' '
-   47: push 'i'
-   48: push 's'
-   49: push ' '
-   50: push 'l'
-   51: push 'e'
+   44: push 'i'
+   45: push ' '
+   46: push 'i'
+   47: push 's'
+   48: push ' '
+   49: push 'l'
+   50: push 'e'
+   51: push 's'
    52: push 's'
-   53: push 's'
-   54: push ' '
-   55: push 't'
-   56: push 'h'
-   57: push 'a'
-   58: push 'n'
-   59: push ' '
-   60: push '0'
-   61: push 16
+   53: push ' '
+   54: push 't'
+   55: push 'h'
+   56: push 'a'
+   57: push 'n'
+   58: push ' '
+   59: push '0'
+   60: push 16
+   61: push 0
    62: push 0
-   63: push 0
-   64: push 1
-   65: putln
+   63: putln
 # test/ifelif.p, 10: 		i := 2
-   66: pushvar 0, 4
-   67: push 2
+   64: pushvar 0, 4
+   65: push 2
 # test/ifelif.p, 11: 	endif;
-   68: assign 1
+   66: assign 1
 # test/ifelif.p, 12: 
 # test/ifelif.p, 13: 	put("i is ");
+   67: push 'i'
+   68: push ' '
    69: push 'i'
-   70: push ' '
-   71: push 'i'
-   72: push 's'
-   73: push ' '
-   74: push 5
-   75: push 0
-   76: push 0
-   77: push 1
-   78: put
+   70: push 's'
+   71: push ' '
+   72: push 5
+   73: push 0
+   74: push 0
+   75: put
 # test/ifelif.p, 14: 	putln(i)
-   79: pushvar 0, 4
-   80: eval 1
-   81: push 1
-   82: push 0
-   83: push 0
+   76: pushvar 0, 4
+   77: eval 1
+   78: push 1
+   79: push 0
+   80: push 0
 # test/ifelif.p, 15: endprog
-   84: push 1
-   85: putln
+   81: putln
 # test/ifelif.p, 16: 
 # test/ifelif.p, 17: 
-   86: ret 0
+   82: ret 0
 
 i is 10

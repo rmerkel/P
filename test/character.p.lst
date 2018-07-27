@@ -23,74 +23,69 @@
    10: push 1
    11: push 0
    12: push 0
-   13: push 1
-   14: putln
+   13: putln
 # test/character.p, 13: 	a1 := "abcdefghij";		{	fill a1 with "abcd..."			}
-   15: pushvar 0, 6
-   16: push 'a'
-   17: push 'b'
-   18: push 'c'
-   19: push 'd'
-   20: push 'e'
-   21: push 'f'
-   22: push 'g'
-   23: push 'h'
-   24: push 'i'
-   25: push 'j'
-   26: assign 10
+   14: pushvar 0, 6
+   15: push 'a'
+   16: push 'b'
+   17: push 'c'
+   18: push 'd'
+   19: push 'e'
+   20: push 'f'
+   21: push 'g'
+   22: push 'h'
+   23: push 'i'
+   24: push 'j'
+   25: assign 10
 # test/character.p, 14:  	putln(a1);
-   27: pushvar 0, 6
-   28: eval 10
-   29: push 10
+   26: pushvar 0, 6
+   27: eval 10
+   28: push 10
+   29: push 0
    30: push 0
-   31: push 0
-   32: push 1
-   33: putln
+   31: putln
 # test/character.p, 15: 	a2 := a1;				{	copies the contents of a1 to a2	}
-   34: pushvar 0, 16
-   35: pushvar 0, 6
-   36: eval 10
-   37: assign 10
+   32: pushvar 0, 16
+   33: pushvar 0, 6
+   34: eval 10
+   35: assign 10
 # test/character.p, 16: 	putln(a2);
-   38: pushvar 0, 16
-   39: eval 10
-   40: push 10
-   41: push 0
-   42: push 0
-   43: push 1
-   44: putln
+   36: pushvar 0, 16
+   37: eval 10
+   38: push 10
+   39: push 0
+   40: push 0
+   41: putln
 # test/character.p, 17: 	a1 := "0123456788";		{	fill a1 with "0123..."			}
-   45: pushvar 0, 6
-   46: push '0'
-   47: push '1'
-   48: push '2'
-   49: push '3'
-   50: push '4'
-   51: push '5'
-   52: push '6'
-   53: push '7'
-   54: push '8'
-   55: push '8'
-   56: assign 10
+   42: pushvar 0, 6
+   43: push '0'
+   44: push '1'
+   45: push '2'
+   46: push '3'
+   47: push '4'
+   48: push '5'
+   49: push '6'
+   50: push '7'
+   51: push '8'
+   52: push '8'
+   53: assign 10
 # test/character.p, 18: 	putln(a1);				{	while a1 has changed...			}
-   57: pushvar 0, 6
-   58: eval 10
-   59: push 10
-   60: push 0
-   61: push 0
-   62: push 1
-   63: putln
+   54: pushvar 0, 6
+   55: eval 10
+   56: push 10
+   57: push 0
+   58: push 0
+   59: putln
 # test/character.p, 19: 	putln(a2)				{	... a2 has not!					}
-   64: pushvar 0, 16
-   65: eval 10
-   66: push 10
-   67: push 0
-   68: push 0
+   60: pushvar 0, 16
+   61: eval 10
+   62: push 10
+   63: push 0
+   64: push 0
 # test/character.p, 20: endprog
-   69: push 1
-   70: putln
+   65: putln
 # test/character.p, 21: 
-   71: ret 0
+   66: ret 0
 
 x
 abcdefghij

@@ -16,7 +16,7 @@
     8: eval 1
     9: push 0
    10: gte
-   11: jneqi 26
+   11: jneqi 25
 # test/forrev.p, 8: 		putln(i)
    12: pushvar 0, 4
    13: eval 1
@@ -24,19 +24,18 @@
    15: push 0
    16: push 0
 # test/forrev.p, 9: 	endloop
-   17: push 1
-   18: putln
+   17: putln
 # test/forrev.p, 10: endprog
+   18: dup
    19: dup
-   20: dup
-   21: eval 1
-   22: push -1
-   23: add
-   24: assign 1
-   25: jumpi 7
-   26: pop 1
+   20: eval 1
+   21: push -1
+   22: add
+   23: assign 1
+   24: jumpi 7
+   25: pop 1
 # test/forrev.p, 11: 
-   27: ret 0
+   26: ret 0
 
 9
 8

@@ -20,262 +20,246 @@
    13: push 4
    14: push 0
    15: push 0
-   16: push 1
-   17: put
-   18: pushvar 0, 4
-   19: eval 1
-   20: push 1
+   16: put
+   17: pushvar 0, 4
+   18: eval 1
+   19: push 1
+   20: push 0
    21: push 0
-   22: push 0
-   23: push 1
-   24: putln
+   22: putln
 # test/bitwise.p, 7: 	put("y = "); putln(y);
-   25: push 'y'
+   23: push 'y'
+   24: push ' '
+   25: push '='
    26: push ' '
-   27: push '='
-   28: push ' '
-   29: push 4
-   30: push 0
-   31: push 0
-   32: push 1
-   33: put
-   34: pushvar 0, 5
-   35: eval 1
-   36: push 1
-   37: push 0
-   38: push 0
-   39: push 1
-   40: putln
+   27: push 4
+   28: push 0
+   29: push 0
+   30: put
+   31: pushvar 0, 5
+   32: eval 1
+   33: push 1
+   34: push 0
+   35: push 0
+   36: putln
 # test/bitwise.p, 8: 
 # test/bitwise.p, 9: 	z := x band y;
-   41: pushvar 0, 6
-   42: pushvar 0, 4
-   43: eval 1
-   44: pushvar 0, 5
-   45: eval 1
-   46: bitand
-   47: assign 1
+   37: pushvar 0, 6
+   38: pushvar 0, 4
+   39: eval 1
+   40: pushvar 0, 5
+   41: eval 1
+   42: bitand
+   43: assign 1
 # test/bitwise.p, 10: 	put("z := x band y = ");
-   48: push 'z'
-   49: push ' '
-   50: push ':'
-   51: push '='
-   52: push ' '
-   53: push 'x'
-   54: push ' '
-   55: push 'b'
-   56: push 'a'
-   57: push 'n'
-   58: push 'd'
+   44: push 'z'
+   45: push ' '
+   46: push ':'
+   47: push '='
+   48: push ' '
+   49: push 'x'
+   50: push ' '
+   51: push 'b'
+   52: push 'a'
+   53: push 'n'
+   54: push 'd'
+   55: push ' '
+   56: push 'y'
+   57: push ' '
+   58: push '='
    59: push ' '
-   60: push 'y'
-   61: push ' '
-   62: push '='
-   63: push ' '
-   64: push 16
-   65: push 0
-   66: push 0
-   67: push 1
-   68: put
+   60: push 16
+   61: push 0
+   62: push 0
+   63: put
 # test/bitwise.p, 11: 	putln(z);
-   69: pushvar 0, 6
-   70: eval 1
-   71: push 1
-   72: push 0
-   73: push 0
-   74: push 1
-   75: putln
+   64: pushvar 0, 6
+   65: eval 1
+   66: push 1
+   67: push 0
+   68: push 0
+   69: putln
 # test/bitwise.p, 12: 
 # test/bitwise.p, 13: 	z := 10 bor z;
-   76: pushvar 0, 6
-   77: push 10
-   78: pushvar 0, 6
-   79: eval 1
-   80: bitor
-   81: assign 1
+   70: pushvar 0, 6
+   71: push 10
+   72: pushvar 0, 6
+   73: eval 1
+   74: bitor
+   75: assign 1
 # test/bitwise.p, 14: 	put("z :+ 10 bor z = ");
-   82: push 'z'
+   76: push 'z'
+   77: push ' '
+   78: push ':'
+   79: push '+'
+   80: push ' '
+   81: push '1'
+   82: push '0'
    83: push ' '
-   84: push ':'
-   85: push '+'
-   86: push ' '
-   87: push '1'
-   88: push '0'
+   84: push 'b'
+   85: push 'o'
+   86: push 'r'
+   87: push ' '
+   88: push 'z'
    89: push ' '
-   90: push 'b'
-   91: push 'o'
-   92: push 'r'
-   93: push ' '
-   94: push 'z'
-   95: push ' '
-   96: push '='
-   97: push ' '
-   98: push 16
+   90: push '='
+   91: push ' '
+   92: push 16
+   93: push 0
+   94: push 0
+   95: put
+# test/bitwise.p, 15: 	putln(z);
+   96: pushvar 0, 6
+   97: eval 1
+   98: push 1
    99: push 0
   100: push 0
-  101: push 1
-  102: put
-# test/bitwise.p, 15: 	putln(z);
-  103: pushvar 0, 6
-  104: eval 1
-  105: push 1
-  106: push 0
-  107: push 0
-  108: push 1
-  109: putln
+  101: putln
 # test/bitwise.p, 16: 
 # test/bitwise.p, 17: 	z := x bxor y;
-  110: pushvar 0, 6
-  111: pushvar 0, 4
-  112: eval 1
-  113: pushvar 0, 5
-  114: eval 1
-  115: bitxor
-  116: assign 1
+  102: pushvar 0, 6
+  103: pushvar 0, 4
+  104: eval 1
+  105: pushvar 0, 5
+  106: eval 1
+  107: bitxor
+  108: assign 1
 # test/bitwise.p, 18: 	put("z := x bxor y = ");
-  117: push 'z'
-  118: push ' '
-  119: push ':'
-  120: push '='
-  121: push ' '
-  122: push 'x'
-  123: push ' '
-  124: push 'b'
-  125: push 'x'
-  126: push 'o'
-  127: push 'r'
-  128: push ' '
-  129: push 'y'
-  130: push ' '
-  131: push '='
-  132: push ' '
-  133: push 16
-  134: push 0
-  135: push 0
-  136: push 1
-  137: put
+  109: push 'z'
+  110: push ' '
+  111: push ':'
+  112: push '='
+  113: push ' '
+  114: push 'x'
+  115: push ' '
+  116: push 'b'
+  117: push 'x'
+  118: push 'o'
+  119: push 'r'
+  120: push ' '
+  121: push 'y'
+  122: push ' '
+  123: push '='
+  124: push ' '
+  125: push 16
+  126: push 0
+  127: push 0
+  128: put
 # test/bitwise.p, 19: 	putln(z);
-  138: pushvar 0, 6
-  139: eval 1
-  140: push 1
-  141: push 0
-  142: push 0
-  143: push 1
-  144: putln
+  129: pushvar 0, 6
+  130: eval 1
+  131: push 1
+  132: push 0
+  133: push 0
+  134: putln
 # test/bitwise.p, 20: 
 # test/bitwise.p, 21: 	z := bnot z;
-  145: pushvar 0, 6
-  146: pushvar 0, 6
-  147: eval 1
-  148: bitand
-  149: assign 1
+  135: pushvar 0, 6
+  136: pushvar 0, 6
+  137: eval 1
+  138: bitand
+  139: assign 1
 # test/bitwise.p, 22: 	put("bnot z = ");
-  150: push 'b'
-  151: push 'n'
-  152: push 'o'
-  153: push 't'
-  154: push ' '
-  155: push 'z'
-  156: push ' '
-  157: push '='
-  158: push ' '
-  159: push 9
-  160: push 0
-  161: push 0
-  162: push 1
-  163: put
+  140: push 'b'
+  141: push 'n'
+  142: push 'o'
+  143: push 't'
+  144: push ' '
+  145: push 'z'
+  146: push ' '
+  147: push '='
+  148: push ' '
+  149: push 9
+  150: push 0
+  151: push 0
+  152: put
 # test/bitwise.p, 23: 	putln(z);
-  164: pushvar 0, 6
-  165: eval 1
-  166: push 1
-  167: push 0
-  168: push 0
-  169: push 1
-  170: putln
+  153: pushvar 0, 6
+  154: eval 1
+  155: push 1
+  156: push 0
+  157: push 0
+  158: putln
 # test/bitwise.p, 24: 
 # test/bitwise.p, 25: 	z := x sleft y;
-  171: pushvar 0, 6
-  172: pushvar 0, 4
-  173: eval 1
-  174: pushvar 0, 5
-  175: eval 1
-  176: shiftl
-  177: assign 1
+  159: pushvar 0, 6
+  160: pushvar 0, 4
+  161: eval 1
+  162: pushvar 0, 5
+  163: eval 1
+  164: shiftl
+  165: assign 1
 # test/bitwise.p, 26: 	put("z := x sleft y = ");
-  178: push 'z'
-  179: push ' '
-  180: push ':'
+  166: push 'z'
+  167: push ' '
+  168: push ':'
+  169: push '='
+  170: push ' '
+  171: push 'x'
+  172: push ' '
+  173: push 's'
+  174: push 'l'
+  175: push 'e'
+  176: push 'f'
+  177: push 't'
+  178: push ' '
+  179: push 'y'
+  180: push ' '
   181: push '='
   182: push ' '
-  183: push 'x'
-  184: push ' '
-  185: push 's'
-  186: push 'l'
-  187: push 'e'
-  188: push 'f'
-  189: push 't'
-  190: push ' '
-  191: push 'y'
-  192: push ' '
-  193: push '='
-  194: push ' '
-  195: push 17
-  196: push 0
-  197: push 0
-  198: push 1
-  199: put
+  183: push 17
+  184: push 0
+  185: push 0
+  186: put
 # test/bitwise.p, 27: 	putln(z);
-  200: pushvar 0, 6
-  201: eval 1
-  202: push 1
-  203: push 0
-  204: push 0
-  205: push 1
-  206: putln
+  187: pushvar 0, 6
+  188: eval 1
+  189: push 1
+  190: push 0
+  191: push 0
+  192: putln
 # test/bitwise.p, 28: 
 # test/bitwise.p, 29: 	z := x sright y;
-  207: pushvar 0, 6
-  208: pushvar 0, 4
-  209: eval 1
-  210: pushvar 0, 5
-  211: eval 1
-  212: shiftr
-  213: assign 1
+  193: pushvar 0, 6
+  194: pushvar 0, 4
+  195: eval 1
+  196: pushvar 0, 5
+  197: eval 1
+  198: shiftr
+  199: assign 1
 # test/bitwise.p, 30: 	put("z := x sright y = ");
-  214: push 'z'
+  200: push 'z'
+  201: push ' '
+  202: push ':'
+  203: push '='
+  204: push ' '
+  205: push 'x'
+  206: push ' '
+  207: push 's'
+  208: push 'r'
+  209: push 'i'
+  210: push 'g'
+  211: push 'h'
+  212: push 't'
+  213: push ' '
+  214: push 'y'
   215: push ' '
-  216: push ':'
-  217: push '='
-  218: push ' '
-  219: push 'x'
-  220: push ' '
-  221: push 's'
-  222: push 'r'
-  223: push 'i'
-  224: push 'g'
-  225: push 'h'
-  226: push 't'
-  227: push ' '
-  228: push 'y'
-  229: push ' '
-  230: push '='
-  231: push ' '
-  232: push 18
-  233: push 0
-  234: push 0
-  235: push 1
-  236: put
+  216: push '='
+  217: push ' '
+  218: push 18
+  219: push 0
+  220: push 0
+  221: put
 # test/bitwise.p, 31: 	putln(z)
-  237: pushvar 0, 6
-  238: eval 1
-  239: push 1
-  240: push 0
-  241: push 0
+  222: pushvar 0, 6
+  223: eval 1
+  224: push 1
+  225: push 0
+  226: push 0
 # test/bitwise.p, 32: endprog
-  242: push 1
-  243: putln
+  227: putln
 # test/bitwise.p, 33: 
-  244: ret 0
+  228: ret 0
 
 x = 15
 y = 1

@@ -66,7 +66,7 @@ protected:
 	static InstrPtr instrTbl[];				///< Table of pointer to instructions, indexed by opcode
 
 	template <class T> Result get();		///< Read a value from standard input
-	Result put();							///< Process PUTx instructions
+	Result putf(int fd);					///< Process PUTx instructions
 
 	// The instructions...
 
@@ -90,6 +90,8 @@ protected:
 	Result GETLN();							///< Read line from standard input
 	Result PUT();							///< Write expression on standard output
 	Result PUTLN();							///< Write expression, followed by newline, on standard output
+	Result PUTF();							///< Write expression on a file stream
+	Result PUTFLN();						///< Write expression, followed by newline, on file stream
 	Result NEW();							///< Allocate space
 	Result DISPOSE();						///< Free space
 	Result ADD();							///< Addition

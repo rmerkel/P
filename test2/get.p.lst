@@ -25,183 +25,169 @@
    15: push 12
    16: push 0
    17: push 0
-   18: push 1
-   19: putln
+   18: putln
 # test2/get.p, 10: 	get(ai);
-   20: pushvar 0, 6
-   21: push 5
-   22: get 2
+   19: pushvar 0, 6
+   20: push 5
+   21: get 2
 # test2/get.p, 11: 	putln(ai);
-   23: pushvar 0, 6
-   24: eval 5
-   25: push 5
+   22: pushvar 0, 6
+   23: eval 5
+   24: push 5
+   25: push 0
    26: push 0
-   27: push 0
-   28: push 1
-   29: putln
+   27: putln
 # test2/get.p, 12: 
 # test2/get.p, 13: 	putln("5 reals: ");
-   30: push '5'
-   31: push ' '
-   32: push 'r'
-   33: push 'e'
-   34: push 'a'
-   35: push 'l'
-   36: push 's'
-   37: push ':'
-   38: push ' '
-   39: push 9
-   40: push 0
-   41: push 0
-   42: push 1
-   43: putln
+   28: push '5'
+   29: push ' '
+   30: push 'r'
+   31: push 'e'
+   32: push 'a'
+   33: push 'l'
+   34: push 's'
+   35: push ':'
+   36: push ' '
+   37: push 9
+   38: push 0
+   39: push 0
+   40: putln
 # test2/get.p, 14: 	get(ar);
-   44: pushvar 0, 13
-   45: push 5
-   46: get 3
+   41: pushvar 0, 13
+   42: push 5
+   43: get 3
 # test2/get.p, 15: 	putln(ar, 0, 7);
-   47: pushvar 0, 13
-   48: eval 5
-   49: push 5
-   50: push 0
-   51: push 7
-   52: push 1
-   53: putln
+   44: pushvar 0, 13
+   45: eval 5
+   46: push 5
+   47: push 0
+   48: push 7
+   49: putln
 # test2/get.p, 16: 
 # test2/get.p, 17: 	putln("2 booleans: ");
-   54: push '2'
-   55: push ' '
-   56: push 'b'
-   57: push 'o'
-   58: push 'o'
-   59: push 'l'
-   60: push 'e'
-   61: push 'a'
-   62: push 'n'
-   63: push 's'
-   64: push ':'
-   65: push ' '
-   66: push 12
-   67: push 0
-   68: push 0
-   69: push 1
-   70: putln
+   50: push '2'
+   51: push ' '
+   52: push 'b'
+   53: push 'o'
+   54: push 'o'
+   55: push 'l'
+   56: push 'e'
+   57: push 'a'
+   58: push 'n'
+   59: push 's'
+   60: push ':'
+   61: push ' '
+   62: push 12
+   63: push 0
+   64: push 0
+   65: putln
 # test2/get.p, 18: 	get(ab);
-   71: pushvar 0, 11
-   72: push 2
-   73: get 0
+   66: pushvar 0, 11
+   67: push 2
+   68: get 0
 # test2/get.p, 19: 	putln(ab);
-   74: pushvar 0, 11
-   75: eval 2
-   76: push 2
-   77: push 0
-   78: push 0
-   79: push 1
-   80: putln
+   69: pushvar 0, 11
+   70: eval 2
+   71: push 2
+   72: push 0
+   73: push 0
+   74: putln
 # test2/get.p, 20: 
 # test2/get.p, 21: 	putln("10 characters: ");
-   81: push '1'
-   82: push '0'
-   83: push ' '
-   84: push 'c'
-   85: push 'h'
-   86: push 'a'
-   87: push 'r'
-   88: push 'a'
-   89: push 'c'
-   90: push 't'
-   91: push 'e'
-   92: push 'r'
-   93: push 's'
-   94: push ':'
-   95: push ' '
-   96: push 15
-   97: push 0
-   98: push 0
-   99: push 1
-  100: putln
+   75: push '1'
+   76: push '0'
+   77: push ' '
+   78: push 'c'
+   79: push 'h'
+   80: push 'a'
+   81: push 'r'
+   82: push 'a'
+   83: push 'c'
+   84: push 't'
+   85: push 'e'
+   86: push 'r'
+   87: push 's'
+   88: push ':'
+   89: push ' '
+   90: push 15
+   91: push 0
+   92: push 0
+   93: putln
 # test2/get.p, 22: 	get(s);
-  101: pushvar 0, 18
-  102: push 10
-  103: get 1
+   94: pushvar 0, 18
+   95: push 10
+   96: get 1
 # test2/get.p, 23: 	put('"');
-  104: push '"'
-  105: push 1
-  106: push 0
-  107: push 0
-  108: push 1
-  109: put
+   97: push '"'
+   98: push 1
+   99: push 0
+  100: push 0
+  101: put
 # test2/get.p, 24: 	put(s);
-  110: pushvar 0, 18
-  111: eval 10
-  112: push 10
-  113: push 0
-  114: push 0
-  115: push 1
-  116: put
+  102: pushvar 0, 18
+  103: eval 10
+  104: push 10
+  105: push 0
+  106: push 0
+  107: put
 # test2/get.p, 25: 	putln('"');
-  117: push '"'
-  118: push 1
-  119: push 0
-  120: push 0
-  121: push 1
-  122: putln
+  108: push '"'
+  109: push 1
+  110: push 0
+  111: push 0
+  112: putln
 # test2/get.p, 26: 
 # test2/get.p, 27: 	putln("integer: ");
-  123: push 'i'
-  124: push 'n'
-  125: push 't'
-  126: push 'e'
-  127: push 'g'
-  128: push 'e'
-  129: push 'r'
-  130: push ':'
-  131: push ' '
-  132: push 9
-  133: push 0
-  134: push 0
-  135: push 1
-  136: putln
+  113: push 'i'
+  114: push 'n'
+  115: push 't'
+  116: push 'e'
+  117: push 'g'
+  118: push 'e'
+  119: push 'r'
+  120: push ':'
+  121: push ' '
+  122: push 9
+  123: push 0
+  124: push 0
+  125: putln
 # test2/get.p, 28: 	get(i);
-  137: pushvar 0, 4
-  138: push 1
-  139: get 2
+  126: pushvar 0, 4
+  127: push 1
+  128: get 2
 # test2/get.p, 29: 	putln(i);
-  140: pushvar 0, 4
-  141: eval 1
-  142: push 1
-  143: push 0
-  144: push 0
-  145: push 1
-  146: putln
+  129: pushvar 0, 4
+  130: eval 1
+  131: push 1
+  132: push 0
+  133: push 0
+  134: putln
 # test2/get.p, 30: 
 # test2/get.p, 31: 	putln("real: ");
-  147: push 'r'
-  148: push 'e'
-  149: push 'a'
-  150: push 'l'
-  151: push ':'
-  152: push ' '
-  153: push 6
-  154: push 0
-  155: push 0
-  156: push 1
-  157: putln
+  135: push 'r'
+  136: push 'e'
+  137: push 'a'
+  138: push 'l'
+  139: push ':'
+  140: push ' '
+  141: push 6
+  142: push 0
+  143: push 0
+  144: putln
 # test2/get.p, 32: 	get(r);
-  158: pushvar 0, 5
-  159: push 1
-  160: get 3
+  145: pushvar 0, 5
+  146: push 1
+  147: get 3
 # test2/get.p, 33: 	putln(r, 0, 7)
-  161: pushvar 0, 5
-  162: eval 1
-  163: push 1
-  164: push 0
-  165: push 7
+  148: pushvar 0, 5
+  149: eval 1
+  150: push 1
+  151: push 0
+  152: push 7
 # test2/get.p, 34: endprog
-  166: push 1
-  167: putln
+  153: putln
 # test2/get.p, 35: 
-  168: ret 0
+  154: ret 0
 
 5 integers: 
 [1,2,3,4,5]

@@ -18,18 +18,16 @@
    11: push 1
    12: push 0
    13: push 0
-   14: push 1
-   15: put
+   14: put
 # test/simple.p, 7: 	putln(y)
-   16: pushvar 0, 5
-   17: eval 1
-   18: push 1
+   15: pushvar 0, 5
+   16: eval 1
+   17: push 1
+   18: push 0
    19: push 0
-   20: push 0
 # test/simple.p, 8: endprog
-   21: push 1
-   22: putln
+   20: putln
 # test/simple.p, 9: 
-   23: ret 0
+   21: ret 0
 
 01

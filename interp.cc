@@ -171,6 +171,8 @@ PInterp::InstrPtr PInterp::instrTbl[] = {
 	&PInterp::GETLN,
 	&PInterp::PUT,
 	&PInterp::PUTLN,
+	&PInterp::PUTF,
+	&PInterp::PUTFLN,
 	&PInterp::NEW,
 	&PInterp::DISPOSE,
 	&PInterp::ADD,
@@ -517,8 +519,16 @@ Result PInterp::GET() {
 }
 
 /********************************************************************************************//**
- * Write one expression on a stream.
+ * Write one expression on a stream
  * 
+ * Stack layout:
+ *    TOS   - p
+ *    TOS-1 - w
+ *    TOS-2 - n
+ *    TOS-3 - v[0]
+ *    ...
+ *    TOS-3-n - v[n]
+ *
  * The expression is described by a 4-tuple (p,w,n,v):
  * - p - the percision of the value(s). Ignored if v isn't a Real.
  * - w - the width of the field to write the value(s) in.
@@ -526,34 +536,19 @@ Result PInterp::GET() {
  * - n - the number of Datum's in the value. If greater than 1, v is treated as an array, where
  *   an array of characters is treated as a string.
  * 
- * Each stream is described by a file descriptor, a small integer. By default 0 is standard input, * 1 is standard output and 2 is standard error.
+ * Each stream is described by a file descriptor, a small integer. By default 0 is standard
+ * input, 1 is standard output and 2 is standard error.
  * 
- * Stack layout:
- * TOS  - stream (file descriptor)
- * TOS-1 - p
- * TOS-2 - w
- * TOS-3 - n
- * TOS-4 - v[0]
- * ...
- * TOS-4-n - v[n]
+ * @param	fd	The file descriptor to write the expression onto. 
  *
  * @return	Result::stackUnderflow if there was insufficient space on the stack,
  * 			Result::badDataType if any of the parameters aren't integers.
  ************************************************************************************************/
-Result PInterp::put() {
+Result PInterp::putf(int fd) {
 	if (sp < 3)
 		return Result::stackUnderflow;
 
 	Result r = Result::success;
-
-	int fd = 1;								// default value of pred
-	const Datum fileDesc = pop();
-	if (fileDesc.kind() == Datum::Integer)
-		fd = fileDesc.integer();
-	else {
-		cerr << "PUTx stream file descriptor is not an integer!" << endl;
-		r = Result::badDataType;
-	}
 
 	if (fd != 1) {							// Temp - make sure stream is standard output
 		cerr << "PUTx stream is not standard output!" << endl;
@@ -639,7 +634,7 @@ Result PInterp::GETLN() {
  * @return	put();
  ************************************************************************************************/
 Result PInterp::PUT() {
-	return put();
+	return putf(1);
 }
 
 /********************************************************************************************//**
@@ -648,9 +643,66 @@ Result PInterp::PUT() {
  * @return	put();
  ************************************************************************************************/
 Result PInterp::PUTLN() {
-	const Result r = put();
+	const Result r = putf(1);
 	cout << '\n';
 	return r;
+}
+
+/********************************************************************************************//**
+ * @return	putf();
+ ************************************************************************************************/
+Result PInterp::PUTF() {
+	if (sp < 4)
+		return Result::stackUnderflow;
+
+	Result r = Result::success;
+
+	int fd = 1;								// default value of file descriptor (standard output)
+	const Datum fileDesc = pop();
+	if (fileDesc.kind() == Datum::Integer)
+		fd = fileDesc.integer();
+
+	else {
+		cerr << "PUTFx stream file descriptor is not an integer!" << endl;
+		r = Result::badDataType;
+	}
+
+	if (fd != 1) {							// Temp - make sure stream is standard output
+		cerr << "PUTFx stream is not standard output!" << endl;
+		r = Result::badDataType;
+	}
+
+	const Result r2 = putf(fd);
+	return r2 != Result::success ? r2 : r;
+}
+
+/********************************************************************************************//**
+ * @return	putf();
+ ************************************************************************************************/
+Result PInterp::PUTFLN() {
+	if (sp < 4)
+		return Result::stackUnderflow;
+
+	Result r = Result::success;
+
+	int fd = 1;								// default value of file descriptor (standard output)
+	const Datum fileDesc = pop();
+	if (fileDesc.kind() == Datum::Integer)
+		fd = fileDesc.integer();
+
+	else {
+		cerr << "PUTFx stream file descriptor is not an integer!" << endl;
+		r = Result::badDataType;
+	}
+
+	if (fd != 1) {							// Temp - make sure stream is standard output
+		cerr << "PUTFx stream is not standard output!" << endl;
+		r = Result::badDataType;
+	}
+
+	const Result r2 = putf(fd);
+	cout << '\n';
+	return r2 != Result::success ? r2 : r;
 }
 
 /********************************************************************************************//**
