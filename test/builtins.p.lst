@@ -56,61 +56,61 @@
    38: push 0
    39: push 0
    40: putln
-# test/builtins.p, 18: 	putln(character_min);		{ 0					}
+# test/builtins.p, 18: 	putln(character`min);		{ 0					}
    41: push 0
    42: push 1
    43: push 0
    44: push 0
    45: putln
-# test/builtins.p, 19:  	putln(character_max);		{ 127				}
+# test/builtins.p, 19:  	putln(character`max);		{ 127				}
    46: push 127
    47: push 1
    48: push 0
    49: push 0
    50: putln
-# test/builtins.p, 20: 	putln(integer_min);			{ -2,147,483,648	}
+# test/builtins.p, 20: 	putln(integer`min);			{ -2,147,483,648	}
    51: push -2147483648
    52: push 1
    53: push 0
    54: push 0
    55: putln
-# test/builtins.p, 21: 	putln(integer_max);			{ 2,147,483,647		}
+# test/builtins.p, 21: 	putln(integer`max);			{ 2,147,483,647		}
    56: push 2147483647
    57: push 1
    58: push 0
    59: push 0
    60: putln
-# test/builtins.p, 22: 	putln(natural_min);			{ 0					}
+# test/builtins.p, 22: 	putln(natural`min);			{ 0					}
    61: push 0
    62: push 1
    63: push 0
    64: push 0
    65: putln
-# test/builtins.p, 23: 	putln(natural_max);			{ 2,147,483,647		}
+# test/builtins.p, 23: 	putln(natural`max);			{ 2,147,483,647		}
    66: push 2147483647
    67: push 1
    68: push 0
    69: push 0
    70: putln
-# test/builtins.p, 24: 	putln(positive_min);		{ 1					}
+# test/builtins.p, 24: 	putln(positive`min);		{ 1					}
    71: push 1
    72: push 1
    73: push 0
    74: push 0
    75: putln
-# test/builtins.p, 25: 	putln(positive_max);		{ 2,147,483,647		}
+# test/builtins.p, 25: 	putln(positive`max);		{ 2,147,483,647		}
    76: push 2147483647
    77: push 1
    78: push 0
    79: push 0
    80: putln
-# test/builtins.p, 26: 	putln(real_min);			{ 2.225074e-308		}
+# test/builtins.p, 26: 	putln(real`min);			{ 2.225074e-308		}
    81: push 0.000000
    82: push 1
    83: push 0
    84: push 0
    85: putln
-# test/builtins.p, 27: 	putln(real_max);			{ 1.797693e+308		}
+# test/builtins.p, 27: 	putln(real`max);			{ 1.797693e+308		}
    86: push 179769313486231570814527423731704356798070567525844996598917476803157260780028538760589558632766878171540458953514382464234321326889464182768467546703537516986049910576551282076245490090389328944075868508455133942304583236903222948165808559332123348274797826204144723168738177180919299881250404026184124858368.000000
    87: push 1
    88: push 0

@@ -12,8 +12,8 @@ begin
 	putln(i);
 	putln();
 
-	putln("natual_min, 9, i := succ(i)");
-	i := natural_min;
+	putln("natural`min, 9, i := succ(i)");
+	i := natural`min;
 	while (i < 9) loop
 		putln(i);
 		i := succ(i)
@@ -21,9 +21,9 @@ begin
 	putln(i);
 	putln();
 
-	putln("R_min, R_max, i := succ(i)");
-	i := R_min;
-	while (i < R_max) loop
+	putln("R`min, R`max, i := succ(i)");
+	i := R`min;
+	while (i < R`max) loop
 		putln(i);
 		i := succ(i)
 	endloop;

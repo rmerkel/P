@@ -51,6 +51,10 @@ private:
 						SymbolTableIter		it,
 						TDescPtr			type);
 
+	/// Attribute production...
+	TDescPtr attribute(	SymbolTableIter	it,
+						TDescPtr			type);
+
 	/// Record selection production...
 	TDescPtr varSelector(SymbolTableIter	it,
 						TDescPtr			type);

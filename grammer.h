@@ -33,17 +33,13 @@
  *      param-decl-lst = param-decl { ';' param-decl } ;
  *          param-decl = [ "var" ] identifier-lst : type ;
  *      identifier-lst = identifier { ',' identifier } ;
- *            variable = identifier [ composite-desc { composite-desc } ] ;
- *      composite-desc = '[' expression-lst ']'                                             |
- *                       '.' identifier                                                     |
- *                       '^' identifier ;
  *       statement-lst = statement {';' statement }  ;
  *        if-statement = "if" expression "then" statement-lst
  *                          { "elif" expresson "then" statement-lst }
  *                          [ "else" statement-lst ]
  *                          "endif" ;
  *     while-statement = "while" expression "loop" statement-lst "endloop" ;
- *       for-statement = "for" identifer "in" [ "reverse" ] ordinal-type
+ *       for-statement = "for" identifier "in" [ "reverse" ] ordinal-type
  *                          "loop" statement "endloop" ;
  *    return-statement = "return" [ expression ] ;
  *           statement = [  variable ':=' expression                                        |
@@ -60,14 +56,21 @@
  *      simple-expr-op = '+' | '-' | "bor" | "bxor" | "sleft" | "sright" | "or' ;
  *            terminal = factor { term_op  factor } ;
  *             term_op = '*' | '/' | "rem" | "band" | | "and" ;
- *              factor = variable | character | string                                      |
+ *              factor = variable | attribute | character | string                          |
  *                       identifier '(' [ expression-lst ] ')'                              |
  *                       "round" '(' expression ')'                                         |
  *                       number                                                             |
  *                       '(' expression ')' ;
- *           character = nul | sox | .. | '}' | '`' | del
- *              string = '"' { character } '"'
- *              number = whole number | floting point value
+ *            variable = identifier [ composite-desc { composite-desc } ] ;
+ *      composite-desc = '[' expression-lst ']'                                             |
+ *                       '.' identifier                                                     |
+ *                       '^' identifier
+ *                       '`' identifier ???? ;
+ *           attribute = identifier '`' identifier ;
+ *           character = nul | sox | .. | '}' | '`' | del ;
+ *              string = '"' { character } '"' ;
+ *              number = whole-number | floting-point-number ;
+ *          identifier = [ '_' ] { alpha-numeric-character } ;
  *
  * Key:
  *

@@ -179,6 +179,12 @@ TDescPtr PComp::identFactor(int level, const string& id, bool var) {
 
 	if (it != symtbl.end()) {
 		switch (it->second.kind()) {
+		case SymValue::Type:
+			if (var) error("can't pass attribute value by reference");
+			expect(Token::Tick);
+			type = attribute(it, it->second.type());
+			break;
+
 		case SymValue::Constant:
 			type = it->second.type();
 			emit(OpCode::PUSH, 0, it->second.value());
@@ -188,10 +194,10 @@ TDescPtr PComp::identFactor(int level, const string& id, bool var) {
 
 		case SymValue::Variable:
 			type = variable(level, it);
-			assert(type.get() != 0);
-			assert(type->base().get() != 0);
+			assert(type != nullptr);
+			assert(type->base() != nullptr);
 			type = type->base();
-			assert(type.get() != 0);
+			assert(type != nullptr);
 			if (!var)
 				emit(OpCode::EVAL, 0, type->size());
 			if (type->ref())
@@ -394,8 +400,7 @@ TDescPtr PComp::factor(int level, bool var) {
 		cout << prefix(progName) << "factor (" << level << ", " << boolalpha << var << ")\n";
 
 	auto type = TypeDesc::newIntDesc();			// Factor data type
-	if (accept(Token::Identifier, false)) {
-		// Copy, and then consume the identifer...
+	if (accept(Token::Identifier, false)) {		// Copy, and then consume the identifer...
     	const string id = ts.current().string_value;
     	next();
 		type = identFactor(level, id, var);
@@ -834,6 +839,66 @@ TDescPtr PComp::varSelector(SymbolTableIter it, TDescPtr type) {
 }
 
 /********************************************************************************************//**
+ * Handle a attribute reference, emitting the result. The '`' has already been consumed
+ *
+ * @param	it		Variable's entry into the symbol table
+ * @param 	type	The owning record type
+ * @return	The identifier type
+ ************************************************************************************************/
+TDescPtr PComp::attribute(SymbolTableIter it, TDescPtr type) {
+	// Copy, and then consume, the attribute identifier...
+	const string attrib = ts.current().string_value;
+	if (expect(Token::Identifier)) {
+		if (attrib == "min") {
+			if (type->tclass() == TypeDesc::Pointer) {
+				error("min attribute not defined for pointers", it->first);
+				emit(OpCode::PUSH, 0, 0);
+			} else if (type->tclass() == TypeDesc::Record) {
+				error("min attribute not defined for records", it->first);
+				emit(OpCode::PUSH, 0, 0);
+			} else if (type->tclass() == TypeDesc::Real)
+				emit(OpCode::PUSH, 0, numeric_limits<double>::min());
+			else if (type->tclass() == TypeDesc::Array) {
+				emit(OpCode::PUSH, 0, type->range().min());
+				type = type->itype();		// Return arrays index type
+			} else
+				emit(OpCode::PUSH, 0, type->range().min());
+
+		} else if (attrib == "max") {
+			if (type->tclass() == TypeDesc::Pointer) {
+				error("max attribute not defined for pointers", it->first);
+				emit(OpCode::PUSH, 0, 0);
+			} else if (type->tclass() == TypeDesc::Record) {
+				error("max attribute not defined for records", it->first);
+				emit(OpCode::PUSH, 0, 0);
+			} else if (type->tclass() == TypeDesc::Real)
+				emit(OpCode::PUSH, 0, numeric_limits<double>::max());
+			else if (type->tclass() == TypeDesc::Array) {
+				emit(OpCode::PUSH, 0, type->range().max());
+				type = type->itype();		// Return arrays index type
+			} else
+				emit(OpCode::PUSH, 0, type->range().max());
+
+		} else if (attrib == "prev") {
+			if (type->ordinal())
+				error("prev requires an ordinal value, got", it->first);
+			emit(OpCode::SUCC, 0, type->range().min());
+
+		} else if (attrib == "next") {
+			if (type->ordinal())
+				error("prev requires an ordinal value, got", it->first);
+			emit(OpCode::PRED, 0, type->range().min());
+
+		} else 
+			error("unknown attribute", attrib);
+
+	} else
+		emit(OpCode::PUSH, 0, 0);
+
+	return type;
+}
+
+/********************************************************************************************//**
  * variable		  = identifier [ composite-desc { composite-desc } ] ;
  * composite-desc = '[' expression-lst ']' | '.' identifier ;
  *
@@ -857,10 +922,17 @@ TDescPtr PComp::variable(int level, SymbolTableIter it) {
 		} else if (accept(Token::Period)) {	// handle record selector...
 			type = TypeDesc::newPointerDesc(varSelector(it, type->base()));
 
-		} else if (accept(Token::Caret)) {	// Dereference pointer
+#if 0
+		} else if (accept(Token::Tick)) {	// Handle attribute
+			assert(type->base() != nullptr); // Use the pointed to type
+			emit(OpCode::POP, 0, type->base()->size());	
+			attribute(it, type->base());	// But return the pointed to type...
+#endif
+
+		} else if (accept(Token::Caret)) {	// 'Dereference' pointer (use pointed to type)
 			emit(OpCode::EVAL, 0, type->base()->size());	
-			assert(type->base().get() != 0);
-			type = type->base();			// Use the pointed to type
+			assert(type->base() != nullptr);
+			type = type->base();
 
 		} else
 			break;							// no more composite-desc(s)
@@ -1087,14 +1159,14 @@ bool PComp::forStatement(int level, SymbolTableEntry& context) {
 			inc = -1;						// "for" identifier "in" "reverse"
 
 		auto range = type(level, false);
-		if (range.get() == 0) {
+		if (range == nullptr) {
 			error("expected ordinal type");
 			return true;					// give up...
 
 		} else if (range->tclass() == TypeDesc::Array)
 			range = range->itype();			// use the arrays index type...
 
-		if (range.get() == 0 || !range->ordinal()) {
+		if (range == nullptr || !range->ordinal()) {
 			error("expected ordinal type");
 			return true;					// give up...
 		}
@@ -1212,7 +1284,7 @@ void PComp::getStatement(int level) {
 		case TypeDesc::Integer:		emit(OpCode::GET, 0, Datum::Integer);			break;
 		case TypeDesc::Real:		emit(OpCode::GET, 0, Datum::Real);				break;
 		default:
-			error("unsupported get parameter");
+			error("unsupported nullptr parameter");
 		}
 	}
 }
@@ -1428,16 +1500,6 @@ void PComp::typeDecl(int level, bool var) {
 		cout << prefix(progName) << "type " << ident << " = " << tdesc->tclass() << '\n';
 
 	symtbl.insert(	{ ident, SymValue::makeType(level, tdesc)	} );
-	symtbl.insert(	{ ident + "_min",
-					  SymValue::makeConst(
-						  level,
-						  Datum(tdesc->range().min()),
-						  tdesc)								} );
-	symtbl.insert(	{ ident + "_max",
-					  SymValue::makeConst(
-						  level,
-						  Datum(tdesc->range().max()),
-						  tdesc)								} );
 }
 
 /********************************************************************************************//**
@@ -1637,7 +1699,7 @@ TDescPtr PComp::type(int level, bool var, const string& idprefix) {
 	} else if (accept(Token::Caret)) 			// Pointer type
 		tdesc = TypeDesc::newPointerDesc(type(level, var, idprefix), var);
 
-	else if ((tdesc = structuredType(level, idprefix, var)) != 0)
+	else if ((tdesc = structuredType(level, idprefix, var)) != nullptr)
 		;
 
 	else 
@@ -2122,53 +2184,6 @@ PComp::PComp() : Compilier () {
 
 	symtbl.insert({"true",   		SymValue::makeConst(0, Datum(true), boolean)	} );
 	symtbl.insert({"false",  		SymValue::makeConst(0, Datum(false), boolean)	} );
-	symtbl.insert({"boolean_min",   SymValue::makeConst(0, Datum(false), boolean)	} );
-	symtbl.insert({"boolean_max",  	SymValue::makeConst(0, Datum(true), boolean)	} );
-	symtbl.insert({"integer_min",	SymValue::makeConst(
-										0,
-										Datum(TypeDesc::maxRange.min()),
-										integer)									} );
-	symtbl.insert({"integer_max",	SymValue::makeConst(
-										0,
-										Datum(TypeDesc::maxRange.max()),
-										integer)									} );
-
-	symtbl.insert({"real_min",		SymValue::makeConst(
-										0,
-										Datum(numeric_limits<double>::min()),
-										real)										} );
-	symtbl.insert({"real_max",		SymValue::makeConst(
-										0,
-										Datum(numeric_limits<double>::max()),
-										real)										} );
-
-	symtbl.insert({"character_min",	SymValue::makeConst(
-										0,
-										Datum(0),
-										character)									} );
-	symtbl.insert({"character_max",	SymValue::makeConst(
-										0,
-										Datum(character->range().max()),
-										character)									} );
-
-	symtbl.insert({"natural_min",	SymValue::makeConst(
-										0,
-										Datum(0),
-										natural)									} );
-	symtbl.insert({"natural_max",	SymValue::makeConst(
-										0,
-										Datum(natural->range().max()),
-										natural)									} );
-
-	symtbl.insert({"positive_min",	SymValue::makeConst(
-										0,
-										Datum(positive->range().min()),
-										positive)									} );
-	symtbl.insert({"positive_max",	SymValue::makeConst(
-										0,
-										Datum(positive->range().max()),
-										positive)									} );
-
 	symtbl.insert({"nil",    		SymValue::makeConst(
 										0,
 										Datum(0),

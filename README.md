@@ -50,6 +50,12 @@ necessary.
 * No input instructions, and just elementary Write/Writeln implementation.
 * No interactive mode for debugging; just automatic single stepping (-v)
 
+## Built-ins
+### Functions
+TBD
+### Procedures
+TBD
+
 ## Design notes and goals
  * Single quotes for character literals, double for strings.
  * There is just one basic integer type, the signed Integer. 
@@ -69,10 +75,11 @@ necessary.
    variable is used. Alternatively, variables could have default values.
  * Allow pointers to point to any variable, thus pass by reference would be 
    similar to C, e.g, pass a pointer.
- * Add object attributes, similar to ADA.
+ * In place of object attributes (ADA), add more built-ins, e.g., min(integer)
+   and not integer'min.
+ * Add object attributes, similar to ADA... but 
  * Bit operators in place of Pascal sets; bit_and, bit_or, ..., shift_left,
    shift_right.
- * Automatically generate *type*_min, max, in place of attributes.
  * Return statement is similar to pascals to func := expr, followed by return 
    instruction. 
    * For functions, this would replace the default RETF instruction generated at
@@ -82,7 +89,13 @@ necessary.
    * Likewise, one can return early from a procedure, resulting in two RET 
      statements, e.g, "procedure foo() begin ... return endproc." However, that
      won't result in an erroneous program.
-
+ * **Type attributes**, such as integer`max, are simular to constant expressions, 
+   a factor in grammer. However, **variable attributes**, such as i'min are more
+   troublesome as variable productions always emit a l-value followed by an 
+   evaluation instruction, which would require storing the attribute Datum 
+   somewhere. One possibility is to add "typeof(expr)," which yeilds the type of
+   expr without emitting any code to evaluate the expr.
+ 
 ## Configuration
 * Configure cc/c++ as clang:
 ```

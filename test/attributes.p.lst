@@ -1,0 +1,181 @@
+# test/attributes.p, 1: program AttrTest() is
+# test/attributes.p, 2: type
+    0: calli 0, 2
+    1: halt
+# test/attributes.p, 3: 	R is 0..9;
+# test/attributes.p, 4: 	A is array [ R ] of character;
+# test/attributes.p, 5: 	E is ( X, Y, Z );
+# test/attributes.p, 6: begin
+# test/attributes.p, 7: 	put("integer`min: ");
+    2: push 'i'
+    3: push 'n'
+    4: push 't'
+    5: push 'e'
+    6: push 'g'
+    7: push 'e'
+    8: push 'r'
+    9: push '`'
+   10: push 'm'
+   11: push 'i'
+   12: push 'n'
+   13: push ':'
+   14: push ' '
+   15: push 13
+   16: push 0
+   17: push 0
+   18: put
+# test/attributes.p, 8: 	putln(integer`min);
+   19: push -2147483648
+   20: push 1
+   21: push 0
+   22: push 0
+   23: putln
+# test/attributes.p, 9: 	put("integer`max: ");
+   24: push 'i'
+   25: push 'n'
+   26: push 't'
+   27: push 'e'
+   28: push 'g'
+   29: push 'e'
+   30: push 'r'
+   31: push '`'
+   32: push 'm'
+   33: push 'a'
+   34: push 'x'
+   35: push ':'
+   36: push ' '
+   37: push 13
+   38: push 0
+   39: push 0
+   40: put
+# test/attributes.p, 10: 	putln(integer`max);
+   41: push 2147483647
+   42: push 1
+   43: push 0
+   44: push 0
+   45: putln
+# test/attributes.p, 11: 
+# test/attributes.p, 12: 	put("R`min: ");
+   46: push 'R'
+   47: push '`'
+   48: push 'm'
+   49: push 'i'
+   50: push 'n'
+   51: push ':'
+   52: push ' '
+   53: push 7
+   54: push 0
+   55: push 0
+   56: put
+# test/attributes.p, 13: 	putln(R`min);
+   57: push 0
+   58: push 1
+   59: push 0
+   60: push 0
+   61: putln
+# test/attributes.p, 14: 	put("R`max: ");
+   62: push 'R'
+   63: push '`'
+   64: push 'm'
+   65: push 'a'
+   66: push 'x'
+   67: push ':'
+   68: push ' '
+   69: push 7
+   70: push 0
+   71: push 0
+   72: put
+# test/attributes.p, 15: 	putln(R`max);
+   73: push 9
+   74: push 1
+   75: push 0
+   76: push 0
+   77: putln
+# test/attributes.p, 16: 
+# test/attributes.p, 17: 	put("A`min: ");
+   78: push 'A'
+   79: push '`'
+   80: push 'm'
+   81: push 'i'
+   82: push 'n'
+   83: push ':'
+   84: push ' '
+   85: push 7
+   86: push 0
+   87: push 0
+   88: put
+# test/attributes.p, 18: 	putln(A`min);
+   89: push 0
+   90: push 1
+   91: push 0
+   92: push 0
+   93: putln
+# test/attributes.p, 19: 	put("A`max: ");
+   94: push 'A'
+   95: push '`'
+   96: push 'm'
+   97: push 'a'
+   98: push 'x'
+   99: push ':'
+  100: push ' '
+  101: push 7
+  102: push 0
+  103: push 0
+  104: put
+# test/attributes.p, 20: 	putln(A`max);
+  105: push 9
+  106: push 1
+  107: push 0
+  108: push 0
+  109: putln
+# test/attributes.p, 21: 
+# test/attributes.p, 22: 	put("E`min: ");
+  110: push 'E'
+  111: push '`'
+  112: push 'm'
+  113: push 'i'
+  114: push 'n'
+  115: push ':'
+  116: push ' '
+  117: push 7
+  118: push 0
+  119: push 0
+  120: put
+# test/attributes.p, 23: 	putln(E`min);
+  121: push 0
+  122: push 1
+  123: push 0
+  124: push 0
+  125: putln
+# test/attributes.p, 24: 	put("E`max: ");
+  126: push 'E'
+  127: push '`'
+  128: push 'm'
+  129: push 'a'
+  130: push 'x'
+  131: push ':'
+  132: push ' '
+  133: push 7
+  134: push 0
+  135: push 0
+  136: put
+# test/attributes.p, 25: 	putln(E`max)
+  137: push 2
+  138: push 1
+  139: push 0
+  140: push 0
+# test/attributes.p, 26: 
+# test/attributes.p, 27: endprog
+  141: putln
+# test/attributes.p, 28: 
+# test/attributes.p, 29: 
+  142: ret 0
+
+integer`min: -2147483648
+integer`max: 2147483647
+R`min: 0
+R`max: 9
+A`min: 0
+A`max: 9
+E`min: 0
+E`max: 2

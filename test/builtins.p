@@ -15,16 +15,16 @@ begin
 
 	putln(true);				{ true				}
 	putln(false);				{ false				}
-	putln(character_min);		{ 0					}
- 	putln(character_max);		{ 127				}
-	putln(integer_min);			{ -2,147,483,648	}
-	putln(integer_max);			{ 2,147,483,647		}
-	putln(natural_min);			{ 0					}
-	putln(natural_max);			{ 2,147,483,647		}
-	putln(positive_min);		{ 1					}
-	putln(positive_max);		{ 2,147,483,647		}
-	putln(real_min);			{ 2.225074e-308		}
-	putln(real_max);			{ 1.797693e+308		}
+	putln(character`min);		{ 0					}
+ 	putln(character`max);		{ 127				}
+	putln(integer`min);			{ -2,147,483,648	}
+	putln(integer`max);			{ 2,147,483,647		}
+	putln(natural`min);			{ 0					}
+	putln(natural`max);			{ 2,147,483,647		}
+	putln(positive`min);		{ 1					}
+	putln(positive`max);		{ 2,147,483,647		}
+	putln(real`min);			{ 2.225074e-308		}
+	putln(real`max);			{ 1.797693e+308		}
 	
 	putln(abs(1));				{ 1			}
 	putln(abs(-1));				{ 1			}

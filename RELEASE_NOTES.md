@@ -39,4 +39,4 @@ Version | Description
  0.43   | Add *type*_min, max as pseudo attributes
  0.44   | Add check for functions with no return statements
  0.45   | Add return statement
-
+ ?.??   | Replace xxx_min/max with `min, `max attributes. Likewise pred/succ with `pred, `succ.
