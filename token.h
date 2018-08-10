@@ -110,7 +110,6 @@ struct Token {
 		Period,							///< '.'
 		Colon,							///< Identifier ':' type
 		SemiColon,						///< ';' - Statement separator
-		Tick,							///< '`' - Attribute selector
 
 		// built-in functions...
 
