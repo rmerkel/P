@@ -4,7 +4,7 @@ procedure Proc(i : integer; r : real; b : boolean) is
 	begin
 		put(i);
 		put(r);
-		putln(b)
+		put_line(b)
 	endproc
 
 begin

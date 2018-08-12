@@ -1,7 +1,7 @@
 /********************************************************************************************//**
  * @file streams.h
  *
- * class template Stream<T>, a retargetable stream. Clases InputStream and OutputStream.
+ * class template Stream<T>, a retargetable stream.
  *
  * @author Randy Merkel, Slowly but Surly Software.
  * @copyright  (c) 2017 Slowly but Surly Software. All rights reserved.
@@ -14,10 +14,10 @@
 #include <ostream>
 
 /********************************************************************************************//**
- * A retargetable stream handle, either a std::istream, or a std::ostream. 
+ * A retargetable stream handle, either a std::istream, std::ostream or an std::iostream.
  *
- * Contains either a weak referance, such as std::cin, or a strong refernce such as a
- * std::ofstream.
+ * Contains either a weak reference (does not own), such as std::cin, or a strong reference
+ * (owns) such as a std::ofstream.
  ************************************************************************************************/
 template<class T> class Stream {
 public:
@@ -61,11 +61,5 @@ template<class T> void Stream<T>::set_stream(T* p) {
 	stream = p;
 	owns = true;
 }
-
-/// An input stream
-typedef Stream<std::istream>	InputStream;
-
-/// An output stream
-typedef	Stream<std::ostream>	OutputStream;
 
 #endif

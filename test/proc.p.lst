@@ -19,14 +19,14 @@ test/proc.p: rounding real to fit in an integer near line 11
    11: push 0
    12: push 0
    13: put
-# test/proc.p, 7: 		putln(b)
+# test/proc.p, 7: 		put_line(b)
    14: pushvar 0, -1
    15: eval 1
    16: push 1
    17: push 0
    18: push 0
 # test/proc.p, 8: 	endproc
-   19: putln
+   19: put_line
 # test/proc.p, 9: 
 # test/proc.p, 10: begin
    20: ret 3

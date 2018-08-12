@@ -6,29 +6,29 @@ var i : integer;
 	ar : array [1..5] of real;
 	s : array [0..9] of character;
 begin
-	putln("5 integers: ");
+	put_line("5 integers: ");
 	get(ai);
-	putln(ai);
+	put_line(ai);
 
-	putln("5 reals: ");
+	put_line("5 reals: ");
 	get(ar);
-	putln(ar, 0, 7);
+	put_line(ar, 0, 7);
 
-	putln("2 booleans: ");
+	put_line("2 booleans: ");
 	get(ab);
-	putln(ab);
+	put_line(ab);
 
-	putln("10 characters: ");
+	put_line("10 characters: ");
 	get(s);
 	put('"');
 	put(s);
-	putln('"');
+	put_line('"');
 
-	putln("integer: ");
+	put_line("integer: ");
 	get(i);
-	putln(i);
+	put_line(i);
 
-	putln("real: ");
+	put_line("real: ");
 	get(r);
-	putln(r, 0, 7)
+	put_line(r, 0, 7)
 endprog

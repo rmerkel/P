@@ -3,13 +3,13 @@
     0: calli 0, 37
     1: halt
 # test/fib.p, 3: 	begin
-# test/fib.p, 4: 		putln(b);
+# test/fib.p, 4: 		put_line(b);
     2: pushvar 0, -2
     3: eval 1
     4: push 1
     5: push 0
     6: push 0
-    7: putln
+    7: put_line
 # test/fib.p, 5: 		if limit > 0 then
     8: pushvar 0, -1
     9: eval 1
@@ -47,13 +47,13 @@
 # test/fib.p, 10: 	endfunc
 # test/fib.p, 11: 
 # test/fib.p, 12: begin
-# test/fib.p, 13: 	putln(0);
+# test/fib.p, 13: 	put_line(0);
    37: push 0
    38: push 1
    39: push 0
    40: push 0
-   41: putln
-# test/fib.p, 14: 	putln(fib(0, 1, 10))
+   41: put_line
+# test/fib.p, 14: 	put_line(fib(0, 1, 10))
    42: push 0
    43: push 1
    44: push 10
@@ -62,7 +62,7 @@
    47: push 0
    48: push 0
 # test/fib.p, 15: endprog
-   49: putln
+   49: put_line
 # test/fib.p, 16: 
 # test/fib.p, 17: 
    50: ret 0

@@ -5,5 +5,5 @@ var
 	r : real;
 begin
 	r := 1 + 3 * 10.0;
-	putln(r)
+	put_line(r)
 endprog

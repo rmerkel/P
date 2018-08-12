@@ -4,5 +4,5 @@ begin
 	x := 0;
 	y := 1;
 	put(x);
-	putln(y)
+	put_line(y)
 endprog

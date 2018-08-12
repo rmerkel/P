@@ -57,6 +57,6 @@ test/oldfuncreturn.p: expected 'begin' got ':=' near line 23
 # test/oldfuncreturn.p, 26: begin
 # test/oldfuncreturn.p, 27: 	{ The result is the 10th factorial; 3,628,000	}
 # test/oldfuncreturn.p, 28:     result := factorial(nFacts);
-# test/oldfuncreturn.p, 29: 	putln(result)
+# test/oldfuncreturn.p, 29: 	put_line(result)
 # test/oldfuncreturn.p, 30: endprog
 

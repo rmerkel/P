@@ -14,7 +14,7 @@
     8: push 10
     9: gt
    10: jneqi 39
-# test/ifelif.p, 6: 		putln("i is greater than 10");
+# test/ifelif.p, 6: 		put_line("i is greater than 10");
    11: push 'i'
    12: push ' '
    13: push 'i'
@@ -38,7 +38,7 @@
    31: push 20
    32: push 0
    33: push 0
-   34: putln
+   34: put_line
 # test/ifelif.p, 7: 		i := 1
    35: pushvar 0, 4
    36: push 1
@@ -50,7 +50,7 @@
    41: push 0
    42: lt
    43: jneqi 67
-# test/ifelif.p, 9: 		putln("i is less than 0");
+# test/ifelif.p, 9: 		put_line("i is less than 0");
    44: push 'i'
    45: push ' '
    46: push 'i'
@@ -70,7 +70,7 @@
    60: push 16
    61: push 0
    62: push 0
-   63: putln
+   63: put_line
 # test/ifelif.p, 10: 		i := 2
    64: pushvar 0, 4
    65: push 2
@@ -87,14 +87,14 @@
    73: push 0
    74: push 0
    75: put
-# test/ifelif.p, 14: 	putln(i)
+# test/ifelif.p, 14: 	put_line(i)
    76: pushvar 0, 4
    77: eval 1
    78: push 1
    79: push 0
    80: push 0
 # test/ifelif.p, 15: endprog
-   81: putln
+   81: put_line
 # test/ifelif.p, 16: 
 # test/ifelif.p, 17: 
    82: ret 0

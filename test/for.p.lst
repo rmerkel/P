@@ -6,7 +6,7 @@
 # test/for.p, 4: var i : R;
 # test/for.p, 5: begin
     2: enter 1
-# test/for.p, 6: 	putln("for i in 0..9...");
+# test/for.p, 6: 	put_line("for i in 0..9...");
     3: push 'f'
     4: push 'o'
     5: push 'r'
@@ -26,7 +26,7 @@
    19: push 16
    20: push 0
    21: push 0
-   22: putln
+   22: put_line
 # test/for.p, 7: 	for i in 0..9 loop
    23: pushvar 0, 4
    24: dup
@@ -37,14 +37,14 @@
    29: push 9
    30: lte
    31: jneqi 45
-# test/for.p, 8: 		putln(i)
+# test/for.p, 8: 		put_line(i)
    32: pushvar 0, 4
    33: eval 1
    34: push 1
    35: push 0
    36: push 0
 # test/for.p, 9: 	endloop;
-   37: putln
+   37: put_line
    38: dup
    39: dup
    40: eval 1
@@ -54,7 +54,7 @@
    44: jumpi 27
    45: pop 1
 # test/for.p, 10: 
-# test/for.p, 11: 	putln("for i in R...");
+# test/for.p, 11: 	put_line("for i in R...");
    46: push 'f'
    47: push 'o'
    48: push 'r'
@@ -71,7 +71,7 @@
    59: push 13
    60: push 0
    61: push 0
-   62: putln
+   62: put_line
 # test/for.p, 12: 	for i in R loop
    63: pushvar 0, 4
    64: dup
@@ -82,14 +82,14 @@
    69: push 9
    70: lte
    71: jneqi 85
-# test/for.p, 13: 		putln(i)
+# test/for.p, 13: 		put_line(i)
    72: pushvar 0, 4
    73: eval 1
    74: push 1
    75: push 0
    76: push 0
 # test/for.p, 14: 	endloop
-   77: putln
+   77: put_line
 # test/for.p, 15: endprog
    78: dup
    79: dup

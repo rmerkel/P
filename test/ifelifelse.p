@@ -3,18 +3,18 @@ var i : integer;
 begin
 	i := 10;
 	if i > 10 then
-		putln("i is greater than 10");
+		put_line("i is greater than 10");
 		i := 1
 	elif i < 0 then
-		putln("i is less than 0");
+		put_line("i is less than 0");
 		i := 2
 	else
 		put("i is between 1 and 10, inclusive ");
-		putln(i);
+		put_line(i);
 		i := 3
 	endif;
 
 	put("i is ");
-	putln(i)
+	put_line(i)
 endprog
 

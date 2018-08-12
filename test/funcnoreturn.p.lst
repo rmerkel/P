@@ -46,14 +46,14 @@ test/funcnoreturn.p: Funcation has no return statement near line 15
    27: push 10
    28: calli 0, 2
    29: assign 1
-# test/funcnoreturn.p, 18: 	putln(result)
+# test/funcnoreturn.p, 18: 	put_line(result)
    30: pushvar 0, 4
    31: eval 1
    32: push 1
    33: push 0
    34: push 0
 # test/funcnoreturn.p, 19: endprog
-   35: putln
+   35: put_line
 # test/funcnoreturn.p, 20: 
    36: ret 0
 

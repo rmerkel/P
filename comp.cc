@@ -1285,7 +1285,7 @@ void PComp::getStatement(int level) {
 /********************************************************************************************//**
  * put or put[ln]( [ expression [',' width [ ',' precision ]]] )
  *
- * Process put and putln parameters, up to, but not including, emitteing the final op-code.
+ * Process put and put_line parameters, up to, but not including, emitteing the final op-code.
  *
  * @param	level	The current block level.
  ************************************************************************************************/
@@ -1332,9 +1332,9 @@ void PComp::put(int level) {
 }
 
 /********************************************************************************************//**
- * put or putln( [ expression [',' width [ ',' precision ]]] )
+ * put or put_line( [ expression [',' width [ ',' precision ]]] )
  *
- * Process put and putln parameters, up to, but not including, emitteing the final op-code.
+ * Process put and put_line parameters, up to, but not including, emitteing the final op-code.
  *
  * @param	level	The current block level.
  ************************************************************************************************/
@@ -1344,7 +1344,7 @@ void PComp::putStatement(int level) {
 }
 
 /********************************************************************************************//**
- * putln [ format-list ]
+ * put_line [ format-list ]
  *
  * @param	level	The current block level.
  ************************************************************************************************/
@@ -1403,7 +1403,7 @@ void PComp::statementProcs(int level) {
 	else if (accept(Token::Put))			// put '(' expr-tuple { ',' expr-tuple } ')'
 		putStatement(level);
 
-	else if (accept(Token::Putln))			// putln [ '(' expr-tuple { ',' expr-tuple } ')' ]
+	else if (accept(Token::Putln))			// put_line [ '(' expr-tuple { ',' expr-tuple } ')' ]
 		putLnStatement(level);
 
 	else if (accept(Token::New))			// 'New (' id ')'

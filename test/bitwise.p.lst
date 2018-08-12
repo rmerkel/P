@@ -12,7 +12,7 @@
     6: pushvar 0, 5
     7: push 1
     8: assign 1
-# test/bitwise.p, 6: 	put("x = "); putln(x);
+# test/bitwise.p, 6: 	put("x = "); put_line(x);
     9: push 'x'
    10: push ' '
    11: push '='
@@ -26,8 +26,8 @@
    19: push 1
    20: push 0
    21: push 0
-   22: putln
-# test/bitwise.p, 7: 	put("y = "); putln(y);
+   22: put_line
+# test/bitwise.p, 7: 	put("y = "); put_line(y);
    23: push 'y'
    24: push ' '
    25: push '='
@@ -41,7 +41,7 @@
    33: push 1
    34: push 0
    35: push 0
-   36: putln
+   36: put_line
 # test/bitwise.p, 8: 
 # test/bitwise.p, 9: 	z := x band y;
    37: pushvar 0, 6
@@ -72,13 +72,13 @@
    61: push 0
    62: push 0
    63: put
-# test/bitwise.p, 11: 	putln(z);
+# test/bitwise.p, 11: 	put_line(z);
    64: pushvar 0, 6
    65: eval 1
    66: push 1
    67: push 0
    68: push 0
-   69: putln
+   69: put_line
 # test/bitwise.p, 12: 
 # test/bitwise.p, 13: 	z := 10 bor z;
    70: pushvar 0, 6
@@ -108,13 +108,13 @@
    93: push 0
    94: push 0
    95: put
-# test/bitwise.p, 15: 	putln(z);
+# test/bitwise.p, 15: 	put_line(z);
    96: pushvar 0, 6
    97: eval 1
    98: push 1
    99: push 0
   100: push 0
-  101: putln
+  101: put_line
 # test/bitwise.p, 16: 
 # test/bitwise.p, 17: 	z := x bxor y;
   102: pushvar 0, 6
@@ -145,13 +145,13 @@
   126: push 0
   127: push 0
   128: put
-# test/bitwise.p, 19: 	putln(z);
+# test/bitwise.p, 19: 	put_line(z);
   129: pushvar 0, 6
   130: eval 1
   131: push 1
   132: push 0
   133: push 0
-  134: putln
+  134: put_line
 # test/bitwise.p, 20: 
 # test/bitwise.p, 21: 	z := bnot z;
   135: pushvar 0, 6
@@ -173,13 +173,13 @@
   150: push 0
   151: push 0
   152: put
-# test/bitwise.p, 23: 	putln(z);
+# test/bitwise.p, 23: 	put_line(z);
   153: pushvar 0, 6
   154: eval 1
   155: push 1
   156: push 0
   157: push 0
-  158: putln
+  158: put_line
 # test/bitwise.p, 24: 
 # test/bitwise.p, 25: 	z := x sleft y;
   159: pushvar 0, 6
@@ -211,13 +211,13 @@
   184: push 0
   185: push 0
   186: put
-# test/bitwise.p, 27: 	putln(z);
+# test/bitwise.p, 27: 	put_line(z);
   187: pushvar 0, 6
   188: eval 1
   189: push 1
   190: push 0
   191: push 0
-  192: putln
+  192: put_line
 # test/bitwise.p, 28: 
 # test/bitwise.p, 29: 	z := x sright y;
   193: pushvar 0, 6
@@ -250,14 +250,14 @@
   219: push 0
   220: push 0
   221: put
-# test/bitwise.p, 31: 	putln(z)
+# test/bitwise.p, 31: 	put_line(z)
   222: pushvar 0, 6
   223: eval 1
   224: push 1
   225: push 0
   226: push 0
 # test/bitwise.p, 32: endprog
-  227: putln
+  227: put_line
 # test/bitwise.p, 33: 
   228: ret 0
 

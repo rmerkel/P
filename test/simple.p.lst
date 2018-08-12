@@ -19,14 +19,14 @@
    12: push 0
    13: push 0
    14: put
-# test/simple.p, 7: 	putln(y)
+# test/simple.p, 7: 	put_line(y)
    15: pushvar 0, 5
    16: eval 1
    17: push 1
    18: push 0
    19: push 0
 # test/simple.p, 8: endprog
-   20: putln
+   20: put_line
 # test/simple.p, 9: 
    21: ret 0
 

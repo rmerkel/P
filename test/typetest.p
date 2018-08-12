@@ -20,14 +20,14 @@ begin
 	i := 1;	{	fill a[] with its index	}
  	while i < 11 loop 
 		a[i] := i;
-		putln(a[i]);
+		put_line(a[i]);
 		i := i + 1
 	endloop;
 
 	r := 1;	{	multiply by 10			}
 	repeat
 		a[r] := a[r] * 10;
-		putln(a[r]);
+		put_line(a[r]);
 		r := r + 1
 	until r = 10 endloop;
 
@@ -36,7 +36,7 @@ begin
 	a2[three] := 3;
 	put(a2[one]);
 	put(a2[two]);
-	putln(a2[three]);
+	put_line(a2[three]);
 
 	i := 0;	{	fill a3[] with it's index	}
 	while (i < 5) loop
@@ -46,7 +46,7 @@ begin
 			put(a3[i][j], 7, 4);
 			j := j + 1
 		endloop;
-		putln();
+		put_line();
 		i := i + 1
 	endloop
 endprog

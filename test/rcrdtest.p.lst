@@ -54,7 +54,7 @@
    27: push 0
    28: push 0
    29: put
-# test/rcrdtest.p, 27: 	putln(x.r, 8, 6);
+# test/rcrdtest.p, 27: 	put_line(x.r, 8, 6);
    30: pushvar 0, 4
    31: push 2
    32: add
@@ -62,7 +62,7 @@
    34: push 1
    35: push 8
    36: push 6
-   37: putln
+   37: put_line
 # test/rcrdtest.p, 28: 
 # test/rcrdtest.p, 29: 	y.i1 := 4;
    38: pushvar 0, 7
@@ -96,7 +96,7 @@
    62: push 0
    63: push 0
    64: put
-# test/rcrdtest.p, 34: 	putln(x.r, 8, 6);
+# test/rcrdtest.p, 34: 	put_line(x.r, 8, 6);
    65: pushvar 0, 4
    66: push 2
    67: add
@@ -104,7 +104,7 @@
    69: push 1
    70: push 8
    71: push 6
-   72: putln
+   72: put_line
 # test/rcrdtest.p, 35: 
 # test/rcrdtest.p, 36: 	z.i1 := 7;
    73: pushvar 0, 10
@@ -138,7 +138,7 @@
    97: push 0
    98: push 0
    99: put
-# test/rcrdtest.p, 41: 	putln(x.r, 8, 6)
+# test/rcrdtest.p, 41: 	put_line(x.r, 8, 6)
   100: pushvar 0, 4
   101: push 2
   102: add
@@ -147,7 +147,7 @@
   105: push 8
   106: push 6
 # test/rcrdtest.p, 42: endprog
-  107: putln
+  107: put_line
 # test/rcrdtest.p, 43: 
   108: ret 0
 

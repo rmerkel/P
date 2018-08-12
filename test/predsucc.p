@@ -1,8 +1,8 @@
 program PredSucc() is
 type e is (zero, one, two, three, four);
 begin
-	putln(zero);
-	putln(pred(two));
-	putln(two);
-	putln(succ(two));
+	put_line(zero);
+	put_line(pred(two));
+	put_line(two);
+	put_line(succ(two));
 endprog

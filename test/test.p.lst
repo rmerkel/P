@@ -44,14 +44,14 @@
    24: eval 1
    25: mul
    26: assign 1
-# test/test.p, 20: 	  putln(f, 8, 6)
+# test/test.p, 20: 	  put_line(f, 8, 6)
    27: pushvar 0, 5
    28: eval 1
    29: push 1
    30: push 8
    31: push 6
 # test/test.p, 21:    endloop
-   32: putln
+   32: put_line
 # test/test.p, 22: endprog
    33: jumpi 9
 # test/test.p, 23: 

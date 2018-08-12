@@ -155,6 +155,9 @@ struct Token {
 	virtual ~Token() {}					///< Destructor
 };
 
+/// An input stream
+typedef Stream<std::istream>	InputStream;
+
 /********************************************************************************************//**
  * A restartiable InputStream of P tokens
  *

@@ -63,14 +63,14 @@ test/fact3.p: passing 2 parameters, where 1 expected near line 28
    33: push 10
    34: calli 0, 2
    35: assign 1
-# test/fact3.p, 29: 	putln(result)
+# test/fact3.p, 29: 	put_line(result)
    36: pushvar 0, 4
    37: eval 1
    38: push 1
    39: push 0
    40: push 0
 # test/fact3.p, 30: endprog
-   41: putln
+   41: put_line
 # test/fact3.p, 31: 
    42: ret 0
 

@@ -24,19 +24,19 @@ begin
 	x.r := 3.0;
 	put(x.i1);
 	put(x.i2);
-	putln(x.r, 8, 6);
+	put_line(x.r, 8, 6);
 
 	y.i1 := 4;
 	y.i2 := 5;
 	y.r := 6.0;
 	put(x.i1);
 	put(x.i2);
-	putln(x.r, 8, 6);
+	put_line(x.r, 8, 6);
 
 	z.i1 := 7;
 	z.i2 := 8;
 	z.r := 9.0;
 	put(x.i1);
 	put(x.i2);
-	putln(x.r, 8, 6)
+	put_line(x.r, 8, 6)
 endprog

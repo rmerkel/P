@@ -26,14 +26,14 @@
 # test/varparam.p, 10: 	inc(i);
    16: pushvar 0, 4
    17: calli 0, 2
-# test/varparam.p, 11:     putln(i)				{	s/b 1, not zero	}
+# test/varparam.p, 11:     put_line(i)				{	s/b 1, not zero	}
    18: pushvar 0, 4
    19: eval 1
    20: push 1
    21: push 0
    22: push 0
 # test/varparam.p, 12: endprog
-   23: putln
+   23: put_line
 # test/varparam.p, 13: 
 # test/varparam.p, 14: 
    24: ret 0

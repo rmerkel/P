@@ -32,13 +32,13 @@
    23: pushvar 0, 6
    24: eval 1
    25: assign 1
-# test/testif.p, 9: 	putln(x);
+# test/testif.p, 9: 	put_line(x);
    26: pushvar 0, 4
    27: eval 1
    28: push 1
    29: push 0
    30: push 0
-   31: putln
+   31: put_line
 # test/testif.p, 10: 
 # test/testif.p, 11: 	{ set x to  3	}
 # test/testif.p, 12: 	if x = y then x := z else x := y endif;
@@ -57,14 +57,14 @@
    44: pushvar 0, 5
    45: eval 1
    46: assign 1
-# test/testif.p, 13: 	putln(x)
+# test/testif.p, 13: 	put_line(x)
    47: pushvar 0, 4
    48: eval 1
    49: push 1
    50: push 0
    51: push 0
 # test/testif.p, 14: endprog
-   52: putln
+   52: put_line
 # test/testif.p, 15: 
 # test/testif.p, 16: 
    53: ret 0

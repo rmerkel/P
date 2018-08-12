@@ -18,13 +18,13 @@
     5: llimit 0
     6: ulimit 127
     7: assign 1
-# test/array.p, 13: 	putln(c);	
+# test/array.p, 13: 	put_line(c);	
     8: pushvar 0, 5
     9: eval 1
    10: push 1
    11: push 0
    12: push 0
-   13: putln
+   13: put_line
 # test/array.p, 14: 
 # test/array.p, 15: 	a1 := "abcdefghij";		{	fill a1 with "abcd..."			}
    14: pushvar 0, 6
@@ -39,26 +39,26 @@
    23: push 'i'
    24: push 'j'
    25: assign 10
-# test/array.p, 16:  	putln(a1);
+# test/array.p, 16:  	put_line(a1);
    26: pushvar 0, 6
    27: eval 10
    28: push 10
    29: push 0
    30: push 0
-   31: putln
+   31: put_line
 # test/array.p, 17: 
 # test/array.p, 18: 	a2 := a1;				{	copies the contents of a1 to a2	}
    32: pushvar 0, 16
    33: pushvar 0, 6
    34: eval 10
    35: assign 10
-# test/array.p, 19: 	putln(a2);
+# test/array.p, 19: 	put_line(a2);
    36: pushvar 0, 16
    37: eval 10
    38: push 10
    39: push 0
    40: push 0
-   41: putln
+   41: put_line
 # test/array.p, 20: 
 # test/array.p, 21: 	a1 := "0123456789";		{	fill a1 with "0123..."			}
    42: pushvar 0, 6
@@ -74,21 +74,21 @@
    52: push '9'
    53: assign 10
 # test/array.p, 22: 							{	while a1 has changed...			}
-# test/array.p, 23: 	putln(a1);
+# test/array.p, 23: 	put_line(a1);
    54: pushvar 0, 6
    55: eval 10
    56: push 10
    57: push 0
    58: push 0
-   59: putln
+   59: put_line
 # test/array.p, 24: 							{	... a2 has not!					}
-# test/array.p, 25: 	putln(a2);
+# test/array.p, 25: 	put_line(a2);
    60: pushvar 0, 16
    61: eval 10
    62: push 10
    63: push 0
    64: push 0
-   65: putln
+   65: put_line
 # test/array.p, 26: 
 # test/array.p, 27: 	for i in 0..9 loop
    66: pushvar 0, 4
@@ -119,13 +119,13 @@
    89: assign 1
    90: jumpi 70
    91: pop 1
-# test/array.p, 30: 	putln(ai);
+# test/array.p, 30: 	put_line(ai);
    92: pushvar 0, 26
    93: eval 10
    94: push 10
    95: push 0
    96: push 0
-   97: putln
+   97: put_line
 # test/array.p, 31: 
 # test/array.p, 32: 	for i in 0..9 loop
    98: pushvar 0, 4
@@ -159,21 +159,21 @@
   124: assign 1
   125: jumpi 102
   126: pop 1
-# test/array.p, 35: 	putln(ar);
+# test/array.p, 35: 	put_line(ar);
   127: pushvar 0, 36
   128: eval 10
   129: push 10
   130: push 0
   131: push 0
-  132: putln
-# test/array.p, 36: 	putln(ar,4,1)
+  132: put_line
+# test/array.p, 36: 	put_line(ar,4,1)
   133: pushvar 0, 36
   134: eval 10
   135: push 10
   136: push 4
   137: push 1
 # test/array.p, 37: endprog
-  138: putln
+  138: put_line
 # test/array.p, 38: 
   139: ret 0
 

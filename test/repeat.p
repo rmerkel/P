@@ -17,6 +17,6 @@ begin
 	repeat
 		n := n + 1;
 		f := f * n;
-		putln(f, 8, 6)
+		put_line(f, 8, 6)
 	until n >= 10 endloop
 endprog

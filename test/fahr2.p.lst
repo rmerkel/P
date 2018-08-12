@@ -14,7 +14,7 @@
 # test/fahr2.p, 12: 
 # test/fahr2.p, 13: begin
     2: enter 2
-# test/fahr2.p, 14: 	putln("Fahrenheit Celsius");
+# test/fahr2.p, 14: 	put_line("Fahrenheit Celsius");
     3: push 'F'
     4: push 'a'
     5: push 'h'
@@ -36,7 +36,7 @@
    21: push 18
    22: push 0
    23: push 0
-   24: putln
+   24: put_line
 # test/fahr2.p, 15: 
 # test/fahr2.p, 16: 	fahr := LOWER;
    25: pushvar 0, 4
@@ -66,13 +66,13 @@
    46: push 9
    47: push 1
    48: put
-# test/fahr2.p, 20: 		putln(celsius, 8, 1);
+# test/fahr2.p, 20: 		put_line(celsius, 8, 1);
    49: pushvar 0, 5
    50: eval 1
    51: push 1
    52: push 8
    53: push 1
-   54: putln
+   54: put_line
 # test/fahr2.p, 21: 		fahr := fahr + STEP;
    55: pushvar 0, 4
    56: pushvar 0, 4

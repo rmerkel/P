@@ -11,7 +11,7 @@ begin
       n := n + 1;
       f := f * n
    endloop;
-   putln(f);
+   put_line(f);
 endprog
 
 {	unterminated comment, but we don't care as it follows the period!

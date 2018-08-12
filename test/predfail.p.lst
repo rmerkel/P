@@ -3,14 +3,14 @@
     0: calli 0, 2
     1: halt
 # test/predfail.p, 3: begin
-# test/predfail.p, 4: 	putln(pred(zero))
+# test/predfail.p, 4: 	put_line(pred(zero))
     2: push 0
     3: pred 0
     4: push 1
     5: push 0
     6: push 0
 # test/predfail.p, 5: endprog
-    7: putln
+    7: put_line
 # test/predfail.p, 6: 
     8: ret 0
 

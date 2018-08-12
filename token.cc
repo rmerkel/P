@@ -272,7 +272,7 @@ TokenStream::KeywordTable	TokenStream::keywords = {
 	{	"var",			Token::VarDecl		},
 	{	"while",		Token::While		},
 	{	"put",			Token::Put			},
-	{	"putln",		Token::Putln		}
+	{	"put_line",		Token::Putln		}
 };
 
 // operators
@@ -378,7 +378,7 @@ ostream& operator<<(std::ostream& os, const Token::Kind& kind) {
 	case Token::Succ:		os << "succ";			break;
 	case Token::Get:		os << "get";			break;
 	case Token::Put:		os << "put";			break;
-	case Token::Putln:		os << "putln";			break;
+	case Token::Putln:		os << "put_line";		break;
 	case Token::New:		os << "new";			break;
 	case Token::Dispose:	os << "dispose";		break;
 

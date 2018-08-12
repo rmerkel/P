@@ -3,32 +3,32 @@
     0: calli 0, 2
     1: halt
 # test/predsucc.p, 3: begin
-# test/predsucc.p, 4: 	putln(zero);
+# test/predsucc.p, 4: 	put_line(zero);
     2: push 0
     3: push 1
     4: push 0
     5: push 0
-    6: putln
-# test/predsucc.p, 5: 	putln(pred(two));
+    6: put_line
+# test/predsucc.p, 5: 	put_line(pred(two));
     7: push 2
     8: pred 0
     9: push 1
    10: push 0
    11: push 0
-   12: putln
-# test/predsucc.p, 6: 	putln(two);
+   12: put_line
+# test/predsucc.p, 6: 	put_line(two);
    13: push 2
    14: push 1
    15: push 0
    16: push 0
-   17: putln
-# test/predsucc.p, 7: 	putln(succ(two));
+   17: put_line
+# test/predsucc.p, 7: 	put_line(succ(two));
    18: push 2
    19: succ 4
    20: push 1
    21: push 0
    22: push 0
-   23: putln
+   23: put_line
 # test/predsucc.p, 8: endprog
 # test/predsucc.p, 9: 
    24: ret 0

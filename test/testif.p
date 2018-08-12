@@ -6,10 +6,10 @@ begin
 	z := 3;
 	{ set x to 2	}
 	if x = 1 then x := y else x := z endif;
-	putln(x);
+	put_line(x);
 
 	{ set x to  3	}
 	if x = y then x := z else x := y endif;
-	putln(x)
+	put_line(x)
 endprog
 

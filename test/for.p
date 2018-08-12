@@ -3,13 +3,13 @@ program ForTest() is
 type R is 0..9;
 var i : R;
 begin
-	putln("for i in 0..9...");
+	put_line("for i in 0..9...");
 	for i in 0..9 loop
-		putln(i)
+		put_line(i)
 	endloop;
 
-	putln("for i in R...");
+	put_line("for i in R...");
 	for i in R loop
-		putln(i)
+		put_line(i)
 	endloop
 endprog
