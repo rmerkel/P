@@ -67,6 +67,7 @@ Token TokenStream::get() {
 	case ']': return ct.kind = Token::CloseBrkt;	break;
 	case ',': return ct.kind = Token::Comma;		break;
 	case ';': return ct.kind = Token::SemiColon;	break;
+	case '`': return ct.kind = Token::Tick;			break;
 	case '^': return ct.kind = Token::Caret;		break;
 
 	case '>':								// >, or >=?
@@ -357,6 +358,7 @@ ostream& operator<<(std::ostream& os, const Token::Kind& kind) {
 	case Token::Period:		os << ".";				break;
 	case Token::Colon:		os << ":";				break;
 	case Token::SemiColon:	os << ";";				break;
+	case Token::Tick:		os << "`";				break;
 	case Token::Assign:		os << ":=";				break;
 
 	case Token::Round:		os << "round";			break;
