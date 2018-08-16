@@ -919,17 +919,10 @@ TDescPtr PComp::variable(int level, SymbolTableIter it) {
 			type = TypeDesc::newPointerDesc(varArray(level, it, type->base()));
 			expect(Token::CloseBrkt);
 
-		} else if (accept(Token::Period)) {	// handle record selector...
+		} else if (accept(Token::Period))	// handle record selector...
 			type = TypeDesc::newPointerDesc(varSelector(it, type->base()));
 
-#if 0
-		} else if (accept(Token::Tick)) {	// Handle attribute
-			assert(type->base() != nullptr); // Use the pointed to type
-			emit(OpCode::POP, 0, type->base()->size());	
-			attribute(it, type->base());	// But return the pointed to type...
-#endif
-
-		} else if (accept(Token::Caret)) {	// 'Dereference' pointer (use pointed to type)
+		else if (accept(Token::Caret)) {	// 'Dereference' pointer (use pointed to type)
 			emit(OpCode::EVAL, 0, type->base()->size());	
 			assert(type->base() != nullptr);
 			type = type->base();

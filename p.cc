@@ -72,7 +72,7 @@ static void help() {
  * Print the version number as major.minor
  ************************************************************************************************/
 static void printVersion() {
-	cout << progName << ": verson: 0.45\n";
+	cout << progName << ": verson: 0.46\n";
 }
 
 /********************************************************************************************//** 
