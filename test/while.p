@@ -12,8 +12,8 @@ begin
 	put_line(i);
 	put_line();
 
-	put_line("natual_min, 9, i := succ(i)");
-	i := natural_min;
+	put_line("natural`min, 9, i := succ(i)");
+	i := natural`min;
 	while (i < 9) loop
 		put_line(i);
 		i := succ(i)
@@ -21,9 +21,9 @@ begin
 	put_line(i);
 	put_line();
 
-	put_line("R_min, R_max, i := succ(i)");
-	i := R_min;
-	while (i < R_max) loop
+	put_line("R`min, R`max, i := succ(i)");
+	i := R`min;
+	while (i < R`max) loop
 		put_line(i);
 		i := succ(i)
 	endloop;

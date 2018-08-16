@@ -80,7 +80,7 @@
    66: push 0
    67: put_line
 # test/while.p, 14: 
-# test/while.p, 15: 	putln("natural`min, 9, i := succ(i)");
+# test/while.p, 15: 	put_line("natural`min, 9, i := succ(i)");
    68: push 'n'
    69: push 'a'
    70: push 't'
@@ -112,7 +112,7 @@
    96: push 28
    97: push 0
    98: push 0
-   99: putln
+   99: put_line
 # test/while.p, 16: 	i := natural`min;
   100: pushvar 0, 4
   101: push 0
@@ -125,98 +125,104 @@
   107: push 9
   108: lt
   109: jneqi 124
-# test/while.p, 18: 		putln(i);
+# test/while.p, 18: 		put_line(i);
   110: pushvar 0, 4
   111: eval 1
   112: push 1
   113: push 0
   114: push 0
-  115: putln
+  115: put_line
 # test/while.p, 19: 		i := succ(i)
   116: pushvar 0, 4
   117: pushvar 0, 4
   118: eval 1
 # test/while.p, 20: 	endloop;
-  118: succ 9
-  119: llimit 0
-  120: ulimit 9
-  121: assign 1
-  122: jumpi 104
+  119: succ 9
+  120: llimit 0
+  121: ulimit 9
+  122: assign 1
+  123: jumpi 105
 # test/while.p, 21: 	put_line(i);
-  123: pushvar 0, 4
-  124: eval 1
-  125: push 1
-  126: push 0
+  124: pushvar 0, 4
+  125: eval 1
+  126: push 1
   127: push 0
-  128: put_line
+  128: push 0
+  129: put_line
 # test/while.p, 22: 	put_line();
-  129: push 0
   130: push 0
   131: push 0
-  132: put_line
+  132: push 0
+  133: put_line
 # test/while.p, 23: 
-# test/while.p, 24: 	put_line("R_min, R_max, i := succ(i)");
-  133: push 'R'
-  134: push '_'
-  135: push 'm'
-  136: push 'i'
-  137: push 'n'
-  138: push ','
-  139: push ' '
-  140: push 'R'
-  141: push '_'
-  142: push 'm'
-  143: push 'a'
-  144: push 'x'
-  145: push ','
-  146: push ' '
-  147: push 'i'
-  148: push ' '
-  149: push ':'
-  150: push '='
-  151: push ' '
-  152: push 's'
-  153: push 'u'
-  154: push 'c'
-  162: put_line
-# test/while.p, 25: 	i := R_min;
-  163: pushvar 0, 4
-  164: push 0
-  165: llimit 0
-  166: ulimit 9
-  167: assign 1
-# test/while.p, 26: 	while (i < R_max) loop
-  168: pushvar 0, 4
-  169: eval 1
-  170: push 9
-  171: lt
-  172: jneqi 187
+# test/while.p, 24: 	put_line("R`min, R`max, i := succ(i)");
+  134: push 'R'
+  135: push '`'
+  136: push 'm'
+  137: push 'i'
+  138: push 'n'
+  139: push ','
+  140: push ' '
+  141: push 'R'
+  142: push '`'
+  143: push 'm'
+  144: push 'a'
+  145: push 'x'
+  146: push ','
+  147: push ' '
+  148: push 'i'
+  149: push ' '
+  150: push ':'
+  151: push '='
+  152: push ' '
+  153: push 's'
+  154: push 'u'
+  155: push 'c'
+  156: push 'c'
+  157: push '('
+  158: push 'i'
+  159: push ')'
+  160: push 26
+  161: push 0
+  162: push 0
+  163: put_line
+# test/while.p, 25: 	i := R`min;
+  164: pushvar 0, 4
+  165: push 0
+  166: llimit 0
+  167: ulimit 9
+  168: assign 1
+# test/while.p, 26: 	while (i < R`max) loop
+  169: pushvar 0, 4
+  170: eval 1
+  171: push 9
+  172: lt
+  173: jneqi 188
 # test/while.p, 27: 		put_line(i);
-  173: pushvar 0, 4
-  174: eval 1
-  175: push 1
-  176: push 0
+  174: pushvar 0, 4
+  175: eval 1
+  176: push 1
   177: push 0
-  178: put_line
+  178: push 0
+  179: put_line
 # test/while.p, 28: 		i := succ(i)
   180: pushvar 0, 4
   181: pushvar 0, 4
   182: eval 1
 # test/while.p, 29: 	endloop;
-  182: succ 9
-  183: llimit 0
-  184: ulimit 9
-  185: assign 1
-  186: jumpi 168
+  183: succ 9
+  184: llimit 0
+  185: ulimit 9
+  186: assign 1
+  187: jumpi 169
 # test/while.p, 30: 	put_line(i)
-  187: pushvar 0, 4
-  188: eval 1
-  189: push 1
-  190: push 0
+  188: pushvar 0, 4
+  189: eval 1
+  190: push 1
   191: push 0
   192: push 0
 # test/while.p, 31: endprog
-  192: put_line
+  193: put_line
 # test/while.p, 32: 
   194: ret 0
 

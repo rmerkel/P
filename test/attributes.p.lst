@@ -24,12 +24,12 @@
    16: push 0
    17: push 0
    18: put
-# test/attributes.p, 8: 	putln(integer`min);
+# test/attributes.p, 8: 	put_line(integer`min);
    19: push -2147483648
    20: push 1
    21: push 0
    22: push 0
-   23: putln
+   23: put_line
 # test/attributes.p, 9: 	put("integer`max: ");
    24: push 'i'
    25: push 'n'
@@ -48,12 +48,12 @@
    38: push 0
    39: push 0
    40: put
-# test/attributes.p, 10: 	putln(integer`max);
+# test/attributes.p, 10: 	put_line(integer`max);
    41: push 2147483647
    42: push 1
    43: push 0
    44: push 0
-   45: putln
+   45: put_line
 # test/attributes.p, 11: 
 # test/attributes.p, 12: 	put("R`min: ");
    46: push 'R'
@@ -67,12 +67,12 @@
    54: push 0
    55: push 0
    56: put
-# test/attributes.p, 13: 	putln(R`min);
+# test/attributes.p, 13: 	put_line(R`min);
    57: push 0
    58: push 1
    59: push 0
    60: push 0
-   61: putln
+   61: put_line
 # test/attributes.p, 14: 	put("R`max: ");
    62: push 'R'
    63: push '`'
@@ -85,12 +85,12 @@
    70: push 0
    71: push 0
    72: put
-# test/attributes.p, 15: 	putln(R`max);
+# test/attributes.p, 15: 	put_line(R`max);
    73: push 9
    74: push 1
    75: push 0
    76: push 0
-   77: putln
+   77: put_line
 # test/attributes.p, 16: 
 # test/attributes.p, 17: 	put("A`min: ");
    78: push 'A'
@@ -104,12 +104,12 @@
    86: push 0
    87: push 0
    88: put
-# test/attributes.p, 18: 	putln(A`min);
+# test/attributes.p, 18: 	put_line(A`min);
    89: push 0
    90: push 1
    91: push 0
    92: push 0
-   93: putln
+   93: put_line
 # test/attributes.p, 19: 	put("A`max: ");
    94: push 'A'
    95: push '`'
@@ -122,12 +122,12 @@
   102: push 0
   103: push 0
   104: put
-# test/attributes.p, 20: 	putln(A`max);
+# test/attributes.p, 20: 	put_line(A`max);
   105: push 9
   106: push 1
   107: push 0
   108: push 0
-  109: putln
+  109: put_line
 # test/attributes.p, 21: 
 # test/attributes.p, 22: 	put("E`min: ");
   110: push 'E'
@@ -141,12 +141,12 @@
   118: push 0
   119: push 0
   120: put
-# test/attributes.p, 23: 	putln(E`min);
+# test/attributes.p, 23: 	put_line(E`min);
   121: push 0
   122: push 1
   123: push 0
   124: push 0
-  125: putln
+  125: put_line
 # test/attributes.p, 24: 	put("E`max: ");
   126: push 'E'
   127: push '`'
@@ -159,14 +159,14 @@
   134: push 0
   135: push 0
   136: put
-# test/attributes.p, 25: 	putln(E`max)
+# test/attributes.p, 25: 	put_line(E`max)
   137: push 2
   138: push 1
   139: push 0
   140: push 0
 # test/attributes.p, 26: 
 # test/attributes.p, 27: endprog
-  141: putln
+  141: put_line
 # test/attributes.p, 28: 
 # test/attributes.p, 29: 
   142: ret 0

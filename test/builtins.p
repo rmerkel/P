@@ -16,16 +16,16 @@ begin
 
 	put_line(true);				{ true				}
 	put_line(false);			{ false				}
-	put_line(character_min);	{ 0					}
- 	put_line(character_max);	{ 127				}
-	put_line(integer_min);		{ -2,147,483,648	}
-	put_line(integer_max);		{ 2,147,483,647		}
-	put_line(natural_min);		{ 0					}
-	put_line(natural_max);		{ 2,147,483,647		}
-	put_line(positive_min);		{ 1					}
-	put_line(positive_max);		{ 2,147,483,647		}
-	put_line(real_min);			{ 2.225074e-308		}
-	put_line(real_max);			{ 1.797693e+308		}
+	put_line(character`min);	{ 0					}
+ 	put_line(character`max);	{ 127				}
+	put_line(integer`min);		{ -2,147,483,648	}
+	put_line(integer`max);		{ 2,147,483,647		}
+	put_line(natural`min);		{ 0					}
+	put_line(natural`max);		{ 2,147,483,647		}
+	put_line(positive`min);		{ 1					}
+	put_line(positive`max);		{ 2,147,483,647		}
+	put_line(real`min);			{ 2.225074e-308		}
+	put_line(real`max);			{ 1.797693e+308		}
 	
 	put_line(abs(1));			{ 1			}
 	put_line(abs(-1));			{ 1			}
@@ -59,7 +59,7 @@ begin
 
 	put_line(PI, 7, 5);
 
-	put_line(E_min);
-	put_line(E_max)
+	put_line(E`min);
+	put_line(E`max)
 endprog
 

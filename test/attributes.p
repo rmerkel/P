@@ -5,24 +5,24 @@ type
 	E is ( X, Y, Z );
 begin
 	put("integer`min: ");
-	putln(integer`min);
+	put_line(integer`min);
 	put("integer`max: ");
-	putln(integer`max);
+	put_line(integer`max);
 
 	put("R`min: ");
-	putln(R`min);
+	put_line(R`min);
 	put("R`max: ");
-	putln(R`max);
+	put_line(R`max);
 
 	put("A`min: ");
-	putln(A`min);
+	put_line(A`min);
 	put("A`max: ");
-	putln(A`max);
+	put_line(A`max);
 
 	put("E`min: ");
-	putln(E`min);
+	put_line(E`min);
 	put("E`max: ");
-	putln(E`max)
+	put_line(E`max)
 
 endprog
 
