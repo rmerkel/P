@@ -343,7 +343,7 @@ ostream& operator<<(std::ostream& os, const Token::Kind& kind) {
 	case Token::BitXor:		os << "bxor";			break;
 
 	case Token::ShiftLeft:	os << "sleft";			break;
-	case Token::ShiftRight:	os << "sleft";			break;
+	case Token::ShiftRight:	os << "sright";			break;
 
 	case Token::Add:		os << "+";				break;
 	case Token::Subtract:	os << "-";				break;

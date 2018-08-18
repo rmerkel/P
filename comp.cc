@@ -383,11 +383,7 @@ TDescPtr PComp::builtInFunc(int level)
 }
 
 /********************************************************************************************//**
- * ident                                |
- * round ( expr )						|
- * ident [ ( expr-lst ) ]				|
- * number                               |
- * ( expr )
+ * identifier | number | not factor |  character | string | ident ( expr-list) | ( expression )
  * 
  * @param	level	The current block level.
  * @param	var		True if factor will be passed to a var parameter
@@ -397,7 +393,7 @@ TDescPtr PComp::builtInFunc(int level)
 TDescPtr PComp::factor(int level, bool var) {
 	LogLevel	lvl;
 	if (verbose)
-		cout << prefix(progName) << "factor (" << level << ", " << boolalpha << var << ")\n";
+		cout << prefix(progName) << "factor(" << level << ", " << boolalpha << var << ")\n";
 
 	auto type = TypeDesc::newIntDesc();			// Factor data type
 	if (accept(Token::Identifier, false)) {		// Copy, and then consume the identifer...
@@ -461,7 +457,7 @@ TDescPtr PComp::factor(int level, bool var) {
 }
 
 /********************************************************************************************//**
- * fact { ( * | / | mod | and ) fact } ;
+ * fact { ( * | / | mod | band | and ) fact } ;
  *
  * @param	level	The current block level 
  * @param	var		True if term will be passed to a var parameter
@@ -488,7 +484,7 @@ TDescPtr PComp::term(int level, bool var) {
 			emit(OpCode::REM);
 
 		} else if (accept(Token::BitAnd)) {
-			lhs = promote(lhs, unary(level, var));
+			lhs = promote(lhs, factor(level, var));
 			emit(OpCode::BAND);
 			
 		} else if (accept(Token::And)) {
@@ -503,12 +499,12 @@ TDescPtr PComp::term(int level, bool var) {
 }
 
 /********************************************************************************************//**
- * [ ( + | - ] term
+ * [ ( + | - | bnot ] term
  *
  * @param	level	The current block level 
  * @param	var		True if unary will be passed to a var parameter
  *
- * @return	Data type 
+ * @return	Data type.
  ************************************************************************************************/
 TDescPtr PComp::unary(int level, bool var) {
 	LogLevel	lvl;
@@ -534,12 +530,12 @@ TDescPtr PComp::unary(int level, bool var) {
 }
 
 /********************************************************************************************//**
- * term { (+ | - | or ) term } ;
+ * term { (+ | - | bor | bxor | sleft | sright | or ) term } ;
  *
  * @param	level	The current block level. 
  * @param	var		True if simple-expr will be passed to a var parameter
  *
- * @return	Data type  
+ * @return	Data type.
  ************************************************************************************************/
 TDescPtr PComp::simpleExpr(int level, bool var) {
 	LogLevel	lvl;
@@ -584,12 +580,12 @@ TDescPtr PComp::simpleExpr(int level, bool var) {
 }
 
 /********************************************************************************************//**
- * simpleExpr { (< | <= | = | >= | > | <> ) simpleExpr } ;
+ * simpleExpr { ( < | <= | = | >= | > | <> ) simpleExpr } ;
  *
  * @param	level	The current block level 
  * @param	var		True if expression will be passed to a var parameter
  *
- * @return	Data type. 
+ * @return	Data type.
  ************************************************************************************************/
 TDescPtr PComp::expression(int level, bool var) {
 	LogLevel	lvl;
@@ -650,12 +646,42 @@ TDescPtrVec	PComp::expressionList(int level) {
 }
 
 /********************************************************************************************//**
- * [ + | - ] number | (const) identifer
+ * Promote binary constant-expression  operands as necessary. 
+ *
+ * Converts lhs or rhs to a Real as necessary.
+ *
+ * @param	lhs	The left-hand-side operand
+ * @param	rhs	The right-hand-side  operand
+ ************************************************************************************************/
+void PComp::constPromote(Datum& lhs, Datum& rhs) {
+	if (lhs.kind() == lhs.kind())
+		;									// nothing to do
+
+	else if ((lhs.kind() == Datum::Integer	&& rhs.kind() == Datum::Integer) ||
+			 (lhs.kind() == Datum::Real		&& rhs.kind() == Datum::Real))
+		;									// nothing to do, again
+
+	else if (lhs.kind() == Datum::Integer && rhs.kind() == Datum::Real)
+		lhs = lhs.integer() * 1.0;			// convert lhs to a real
+
+	else if (lhs.kind() == Datum::Real && rhs.kind() == Datum::Integer)
+		rhs = rhs.integer() * 1.0;			// convert rhs to a real
+
+	else
+		error("incompatable binary types");
+}
+
+/********************************************************************************************//**
+ * identifier | number | ( const-expression )
  *
  * @return A boolean, constant value pair. Second is valid only if first is true.
  ************************************************************************************************/
-pair<bool,Datum> PComp::constExpr() {
-	auto value = make_pair(true, Datum(0));
+PComp::ConstExprValue PComp::constFactor() {
+	LogLevel	lvl;
+	if (verbose)
+		cout << prefix(progName) << "constant-factor ()\n";
+
+	ConstExprValue value = make_pair(true, Datum(0));
 	int sign = 1;
 
 	if (accept(Token::Add))
@@ -671,22 +697,236 @@ pair<bool,Datum> PComp::constExpr() {
 		value.second = sign * ts.current().real_value;
 		next();										// Consume the number
 
-	} else if (accept(Token::Identifier, false)) {
-		// Copy, and then, consume the identifier..
+	} else if (accept(Token::Identifier, false)) {	// Copy, and then, consume the identifier..
 		auto it = lookup(ts.current().string_value);
-		expect(Token::Identifier);
+		next(); 									// consume the identifier
 
-		if (it != symtbl.end()) {
-			if (it->second.kind() == SymValue::Constant)
-				value.second = Datum(sign) * it->second.value();
-			else
-				error("Identifier is not a constant, variable or function", it->first);
+		switch (it->second.kind()) {
+		case SymValue::Type: {
+			expect(Token::Tick);
+			const string attrib = ts.current().string_value;
+			if (expect(Token::Identifier)) {
+				if (attrib == "min") {
+					if (it->second.type()->tclass() == TypeDesc::Pointer)
+						error("min attribute not defined for pointers", it->first);
+					else if (it->second.type()->tclass() == TypeDesc::Record)
+						error("min attribute not defined for records", it->first);
+					else if (it->second.type()->tclass() == TypeDesc::Real)
+						value.second = numeric_limits<double>::min();
+					else 
+						value.second = it->second.type()->range().min();
+
+				} else if (attrib == "max") {
+					if (it->second.type()->tclass() == TypeDesc::Pointer)
+						error("max attribute not defined for pointers", it->first);
+						else if (it->second.type()->tclass() == TypeDesc::Record)
+							error("max attribute not defined for records", it->first);
+						else if (it->second.type()->tclass() == TypeDesc::Real)
+							value.second = numeric_limits<double>::max();
+						else
+							value.second = it->second.type()->range().max();
+					}
+				}
+			}
+			break;
+
+		case SymValue::Constant:
+			value.second = Datum(sign) * it->second.value();
+			break;
+
+		default:
+			error("Identifier is not a constant or type attribute ", it->first);
 		}
+
+	} else if (accept(Token::OpenParen)) {
+		value = constExpr();
+		expect(Token::CloseParen);
 
 	} else
 		value.first = false;
+		
+	return value;
+}
+
+/********************************************************************************************//**
+ * const-fact { ( * | / | mod | and ) const-fact } ;
+ *
+ * @return A boolean, constant value pair. Second is valid only if first is true.
+ ************************************************************************************************/
+PComp::ConstExprValue PComp::constTerm() {
+	LogLevel	lvl;
+	if (verbose)
+		cout << prefix(progName) << "constant-terminal()\n";
+
+	ConstExprValue lhs = constFactor();
+	ConstExprValue rhs = make_pair(false, Datum(0));
+	for (;;) {
+		if (accept(Token::Multiply)) {
+			rhs = constSimpleExpr();
+			constPromote(lhs.second, rhs.second);
+			lhs.second *= rhs.second;
+			
+		} else if (accept(Token::Divide)) {
+			rhs = constSimpleExpr();
+			constPromote(lhs.second, rhs.second);
+			lhs.second /= rhs.second;
+			
+		} else if (accept(Token::Mod)) {
+			rhs = constSimpleExpr();
+			constPromote(lhs.second, rhs.second);
+			lhs.second *= rhs.second;
+
+		} else if (accept(Token::BitAnd)) {
+			rhs = constSimpleExpr();
+			constPromote(lhs.second, rhs.second);
+			lhs.second *= rhs.second;
+			
+		} else if (accept(Token::And)) {
+			rhs = constSimpleExpr();
+			constPromote(lhs.second, rhs.second);
+			lhs.second *= rhs.second;
+
+		} else
+			break;
+	}
+
+	return lhs;
+}
+
+/********************************************************************************************//**
+ * [ ( + | - | bnot ] const-term
+ *
+ * @return A boolean, constant value pair. Second is valid only if first is true.
+ ************************************************************************************************/
+PComp::ConstExprValue PComp::constUnary() {
+	LogLevel	lvl;
+	if (verbose)
+		cout << prefix(progName) << "constant-unary()\n";
+
+	ConstExprValue value = make_pair(false, Datum(0));
+	if (accept(Token::Add)) 
+		value = constTerm();				// ignore unary + 
+
+	else if (accept(Token::Subtract)) {
+		value = constTerm();
+		value.second = -value.second;
+
+	} else if (accept(Token::BitNot)) {
+		value = constTerm();
+		value.second = ~value.second;
+
+	} else									
+		value = constTerm();
 
 	return value;
+}
+
+/********************************************************************************************//**
+ * const-unary { + | - | | | ^ | sleft | sright | or ;
+ *
+ * @return A boolean, constant value pair. Second is valid only if first is true.
+ ************************************************************************************************/
+PComp::ConstExprValue PComp::constSimpleExpr() {
+	LogLevel	lvl;
+	if (verbose)
+		cout << prefix(progName) << "constant-simple-expression()\n";
+
+	ConstExprValue lhs = constUnary();
+	ConstExprValue rhs = make_pair(false, Datum(0));
+	for (;;) {
+		if (accept(Token::Add)) {
+			rhs = constSimpleExpr();
+			constPromote(lhs.second, rhs.second);
+			lhs.second += rhs.second;
+
+		} else if (accept(Token::Subtract)) {
+			rhs = constSimpleExpr();
+			constPromote(lhs.second, rhs.second);
+			lhs.second - rhs.second;
+
+		} else if (accept(Token::BitOr)) {
+			rhs = constSimpleExpr();
+			constPromote(lhs.second, rhs.second);
+			lhs.second |= rhs.second;
+
+		} else if (accept(Token::BitXor)) {
+			rhs = constSimpleExpr();
+			constPromote(lhs.second, rhs.second);
+			lhs.second ^= rhs.second;
+
+		} else if (accept(Token::ShiftLeft)) {
+			rhs = constSimpleExpr();
+			constPromote(lhs.second, rhs.second);
+			lhs.second = lhs.second << rhs.second;
+
+		} else if (accept(Token::ShiftRight)) {
+			rhs = constSimpleExpr();
+			constPromote(lhs.second, rhs.second);
+			lhs.second = lhs.second >> rhs.second;
+
+		} else if (accept(Token::Or)) {
+			rhs = constSimpleExpr();
+			constPromote(lhs.second, rhs.second);
+			lhs.second = lhs.second || rhs.second;
+
+		} else
+			break;
+	}
+
+	return lhs;
+}
+
+/********************************************************************************************//**
+ * const-simple-expr { <= | < | > | >= | = | <> const-simple-expr
+ *
+ * @return A boolean, constant value pair. Second is valid only if first is true.
+ ************************************************************************************************/
+PComp::ConstExprValue PComp::constExpr() {
+	LogLevel	lvl;
+
+	if (verbose)
+		cout << prefix(progName) << "constant-expression()\n";
+
+	ConstExprValue lhs = constSimpleExpr();
+	ConstExprValue rhs = make_pair(false, Datum(0));
+	if (lhs.first) {
+		for (;;) {
+			if (accept(Token::LTE)) {
+				rhs = constSimpleExpr();
+				constPromote(lhs.second, rhs.second);
+				lhs.second = lhs.second <= rhs.second;
+
+			} else if (accept(Token::LT)) {
+				rhs = constSimpleExpr();
+				constPromote(lhs.second, rhs.second);
+				lhs.second = lhs.second <  rhs.second;
+
+			} else if (accept(Token::GT)) {
+				rhs = constSimpleExpr();
+				constPromote(lhs.second, rhs.second);
+				lhs.second = lhs.second >  rhs.second;
+
+			} else if (accept(Token::GTE)) {
+				rhs = constSimpleExpr();
+				constPromote(lhs.second, rhs.second);
+				lhs.second = lhs.second >= rhs.second;
+			
+			} else if (accept(Token::EQU)) {
+				rhs = constSimpleExpr();
+				constPromote(lhs.second, rhs.second);
+				lhs.second = lhs.second == rhs.second;
+
+			} else if (accept(Token::NEQ)) {
+				rhs = constSimpleExpr();
+				constPromote(lhs.second, rhs.second);
+				lhs.second = lhs.second != rhs.second;
+
+			} else
+				break;
+		}
+	}
+
+	return lhs;
 }
 
 /********************************************************************************************//**
@@ -878,16 +1118,6 @@ TDescPtr PComp::attribute(SymbolTableIter it, TDescPtr type) {
 				type = type->itype();		// Return arrays index type
 			} else
 				emit(OpCode::PUSH, 0, type->range().max());
-
-		} else if (attrib == "prev") {
-			if (type->ordinal())
-				error("prev requires an ordinal value, got", it->first);
-			emit(OpCode::SUCC, 0, type->range().min());
-
-		} else if (attrib == "next") {
-			if (type->ordinal())
-				error("prev requires an ordinal value, got", it->first);
-			emit(OpCode::PRED, 0, type->range().min());
 
 		} else 
 			error("unknown attribute", attrib);

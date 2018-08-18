@@ -1,0 +1,134 @@
+# test/constexpr.p, 1: program TestConstExpr() is 
+# test/constexpr.p, 2: const i = 0;
+    0: calli 0, 2
+    1: halt
+# test/constexpr.p, 3: 	  j = 1+2;
+# test/constexpr.p, 4: 	  k = j*10/2;
+# test/constexpr.p, 5: 	  l = k < 2;
+# test/constexpr.p, 6: 	  m = k sleft 2;
+# test/constexpr.p, 7: 	  n = j*(10/2);
+# test/constexpr.p, 8: 	  p = integer`max;
+# test/constexpr.p, 9: 
+# test/constexpr.p, 10: begin
+# test/constexpr.p, 11: 	put("i = ");
+    2: push 'i'
+    3: push ' '
+    4: push '='
+    5: push ' '
+    6: push 4
+    7: push 0
+    8: push 0
+    9: put
+# test/constexpr.p, 12: 	putln(i);
+   10: push 0
+   11: push 1
+   12: push 0
+   13: push 0
+   14: putln
+# test/constexpr.p, 13: 
+# test/constexpr.p, 14: 	put("j = ");
+   15: push 'j'
+   16: push ' '
+   17: push '='
+   18: push ' '
+   19: push 4
+   20: push 0
+   21: push 0
+   22: put
+# test/constexpr.p, 15: 	putln(j);
+   23: push 3
+   24: push 1
+   25: push 0
+   26: push 0
+   27: putln
+# test/constexpr.p, 16: 
+# test/constexpr.p, 17: 	put("k = ");
+   28: push 'k'
+   29: push ' '
+   30: push '='
+   31: push ' '
+   32: push 4
+   33: push 0
+   34: push 0
+   35: put
+# test/constexpr.p, 18: 	putln(k);
+   36: push 15
+   37: push 1
+   38: push 0
+   39: push 0
+   40: putln
+# test/constexpr.p, 19: 
+# test/constexpr.p, 20: 	put("l = ");
+   41: push 'l'
+   42: push ' '
+   43: push '='
+   44: push ' '
+   45: push 4
+   46: push 0
+   47: push 0
+   48: put
+# test/constexpr.p, 21: 	putln(l); 
+   49: push 0
+   50: push 1
+   51: push 0
+   52: push 0
+   53: putln
+# test/constexpr.p, 22: 
+# test/constexpr.p, 23: 	put("m = ");
+   54: push 'm'
+   55: push ' '
+   56: push '='
+   57: push ' '
+   58: push 4
+   59: push 0
+   60: push 0
+   61: put
+# test/constexpr.p, 24: 	putln(m);
+   62: push 60
+   63: push 1
+   64: push 0
+   65: push 0
+   66: putln
+# test/constexpr.p, 25: 
+# test/constexpr.p, 26: 	put("n = ");
+   67: push 'n'
+   68: push ' '
+   69: push '='
+   70: push ' '
+   71: push 4
+   72: push 0
+   73: push 0
+   74: put
+# test/constexpr.p, 27: 	putln(n);
+   75: push 15
+   76: push 1
+   77: push 0
+   78: push 0
+   79: putln
+# test/constexpr.p, 28: 
+# test/constexpr.p, 29: 	put("p = ");
+   80: push 'p'
+   81: push ' '
+   82: push '='
+   83: push ' '
+   84: push 4
+   85: push 0
+   86: push 0
+   87: put
+# test/constexpr.p, 30: 	putln(p)
+   88: push 2147483647
+   89: push 1
+   90: push 0
+   91: push 0
+# test/constexpr.p, 31: endprog
+   92: putln
+# test/constexpr.p, 32: 
+   93: ret 0
+
+i = 0
+j = 3
+k = 15
+l = false
+m = 60
+n = 15
+p = 2147483647
