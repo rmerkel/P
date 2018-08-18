@@ -40,4 +40,4 @@ Version | Description
  0.44   | Add check for functions with no return statements
  0.45   | Add return statement
  0.46   | Replace xxx_min/max with `min, `max attributes.
- ?.??   | Extend const-expressions to include +, /, etc.
+ 0.47   | Extend const-expressions to include +, /, etc.
