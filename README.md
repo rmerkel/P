@@ -21,7 +21,7 @@ standard output.
 
 The compiler started life as a copy of the C example;
 [Recursive Descent Parser]
-(https://en.wikipedia.org/wiki/Recursive_descent_parser/), modified to emit code
+(https://en.wikipedia.org/wiki/Recursive_descent_parser), modified to emit code
 per Wirth's interpret procedure while using the TokenStream (TokenStream) from
 "The C++ Programming Language," 4th Edition, by Stroustrup, modified to support
 the PL/0 dialect, and thus Pascal. By default, PComp writes error messages on 
