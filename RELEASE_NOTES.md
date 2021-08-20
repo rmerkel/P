@@ -1,5 +1,5 @@
 Version | Description
--------: | --------------
+------: | --------------
   0.1   | Initial fork form pl0c, modified to use =, <> etc.
   0.2   | Program declaraction
   0.3   | Removed the C/C++ bit and shift operations
