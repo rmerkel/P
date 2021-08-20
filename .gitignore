@@ -13,11 +13,11 @@
 # Eclipse files
 .metadata
 RemoteSystemsTempFiles
+Debug
+Release
 
 # Project files
 docs
 objs
-Debug
-Release
 p
 objs
