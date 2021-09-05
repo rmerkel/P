@@ -2335,7 +2335,7 @@ size_t PComp::blockDecl(SymbolTableEntry& context, int level, Token::Kind end) {
 	/* Block body
 	 *
 	 * Emit the block's prefix, saving and return its address, followed by the postfix. Omit the prefix
-	 * if dx == 0 (the subroutine has zero locals.
+	 * if dx == 0 (the subroutine has zero locals).
 	 */
 
 	const size_t addr = dx > 0 ? emit(OpCode::ENTER, 0, dx) : code->size();
@@ -2352,9 +2352,9 @@ size_t PComp::blockDecl(SymbolTableEntry& context, int level, Token::Kind end) {
 }
 
 /********************************************************************************************//**
- * @param	level	Top level block number
  ************************************************************************************************/
-void PComp::progDecl(int level) {
+void PComp::progDecl() {
+	constexpr int level = 0;
 	next();										// Fetch the 1st token
 
 	expect(Token::ProgDecl);					// Program heading...
@@ -2376,7 +2376,7 @@ void PComp::progDecl(int level) {
 
 /********************************************************************************************//**
  ************************************************************************************************/
-void PComp::run()								{	progDecl(0);	}
+void PComp::run()								{	progDecl();	}
 
 // public:
 
