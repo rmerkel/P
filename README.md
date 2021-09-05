@@ -88,7 +88,7 @@ See [Extended Backus Naur Form](https://en.wikipedia.org/wiki/Extended_Backus%E2
            const-expr = const-simple-expr { expr-op const-simple-expr } ;
     const-simple-expr = [ simple-expr-pre] const-term { simple-expr-op const-term } ;
            const-term = const-fact { term-op  const-fact } ;
-           const-fact = ident | attribute | number | '(' const-expr ')' ;
+           const-fact = ident | attr-fact | number | '(' const-expr ')' ;
              expr-lst = expr { ',' expr } ;
                  expr = simple-expr { expr-op simple-expr } ;
               expr-op = '<' | "<=" | '=' | ">=" | '>' | "<>" simple-expr ;
@@ -97,7 +97,7 @@ See [Extended Backus Naur Form](https://en.wikipedia.org/wiki/Extended_Backus%E2
        simple-expr-op = '+' | '-' | "bor" | "bxor" | "sleft" | "sright" | "or' ;
              terminal = fact { term-op  fact } ;
               term-op = '*' | '/' | "rem" | "band" | | "and" ;
-               fact = variable | attribute | character | string |
+                 fact = variable | attr-fact | character | string |
                         ident '(' [ expr-lst ] ')'              |
                         "round" '(' expr ')'                    |
                         number                                  |
@@ -106,11 +106,14 @@ See [Extended Backus Naur Form](https://en.wikipedia.org/wiki/Extended_Backus%E2
        composite-desc = '[' expr-lst ']'                        |
                         '.' ident                               |
                         '^' ident ;
-            attribute = ident '`' ident ;
+            attr-fact = ident '`' "min" | "max" ;
             character = nul | sox | .. | '}' | '`' | del ;
                string = '"' { character } '"' ;
                number = whole-number | floting-point-number ;
-                ident = [ '_' ] { alpha-numeric-character } ;
+               letter = "A" | "B" | "C" | ... | "Y" | "Z" |
+                        "a" | "b" | "c" | ... | "y" | "z" ;
+                digit = "0" | "1" | "2" | "3" | "4" | "5" | "6" | "7" | "8" | "9" ;
+                ident = [ '_' | letter ] { letter | digit | '_' } ;
 
      {} Repeat zero or more times
      [] Optional; zero or *one* times
@@ -157,9 +160,7 @@ TBD
    variable is used. Alternatively, variables could have default values.
  * Allow pointers to point to any variable, thus pass by reference would be
    similar to C, e.g, pass a pointer.
- * In place of object attributes (ADA), add more built-ins, e.g., min(integer)
-   and not integer'min.
- * Add object attributes, similar to ADA... but
+ * Add object attributes, similar to ADA.
  * Bit operators in place of Pascal sets; bit_and, bit_or, ..., shift_left,
    shift_right.
  * Return statement is similar to pascals to func := expr, followed by return
@@ -179,15 +180,20 @@ TBD
    expr without emitting any code to evaluate the expr.
 
 ## Configuration
-* Configure cc/c++ as clang:
+* Add clang as a cc/c++ alternative:
 ```
-	sudo update-alternatives --install /usr/bin/cc cc /usr/bin/clang 100
-	sudo update-alternatives --install /usr/bin/c++ c++ /usr/bin/clang++ 100
+	sudo update-alternatives --install /usr/bin/cc cc /usr/bin/clang 10
+	sudo update-alternatives --install /usr/bin/c++ c++ /usr/bin/clang++ 10
 ```
-* Configure cc/C++ as gcc:
+* Add gcc as a cc/c++ alternative:
 ```
-	sudo update-alternatives --install /usr/bin/cc cc /usr/bin/gcc 100
-	sudo update-alternatives --install /usr/bin/c++ c++ /usr/bin/g++ 100
+	sudo update-alternatives --install /usr/bin/cc cc /usr/bin/gcc 20
+	sudo update-alternatives --install /usr/bin/c++ c++ /usr/bin/g++ 20
+```
+* To select gcc or clang:
+```
+	sudo update-alternatives --config cc
+	sudo update-alternatives --config c++
 ```
 
 ## Author
