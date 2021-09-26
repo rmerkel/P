@@ -1,3 +1,5 @@
+# Release Notes
+
 Version | Description
 ------: | --------------
   0.1   | Initial fork form pl0c, modified to use =, <> etc.
@@ -41,3 +43,5 @@ Version | Description
  0.45   | Add return statement
  0.46   | Replace xxx_min/max with `min, `max attributes.
  0.47   | Extend const-expressions to include +, /, etc.
+ 0.48   | band, bor .. sright -> bit_and, bit_or .. bit_sright
+

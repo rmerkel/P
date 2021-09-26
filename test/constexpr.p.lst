@@ -5,7 +5,7 @@
 # test/constexpr.p, 3: 	  j = 1+2;
 # test/constexpr.p, 4: 	  k = j*10/2;
 # test/constexpr.p, 5: 	  l = k < 2;
-# test/constexpr.p, 6: 	  m = k sleft 2;
+# test/constexpr.p, 6: 	  m = k bit_sleft 2;
 # test/constexpr.p, 7: 	  n = j*(10/2);
 # test/constexpr.p, 8: 	  p = integer`max;
 # test/constexpr.p, 9: 

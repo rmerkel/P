@@ -457,7 +457,7 @@ TDescPtr PComp::factor(int level, bool var) {
 }
 
 /********************************************************************************************//**
- * fact { ( * | / | mod | band | and ) fact } ;
+ * fact { ( * | / | mod | bit_and | and ) fact } ;
  *
  * @param	level	The current block level 
  * @param	var		True if term will be passed to a var parameter
@@ -499,7 +499,7 @@ TDescPtr PComp::term(int level, bool var) {
 }
 
 /********************************************************************************************//**
- * [ ( + | - | bnot ] term
+ * [ ( + | - | bit_not ] term
  *
  * @param	level	The current block level 
  * @param	var		True if unary will be passed to a var parameter
@@ -530,7 +530,7 @@ TDescPtr PComp::unary(int level, bool var) {
 }
 
 /********************************************************************************************//**
- * term { (+ | - | bor | bxor | sleft | sright | or ) term } ;
+ * term { (+ | - | bit_or | bit_xor | bit_sleft | bit_sright | or ) term } ;
  *
  * @param	level	The current block level. 
  * @param	var		True if simple-expr will be passed to a var parameter
@@ -794,7 +794,7 @@ PComp::ConstExprValue PComp::constTerm() {
 }
 
 /********************************************************************************************//**
- * [ ( + | - | bnot ] const-term
+ * [ ( + | - | bit_not ] const-term
  *
  * @return A boolean, constant value pair. Second is valid only if first is true.
  ************************************************************************************************/
@@ -822,7 +822,7 @@ PComp::ConstExprValue PComp::constUnary() {
 }
 
 /********************************************************************************************//**
- * const-unary { + | - | | | ^ | sleft | sright | or ;
+ * const-unary { + | - | | | ^ | bit_sleft | bit_sright | or ;
  *
  * @return A boolean, constant value pair. Second is valid only if first is true.
  ************************************************************************************************/

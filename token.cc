@@ -219,10 +219,12 @@ TokenStream::KeywordTable	TokenStream::keywords = {
 	{	"array",		Token::Array		},
 	{	"arctan",		Token::Atan			},
 	{	"begin",		Token::Begin		},
-	{	"band",			Token::BitAnd		},
-	{	"bnot",			Token::BitNot		},
-	{	"bor",			Token::BitOr		},
-	{	"bxor",			Token::BitXor		},
+	{	"bit_and",		Token::BitAnd		},
+	{	"bit_not",		Token::BitNot		},
+	{	"bit_or",		Token::BitOr		},
+	{	"bit_sleft",	Token::ShiftLeft	},
+	{	"bit_sright",	Token::ShiftRight	},
+	{	"bit_xor",		Token::BitXor		},
 	{   "const",		Token::ConsDecl		},
 	{	"dispose",		Token::Dispose		},
 	{	"elif",			Token::Elif			},
@@ -255,8 +257,6 @@ TokenStream::KeywordTable	TokenStream::keywords = {
 	{	"return",		Token::Return		},
 	{	"reverse",		Token::Reverse		},
 	{	"round",		Token::Round		},
-	{	"sleft",		Token::ShiftLeft	},
-	{	"sright",		Token::ShiftRight	},
 	{	"sin",			Token::Sin			},
 	{	"sqr",			Token::Sqr			},
 	{	"sqrt",			Token::Sqrt			},
@@ -337,13 +337,13 @@ ostream& operator<<(std::ostream& os, const Token::Kind& kind) {
 	case Token::Or:			os << "or";				break;
 	case Token::And:		os << "and";			break;
 
-	case Token::BitNot:		os << "bnot";			break;
-	case Token::BitAnd:		os << "band";			break;
-	case Token::BitOr:		os << "bor";			break;
-	case Token::BitXor:		os << "bxor";			break;
+	case Token::BitNot:		os << "bit_not";		break;
+	case Token::BitAnd:		os << "bit_and";		break;
+	case Token::BitOr:		os << "bit_or";			break;
+	case Token::BitXor:		os << "bit_xor";		break;
 
-	case Token::ShiftLeft:	os << "sleft";			break;
-	case Token::ShiftRight:	os << "sright";			break;
+	case Token::ShiftLeft:	os << "bit_sleft";		break;
+	case Token::ShiftRight:	os << "bit_sright";		break;
 
 	case Token::Add:		os << "+";				break;
 	case Token::Subtract:	os << "-";				break;

@@ -3,7 +3,7 @@ const i = 0;
 	  j = 1+2;
 	  k = j*10/2;
 	  l = k < 2;
-	  m = k sleft 2;
+	  m = k bit_sleft 2;
 	  n = j*(10/2);
 	  p = integer`max;
 

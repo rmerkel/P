@@ -39,6 +39,7 @@ SRCS	= $(wildcard *.cc)
 ALLSRCS	= $(SRCS) $(wildcard *.h)
 OBJS	= $(addprefix $(OBJDIR)/,$(SRCS:.cc=.o))
 DEPS	= $(addprefix $(OBJDIR)/,$(SRCS:.cc=.d))
+DOCS	= $(wildcard *.md)
 EXE		= p
 
 LSTINGS = $(wildcard *p.lst)
@@ -95,7 +96,7 @@ cleanall: clean
 
 $(DOCDIR):	$(DOCDIR)/html/index.html
 
-$(DOCDIR)/html/index.html:	Doxyfile $(ALLSRCS) README.md
+$(DOCDIR)/html/index.html:	Doxyfile $(ALLSRCS) $(DOCS)
 	doxygen
 
 ################################################################################
@@ -124,7 +125,7 @@ help:
 ################################################################################
 
 pr:
-	@pr --expand-tabs=4 $(ALLSRCS) Makefile README.md
+	@pr --expand-tabs=4 $(ALLSRCS) Makefile $(DOCS)
 
 ################################################################################
 		assert(false);
